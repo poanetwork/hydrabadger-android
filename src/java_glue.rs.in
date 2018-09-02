@@ -1,0 +1,44 @@
+use android_c_headers::*;
+use Session;
+
+use OnEvent1;
+use OnEvent2;
+use OnEvent3;
+
+foreign_interface!(interface MyObserver1 {
+    self_type OnEvent1;
+
+    onStateChanged = OnEvent1::node_started_1 (&self, start: bool);
+});
+
+foreign_interface!(interface MyObserver2 {
+    self_type OnEvent2;
+
+    onStateChanged = OnEvent2::node_started_2(&self, start: bool);
+});
+
+foreign_interface!(interface MyObserver3 {
+    self_type OnEvent3;
+
+    onStateChanged = OnEvent3::node_started_3(&self, start: bool);
+});
+
+foreigner_class!(class Session {
+    self_type Session;
+    constructor Session::new() -> Session;
+
+    method Session::start_node1(&self);
+    method Session::start_node2(&self);
+    method Session::start_node3(&self);
+
+    method Session::subscribe1(&mut self, _: Box<OnEvent1>);
+    method Session::subscribe2(&mut self, _: Box<OnEvent2>);
+    method Session::subscribe3(&mut self, _: Box<OnEvent3>);
+
+    method Session::after_subscribe(&'static mut self);
+
+    method Session::change1(&self, _: bool);
+    method Session::change2(&self, _: bool);
+    method Session::change3(&self, _: bool);
+});
+

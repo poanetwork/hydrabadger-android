@@ -1,0 +1,17 @@
+
+
+
+[target.aarch64-linux-android]
+ar = "/home/user/hbbft/greetings/NDK/arm64/bin/aarch64-linux-android-ar"
+linker = "/home/user/hbbft/greetings/NDK/arm64/bin/aarch64-linux-android-clang"
+runner = "./run-on-adroid.sh"
+
+[target.arm-linux-androideabi]
+ar = "/home/user/hbbft/greetings/NDK/arm/bin/arm-linux-androideabi-ar"
+linker = "/home/user/hbbft/greetings/NDK/arm/bin/arm-linux-androideabi-clang"
+runner = "./run-on-adroid.sh"
+
+[target.i686-linux-android]
+ar = "/home/user/hbbft/greetings/NDK/x86/bin/i686-linux-android-ar"
+linker = "/home/user/hbbft/greetings/NDK/x86/bin/i686-linux-android-clang"
+runner = "./run-on-adroid.sh"

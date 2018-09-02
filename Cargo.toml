@@ -1,0 +1,88 @@
+[package]
+name = "android"
+version = "0.0.1"
+authors = ["Vladimir Orlov <korul1@yandex.ru>"]
+build = "build.rs"
+
+[lib]
+name = "mobcore"
+crate-type = ["cdylib"]
+
+[features]
+# Used for debugging memory usage.
+exit_upon_epoch_1000 = []
+
+[dependencies]
+log = "0.4"
+log-panics = "2.0"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger =  { git = "https://github.com/Nercury/android_logger-rs" }
+
+
+
+
+env_logger = "0.5"
+clap = "*"
+failure = "*"
+crossbeam = "~0.4.1"
+crossbeam-channel = "*"
+chrono = "*"
+rust-crypto = "*"
+num-traits = "*"
+num-bigint = "*"
+colored = "*"
+itertools = "*"
+pairing = "*"
+rand = "0.4.2"
+serde = "1"
+serde_bytes = "*"
+serde_derive = "1"
+signifix = "*"
+futures = "0.1"
+tokio = "*"
+tokio-codec = "*"
+tokio-io = "*"
+bincode = "0.8"
+tokio-serde = "*"
+tokio-serde-bincode = "*"
+bytes = "*"
+uuid = { version = "0.6", features = ["v4", "serde"] }
+byteorder = "*"
+parking_lot = "*"
+clear_on_drop = "*"
+mio-uds = "0.6"
+mio = "0.6"
+
+
+[dependencies.hbbft]
+version = "*"
+git = "https://github.com/poanetwork/hbbft"
+# branch = "master"
+branch = "add-mlock-error-handling"
+
+[build-dependencies]
+bindgen = "0.37.4"
+syntex = "0.58"
+walkdir = "2"
+rust_swig = "*"
+
+[profile.dev]
+opt-level = 0
+debug = true
+rpath = false
+lto = false
+codegen-units = 8
+panic = 'unwind'
+incremental = true
+overflow-checks = true
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+codegen-units = 1
+panic = 'unwind'
+incremental = false
+overflow-checks = false
