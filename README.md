@@ -1,7 +1,7 @@
 # Hydrabadger
 
 An experimental peer-to-peer client using the [Honey Badger Byzantine Fault
-Tolerant consensus algorithm](https://github.com/poanetwork/hbbft).
+Tolerant consensus algorithm](https://github.com/poanetwork/hbbft) and Mobile messenger based on hbbft consensus 
 
 ## Usage
 
