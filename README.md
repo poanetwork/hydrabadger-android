@@ -7,7 +7,7 @@ Tolerant consensus algorithm](https://github.com/poanetwork/hbbft) and Mobile me
 
 ### Compile
 
-1. `git clone git@github.com:poanetwork/hydrabadger-android.git
+1. `git clone git@github.com:poanetwork/hydrabadger-android.git`
 
 2. set needs environments 
 
