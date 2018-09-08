@@ -47,7 +47,7 @@ const DEFAULT_TXN_GEN_BYTES: usize = 2;
 const DEFAULT_KEYGEN_PEER_COUNT: usize = 2;
 // Causes the primary hydrabadger thread to sleep after every batch. Used for
 // debugging.
-const DEFAULT_OUTPUT_EXTRA_DELAY_MS: u64 = 0;
+const DEFAULT_OUTPUT_EXTRA_DELAY_MS: u64 = 10;
 
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -108,7 +108,7 @@ struct Inner {
 }
 
 
-type CallbackBatch = fn();
+type CallbackBatch = fn(num: i32, its_me: bool, id: String, trans: String);
 
 /// A `HoneyBadger` network node.
 #[derive(Clone)]
@@ -117,11 +117,12 @@ pub struct Hydrabadger {
     handler: Arc<Mutex<Option<Handler>>>,
      // callback Batch
     callbackbatch: CallbackBatch,
+    num: i32,
 }
 
 impl Hydrabadger {
     /// Returns a new Hydrabadger node.
-    pub fn new(addr: SocketAddr, cfg: Config, callbackbatch: CallbackBatch) -> Self {
+    pub fn new(addr: SocketAddr, cfg: Config, callbackbatch: CallbackBatch, num: i32) -> Self {
         use std::env;
         use env_logger;
         use chrono::Local;
@@ -161,23 +162,14 @@ impl Hydrabadger {
         let hdb = Hydrabadger {
             inner,
             handler: Arc::new(Mutex::new(None)),
-            callbackbatch
+            callbackbatch,
+            num,
         };
 
 
-        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, callbackbatch));
+        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, callbackbatch, num));
 
         hdb
-    }
-
-    fn simple_callbackbatch_() {
-        //////
-        ///  println!("hello world!");
-        warn!("hello world!");
-    }
-
-    pub fn set_callbackbatch(&mut self, c: CallbackBatch) {
-        self.callbackbatch = c;
     }
 
     /// Returns the pre-created handler.
@@ -343,16 +335,36 @@ impl Hydrabadger {
 
                 match dsct {
                     StateDsct::Validator => {
-                        warn!("Generating and inputting {} random transactions...", self.inner.config.txn_gen_count);
-                        // Send some random transactions to our internal HB instance.
-                        let txns: Vec<_> = (0..self.inner.config.txn_gen_count).map(|_| {
-                            Transaction::random(self.inner.config.txn_gen_bytes)
-                        }).collect();
-
-                        hdb.send_internal(
-                            InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                            // InternalMessage::hb_message(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                        );
+                        if self.num == 0 {
+                             let txns = Transaction::get_tr1();
+                            if !txns.is_empty() {
+                                warn!("!!send_internal {}", self.num);
+                                hdb.send_internal (
+                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                                );
+                                warn!("!!send_internal__ {}", self.num);
+                            }
+                        }
+                        if self.num == 1 {
+                            let txns = Transaction::get_tr2();
+                            if !txns.is_empty() {
+                                warn!("!!send_internal {}", self.num);
+                                hdb.send_internal (
+                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                                );
+                                warn!("!!send_internal__ {}", self.num);
+                            }
+                        }
+                        if self.num == 2 {
+                            let txns = Transaction::get_tr3();
+                            if !txns.is_empty() {
+                                warn!("!!send_internal {}", self.num);
+                                hdb.send_internal (
+                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                                );
+                                warn!("!!send_internal__ {}", self.num);
+                            }
+                        }
                     },
                     _ => {},
                 }

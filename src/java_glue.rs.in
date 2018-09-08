@@ -1,44 +1,25 @@
 use android_c_headers::*;
 use Session;
 
-use OnEvent1;
-use OnEvent2;
-use OnEvent3;
+use OnEvent;
 
-foreign_interface!(interface MyObserver1 {
-    self_type OnEvent1;
+foreign_interface!(interface MyObserver {
+    self_type OnEvent;
 
-    onStateChanged = OnEvent1::node_started_1 (&self, start: bool);
-});
-
-foreign_interface!(interface MyObserver2 {
-    self_type OnEvent2;
-
-    onStateChanged = OnEvent2::node_started_2(&self, start: bool);
-});
-
-foreign_interface!(interface MyObserver3 {
-    self_type OnEvent3;
-
-    onStateChanged = OnEvent3::node_started_3(&self, start: bool);
+    onStateChanged = OnEvent::changed(&self, ItsMe: bool, id: String, trans: String);
 });
 
 foreigner_class!(class Session {
     self_type Session;
     constructor Session::new() -> Session;
 
-    method Session::start_node1(&self);
-    method Session::start_node2(&self);
-    method Session::start_node3(&self);
+    method Session::send_message(&self, num: i32, str1: String);
 
-    method Session::subscribe1(&mut self, _: Box<OnEvent1>);
-    method Session::subscribe2(&mut self, _: Box<OnEvent2>);
-    method Session::subscribe3(&mut self, _: Box<OnEvent3>);
+    method Session::start_node(&self, ipport_string_source: String, ipports_string_remote: String);
 
+    method Session::subscribe(&mut self, _: Box<OnEvent>);
     method Session::after_subscribe(&'static mut self);
 
-    method Session::change1(&self, _: bool);
-    method Session::change2(&self, _: bool);
-    method Session::change3(&self, _: bool);
+    method Session::change(&self, _: i32, ItsMe: bool, id: String, trans: String);
 });
 

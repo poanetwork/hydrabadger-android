@@ -43,6 +43,7 @@ extern crate hbbft;
 
 use android_logger::Filter;
 use log::Level;
+use parking_lot::{Mutex};
 
 
 #[cfg(feature = "nightly")]
@@ -52,11 +53,9 @@ use alloc_system::System;
 #[global_allocator]
 static A: System = System;
 
-// pub mod network;
 pub mod hydrabadger;
 pub mod blockchain;
 pub mod peer;
-
 
 
 use std::{
@@ -64,7 +63,13 @@ use std::{
     fmt::{self},
     net::{SocketAddr},
     ops::Deref,
+    sync::{
+        Arc,
+    },
+    thread,
+    mem,
 };
+
 
 use futures::{
     StartSend, AsyncSink,
@@ -115,11 +120,82 @@ type InternalRx = mpsc::UnboundedReceiver<InternalMessage>;
 
 /// A transaction.
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Ord, PartialOrd, Debug, Clone)]
-pub struct Transaction(pub Vec<u8>);
+pub struct Transaction(pub String);
+
+static mut M_TEXT1: Option<String> = None;
+static mut M_TEXT2: Option<String> = None;
+static mut M_TEXT3: Option<String> = None;
 
 impl Transaction {
     fn random(len: usize) -> Transaction {
-        Transaction(rand::thread_rng().gen_iter().take(len).collect())
+        let consonants = "bcdfghjk lmnpqrstvwxyz ";
+        let mut result = String::new();
+
+        for _i in 0..len  {
+            result.push(rand::sample(&mut rand::thread_rng(), consonants.chars(), 1)[0]);
+        }
+
+        Transaction(result)
+    }
+
+    fn get_tr1() -> Vec<Transaction> {
+        unsafe {
+            // warn!("!!get_tr1 {}", M_TEXT1 );
+            let mut vec: Vec<Transaction> = Vec::new();
+            match M_TEXT1 {
+                Some(ref mut x) => {
+                    warn!("!!get_tr1  {:?}", x);
+                    vec.push( Transaction(x.to_string()) );
+                    warn!("!!get_tr1 vec {:?}", vec);
+                    M_TEXT1 = None;
+                    vec
+                }
+                None => {
+                    warn!("!!get_tr1 None");
+                    vec
+                }
+            }
+        }
+    }
+
+    fn get_tr2() -> Vec<Transaction> {
+        unsafe {
+            // warn!("!!get_tr2 {}", M_TEXT2);
+            let mut vec: Vec<Transaction> = Vec::new();
+            match M_TEXT2 {
+                Some(ref mut x) => {
+                    warn!("!!get_tr2  {:?}", x);
+                    vec.push( Transaction(x.to_string()) );
+                    warn!("!!get_tr2 vec {:?}", vec);
+                    M_TEXT2 = None;
+                    vec
+                }
+                None => {
+                    warn!("!!get_tr2 None");
+                    vec
+                }
+            }
+        }
+    }
+
+    fn get_tr3() -> Vec<Transaction> {
+        // warn!("!!get_tr3 {}", M_TEXT3);
+        unsafe {
+            let mut vec: Vec<Transaction> = Vec::new();
+            match M_TEXT3 {
+                Some(ref mut x) => {
+                    warn!("!!get_tr3  {:?}", x);
+                    vec.push( Transaction(x.to_string()) );
+                    warn!("!!get_tr3 vec {:?}", vec);
+                    M_TEXT3 = None;
+                    vec
+                }
+                None => {
+                    warn!("!!get_tr3 None");
+                    vec
+                }
+            }
+        }
     }
 }
 
@@ -451,60 +527,38 @@ impl InternalMessage {
     }
 }
 
+
+
+
+
+
+
+
+
 use std::collections::HashSet;
-use std::net::Ipv4Addr;
-use std::net::IpAddr;
 
-
-trait OnEvent1 {
-    fn node_started_1(&self, start: bool);
+trait OnEvent {
+    fn changed(&self, its_me: bool, id: String, trans: String);
 }
 
-trait OnEvent2 {
-    fn node_started_2(&self, start: bool);
-}
-
-trait OnEvent3 {
-    fn node_started_3(&self, start: bool);
-}
-
-
-fn simple_callback1() {
+fn callback(num_call_back: i32, its_me: bool, id: String, trans: String) {
     unsafe {
         match M_SESSION_PTR {
-            Some(ref mut x) => x.change1(true),
-            None => panic!(),
-        } 
-    }
-}
-fn simple_callback2() {
-    unsafe {
-        match M_SESSION_PTR {
-            Some(ref mut x) => x.change2(true),
-            None => panic!(),
-        } 
-    }
-}
-fn simple_callback3() {
-    unsafe {
-        match M_SESSION_PTR {
-            Some(ref mut x) => x.change3(true),
+            Some(ref mut x) => x.change(num_call_back, its_me, id, trans),
             None => panic!(),
         } 
     }
 }
 
 static mut M_SESSION_PTR: Option<&'static mut Session> = None;
-
-
+static mut M_NUM_OF_CALLBACK: i32 = 0;
 
 struct Session {
-    observers1:   Vec<Box<OnEvent1>>,
-    observers2:   Vec<Box<OnEvent2>>,
-    observers3:   Vec<Box<OnEvent3>>,
-    a: i32,
+    observers: Vec<Box<OnEvent>>,
+    handler1: Arc<Mutex<Option<Hydrabadger>>>,
+    handler2: Arc<Mutex<Option<Hydrabadger>>>,
+    handler3: Arc<Mutex<Option<Hydrabadger>>>,
 }
-
 
 impl Session {
     pub fn new() -> Session {
@@ -517,19 +571,14 @@ impl Session {
         log_panics::init(); // log panics rather than printing them
         info!("init log system - done");
 
-        Session { observers1: Vec::new(), 
-                    observers2: Vec::new(), 
-                    observers3: Vec::new(), 
-                    a: 2 }
+        Session {  observers: Vec::new(),
+                    handler1: Arc::new(Mutex::new(None)),
+                    handler2: Arc::new(Mutex::new(None)),
+                    handler3: Arc::new(Mutex::new(None)),}
     }
 
-    pub fn add_and1(&self, val: i32) -> i32 {
-        self.a + val + 1
-    }
-
-    // Greeting with full, no-runtime-cost support for newlines and UTF-8
-    pub fn greet(to: &str) -> String {
-        format!("Hello {} ✋\nIt's a pleasure to meet you!", to)
+    fn subscribe(&mut self, cb: Box<OnEvent>) {
+        self.observers.push(cb);
     }
 
     pub fn after_subscribe(&'static mut self) {
@@ -538,90 +587,114 @@ impl Session {
         }
     }
 
-    fn subscribe1(&mut self, cb: Box<OnEvent1>) {
-        self.observers1.push(cb);
-    }
+    pub fn send_message(&self, num: i32, str1: String) {
+        unsafe {
+            warn!("!!send_message: {:?}", str1);
 
-    fn subscribe2(&mut self, cb: Box<OnEvent2>) {
-        self.observers2.push(cb);
-    }
+            let mut new_string = String::new();
+            new_string = format!("{}!", str1);
 
-    fn subscribe3(&mut self, cb: Box<OnEvent3>) {
-        self.observers3.push(cb);
-    }
 
-    pub fn change1 (&self, x: bool) {
-        for cb in &self.observers1 {
-            cb.node_started_1(x);
+            // let ret = mem::transmute(&str1 as &String);
+            // mem::forget(str1);
+            // let S1: &'static mut String = ret;
+            warn!("!!send_message string: {:?}", new_string);
+
+            if num == 0 {
+                M_TEXT1 = Some(new_string);
+                warn!("!!send_message string1: {:?}", M_TEXT1);
+            }
+            else if num == 1 {
+                M_TEXT2 = Some(new_string);
+                warn!("!!send_message string1: {:?}", M_TEXT2);
+            }
+            else if num == 2 {
+                M_TEXT3 = Some(new_string);
+                warn!("!!send_message string1: {:?}", M_TEXT3);
+            }
         }
     }
 
-    pub fn change2 (&self, x: bool) {
-        for cb in &self.observers2 {
-            cb.node_started_2(x);
+    pub fn change(&self, x: i32, its_me: bool, id: String, trans: String) {
+        let mut i = 0;
+        for cb in &self.observers {
+            if i == x {
+                warn!("Call callback at number: {:?}", i);
+                cb.changed(its_me, id.clone(), trans.clone());
+            }
+            i += 1;
         }
     }
 
-    pub fn change3 (&self, x: bool) {
-        for cb in &self.observers3 {
-            cb.node_started_3(x);
+    pub fn start_node(&self, ipport_string_source: String, ipports_string_remote: String) {
+        unsafe {
+            warn!("enter to startNode: {:?}", M_NUM_OF_CALLBACK.clone());
+        }
+
+        let bind_address: SocketAddr = ipport_string_source.parse().expect("Unable to parse socket address");
+    
+        let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
+        let split = ipports_string_remote.split(";");
+        for address in split {
+            remote_addresses.insert(address.parse().expect("Unable to parse socket address"));
+        }
+
+        let cfg = Config::default();
+         
+        let callback_ = callback;
+
+        unsafe {
+            let num = M_NUM_OF_CALLBACK.clone();
+            // let hb = Hydrabadger::new(bind_address, cfg, callback_, num);
+
+            if num == 0 {
+                *self.handler1.lock() = Some(Hydrabadger::new(bind_address, cfg, callback_, num));
+                M_NUM_OF_CALLBACK += 1;
+                
+                match self.handler1.lock().take() {
+                    Some(v) => {
+                        thread::spawn(move || {
+                            warn!("!!startNode: {:?}", num);
+                            v.run_node(Some(remote_addresses));
+                            warn!("!!started Node: {:?}", num);
+                        });
+                    },
+                    None => {},
+                }
+                warn!("!!match out started Node: {:?}", num);
+            }
+            else if num == 1 {
+                *self.handler2.lock() = Some(Hydrabadger::new(bind_address, cfg, callback_, num));
+                M_NUM_OF_CALLBACK += 1;
+                match self.handler2.lock().take() {
+                    Some(v) => {
+                        thread::spawn(move || {
+                            warn!("!!startNode: {:?}", num);
+                            v.run_node(Some(remote_addresses));
+                            warn!("!!started Node: {:?}", num);
+                        });
+                    },
+                    None => {},
+                }
+                warn!("!!match out started Node: {:?}", num);
+            }
+            else if num == 2 {
+                *self.handler3.lock() = Some(Hydrabadger::new(bind_address, cfg, callback_, num));
+                M_NUM_OF_CALLBACK += 1;
+
+                match self.handler3.lock().take() {
+                    Some(v) => {
+                        thread::spawn(move || {
+                            warn!("!!startNode: {:?}", num);
+                            v.run_node(Some(remote_addresses));
+                            warn!("!!started Node: {:?}", num);
+                        });
+                    },
+                    None => {},
+                }
+                warn!("!!match out started Node: {:?}", num);
+            }
         }
     }
-
-
-
-    pub fn start_node1(&self) {
-        warn!("enter to startNode1");
-        let bind_address: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3000);
-    
-        let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
-        remote_addresses.insert(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3001));
-        remote_addresses.insert(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3002));
-
-        let cfg = Config::default();
-
-        let callbackbatch = simple_callback1;
-
-        let hb = Hydrabadger::new(bind_address, cfg, callbackbatch);
-        warn!("Hydrabadger::new");
-        hb.run_node(Some(remote_addresses));
-        warn!("startNode1");
-    }
-
-    pub fn start_node2(&self) {
-        warn!("enter to startNode2");
-        let bind_address: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3001);
-    
-        let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
-        remote_addresses.insert(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3000));
-        remote_addresses.insert(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3002));
-
-        let cfg = Config::default();
-
-        let callbackbatch = simple_callback2;
-
-        let hb = Hydrabadger::new(bind_address, cfg,  callbackbatch);
-        hb.run_node(Some(remote_addresses));
-        warn!("startNode2");
-    }
-
-
-    pub fn start_node3(&self) {
-        warn!("enter to startNode3");
-        let bind_address: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3002);
-    
-        let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
-        remote_addresses.insert(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3001));
-        remote_addresses.insert(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3000));
-
-        let cfg = Config::default();
-
-        let callbackbatch = simple_callback3;
-
-        let hb = Hydrabadger::new(bind_address, cfg,  callbackbatch);
-        hb.run_node(Some(remote_addresses));
-        warn!("startNode3");
-    }
-
 
 }

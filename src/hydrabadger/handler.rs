@@ -26,10 +26,7 @@ use ::{InternalMessage, InternalMessageKind, WireMessage, WireMessageKind,
 use super::{Hydrabadger, Error, State, StateDsct, InputOrMessage};
 use super::{WIRE_MESSAGE_RETRY_MAX};
 
-
-
-
-type CallbackBatch = fn();
+type CallbackBatch = fn(num: i32, its_me: bool, id: String, trans: String);
 
 /// Hydrabadger event (internal message) handler.
 pub struct Handler {
@@ -43,21 +40,19 @@ pub struct Handler {
 
     // callback Batch
     callbackbatch: CallbackBatch,
+    num: i32,
 }
 
 impl Handler {
 
-    pub fn set_callbackbatch(&mut self, c: CallbackBatch) {
-        self.callbackbatch = c;
-    }
-
-    pub(super) fn new(hdb: Hydrabadger, peer_internal_rx: InternalRx, callbackbatch: CallbackBatch) -> Handler {
+    pub(super) fn new(hdb: Hydrabadger, peer_internal_rx: InternalRx, callbackbatch: CallbackBatch, num: i32) -> Handler {
          Handler {
             hdb,
             peer_internal_rx,
             wire_queue: SegQueue::new(),
             step_queue: SegQueue::new(),
             callbackbatch,
+            num,
         }
     }
 
@@ -171,15 +166,22 @@ impl Handler {
     }
 
     fn handle_message(&self, msg: Message, src_uid: &Uid, state: &mut State) -> Result <(), Error> {
-        trace!("hydrabadger::Handler: HB_MESSAGE: {:?}", msg);
+        warn!("hydrabadger::Handler: HB_MESSAGE: {:?}", msg);
         // match &msg {
         //     // A message belonging to the `HoneyBadger` algorithm started in
         //     // the given epoch.
-        //     DhbMessage::HoneyBadger(start_epoch, ref msg) => {},
+        //     DhbMessage::HoneyBadger(start_epoch, ref msg) => {
+        //         warn!("1!!!1 : {:?}",msg);
+        //     },
         //     // A transaction to be committed, signed by a node.
-        //     DhbMessage::KeyGen(epoch, _key_gen_msg, _sig) => {},
+        //     DhbMessage::KeyGen(epoch, _key_gen_msg, _sig) => {
+        //         warn!("2!!!2 : {:?}", _key_gen_msg);
+        //         warn!("2!!!2 : {:?}", _sig);
+        //     },
         //     // A vote to be committed, signed by a validator.
-        //     DhbMessage::SignedVote(signed_vote) => {},
+        //     DhbMessage::SignedVote(signed_vote) => {
+        //         warn!("3!!!3 : {:?}", signed_vote);
+        //     },
         // }
         trace!("hydrabadger::Handler: About to handle_message....");
         if let Some(step_res) = state.handle_message(src_uid, msg) {
@@ -550,6 +552,7 @@ impl Handler {
             },
 
             InternalMessageKind::HbInput(input) => {
+                warn!("My Message to Other {:?}", input);
                 self.handle_input(input, state)?;
             },
 
@@ -618,6 +621,13 @@ impl Handler {
                     self.handle_join_plan(jp, state, &peers)?;
                 },
 
+                // WireMessageKind::Transactions(uid, tranz)  => {
+                //     for tr in tranz
+                //     {
+                //         warn!("!!!TR {}, {:?}", uid, tr);
+                //     };
+                // },
+
                 wm @ _ => warn!("hydrabadger::Handler::handle_internal_message: Unhandled wire message: \
                     \n{:?}", wm,),
             },
@@ -681,8 +691,25 @@ impl Future for Handler {
             for batch in step.output.drain(..) {
                 warn!("    BATCH: \n{:?}", batch);
 
-                // call
-                (self.callbackbatch)();
+                let mybatch = batch.clone();
+                let epoch = mybatch.epoch();
+                if !mybatch.is_empty() {
+                    for (id, int_contrib) in mybatch.contributions {
+                        let local_uid = *self.hdb.uid();
+                        if !int_contrib.is_empty() {
+                            let id_string = format!("{}", id);
+                            let trans_string = format!("{:?}", int_contrib);
+
+                            if local_uid == id {
+                                // call
+                                (self.callbackbatch)(self.num, true, id_string.clone(), trans_string.clone());
+                            }
+                            else {
+                                (self.callbackbatch)(self.num, false, id_string.clone(), trans_string.clone());
+                            }
+                        }
+                    }
+                }
 
                 if cfg!(exit_upon_epoch_1000) && batch.epoch() >= 1000 {
                     return Ok(Async::Ready(()))
@@ -720,10 +747,11 @@ impl Future for Handler {
                 }
 
                 // TODO: Something useful!
+
             }
 
             for hb_msg in step.messages.drain(..) {
-                trace!("hydrabadger::Handler: Forwarding message: {:?}", hb_msg);
+                warn!("hydrabadger::Handler: Forwarding message: {:?}", hb_msg);
                 match hb_msg.target {
                     Target::Node(p_uid) => {
                         self.wire_to(p_uid, WireMessage::message(*self.hdb.uid(), hb_msg.message), 0, &peers);

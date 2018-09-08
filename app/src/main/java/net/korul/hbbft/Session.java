@@ -10,41 +10,23 @@ public final class Session {
     }
     private static native long init() ;
 
-    public final void start_node1()  {
+    public final void send_message(int a0, @NonNull String a1)  {
 
-        do_start_node1(mNativeObj);
+        do_send_message(mNativeObj, a0, a1);
     }
-    private static native void do_start_node1(long me) ;
+    private static native void do_send_message(long me, int a0, String a1) ;
 
-    public final void start_node2()  {
+    public final void start_node(@NonNull String a0, @NonNull String a1)  {
 
-        do_start_node2(mNativeObj);
+        do_start_node(mNativeObj, a0, a1);
     }
-    private static native void do_start_node2(long me) ;
+    private static native void do_start_node(long me, String a0, String a1) ;
 
-    public final void start_node3()  {
+    public final void subscribe(@NonNull MyObserver a0)  {
 
-        do_start_node3(mNativeObj);
+        do_subscribe(mNativeObj, a0);
     }
-    private static native void do_start_node3(long me) ;
-
-    public final void subscribe1(@NonNull MyObserver1 a0)  {
-
-        do_subscribe1(mNativeObj, a0);
-    }
-    private static native void do_subscribe1(long me, MyObserver1 a0) ;
-
-    public final void subscribe2(@NonNull MyObserver2 a0)  {
-
-        do_subscribe2(mNativeObj, a0);
-    }
-    private static native void do_subscribe2(long me, MyObserver2 a0) ;
-
-    public final void subscribe3(@NonNull MyObserver3 a0)  {
-
-        do_subscribe3(mNativeObj, a0);
-    }
-    private static native void do_subscribe3(long me, MyObserver3 a0) ;
+    private static native void do_subscribe(long me, MyObserver a0) ;
 
     public final void after_subscribe()  {
 
@@ -52,23 +34,11 @@ public final class Session {
     }
     private static native void do_after_subscribe(long me) ;
 
-    public final void change1(boolean a0)  {
+    public final void change(int a0, boolean a1, @NonNull String a2, @NonNull String a3)  {
 
-        do_change1(mNativeObj, a0);
+        do_change(mNativeObj, a0, a1, a2, a3);
     }
-    private static native void do_change1(long me, boolean a0) ;
-
-    public final void change2(boolean a0)  {
-
-        do_change2(mNativeObj, a0);
-    }
-    private static native void do_change2(long me, boolean a0) ;
-
-    public final void change3(boolean a0)  {
-
-        do_change3(mNativeObj, a0);
-    }
-    private static native void do_change3(long me, boolean a0) ;
+    private static native void do_change(long me, int a0, boolean a1, String a2, String a3) ;
 
     public synchronized void delete() {
         if (mNativeObj != 0) {
