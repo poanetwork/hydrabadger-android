@@ -1,13 +1,13 @@
 # Hydrabadger
 
 An experimental peer-to-peer client using the [Honey Badger Byzantine Fault
-Tolerant consensus algorithm](https://github.com/poanetwork/hbbft).
+Tolerant consensus algorithm](https://github.com/poanetwork/hbbft) and Mobile messenger based on hbbft consensus 
 
 ## Usage
 
 ### Compile
 
-1. `git clone -b git@github.com:poanetwork/hydrabadger-android.git
+1. `git clone git@github.com:poanetwork/hydrabadger-android.git`
 
 2. set needs environments 
 
