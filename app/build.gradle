@@ -4,7 +4,17 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'io.fabric'
+
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword '199214'
+            storeFile file('/home/user/project/hydrabadger-android/hydra.jks')
+            storePassword '199214'
+        }
+    }
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
@@ -14,15 +24,14 @@ android {
         versionCode 2
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.config
     }
-
     sourceSets {
         main {
             jni.srcDirs = []
             jniLibs.srcDir 'src/main/libs'
         }
     }
-
     buildTypes {
         release {
             minifyEnabled true
@@ -36,6 +45,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -48,12 +59,15 @@ dependencies {
     api 'com.android.support.constraint:constraint-layout:1.1.0'
     api 'com.android.support:design:28.+'
     testImplementation 'junit:junit:4.12'
-
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-//// Because RxAndroid releases are few and far between, it is recommended you also
-//// explicitly depend on RxJava's latest version for bug fixes and new features.
-//// (see https://github.com/ReactiveX/RxJava/releases for latest 2.x.x version)
+    //// Because RxAndroid releases are few and far between, it is recommended you also
+    //// explicitly depend on RxJava's latest version for bug fixes and new features.
+    //// (see https://github.com/ReactiveX/RxJava/releases for latest 2.x.x version)
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
+        transitive = true;
+    }
 }
 
 def rustBasePath = ".."
@@ -98,4 +112,5 @@ archTriplets.each { arch, target ->
 }
 repositories {
     mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
 }

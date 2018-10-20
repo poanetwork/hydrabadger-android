@@ -5,33 +5,29 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.text.SpannableStringBuilder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.tab1_content.*
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.*
-
-import android.util.Log
-import io.reactivex.Observable
-
-import io.reactivex.android.*
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.locks.ReentrantLock
 
 data class Optional<M>(val value : M?)
 
 class Tab1 : Fragment() {
+    private val lock = ReentrantLock()
 
     private var TAG = "HYDRA"
 
@@ -63,8 +59,10 @@ class Tab1 : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
         return inflater.inflate(R.layout.tab1_content, container, false)
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -72,71 +70,80 @@ class Tab1 : Fragment() {
     }
 
 
+    @SuppressLint("CheckResult")
     private fun startTimerThread1(str: String) {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            handler.post {
-                val text = view?.findViewById<TextView>(R.id.Text1)
-                text?.text = str
-            }
-        }
-        Thread(runnable).start()
+        Observable.just(Optional(null))
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { _ ->
+                    val text = view?.findViewById<TextView>(R.id.Text1)
+                    text?.text = str
+                }
     }
 
+    @SuppressLint("CheckResult")
     private fun startTimerThread2(str: String) {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            handler.post {
-                val text = view?.findViewById<TextView>(R.id.Text2)
-                text?.text = str
-            }
-        }
-        Thread(runnable).start()
+        Observable.just(Optional(null))
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { _ ->
+                    val text = view?.findViewById<TextView>(R.id.Text2)
+                    text?.text = str
+                }
     }
 
+    @SuppressLint("CheckResult")
     private fun startTimerThread3(str: String) {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            handler.post {
-                val text = view?.findViewById<TextView>(R.id.Text3)
-                text?.text = str
-            }
-        }
-        Thread(runnable).start()
+        Observable.just(Optional(null))
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { _ ->
+                    val text = view?.findViewById<TextView>(R.id.Text3)
+                    text?.text = str
+                }
     }
 
 
+    @SuppressLint("CheckResult")
     private fun updateFloatBut1() {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            handler.post {
-                val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton1)
-                fab?.backgroundTintList = ColorStateList.valueOf(0xFF4CAF50.toInt())
-            }
+        val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton1)
+        if(fab?.rippleColorStateList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+            Observable.just(Optional(null))
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { _ ->
+                        val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton1)
+                        fab?.backgroundTintList = ColorStateList.valueOf(0xFF4CAF50.toInt())
+                    }
         }
-        Thread(runnable).start()
     }
 
+    @SuppressLint("CheckResult")
     private fun updateFloatBut2() {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            handler.post {
-                val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton2)
-                fab?.backgroundTintList = ColorStateList.valueOf(0xFF4CAF50.toInt())
-            }
+        val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton2)
+        if(fab?.rippleColorStateList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+            Observable.just(Optional(null))
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { _ ->
+                        val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton2)
+                        fab?.backgroundTintList = ColorStateList.valueOf(0xFF4CAF50.toInt())
+                    }
         }
-        Thread(runnable).start()
     }
 
+    @SuppressLint("CheckResult")
     private fun updateFloatBut3() {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            handler.post {
-                val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton3)
-                fab?.backgroundTintList = ColorStateList.valueOf(0xFF4CAF50.toInt())
-            }
+        val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton3)
+        if(fab?.rippleColorStateList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+            Observable.just(Optional(null))
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { _ ->
+                        val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton3)
+                        fab?.backgroundTintList = ColorStateList.valueOf(0xFF4CAF50.toInt())
+                    }
         }
-        Thread(runnable).start()
     }
 
     @SuppressLint("CheckResult")
@@ -184,29 +191,31 @@ class Tab1 : Fragment() {
 
             updateFloatBut1()
 
-            val text1 = view.findViewById<TextView>(R.id.Text1)
-            if (you) {
-                val str = SpannableStringBuilder()
-                str.append(text1.text)
-                str.append("\n")
-                str.append("you: ")
-                var mess = mes.removeRange(0, 15)
-                mess = mess.removeRange(mess.count()-5, mess.count())
-                str.append(mess)
+            if(!uid.isEmpty() && !mes.isEmpty()) {
+                val text1 = view.findViewById<TextView>(R.id.Text1)
+                if (you) {
+                    val str = SpannableStringBuilder()
+                    str.append(text1.text)
+                    str.append("\n")
+                    str.append("you: ")
+                    var mess = mes.removeRange(0, 15)
+                    mess = mess.removeRange(mess.count()-5, mess.count())
+                    str.append(mess)
 
-                startTimerThread1(str.toString())
-            }
-            else {
-                val str = SpannableStringBuilder()
-                str.append(text1.text)
-                str.append("\n")
-                str.append(uid)
-                str.append(": ")
-                var mess = mes.removeRange(0, 15)
-                mess = mess.removeRange(mess.count()-5, mess.count())
-                str.append(mess)
+                    startTimerThread1(str.toString())
+                }
+                else {
+                    val str = SpannableStringBuilder()
+                    str.append(text1.text)
+                    str.append("\n")
+                    str.append(uid)
+                    str.append(": ")
+                    var mess = mes.removeRange(0, 15)
+                    mess = mess.removeRange(mess.count()-5, mess.count())
+                    str.append(mess)
 
-                startTimerThread1(str.toString())
+                    startTimerThread1(str.toString())
+                }
             }
         }
 
@@ -214,29 +223,30 @@ class Tab1 : Fragment() {
 
             updateFloatBut2()
 
-            val text1 = view.findViewById<TextView>(R.id.Text2)
-            if (you) {
-                val str = SpannableStringBuilder()
-                str.append(text1.text)
-                str.append("\n")
-                str.append("you: ")
-                var mess = mes.removeRange(0, 15)
-                mess = mess.removeRange(mess.count()-5, mess.count())
-                str.append(mess)
+            if(!uid.isEmpty() && !mes.isEmpty()) {
+                val text1 = view.findViewById<TextView>(R.id.Text2)
+                if (you) {
+                    val str = SpannableStringBuilder()
+                    str.append(text1.text)
+                    str.append("\n")
+                    str.append("you: ")
+                    var mess = mes.removeRange(0, 15)
+                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    str.append(mess)
 
-                startTimerThread2(str.toString())
-            }
-            else {
-                val str = SpannableStringBuilder()
-                str.append(text1.text)
-                str.append("\n")
-                str.append(uid)
-                str.append(": ")
-                var mess = mes.removeRange(0, 15)
-                mess = mess.removeRange(mess.count()-5, mess.count())
-                str.append(mess)
+                    startTimerThread2(str.toString())
+                } else {
+                    val str = SpannableStringBuilder()
+                    str.append(text1.text)
+                    str.append("\n")
+                    str.append(uid)
+                    str.append(": ")
+                    var mess = mes.removeRange(0, 15)
+                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    str.append(mess)
 
-                startTimerThread2(str.toString())
+                    startTimerThread2(str.toString())
+                }
             }
         }
 
@@ -244,29 +254,30 @@ class Tab1 : Fragment() {
 
             updateFloatBut3()
 
-            val text1 = view.findViewById<TextView>(R.id.Text3)
-            if (you) {
-                val str = SpannableStringBuilder()
-                str.append(text1.text)
-                str.append("\n")
-                str.append("you: ")
-                var mess = mes.removeRange(0, 15)
-                mess = mess.removeRange(mess.count()-5, mess.count())
-                str.append(mess)
+            if(!uid.isEmpty() && !mes.isEmpty()) {
+                val text1 = view.findViewById<TextView>(R.id.Text3)
+                if (you) {
+                    val str = SpannableStringBuilder()
+                    str.append(text1.text)
+                    str.append("\n")
+                    str.append("you: ")
+                    var mess = mes.removeRange(0, 15)
+                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    str.append(mess)
 
-                startTimerThread3(str.toString())
-            }
-            else {
-                val str = SpannableStringBuilder()
-                str.append(text1.text)
-                str.append("\n")
-                str.append(uid)
-                str.append(": ")
-                var mess = mes.removeRange(0, 15)
-                mess = mess.removeRange(mess.count()-5, mess.count())
-                str.append(mess)
+                    startTimerThread3(str.toString())
+                } else {
+                    val str = SpannableStringBuilder()
+                    str.append(text1.text)
+                    str.append("\n")
+                    str.append(uid)
+                    str.append(": ")
+                    var mess = mes.removeRange(0, 15)
+                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    str.append(mess)
 
-                startTimerThread3(str.toString())
+                    startTimerThread3(str.toString())
+                }
             }
         }
 
@@ -343,10 +354,10 @@ class Tab1 : Fragment() {
                         .subscribe { _ ->
                             if(use1) {
                                 Log.d(TAG, "retranslateAllToMainSocket 1")
-                                retranslateAllToMainSocket("192.168.111.138", 50001, "127.0.0.1", 50010, 0)
+                                retranslateAllToMainSocket("62.176.10.54", 50001, "127.0.0.1", 50010, 0)
 
                                 thread1 = Thread {
-                                    hbbft.get().session?.start_node(ip1.text.toString(), "192.168.111.138:50002", iplist1.text.toString())
+                                    hbbft.get().session?.start_node(ip1.text.toString(), "62.176.10.54:50002", iplist1.text.toString())
                                 }
                                 thread1.start()
                             }
@@ -373,10 +384,10 @@ class Tab1 : Fragment() {
                         .subscribe { _ ->
                             if(use2) {
                                 Log.d(TAG, "retranslateAllToMainSocket 2")
-                                retranslateAllToMainSocket("192.168.111.138", 50003, "127.0.0.1", 50011, 0)
+                                retranslateAllToMainSocket("62.176.10.54", 50003, "127.0.0.1", 50011, 0)
 
                                 thread2 = Thread {
-                                    hbbft.get().session?.start_node(ip2.text.toString(), "192.168.111.138:50004", iplist2.text.toString())
+                                    hbbft.get().session?.start_node(ip2.text.toString(), "62.176.10.54:50004", iplist2.text.toString())
                                 }
                                 thread2.start()
                             }
@@ -404,10 +415,10 @@ class Tab1 : Fragment() {
                         .subscribe { _ ->
                             if(use3) {
                                 Log.d(TAG, "retranslateAllToMainSocket 3")
-                                retranslateAllToMainSocket("192.168.111.138", 50005, "127.0.0.1", 50012, 0)
+                                retranslateAllToMainSocket("62.176.10.54", 50005, "127.0.0.1", 50012, 0)
 
                                 thread3 = Thread {
-                                    hbbft.get().session?.start_node(ip3.text.toString(), "192.168.111.138:50006", iplist3.text.toString())
+                                    hbbft.get().session?.start_node(ip3.text.toString(), "62.176.10.54:50006", iplist3.text.toString())
                                 }
                                 thread3.start()
                             }
@@ -446,6 +457,7 @@ class Tab1 : Fragment() {
 
                     val size = din.available()
                     if(size > 0) {
+                        lock.lock()
                         val bytes = ByteArray(size)
                         val readsize = din.read(bytes, 0, size)
 
@@ -453,6 +465,7 @@ class Tab1 : Fragment() {
                         dout.writeInt(socketDescription)
                         dout.write(bytes, 0, readsize)
                         dout.flush()
+                        lock.unlock()
                     }
                 }
             }
@@ -515,7 +528,7 @@ class Tab1 : Fragment() {
 
     fun resetConnectOnServer(uniqueID: String) {
         try {
-            val soc = Socket("192.168.111.138", 49999)
+            val soc = Socket("62.176.10.54", 49999)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())
 
@@ -540,7 +553,7 @@ class Tab1 : Fragment() {
 
     fun connectToStun(uniqueID: String) {
         try {
-            val soc = Socket("192.168.111.138", 50000)
+            val soc = Socket("62.176.10.54", 50000)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())
 

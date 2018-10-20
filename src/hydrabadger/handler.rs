@@ -41,11 +41,14 @@ pub struct Handler {
     // callback Batch
     callbackbatch: CallbackBatch,
     num: i32,
+
+    addr: InAddr,
+    addr_out: InAddr,
 }
 
 impl Handler {
 
-    pub(super) fn new(hdb: Hydrabadger, peer_internal_rx: InternalRx, callbackbatch: CallbackBatch, num: i32) -> Handler {
+    pub(super) fn new(hdb: Hydrabadger, peer_internal_rx: InternalRx, callbackbatch: CallbackBatch, num: i32, addr: InAddr, addr_out: InAddr) -> Handler {
          Handler {
             hdb,
             peer_internal_rx,
@@ -53,6 +56,8 @@ impl Handler {
             step_queue: SegQueue::new(),
             callbackbatch,
             num,
+            addr,
+            addr_out,
         }
     }
 
@@ -337,6 +342,7 @@ impl Handler {
             StateDsct::Disconnected => { unimplemented!() },
             StateDsct::DeterminingNetworkState | StateDsct::GeneratingKeys => {
                 warn!("== INSTANTIATING HONEY BADGER ==");
+                (self.callbackbatch)(self.num, true, "".to_string(), "".to_string());
                 match jp_opt {
                     // Some((nni, pk_set, pk_map)) => {
                     //     iom_queue_opt = Some(state.set_observer(*self.hdb.uid(),
@@ -428,10 +434,10 @@ impl Handler {
             if peer_info.in_addr != *self.hdb.addr()
                     && !peers.contains_in_addr(&peer_info.in_addr)
                     && peers.get(&OutAddr(peer_info.in_addr.0)).is_none()
-                    && InAddr(peer_info.in_addr.0) != peer_info.in_addr {
+                    && peer_info.in_addr != self.addr_out {
                 let local_pk = self.hdb.secret_key().public_key();
 
-                warn!("@@@@@@@@@@@@@I am HERE suck {} - {} ", peer_info.in_addr.0, peer_info.in_addr);
+                warn!("@@@@@@@@@@@@@I am HERE suck {} - {} ", self.addr, self.addr_out);
 
                 tokio::spawn(self.hdb.clone().connect_outgoing(
                     peer_info.in_addr.0,

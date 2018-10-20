@@ -3,8 +3,5 @@ package net.korul.hbbft;
 import android.support.annotation.NonNull;
 
 public interface MyObserver {
-
-
     void onStateChanged(boolean a0, @NonNull String a1, @NonNull String a2);
-
 }

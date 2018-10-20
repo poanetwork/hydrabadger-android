@@ -89,9 +89,7 @@ struct Inner {
     uid: Uid,
     /// Incoming connection socket.
     addr: InAddr,
-
-    addr_out: InAddr,
-    addr_out_: SocketAddr,
+    addr_out: SocketAddr,
 
     /// This node's secret key.
     secret_key: SecretKey,
@@ -149,8 +147,7 @@ impl Hydrabadger {
         let inner = Arc::new(Inner {
             uid,
             addr: InAddr(addr),
-            addr_out: InAddr(addr_out),
-            addr_out_: addr_out,
+            addr_out: addr_out,
             secret_key,
             peers: RwLock::new(Peers::new()),
             state: RwLock::new(State::disconnected()),
@@ -167,7 +164,7 @@ impl Hydrabadger {
         };
 
 
-        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, callbackbatch, num));
+        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, callbackbatch, num, InAddr(addr), InAddr(addr_out)));
 
         hdb
     }
@@ -299,7 +296,7 @@ impl Hydrabadger {
                     warn!("!!! {} - send info Initiating outgoing connection!!!!!!!!!!!!!!!!!!!  {}", self.num, in_addr_out);
     
                     let wire_hello_result = wire_msgs.send_msg(
-                        WireMessage::hello_request_change_add(uid, in_addr_out, local_pk));
+                        WireMessage::hello_request_change_add(uid, InAddr(in_addr_out), local_pk));
                     match wire_hello_result {
                         Ok(_) => {
                             warn!("!! {} - connect_outgoing with sending \
@@ -355,36 +352,51 @@ impl Hydrabadger {
 
                 match dsct {
                     StateDsct::Validator => {
-                        if self.num == 0 {
-                             let txns = Transaction::get_tr1();
-                            if !txns.is_empty() {
-                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                                hdb.send_internal (
-                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                                );
-                                warn!("!! {} - send_internal__ ", self.num);
-                            }
-                        }
-                        if self.num == 1 {
-                            let txns = Transaction::get_tr2();
-                            if !txns.is_empty() {
-                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                                hdb.send_internal (
-                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                                );
-                                warn!("!! {} - send_internal__", self.num);
-                            }
-                        }
-                        if self.num == 2 {
-                            let txns = Transaction::get_tr3();
-                            if !txns.is_empty() {
-                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                                hdb.send_internal (
-                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                                );
-                                warn!("!! {} - send_internal__", self.num);
-                            }
-                        }
+
+                        // TODO transaction
+                        // Send some random transactions to our internal HB instance.
+                        let mut vec: Vec<Transaction> = Vec::new();
+                        let txns = Transaction::random(20);
+                        vec.push(txns);
+                        hdb.send_internal(InternalMessage::hb_input(
+                                hdb.inner.uid,
+                                OutAddr(*hdb.inner.addr),
+                                QhbInput::User(vec),
+                        ));
+                        
+
+                        //TODO message
+
+                        // if self.num == 0 {
+                        //      let txns = Transaction::get_tr1();
+                        //     if !txns.is_empty() {
+                        //         warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
+                        //         hdb.send_internal (
+                        //             InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                        //         );
+                        //         warn!("!! {} - send_internal__ ", self.num);
+                        //     }
+                        // }
+                        // if self.num == 1 {
+                        //     let txns = Transaction::get_tr2();
+                        //     if !txns.is_empty() {
+                        //         warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
+                        //         hdb.send_internal (
+                        //             InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                        //         );
+                        //         warn!("!! {} - send_internal__", self.num);
+                        //     }
+                        // }
+                        // if self.num == 2 {
+                        //     let txns = Transaction::get_tr3();
+                        //     if !txns.is_empty() {
+                        //         warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
+                        //         hdb.send_internal (
+                        //             InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                        //         );
+                        //         warn!("!! {} - send_internal__", self.num);
+                        //     }
+                        // }
                     },
                     _ => {},
                 }
@@ -416,7 +428,7 @@ impl Hydrabadger {
         let local_pk = hdb.inner.secret_key.public_key();
         let connect = future::lazy(move || {
             for &remote_addr in remotes.iter() {
-                if remote_addr != hdb.clone().inner.addr_out_ {
+                if remote_addr != hdb.clone().inner.addr_out {
                     warn!(" {} - connect_outgoing remote_addr: {}", hdb.clone().num, hdb.clone().inner.addr_out);
                     tokio::spawn(hdb.clone().connect_outgoing(remote_addr, local_pk, None, true));
                 } 

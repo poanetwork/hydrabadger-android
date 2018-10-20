@@ -144,14 +144,11 @@ impl Transaction {
             let mut vec: Vec<Transaction> = Vec::new();
             match M_TEXT1 {
                 Some(ref mut x) => {
-                    warn!("!!get_tr1  {:?}", x);
                     vec.push( Transaction(x.to_string()) );
-                    warn!("!!get_tr1 vec {:?}", vec);
                     M_TEXT1 = None;
                     vec
                 }
                 None => {
-                    warn!("!!get_tr1 None");
                     vec
                 }
             }
@@ -164,14 +161,11 @@ impl Transaction {
             let mut vec: Vec<Transaction> = Vec::new();
             match M_TEXT2 {
                 Some(ref mut x) => {
-                    warn!("!!get_tr2  {:?}", x);
                     vec.push( Transaction(x.to_string()) );
-                    warn!("!!get_tr2 vec {:?}", vec);
                     M_TEXT2 = None;
                     vec
                 }
                 None => {
-                    warn!("!!get_tr2 None");
                     vec
                 }
             }
@@ -184,14 +178,11 @@ impl Transaction {
             let mut vec: Vec<Transaction> = Vec::new();
             match M_TEXT3 {
                 Some(ref mut x) => {
-                    warn!("!!get_tr3  {:?}", x);
                     vec.push( Transaction(x.to_string()) );
-                    warn!("!!get_tr3 vec {:?}", vec);
                     M_TEXT3 = None;
                     vec
                 }
                 None => {
-                    warn!("!!get_tr3 None");
                     vec
                 }
             }
