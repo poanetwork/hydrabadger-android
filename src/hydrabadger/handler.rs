@@ -108,7 +108,7 @@ impl Handler {
                         self.hdb.secret_key().clone(), peers, self.hdb.config())?;
                     self.hdb.set_state_discriminant(state.discriminant());
 
-                    warn!("KEY GENERATION: Sending initial parts and our own ack.");
+                    warn!("!! {} -KEY GENERATION: Sending initial parts and our own ack. {}", self.num, local_in_addr);
                     self.wire_to_validators(
                         WireMessage::hello_from_validator(
                             local_uid, local_in_addr, local_sk, state.network_state(&peers)),
@@ -384,7 +384,7 @@ impl Handler {
     }
 
     fn handle_net_state(&self, net_state: NetworkState, state: &mut State, peers: &Peers)
-            -> Result<(), Error> {
+            -> Result<(), Error> {                
         let peer_infos;
         match net_state {
             NetworkState::Unknown(p_infos) => {
@@ -427,8 +427,12 @@ impl Handler {
             // connected (and are not us).
             if peer_info.in_addr != *self.hdb.addr()
                     && !peers.contains_in_addr(&peer_info.in_addr)
-                    && peers.get(&OutAddr(peer_info.in_addr.0)).is_none() {
+                    && peers.get(&OutAddr(peer_info.in_addr.0)).is_none()
+                    && InAddr(peer_info.in_addr.0) != peer_info.in_addr {
                 let local_pk = self.hdb.secret_key().public_key();
+
+                warn!("@@@@@@@@@@@@@I am HERE suck {} - {} ", peer_info.in_addr.0, peer_info.in_addr);
+
                 tokio::spawn(self.hdb.clone().connect_outgoing(
                     peer_info.in_addr.0,
                     local_pk,
@@ -490,6 +494,8 @@ impl Handler {
             // New incoming connection:
             InternalMessageKind::NewIncomingConnection(_src_in_addr, src_pk, request_change_add) => {
                 let peers = self.hdb.peers();
+
+                warn!("{} - handle_internal_message NewIncomingConnection - {}", self.num, _src_in_addr);
 
                 // if let StateDsct::Disconnected = state.discriminant() {
                 //     state.set_awaiting_more_peers();
@@ -588,6 +594,8 @@ impl Handler {
                     debug!("Received NetworkState: \n{:?}", net_state);
                     assert!(src_uid_new == src_uid.clone().unwrap());
                     let mut peers = self.hdb.peers_mut();
+
+                    warn!("!! {} - handle_internal_message  WelcomeReceivedChangeAdd - {} - {}", self.num, src_out_addr, src_out_addr.0);
 
                     // Set new (outgoing-connection) peer's public info:
                     peers.establish_validator(src_out_addr,

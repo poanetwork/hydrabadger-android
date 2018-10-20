@@ -90,6 +90,9 @@ struct Inner {
     /// Incoming connection socket.
     addr: InAddr,
 
+    addr_out: InAddr,
+    addr_out_: SocketAddr,
+
     /// This node's secret key.
     secret_key: SecretKey,
 
@@ -122,7 +125,7 @@ pub struct Hydrabadger {
 
 impl Hydrabadger {
     /// Returns a new Hydrabadger node.
-    pub fn new(addr: SocketAddr, cfg: Config, callbackbatch: CallbackBatch, num: i32) -> Self {
+    pub fn new(addr: SocketAddr, addr_out: SocketAddr, cfg: Config, callbackbatch: CallbackBatch, num: i32) -> Self {
         use std::env;
         use env_logger;
         use chrono::Local;
@@ -133,24 +136,21 @@ impl Hydrabadger {
         let (peer_internal_tx, peer_internal_rx) = mpsc::unbounded();
 
         warn!("");
-        warn!("Local Hydrabadger Node: ");
-        warn!("    UID:             {}", uid);
-        warn!("    Socket Address:  {}", addr);
-        warn!("    Public Key:      {:?}", secret_key.public_key());
+        warn!(" {} - Local Hydrabadger Node: ", num);
+        warn!(" {} -     UID:             {}", num, uid);
+        warn!(" {} -     Socket Address:  {}", num, addr);
+        warn!(" {} -     Socket Address:  {}", num, addr_out);
+        warn!(" {} -     Public Key:      {:?}", num, secret_key.public_key());
 
         warn!("");
-        warn!("****** This is an alpha build. Do not use in production! ******");
+        warn!(" {} - ****** This is an alpha build. Do not use in production! ******", num);
         warn!("");
-
-        println!("");
-        println!("Local Hydrabadger Node: ");
-        println!("    UID:             {}", uid);
-        println!("    Socket Address:  {}", addr);
-        println!("    Public Key:      {:?}", secret_key.public_key());
 
         let inner = Arc::new(Inner {
             uid,
             addr: InAddr(addr),
+            addr_out: InAddr(addr_out),
+            addr_out_: addr_out,
             secret_key,
             peers: RwLock::new(Peers::new()),
             state: RwLock::new(State::disconnected()),
@@ -201,7 +201,7 @@ impl Hydrabadger {
     /// Sets the publicly visible state discriminant and returns the previous value.
     pub(super) fn set_state_discriminant(&self, dsct: StateDsct) -> StateDsct {
         let sd = StateDsct::from(self.inner.state_dsct.swap(dsct.into(), Ordering::Release));
-        warn!("State has been set from '{}' to '{}'.", sd, dsct);
+        warn!(" {} - State has been set from '{}' to '{}'.", self.num, sd, dsct);
         sd
     }
 
@@ -231,7 +231,7 @@ impl Hydrabadger {
     /// Returns a future that handles incoming connections on `socket`.
     fn handle_incoming(self, socket: TcpStream)
             -> impl Future<Item = (), Error = ()> {
-        warn!("Incoming connection from '{}'", socket.peer_addr().unwrap());
+        warn!("!! {} - Incoming connection from '{}'", self.num, socket.peer_addr().unwrap());
         let wire_msgs = WireMessages::new(socket);
 
         wire_msgs.into_future()
@@ -243,6 +243,9 @@ impl Hydrabadger {
                     Some(msg) => match msg.into_kind() {
                         // The only correct entry point:
                         WireMessageKind::HelloRequestChangeAdd(peer_uid, peer_in_addr, peer_pk) => {
+                            warn!("!! {} - Peer connected with sending \
+                                `WireMessageKind::HelloRequestChangeAdd` completed.", self.num);
+
                             // Also adds a `Peer` to `self.peers`.
                             let peer_h = PeerHandler::new(Some((peer_uid, peer_in_addr, peer_pk)),
                                 self.clone(), w_messages);
@@ -252,23 +255,27 @@ impl Hydrabadger {
                                 InternalMessage::new_incoming_connection(peer_uid,
                                     *peer_h.out_addr(), peer_in_addr, peer_pk, true)
                             );
+
+                            warn!("!!! {} - handle_incoming!!!!!!!!!!!!!!!!!!!  peer_in_addr {} out_addr {}", self.num, peer_in_addr, *peer_h.out_addr());
+
                             Either::B(peer_h)
                         },
                         _ => {
                             // TODO: Return this as a future-error (handled below):
-                            error!("Peer connected without sending \
-                                `WireMessageKind::HelloRequestChangeAdd`.");
+                            error!("!! {} - Peer connected without sending \
+                                `WireMessageKind::HelloRequestChangeAdd`.", self.num);
                             Either::A(future::ok(()))
                         },
                     },
-                    None => {
+                    None => { 
+                        warn!("!! {} - Incoming connection from  None msg_kind", self.num);
                         // The remote client closed the connection without sending
                         // a welcome_request_change_add message.
                         Either::A(future::ok(()))
                     },
                 }
             })
-            .map_err(|err| error!("Connection error = {:?}", err))
+            .map_err(|err| error!("!Connection error = {:?}", err))
     }
 
     /// Returns a future that connects to new peer.
@@ -277,33 +284,46 @@ impl Hydrabadger {
             -> impl Future<Item = (), Error = ()> {
         let uid = self.inner.uid.clone();
         let in_addr = self.inner.addr;
-        warn!("Initiating outgoing connection to: {}", remote_addr);
+        let in_addr_out = self.inner.addr_out;
+        
 
-        TcpStream::connect(&remote_addr)
-            .map_err(Error::from)
-            .and_then(move |socket| {
-                // Wrap the socket with the frame delimiter and codec:
-                let mut wire_msgs = WireMessages::new(socket);
-                let wire_hello_result = wire_msgs.send_msg(
-                    WireMessage::hello_request_change_add(uid, in_addr, local_pk));
-                match wire_hello_result {
-                    Ok(_) => {
-                        let peer = PeerHandler::new(pub_info, self.clone(), wire_msgs);
+        // if remote_addr != in_addr_out {
+            warn!("!! {} - Initiating outgoing connection to remote_addr: {}  in_addr_out: {}", self.num, remote_addr, in_addr_out);
 
-                        self.send_internal(InternalMessage::new_outgoing_connection(*peer.out_addr()));
-
-                        Either::A(peer)
-                    },
-                    Err(err) => Either::B(future::err(err)),
-                }
-            })
-            .map_err(move |err| {
-                if is_optimistic {
-                    warn!("Unable to connect to: {}", remote_addr);
-                } else {
-                    error!("Error connecting to: {} \n{:?}", remote_addr, err);
-                }
-            })
+            TcpStream::connect(&remote_addr)
+                .map_err(Error::from)
+                .and_then(move |socket| {
+                    // Wrap the socket with the frame delimiter and codec:
+                    let mut wire_msgs = WireMessages::new(socket);
+    
+                    warn!("!!! {} - send info Initiating outgoing connection!!!!!!!!!!!!!!!!!!!  {}", self.num, in_addr_out);
+    
+                    let wire_hello_result = wire_msgs.send_msg(
+                        WireMessage::hello_request_change_add(uid, in_addr_out, local_pk));
+                    match wire_hello_result {
+                        Ok(_) => {
+                            warn!("!! {} - connect_outgoing with sending \
+                                    `WireMessageKind::HelloRequestChangeAdd` completed.", self.num);
+    
+                            let peer = PeerHandler::new(pub_info, self.clone(), wire_msgs);
+    
+                            warn!("!!! {} - result Initiating outgoing connection!!!!!!!!!!!!!!!!!!! pub_info {:?} out_addr {}", self.num, pub_info, *peer.out_addr());
+    
+                            self.send_internal(InternalMessage::new_outgoing_connection(*peer.out_addr()));
+    
+                            Either::A(peer)
+                        },
+                        Err(err) => Either::B(future::err(err)),
+                    }
+                })
+                .map_err(move |err| {
+                    if is_optimistic {
+                        warn!("!! - Unable to connect to: {} \n{:?}" , remote_addr, err);
+                    } else {
+                        warn!("!! - Error connecting to: {} \n{:?}", remote_addr, err);
+                    }
+                })
+        // }
     }
 
     /// Returns a future that generates random transactions and logs status
@@ -317,19 +337,19 @@ impl Hydrabadger {
                 // Log state:
                 let (dsct, p_ttl, p_est) = hdb.state_info_stale();
                 let peer_count = peers.count_total();
-                warn!("State: {:?}({})", dsct, peer_count);
+                warn!(" {} - State: {:?}({})", self.num, dsct, peer_count);
 
                 // Log peer list:
                 let peer_list = peers.peers().map(|p| {
                     p.in_addr().map(|ia| ia.0.to_string())
                         .unwrap_or(format!("No in address"))
                 }).collect::<Vec<_>>();
-                warn!("    Peers: {:?}", peer_list);
+                warn!("  {} -    Peers: {:?}", self.num, peer_list);
 
                 // Log (trace) full peerhandler details:
-                trace!("PeerHandler list:");
+                warn!(" {} - PeerHandler list:", self.num);
                 for (peer_addr, _peer) in peers.iter() {
-                    trace!("     peer_addr: {}", peer_addr); }
+                    warn!(" {} -      peer_addr: {}", self.num, peer_addr); }
 
                 drop(peers);
 
@@ -338,31 +358,31 @@ impl Hydrabadger {
                         if self.num == 0 {
                              let txns = Transaction::get_tr1();
                             if !txns.is_empty() {
-                                warn!("!!send_internal {}", self.num);
+                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
                                 hdb.send_internal (
                                     InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
                                 );
-                                warn!("!!send_internal__ {}", self.num);
+                                warn!("!! {} - send_internal__ ", self.num);
                             }
                         }
                         if self.num == 1 {
                             let txns = Transaction::get_tr2();
                             if !txns.is_empty() {
-                                warn!("!!send_internal {}", self.num);
+                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
                                 hdb.send_internal (
                                     InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
                                 );
-                                warn!("!!send_internal__ {}", self.num);
+                                warn!("!! {} - send_internal__", self.num);
                             }
                         }
                         if self.num == 2 {
                             let txns = Transaction::get_tr3();
                             if !txns.is_empty() {
-                                warn!("!!send_internal {}", self.num);
+                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
                                 hdb.send_internal (
                                     InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
                                 );
-                                warn!("!!send_internal__ {}", self.num);
+                                warn!("!! {} - send_internal__", self.num);
                             }
                         }
                     },
@@ -374,11 +394,13 @@ impl Hydrabadger {
             .map_err(|err| error!("List connection inverval error: {:?}", err))
     }
 
+
     /// Binds to a host address and returns a future which starts the node.
     pub fn node(self, remotes: Option<HashSet<SocketAddr>>, reactor_remote: Option<()>)
             -> impl Future<Item = (), Error = ()> {
         let socket = TcpListener::bind(&self.inner.addr).unwrap();
-        warn!("Listening on: {}", self.inner.addr);
+        // let mut socket = TcpStream::connect(&self.inner.addr).unwrap();
+        warn!(" {} - Listening on: {}", self.num, self.inner.addr);
 
         let remotes = remotes.unwrap_or(HashSet::new());
 
@@ -394,7 +416,10 @@ impl Hydrabadger {
         let local_pk = hdb.inner.secret_key.public_key();
         let connect = future::lazy(move || {
             for &remote_addr in remotes.iter() {
-                tokio::spawn(hdb.clone().connect_outgoing(remote_addr, local_pk, None, true));
+                if remote_addr != hdb.clone().inner.addr_out_ {
+                    warn!(" {} - connect_outgoing remote_addr: {}", hdb.clone().num, hdb.clone().inner.addr_out);
+                    tokio::spawn(hdb.clone().connect_outgoing(remote_addr, local_pk, None, true));
+                } 
             }
             Ok(())
         });

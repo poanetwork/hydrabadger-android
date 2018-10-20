@@ -418,7 +418,7 @@ impl Peers {
             Some(_out_addr_pub) => {
                 let pi_pub = peer.pub_info()
                     .expect("Peers::set_pending: internal consistency error");
-                assert!(pub_info.0 == *pi_pub.0 && pub_info.1 == *pi_pub.1 && pub_info.2 == *pi_pub.2);
+                assert!(pub_info.0 == *pi_pub.0 && pub_info.2 == *pi_pub.2);// && pub_info.1 == *pi_pub.1 );
                 assert!(peer.is_validator());
                 return true;
             },
@@ -463,7 +463,8 @@ impl Peers {
             Some(_out_addr_pub) => {
                 let pi_pub = peer.pub_info()
                     .expect("Peers::establish_validator: internal consistency error");
-                assert!(pub_info.0 == *pi_pub.0 && pub_info.1 == *pi_pub.1 && pub_info.2 == *pi_pub.2);
+                // assert!(pub_info.0 == *pi_pub.0 && pub_info.1 == *pi_pub.1 && pub_info.2 == *pi_pub.2);
+                assert!(pub_info.0 == *pi_pub.0 && pub_info.2 == *pi_pub.2);// && pub_info.1 == *pi_pub.1 );
                 assert!(peer.is_validator());
                 return true;
             },

@@ -626,12 +626,13 @@ impl Session {
         }
     }
 
-    pub fn start_node(&self, ipport_string_source: String, ipports_string_remote: String) {
+    pub fn start_node(&self, ipport_string_source: String, ipport_string_myout: String, ipports_string_remote: String) {
         unsafe {
             warn!("enter to startNode: {:?}", M_NUM_OF_CALLBACK.clone());
         }
 
         let bind_address: SocketAddr = ipport_string_source.parse().expect("Unable to parse socket address");
+        let bind_address_out: SocketAddr = ipport_string_myout.parse().expect("Unable to parse socket address");
     
         let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
         let split = ipports_string_remote.split(";");
@@ -648,15 +649,13 @@ impl Session {
             // let hb = Hydrabadger::new(bind_address, cfg, callback_, num);
 
             if num == 0 {
-                *self.handler1.lock() = Some(Hydrabadger::new(bind_address, cfg, callback_, num));
+                *self.handler1.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
                 M_NUM_OF_CALLBACK += 1;
                 
                 match self.handler1.lock().take() {
                     Some(v) => {
                         thread::spawn(move || {
-                            warn!("!!startNode: {:?}", num);
                             v.run_node(Some(remote_addresses));
-                            warn!("!!started Node: {:?}", num);
                         });
                     },
                     None => {},
@@ -664,14 +663,12 @@ impl Session {
                 warn!("!!match out started Node: {:?}", num);
             }
             else if num == 1 {
-                *self.handler2.lock() = Some(Hydrabadger::new(bind_address, cfg, callback_, num));
+                *self.handler2.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
                 M_NUM_OF_CALLBACK += 1;
                 match self.handler2.lock().take() {
                     Some(v) => {
                         thread::spawn(move || {
-                            warn!("!!startNode: {:?}", num);
                             v.run_node(Some(remote_addresses));
-                            warn!("!!started Node: {:?}", num);
                         });
                     },
                     None => {},
@@ -679,15 +676,13 @@ impl Session {
                 warn!("!!match out started Node: {:?}", num);
             }
             else if num == 2 {
-                *self.handler3.lock() = Some(Hydrabadger::new(bind_address, cfg, callback_, num));
+                *self.handler3.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
                 M_NUM_OF_CALLBACK += 1;
 
                 match self.handler3.lock().take() {
                     Some(v) => {
                         thread::spawn(move || {
-                            warn!("!!startNode: {:?}", num);
                             v.run_node(Some(remote_addresses));
-                            warn!("!!started Node: {:?}", num);
                         });
                     },
                     None => {},
