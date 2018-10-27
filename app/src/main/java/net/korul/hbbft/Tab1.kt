@@ -2,8 +2,10 @@ package net.korul.hbbft
 
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
@@ -23,6 +25,7 @@ import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+
 
 data class Optional<M>(val value : M?)
 
@@ -334,9 +337,23 @@ class Tab1 : Fragment() {
                 }
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { _ ->
+                .subscribe ({ _ ->
 
-                }
+                }, { it ->
+                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
+                    } else {
+                        AlertDialog.Builder(context)
+                    }
+                    builder.setTitle("Error")
+                            .setMessage(it.message)
+                            .setPositiveButton(android.R.string.yes) { dialog, which ->
+                                dialog.cancel()
+                            }
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show()
+
+                })
 
 
         if(use1) {
@@ -528,6 +545,7 @@ class Tab1 : Fragment() {
 
     fun resetConnectOnServer(uniqueID: String) {
         try {
+//            62.176.10.54
             val soc = Socket("62.176.10.54", 49999)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())
@@ -548,6 +566,8 @@ class Tab1 : Fragment() {
         }
         catch (e:Exception){
             e.printStackTrace()
+
+            throw e
         }
     }
 
@@ -593,6 +613,7 @@ class Tab1 : Fragment() {
         }
         catch (e:Exception){
             e.printStackTrace()
+            throw e
         }
     }
 }

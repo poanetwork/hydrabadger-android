@@ -355,48 +355,48 @@ impl Hydrabadger {
 
                         // TODO transaction
                         // Send some random transactions to our internal HB instance.
-                        let mut vec: Vec<Transaction> = Vec::new();
-                        let txns = Transaction::random(20);
-                        vec.push(txns);
-                        hdb.send_internal(InternalMessage::hb_input(
-                                hdb.inner.uid,
-                                OutAddr(*hdb.inner.addr),
-                                QhbInput::User(vec),
-                        ));
+                        // let mut vec: Vec<Transaction> = Vec::new();
+                        // let txns = Transaction::random(20);
+                        // vec.push(txns);
+                        // hdb.send_internal(InternalMessage::hb_input(
+                        //         hdb.inner.uid,
+                        //         OutAddr(*hdb.inner.addr),
+                        //         QhbInput::User(vec),
+                        // ));
                         
 
                         //TODO message
 
-                        // if self.num == 0 {
-                        //      let txns = Transaction::get_tr1();
-                        //     if !txns.is_empty() {
-                        //         warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                        //         hdb.send_internal (
-                        //             InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                        //         );
-                        //         warn!("!! {} - send_internal__ ", self.num);
-                        //     }
-                        // }
-                        // if self.num == 1 {
-                        //     let txns = Transaction::get_tr2();
-                        //     if !txns.is_empty() {
-                        //         warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                        //         hdb.send_internal (
-                        //             InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                        //         );
-                        //         warn!("!! {} - send_internal__", self.num);
-                        //     }
-                        // }
-                        // if self.num == 2 {
-                        //     let txns = Transaction::get_tr3();
-                        //     if !txns.is_empty() {
-                        //         warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                        //         hdb.send_internal (
-                        //             InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
-                        //         );
-                        //         warn!("!! {} - send_internal__", self.num);
-                        //     }
-                        // }
+                        if self.num == 0 {
+                             let txns = Transaction::get_tr1();
+                            if !txns.is_empty() {
+                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
+                                hdb.send_internal (
+                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                                );
+                                warn!("!! {} - send_internal__ ", self.num);
+                            }
+                        }
+                        if self.num == 1 {
+                            let txns = Transaction::get_tr2();
+                            if !txns.is_empty() {
+                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
+                                hdb.send_internal (
+                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                                );
+                                warn!("!! {} - send_internal__", self.num);
+                            }
+                        }
+                        if self.num == 2 {
+                            let txns = Transaction::get_tr3();
+                            if !txns.is_empty() {
+                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
+                                hdb.send_internal (
+                                    InternalMessage::hb_input(hdb.inner.uid, OutAddr(*hdb.inner.addr), QhbInput::User(txns))
+                                );
+                                warn!("!! {} - send_internal__", self.num);
+                            }
+                        }
                     },
                     _ => {},
                 }
