@@ -1,31 +1,30 @@
-mod state;
 mod handler;
 mod hydrabadger;
+mod state;
 
-use std;
+use self::handler::Handler;
+use self::state::State;
 use bincode;
 use hbbft::{
-    dynamic_honey_badger::{Error as DhbError},
-    queueing_honey_badger::{Error as QhbError},
-    sync_key_gen::{Error as SyncKeyGenError},
+    dynamic_honey_badger::Error as DhbError,
+    // queueing_honey_badger::Error as QhbError,
+    sync_key_gen::Error as SyncKeyGenError,
 };
-use ::{Message, Input, Uid};
-use self::state::{State, StateDsct};
-use self::handler::{Handler};
+use std;
+use {Input, Message, Uid};
 
-pub use self::hydrabadger::{Hydrabadger, Config};
+pub use self::hydrabadger::{Config, Hydrabadger, HydrabadgerWeak};
+pub use self::state::StateDsct;
 
 // Number of times to attempt wire message re-send.
 pub const WIRE_MESSAGE_RETRY_MAX: usize = 10;
 
-
 /// A HoneyBadger input or message.
 #[derive(Clone, Debug)]
-pub(crate) enum InputOrMessage {
-    Input(Input),
+pub enum InputOrMessage<T> {
+    Input(Input<T>),
     Message(Uid, Message),
 }
-
 
 #[derive(Debug, Fail)]
 pub enum Error {
@@ -51,6 +50,10 @@ pub enum Error {
     SyncKeyGenNew(SyncKeyGenError),
     #[fail(display = "Error generating keys: {}", _0)]
     SyncKeyGenGenerate(SyncKeyGenError),
+    #[fail(display = "Unable to push user transactions, this node is not a validator")]
+    ProposeUserContributionNotValidator,
+    #[fail(display = "Unable to transmit epoch status to listener, listener receiver dropped")]
+    InstantiateHbListenerDropped,
 }
 
 impl From<std::io::Error> for Error {
@@ -59,15 +62,8 @@ impl From<std::io::Error> for Error {
     }
 }
 
-impl From<QhbError> for Error {
-    fn from(_err: QhbError) -> Error {
-        Error::Qhb(())
-    }
-}
-
 impl From<DhbError> for Error {
     fn from(_err: DhbError) -> Error {
         Error::Dhb(())
     }
 }
-

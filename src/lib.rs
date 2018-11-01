@@ -1,50 +1,57 @@
+// android fix
 #[cfg(target_os = "android")]
 extern crate android_logger;
 #[macro_use]
-extern crate log;
 extern crate log_panics;
 
 #[cfg(target_os = "android")]
 mod android_c_headers;
 #[cfg(target_os = "android")]
 pub mod java_glue;
+///
+
+
+
+// #![cfg_attr(feature = "nightly", feature(alloc_system))]
+// #![cfg_attr(feature = "nightly", feature(proc_macro))]
 
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
 extern crate clap;
-
 extern crate env_logger;
+#[macro_use]
+extern crate log;
 #[macro_use]
 extern crate failure;
 extern crate crossbeam;
 // #[macro_use] extern crate crossbeam_channel;
-extern crate crypto;
 extern crate chrono;
-extern crate num_traits;
+extern crate crypto;
 extern crate num_bigint;
+extern crate num_traits;
 #[macro_use]
 extern crate futures;
+extern crate byteorder;
+extern crate bytes;
+extern crate rand;
 extern crate tokio;
 extern crate tokio_codec;
 extern crate tokio_io;
-extern crate rand;
-extern crate bytes;
 extern crate uuid;
-extern crate byteorder;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
-extern crate serde_bytes;
 extern crate bincode;
-extern crate tokio_serde_bincode;
-extern crate parking_lot;
 extern crate clear_on_drop;
 extern crate hbbft;
+extern crate parking_lot;
+extern crate serde;
+extern crate serde_bytes;
+extern crate tokio_serde_bincode;
 
+// android fix
 use android_logger::Filter;
 use log::Level;
 use parking_lot::{Mutex};
-
 
 #[cfg(feature = "nightly")]
 use alloc_system::System;
@@ -53,69 +60,79 @@ use alloc_system::System;
 #[global_allocator]
 static A: System = System;
 
-pub mod hydrabadger;
+// pub mod network;
 pub mod blockchain;
+pub mod hydrabadger;
 pub mod peer;
 
 
+use bytes::{Bytes, BytesMut};
+use futures::{sync::mpsc, AsyncSink, StartSend};
+use rand::{Rand, Rng};
+use serde::{de::DeserializeOwned, Serialize};
 use std::{
     collections::BTreeMap,
-    fmt::{self},
-    net::{SocketAddr},
+    fmt::{self, Debug},
+    marker::PhantomData,
+    net::SocketAddr,
     ops::Deref,
+    
+    // android fix
     sync::{
         Arc,
     },
     thread,
     mem,
 };
-
-
-use futures::{
-    StartSend, AsyncSink,
-    sync::mpsc,
-};
-
-use tokio::{
-    io,
-    net::{TcpStream},
-    prelude::*,
-};
-use tokio_io::codec::length_delimited::Framed;
-use bytes::{BytesMut, Bytes};
-use rand::{Rng, Rand};
+use tokio::{io, net::TcpStream, prelude::*, codec::{Framed, LengthDelimitedCodec}};
 use uuid::Uuid;
-// use bincode::{serialize, deserialize};
 use hbbft::{
     crypto::{PublicKey, PublicKeySet},
-    sync_key_gen::{Part, Ack},
-    messaging::Step as MessagingStep,
-    dynamic_honey_badger::{Message as DhbMessage, JoinPlan},
-    queueing_honey_badger::{QueueingHoneyBadger, Input as QhbInput},
+    dynamic_honey_badger::{JoinPlan, Message as DhbMessage, DynamicHoneyBadger, Input as DhbInput},
+    sync_key_gen::{Ack, Part},
+    Step as MessagingStep,
+    Contribution as HbbftContribution,
 };
 
-pub use hydrabadger::{Hydrabadger, Config};
 pub use blockchain::{Blockchain, MiningError};
-
-// FIME: TEMPORARY -- Create another error type.
-pub use hydrabadger::{Error};
+pub use hydrabadger::{Config, Hydrabadger, HydrabadgerWeak};
+// TODO: Create a separate, library-wide error type.
+pub use hydrabadger::Error;
+pub use hbbft::dynamic_honey_badger::Batch;
+pub use hydrabadger::StateDsct;
 
 
 /// Transmit half of the wire message channel.
 // TODO: Use a bounded tx/rx (find a sensible upper bound):
-type WireTx = mpsc::UnboundedSender<WireMessage>;
+type WireTx<T> = mpsc::UnboundedSender<WireMessage<T>>;
 
 /// Receive half of the wire message channel.
 // TODO: Use a bounded tx/rx (find a sensible upper bound):
-type WireRx = mpsc::UnboundedReceiver<WireMessage>;
+type WireRx<T> = mpsc::UnboundedReceiver<WireMessage<T>>;
 
 /// Transmit half of the internal message channel.
 // TODO: Use a bounded tx/rx (find a sensible upper bound):
-type InternalTx = mpsc::UnboundedSender<InternalMessage>;
+type InternalTx<T> = mpsc::UnboundedSender<InternalMessage<T>>;
 
 /// Receive half of the internal message channel.
 // TODO: Use a bounded tx/rx (find a sensible upper bound):
-type InternalRx = mpsc::UnboundedReceiver<InternalMessage>;
+type InternalRx<T> = mpsc::UnboundedReceiver<InternalMessage<T>>;
+
+/// Transmit half of the batch output channel.
+// TODO: Use a bounded tx/rx (find a sensible upper bound):
+type BatchTx<T> = mpsc::UnboundedSender<Batch<T, Uid>>;
+
+/// Receive half of the batch output channel.
+// TODO: Use a bounded tx/rx (find a sensible upper bound):
+pub type BatchRx<T> = mpsc::UnboundedReceiver<Batch<T, Uid>>;
+
+/// Transmit half of the epoch number output channel.
+// TODO: Use a bounded tx/rx (find a sensible upper bound):
+type EpochTx = mpsc::UnboundedSender<u64>;
+
+/// Receive half of the epoch number output channel.
+// TODO: Use a bounded tx/rx (find a sensible upper bound):
+pub type EpochRx = mpsc::UnboundedReceiver<u64>;
 
 
 /// A transaction.
@@ -191,6 +208,14 @@ impl Transaction {
 }
 
 
+pub trait Contribution:
+    HbbftContribution + Clone + Debug + Serialize + DeserializeOwned + 'static
+{
+}
+impl<C> Contribution for C where
+    C: HbbftContribution + Clone + Debug + Serialize + DeserializeOwned + 'static
+{}
+
 /// A unique identifier.
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct Uid(pub(crate) Uuid);
@@ -221,8 +246,8 @@ impl fmt::Debug for Uid {
 }
 
 type Message = DhbMessage<Uid>;
-type Step = MessagingStep<QueueingHoneyBadger<Vec<Transaction>, Uid>>;
-type Input = QhbInput<Vec<Transaction>, Uid>;
+type Step<T> = MessagingStep<DynamicHoneyBadger<T, Uid>>;
+type Input<T> = DhbInput<T, Uid>;
 
 /// A peer's incoming (listening) address.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -240,7 +265,6 @@ impl fmt::Display for InAddr {
         write!(f, "InAddr({})", self.0)
     }
 }
-
 
 /// An internal address used to respond to a connected peer.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -268,7 +292,6 @@ pub struct NetworkNodeInfo {
     pub(crate) pk: PublicKey,
 }
 
-
 /// The current state of the network.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum NetworkState {
@@ -279,10 +302,9 @@ pub enum NetworkState {
     Active((Vec<NetworkNodeInfo>, PublicKeySet, BTreeMap<Uid, PublicKey>)),
 }
 
-
 /// Messages sent over the network between nodes.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum WireMessageKind {
+pub enum WireMessageKind<T> {
     HelloFromValidator(Uid, InAddr, PublicKey, NetworkState),
     HelloRequestChangeAdd(Uid, InAddr, PublicKey),
     WelcomeReceivedChangeAdd(Uid, PublicKey, NetworkState),
@@ -292,88 +314,108 @@ pub enum WireMessageKind {
     #[serde(with = "serde_bytes")]
     Bytes(Bytes),
     Message(Uid, Message),
-    Transactions(Uid, Vec<Transaction>),
+    Transaction(Uid, T),
     KeyGenPart(Part),
     KeyGenAck(Ack),
-    JoinPlan(JoinPlan<Uid>)
-    // TargetedMessage(TargetedMessage<Uid>),
+    JoinPlan(JoinPlan<Uid>), // TargetedMessage(TargetedMessage<Uid>)
 }
 
 
 /// Messages sent over the network between nodes.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct WireMessage {
-    kind: WireMessageKind,
+pub struct WireMessage<T> {
+    kind: WireMessageKind<T>,
 }
 
-impl WireMessage {
-    pub fn hello_from_validator(src_uid: Uid, in_addr: InAddr, pk: PublicKey,
-            net_state: NetworkState) -> WireMessage {
+impl<T: Contribution> WireMessage<T> {
+    pub fn hello_from_validator(
+        src_uid: Uid,
+        in_addr: InAddr,
+        pk: PublicKey,
+        net_state: NetworkState,
+    ) -> WireMessage<T> {
         WireMessageKind::HelloFromValidator(src_uid, in_addr, pk, net_state).into()
     }
 
     /// Returns a `HelloRequestChangeAdd` variant.
-    pub fn hello_request_change_add(src_uid: Uid, in_addr: InAddr, pk: PublicKey) -> WireMessage {
-        WireMessage { kind: WireMessageKind::HelloRequestChangeAdd(src_uid, in_addr, pk), }
+    pub fn hello_request_change_add(
+        src_uid: Uid,
+        in_addr: InAddr,
+        pk: PublicKey,
+    ) -> WireMessage<T> {
+        WireMessage {
+            kind: WireMessageKind::HelloRequestChangeAdd(src_uid, in_addr, pk),
+        }
     }
 
     /// Returns a `WelcomeReceivedChangeAdd` variant.
-    pub fn welcome_received_change_add(src_uid: Uid, pk: PublicKey, net_state: NetworkState)
-            -> WireMessage {
-        WireMessage { kind: WireMessageKind::WelcomeReceivedChangeAdd(src_uid, pk, net_state) }
+    pub fn welcome_received_change_add(
+        src_uid: Uid,
+        pk: PublicKey,
+        net_state: NetworkState,
+    ) -> WireMessage<T> {
+        WireMessage {
+            kind: WireMessageKind::WelcomeReceivedChangeAdd(src_uid, pk, net_state),
+        }
     }
 
     /// Returns an `Input` variant.
-    pub fn transaction(src_uid: Uid, txns: Vec<Transaction>) -> WireMessage {
-        WireMessage { kind: WireMessageKind::Transactions(src_uid, txns), }
+    pub fn transaction(src_uid: Uid, txn: T) -> WireMessage<T> {
+        WireMessage {
+            kind: WireMessageKind::Transaction(src_uid, txn),
+        }
     }
 
     /// Returns a `Message` variant.
-    pub fn message(src_uid: Uid, msg: Message) -> WireMessage {
-        WireMessage { kind: WireMessageKind::Message(src_uid, msg), }
+    pub fn message(src_uid: Uid, msg: Message) -> WireMessage<T> {
+        WireMessage {
+            kind: WireMessageKind::Message(src_uid, msg),
+        }
     }
 
-    pub fn key_gen_part(part: Part) -> WireMessage {
-        WireMessage { kind: WireMessageKind::KeyGenPart(part) }
+    pub fn key_gen_part(part: Part) -> WireMessage<T> {
+        WireMessage {
+            kind: WireMessageKind::KeyGenPart(part),
+        }
     }
 
-    pub fn key_gen_part_ack(outcome: Ack) -> WireMessage {
+    pub fn key_gen_part_ack(outcome: Ack) -> WireMessage<T> {
         WireMessageKind::KeyGenAck(outcome).into()
     }
 
-    pub fn join_plan(jp: JoinPlan<Uid>) -> WireMessage {
+    pub fn join_plan(jp: JoinPlan<Uid>) -> WireMessage<T> {
         WireMessageKind::JoinPlan(jp).into()
     }
 
     /// Returns the wire message kind.
-    pub fn kind(&self) -> &WireMessageKind {
+    pub fn kind(&self) -> &WireMessageKind<T> {
         &self.kind
     }
 
     /// Consumes this `WireMessage` into its kind.
-    pub fn into_kind(self) -> WireMessageKind {
+    pub fn into_kind(self) -> WireMessageKind<T> {
         self.kind
     }
 }
 
-impl From<WireMessageKind> for WireMessage {
-    fn from(kind: WireMessageKind) -> WireMessage {
+impl<T: Contribution> From<WireMessageKind<T>> for WireMessage<T> {
+    fn from(kind: WireMessageKind<T>) -> WireMessage<T> {
         WireMessage { kind }
     }
 }
 
-
-
 /// A stream/sink of `WireMessage`s connected to a socket.
 #[derive(Debug)]
-pub struct WireMessages {
-    framed: Framed<TcpStream>,
+pub struct WireMessages<T> {
+    framed: Framed<TcpStream, LengthDelimitedCodec>,
+    _t: PhantomData<T>,
 }
 
-impl WireMessages {
-    pub fn new(socket: TcpStream) -> WireMessages {
+impl<T: Contribution> WireMessages<T> {
+    pub fn new(socket: TcpStream) -> WireMessages<T> {
         WireMessages {
-            framed: Framed::new(socket),
+            framed: Framed::new(socket, LengthDelimitedCodec::new()),
+            _t: PhantomData,
         }
     }
 
@@ -381,15 +423,15 @@ impl WireMessages {
         self.framed.get_ref()
     }
 
-    pub fn send_msg(&mut self, msg: WireMessage) -> Result<(), Error> {
+    pub fn send_msg(&mut self, msg: WireMessage<T>) -> Result<(), Error> {
         self.start_send(msg)?;
         let _ = self.poll_complete()?;
         Ok(())
     }
 }
 
-impl Stream for WireMessages {
-    type Item = WireMessage;
+impl<T: Contribution> Stream for WireMessages<T> {
+    type Item = WireMessage<T>;
     type Error = Error;
 
     fn poll(&mut self) -> Poll<Option<Self::Item>, Self::Error> {
@@ -397,16 +439,16 @@ impl Stream for WireMessages {
             Some(frame) => {
                 Ok(Async::Ready(Some(
                     // deserialize_from(frame.reader()).map_err(Error::Serde)?
-                    bincode::deserialize(&frame.freeze()).map_err(Error::Serde)?
+                    bincode::deserialize(&frame.freeze()).map_err(Error::Serde)?,
                 )))
             }
-            None => Ok(Async::Ready(None))
+            None => Ok(Async::Ready(None)),
         }
     }
 }
 
-impl Sink for WireMessages {
-    type SinkItem = WireMessage;
+impl<T: Contribution> Sink for WireMessages<T> {
+    type SinkItem = WireMessage<T>;
     type SinkError = Error;
 
     fn start_send(&mut self, item: Self::SinkItem) -> StartSend<Self::SinkItem, Self::SinkError> {
@@ -417,16 +459,16 @@ impl Sink for WireMessages {
         //
         // Original: `bincode::serialize(&item)`
         //
-        match bincode::serialize(&item, bincode::Bounded(1 << 20)) {
+        match bincode::serialize(&item) {
             Ok(s) => serialized.extend_from_slice(&s),
             Err(err) => return Err(Error::Io(io::Error::new(io::ErrorKind::Other, err))),
         }
-        match self.framed.start_send(serialized) {
+        match self.framed.start_send(serialized.freeze()) {
             Ok(async_sink) => match async_sink {
                 AsyncSink::Ready => Ok(AsyncSink::Ready),
                 AsyncSink::NotReady(_) => Ok(AsyncSink::NotReady(item)),
             },
-            Err(err) => Err(Error::Io(err))
+            Err(err) => Err(Error::Io(err)),
         }
     }
 
@@ -443,57 +485,76 @@ impl Sink for WireMessages {
 
 /// A message between internal threads/tasks.
 #[derive(Clone, Debug)]
-pub enum InternalMessageKind {
-    Wire(WireMessage),
+pub enum InternalMessageKind<T: Contribution> {
+    Wire(WireMessage<T>),
     HbMessage(Message),
-    HbInput(Input),
+    HbInput(Input<T>),
     PeerDisconnect,
     NewIncomingConnection(InAddr, PublicKey, bool),
     NewOutgoingConnection,
 }
 
-
 /// A message between internal threads/tasks.
 #[derive(Clone, Debug)]
-pub struct InternalMessage {
+pub struct InternalMessage<T: Contribution> {
     src_uid: Option<Uid>,
     src_addr: OutAddr,
-    kind: InternalMessageKind,
+    kind: InternalMessageKind<T>,
 }
 
-impl InternalMessage {
-    pub fn new(src_uid: Option<Uid>, src_addr: OutAddr, kind: InternalMessageKind) -> InternalMessage {
-        InternalMessage { src_uid: src_uid, src_addr, kind }
+impl<T: Contribution> InternalMessage<T> {
+    pub fn new(
+        src_uid: Option<Uid>,
+        src_addr: OutAddr,
+        kind: InternalMessageKind<T>,
+    ) -> InternalMessage<T> {
+        InternalMessage {
+            src_uid,
+            src_addr,
+            kind,
+        }
     }
 
     /// Returns a new `InternalMessage` without a uid.
-    pub fn new_without_uid(src_addr: OutAddr, kind: InternalMessageKind) -> InternalMessage {
+    pub fn new_without_uid(src_addr: OutAddr, kind: InternalMessageKind<T>) -> InternalMessage<T> {
         InternalMessage::new(None, src_addr, kind)
     }
 
-    pub fn wire(src_uid: Option<Uid>, src_addr: OutAddr, wire_message: WireMessage) -> InternalMessage {
+    pub fn wire(
+        src_uid: Option<Uid>,
+        src_addr: OutAddr,
+        wire_message: WireMessage<T>,
+    ) -> InternalMessage<T> {
         InternalMessage::new(src_uid, src_addr, InternalMessageKind::Wire(wire_message))
     }
 
-    pub fn hb_message(src_uid: Uid, src_addr: OutAddr, msg: Message) -> InternalMessage {
+    pub fn hb_message(src_uid: Uid, src_addr: OutAddr, msg: Message) -> InternalMessage<T> {
         InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::HbMessage(msg))
     }
 
-    pub fn hb_input(src_uid: Uid, src_addr: OutAddr, input: Input) -> InternalMessage {
+    pub fn hb_input(src_uid: Uid, src_addr: OutAddr, input: Input<T>) -> InternalMessage<T> {
         InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::HbInput(input))
     }
 
-    pub fn peer_disconnect(src_uid: Uid, src_addr: OutAddr) -> InternalMessage {
+    pub fn peer_disconnect(src_uid: Uid, src_addr: OutAddr) -> InternalMessage<T> {
         InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::PeerDisconnect)
     }
 
-    pub fn new_incoming_connection(src_uid: Uid, src_addr: OutAddr, src_in_addr: InAddr,
-            src_pk: PublicKey, request_change_add: bool) -> InternalMessage {
-        InternalMessage::new(Some(src_uid), src_addr,
-            InternalMessageKind::NewIncomingConnection(src_in_addr, src_pk, request_change_add))
+    pub fn new_incoming_connection(
+        src_uid: Uid,
+        src_addr: OutAddr,
+        src_in_addr: InAddr,
+        src_pk: PublicKey,
+        request_change_add: bool,
+    ) -> InternalMessage<T> {
+        InternalMessage::new(
+            Some(src_uid),
+            src_addr,
+            InternalMessageKind::NewIncomingConnection(src_in_addr, src_pk, request_change_add),
+        )
     }
 
-    pub fn new_outgoing_connection(src_addr: OutAddr) -> InternalMessage {
+    pub fn new_outgoing_connection(src_addr: OutAddr) -> InternalMessage<T> {
         InternalMessage::new_without_uid(src_addr, InternalMessageKind::NewOutgoingConnection)
     }
 
@@ -508,12 +569,12 @@ impl InternalMessage {
     }
 
     /// Returns the internal message kind.
-    pub fn kind(&self) -> &InternalMessageKind {
+    pub fn kind(&self) -> &InternalMessageKind<T> {
         &self.kind
     }
 
     /// Consumes this `InternalMessage` into its parts.
-    pub fn into_parts(self) -> (Option<Uid>, OutAddr, InternalMessageKind) {
+    pub fn into_parts(self) -> (Option<Uid>, OutAddr, InternalMessageKind<T>) {
         (self.src_uid, self.src_addr, self.kind)
     }
 }
@@ -525,6 +586,7 @@ impl InternalMessage {
 
 
 
+// android fix
 
 use std::collections::HashSet;
 

@@ -1,0 +1,15 @@
+/home/user/project/hydrabadger-android/target/release/deps/libderivative-e1293a630b608ef5.so: /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/lib.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/ast.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/attr.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/bound.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/clone.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/cmp.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/debug.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/default.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/hash.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/matcher.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/utils.rs
+
+/home/user/project/hydrabadger-android/target/release/deps/derivative-e1293a630b608ef5.d: /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/lib.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/ast.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/attr.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/bound.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/clone.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/cmp.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/debug.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/default.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/hash.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/matcher.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/utils.rs
+
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/lib.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/ast.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/attr.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/bound.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/clone.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/cmp.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/debug.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/default.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/hash.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/matcher.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-1.0.1/src/utils.rs:

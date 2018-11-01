@@ -1,0 +1,12 @@
+/home/user/project/hydrabadger-android/target/release/deps/libsyntex_errors-e490bf6801d57644.rlib: /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/lib.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/diagnostic.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/diagnostic_builder.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/emitter.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/snippet.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/registry.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/styled_buffer.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/lock.rs
+
+/home/user/project/hydrabadger-android/target/release/deps/syntex_errors-e490bf6801d57644.d: /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/lib.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/diagnostic.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/diagnostic_builder.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/emitter.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/snippet.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/registry.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/styled_buffer.rs /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/lock.rs
+
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/lib.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/diagnostic.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/diagnostic_builder.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/emitter.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/snippet.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/registry.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/styled_buffer.rs:
+/home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_errors-0.58.1/src/lock.rs:

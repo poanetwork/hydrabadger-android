@@ -1,0 +1,2 @@
+error: toolchain 'stable-x86_64-unknown-linux-gnu' does not have the binary `rustfmt`
+Custom { kind: Other, error: StringError("Internal rustfmt error") }

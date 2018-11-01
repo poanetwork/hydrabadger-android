@@ -4,6 +4,7 @@ package net.korul.hbbft
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -19,6 +20,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.tab1_content.*
+import ru.hintsolutions.diabets.services.ClosingService
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -447,6 +449,12 @@ class Tab1 : Fragment() {
             button3.isEnabled = false
         }
 
+        val serviceIntent = Intent(context, ClosingService::class.java)
+        serviceIntent.putExtra("uniqueID1", uniqueID1)
+        serviceIntent.putExtra("uniqueID2", uniqueID2)
+        serviceIntent.putExtra("uniqueID3", uniqueID3)
+
+        activity?.startService(serviceIntent)
     }
 
 

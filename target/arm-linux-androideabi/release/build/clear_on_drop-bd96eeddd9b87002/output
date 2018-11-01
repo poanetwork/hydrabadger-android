@@ -1,0 +1,46 @@
+TARGET = Some("arm-linux-androideabi")
+OPT_LEVEL = Some("3")
+TARGET = Some("arm-linux-androideabi")
+HOST = Some("x86_64-unknown-linux-gnu")
+TARGET = Some("arm-linux-androideabi")
+TARGET = Some("arm-linux-androideabi")
+HOST = Some("x86_64-unknown-linux-gnu")
+CC_arm-linux-androideabi = None
+CC_arm_linux_androideabi = None
+TARGET_CC = None
+CC = None
+TARGET = Some("arm-linux-androideabi")
+HOST = Some("x86_64-unknown-linux-gnu")
+CFLAGS_arm-linux-androideabi = None
+CFLAGS_arm_linux_androideabi = None
+TARGET_CFLAGS = None
+CFLAGS = None
+DEBUG = Some("true")
+TARGET = Some("arm-linux-androideabi")
+HOST = Some("x86_64-unknown-linux-gnu")
+CFLAGS_arm-linux-androideabi = None
+CFLAGS_arm_linux_androideabi = None
+TARGET_CFLAGS = None
+CFLAGS = None
+TARGET = Some("arm-linux-androideabi")
+HOST = Some("x86_64-unknown-linux-gnu")
+CFLAGS_arm-linux-androideabi = None
+CFLAGS_arm_linux_androideabi = None
+TARGET_CFLAGS = None
+CFLAGS = None
+running: "arm-linux-androideabi-gcc" "-O3" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-Wall" "-Wextra" "-o" "/home/user/project/hydrabadger-android/target/arm-linux-androideabi/release/build/clear_on_drop-bd96eeddd9b87002/out/src/hide.o" "-c" "src/hide.c"
+exit code: 0
+TARGET = Some("arm-linux-androideabi")
+TARGET = Some("arm-linux-androideabi")
+HOST = Some("x86_64-unknown-linux-gnu")
+AR_arm-linux-androideabi = None
+AR_arm_linux_androideabi = None
+TARGET_AR = None
+AR = None
+TARGET = Some("arm-linux-androideabi")
+TARGET = Some("arm-linux-androideabi")
+running: "arm-linux-androideabi-ar" "crs" "/home/user/project/hydrabadger-android/target/arm-linux-androideabi/release/build/clear_on_drop-bd96eeddd9b87002/out/libclear_on_drop.a" "/home/user/project/hydrabadger-android/target/arm-linux-androideabi/release/build/clear_on_drop-bd96eeddd9b87002/out/src/hide.o"
+exit code: 0
+TARGET = Some("arm-linux-androideabi")
+cargo:rustc-link-lib=static=clear_on_drop
+cargo:rustc-link-search=native=/home/user/project/hydrabadger-android/target/arm-linux-androideabi/release/build/clear_on_drop-bd96eeddd9b87002/out
