@@ -1,1 +1,0 @@
-{"rustc":7311099760834594431,"features":"[\"default\", \"u128-support\"]","target":17743327959297859400,"profile":16031268778408020059,"path":16441150195040690872,"deps":[["byteorder v1.2.6","byteorder",11855751148784208392],["rand v0.4.3","rand",17359119489562512748]],"local":[{"Precalculated":"0.14.2"}],"rustflags":[],"edition":"Edition2015"}

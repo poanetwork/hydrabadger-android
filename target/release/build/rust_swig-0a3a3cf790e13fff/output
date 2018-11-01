@@ -1,4 +1,0 @@
-cargo:rerun-if-changed=src/java_jni/jni-include.rs
-cargo:rerun-if-changed=src/cpp/cpp-include.rs
-cargo:rerun-if-changed=/home/user/project/hydrabadger-android/target/release/build/rust_swig-0a3a3cf790e13fff/out
-cargo:rerun-if-changed=tests/test_includes_syntax.rs
