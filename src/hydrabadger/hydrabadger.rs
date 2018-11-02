@@ -193,9 +193,9 @@ impl<T: Contribution> Hydrabadger<T>  {
 
 
     /// Returns a new Hydrabadger node.
-    pub fn with_defaults(addr: SocketAddr) -> Self {
-        Hydrabadger::new(addr, Config::default())
-    }
+    // pub fn with_defaults(addr: SocketAddr) -> Self {
+    //     Hydrabadger::new(addr, Config::default())
+    // }
 
     /// Returns the pre-created handler.
     pub fn handler(&self) -> Option<Handler<T>> {
@@ -417,11 +417,11 @@ impl<T: Contribution> Hydrabadger<T>  {
     }
 
 
-    // fn generate_contributions(self, gen_txns: Option<fn(usize, usize) -> T>)
-    fn generate_contributions(self)
+    fn generate_contributions(self, gen_txns: Option<fn() -> T>)
+    // fn generate_contributions(self)
         -> impl Future<Item = (), Error = ()>
     {
-        // if let Some(gen_txns) = gen_txns {
+        if let Some(gen_txns) = gen_txns {
             let epoch_stream = self.register_epoch_listener();
             let gen_delay = self.inner.config.txn_gen_interval;
             let gen_cntrb = epoch_stream
@@ -439,11 +439,8 @@ impl<T: Contribution> Hydrabadger<T>  {
                             //     "Generating and inputting {} random transactions...",
                             //     self.inner.config.txn_gen_count
                             // );
-                            // // Send some random transactions to our internal HB instance.
-                            // let txns = gen_txns(
-                            //     self.inner.config.txn_gen_count,
-                            //     self.inner.config.txn_gen_bytes,
-                            // );
+                            // Send some random transactions to our internal HB instance.
+                            // let txns = gen_txns();
 
                             // hdb.send_internal(InternalMessage::hb_input(
                             //     hdb.inner.uid,
@@ -452,24 +449,10 @@ impl<T: Contribution> Hydrabadger<T>  {
                             // ));
 
 
-                        // android fix
-
-                        // TODO transaction
-                        // Send some random transactions to our internal HB instance.
-                        // let mut vec: Vec<Transaction> = Vec::new();
-                        // let txns = Transaction::random(20);
-                        // vec.push(txns);
-                        // hdb.send_internal(InternalMessage::hb_input(
-                        //     hdb.inner.uid,
-                        //     OutAddr(*hdb.inner.addr),
-                        //     DhbInput::User(vec),
-                        // ));
-                        
-
-                        //TODO message
-                        if self.num == 0 {
-                             let txns = Transaction::get_tr1();
-                            if !txns.is_empty() {
+                            // android fix
+                            //TODO message
+                            let txns = gen_txns();
+                            // if !txns.is_empty() {
                                 warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
                                 hdb.send_internal (
                                     InternalMessage::hb_input (
@@ -479,37 +462,7 @@ impl<T: Contribution> Hydrabadger<T>  {
                                     )
                                 );
                                 warn!("!! {} - send_internal__ ", self.num);
-                            }
-                        }
-                        if self.num == 1 {
-                            let txns = Transaction::get_tr2();
-                            if !txns.is_empty() {
-                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                                hdb.send_internal (
-                                    InternalMessage::hb_input (
-                                        hdb.inner.uid, 
-                                        OutAddr(*hdb.inner.addr),
-                                        DhbInput::User(txns)
-                                    )
-                                );
-                                warn!("!! {} - send_internal__", self.num);
-                            }
-                        }
-                        if self.num == 2 {
-                            let txns = Transaction::get_tr3();
-                            if !txns.is_empty() {
-                                warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
-                                hdb.send_internal (
-                                    InternalMessage::hb_input (
-                                        hdb.inner.uid, 
-                                        OutAddr(*hdb.inner.addr), 
-                                        DhbInput::User(txns)
-                                    )
-                                );
-                                warn!("!! {} - send_internal__", self.num);
-                            }
-                        }
-
+                            // }
                         }
                         _ => {}
                     }
@@ -519,9 +472,9 @@ impl<T: Contribution> Hydrabadger<T>  {
 
             Either::A(gen_cntrb)
 
-        // } else {
-        //     Either::B(future::ok(()))
-        // }
+        } else {
+            Either::B(future::ok(()))
+        }
     }
 
     /// Returns a future that generates random transactions and logs status
@@ -569,7 +522,7 @@ impl<T: Contribution> Hydrabadger<T>  {
     pub fn node(
         self,
         remotes: Option<HashSet<SocketAddr>>,
-        // gen_txns: Option<fn(usize, usize) -> T>,
+        gen_txns: Option<fn() -> T>,
     ) -> impl Future<Item = (), Error = ()> {
         let socket = TcpListener::bind(&self.inner.addr).unwrap();
         info!("Listening on: {}", self.inner.addr);
@@ -602,8 +555,8 @@ impl<T: Contribution> Hydrabadger<T>  {
             .map_err(|err| error!("Handler internal error: {:?}", err));
 
         let log_status = self.clone().log_status();
-        // let generate_contributions = self.clone().generate_contributions(gen_txns);
-        let generate_contributions = self.clone().generate_contributions();
+        let generate_contributions = self.clone().generate_contributions(gen_txns);
+        // let generate_contributions = self.clone().generate_contributions();
 
         listen
             .join5(connect, hdb_handler, log_status, generate_contributions)
@@ -614,10 +567,10 @@ impl<T: Contribution> Hydrabadger<T>  {
     pub fn run_node(
         self,
         remotes: Option<HashSet<SocketAddr>>,
-        // gen_txns: Option<fn(usize, usize) -> T>,
+        gen_txns: Option<fn() -> T>,
     ) {
-        // tokio::run(self.node(remotes, gen_txns));
-        tokio::run(self.node(remotes));
+        tokio::run(self.node(remotes, gen_txns));
+        // tokio::run(self.node(remotes));
     }
 
     pub fn addr(&self) -> &InAddr {
@@ -647,14 +600,14 @@ pub struct HydrabadgerWeak<T: Contribution> {
     batch_rx: Weak<Mutex<Option<BatchRx<T>>>>,
 }
 
-impl<T: Contribution> HydrabadgerWeak<T> {
-    pub fn upgrade(self) -> Option<Hydrabadger<T>> {
-        self.inner.upgrade() .and_then(|inner| {
-            self.handler.upgrade().and_then(|handler| {
-                self.batch_rx.upgrade().and_then(|batch_rx|{
-                    Some(Hydrabadger { inner, handler, batch_rx })
-                })
-            })
-        })
-    }
-}
+// impl<T: Contribution> HydrabadgerWeak<T> {
+//     pub fn upgrade(self) -> Option<Hydrabadger<T>> {
+//         self.inner.upgrade() .and_then(|inner| {
+//             self.handler.upgrade().and_then(|handler| {
+//                 self.batch_rx.upgrade().and_then(|batch_rx|{
+//                     Some(Hydrabadger { inner, handler, batch_rx })
+//                 })
+//             })
+//         })
+//     }
+// }

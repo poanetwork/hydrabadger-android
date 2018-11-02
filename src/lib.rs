@@ -157,7 +157,6 @@ impl Transaction {
 
     fn get_tr1() -> Vec<Transaction> {
         unsafe {
-            // warn!("!!get_tr1 {}", M_TEXT1 );
             let mut vec: Vec<Transaction> = Vec::new();
             match M_TEXT1 {
                 Some(ref mut x) => {
@@ -174,7 +173,6 @@ impl Transaction {
 
     fn get_tr2() -> Vec<Transaction> {
         unsafe {
-            // warn!("!!get_tr2 {}", M_TEXT2);
             let mut vec: Vec<Transaction> = Vec::new();
             match M_TEXT2 {
                 Some(ref mut x) => {
@@ -190,7 +188,6 @@ impl Transaction {
     }
 
     fn get_tr3() -> Vec<Transaction> {
-        // warn!("!!get_tr3 {}", M_TEXT3);
         unsafe {
             let mut vec: Vec<Transaction> = Vec::new();
             match M_TEXT3 {
@@ -608,9 +605,9 @@ static mut M_NUM_OF_CALLBACK: i32 = 0;
 
 struct Session {
     observers: Vec<Box<OnEvent>>,
-    handler1: Arc<Mutex<Option<Hydrabadger>>>,
-    handler2: Arc<Mutex<Option<Hydrabadger>>>,
-    handler3: Arc<Mutex<Option<Hydrabadger>>>,
+    // handler1: Arc<Mutex<Option<Hydrabadger>>>,
+    // handler2: Arc<Mutex<Option<Hydrabadger>>>,
+    // handler3: Arc<Mutex<Option<Hydrabadger>>>,
 }
 
 impl Session {
@@ -625,9 +622,10 @@ impl Session {
         info!("init log system - done");
 
         Session {  observers: Vec::new(),
-                    handler1: Arc::new(Mutex::new(None)),
-                    handler2: Arc::new(Mutex::new(None)),
-                    handler3: Arc::new(Mutex::new(None)),}
+                    // handler1: Arc::new(Mutex::new(None)),
+                    // handler2: Arc::new(Mutex::new(None)),
+                    // handler3: Arc::new(Mutex::new(None)),
+                }
     }
 
     fn subscribe(&mut self, cb: Box<OnEvent>) {
@@ -644,25 +642,19 @@ impl Session {
         unsafe {
             warn!("!!send_message: {:?}", str1);
 
-            let mut new_string = String::new();
-            new_string = format!("{}!", str1);
-
-
-            // let ret = mem::transmute(&str1 as &String);
-            // mem::forget(str1);
-            // let S1: &'static mut String = ret;
+            let new_string = format!("{}!", str1);
             warn!("!!send_message string: {:?}", new_string);
 
             if num == 0 {
-                M_TEXT1 = Some(new_string);
+                M_TEXT1 = Some(new_string.clone());
                 warn!("!!send_message string1: {:?}", M_TEXT1);
             }
             else if num == 1 {
-                M_TEXT2 = Some(new_string);
+                M_TEXT2 = Some(new_string.clone());
                 warn!("!!send_message string1: {:?}", M_TEXT2);
             }
             else if num == 2 {
-                M_TEXT3 = Some(new_string);
+                M_TEXT3 = Some(new_string.clone());
                 warn!("!!send_message string1: {:?}", M_TEXT3);
             }
         }
@@ -702,13 +694,21 @@ impl Session {
             // let hb = Hydrabadger::new(bind_address, cfg, callback_, num);
 
             if num == 0 {
-                *self.handler1.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
+                // *self.handler1.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
+                let hb = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
                 M_NUM_OF_CALLBACK += 1;
                 
-                match self.handler1.lock().take() {
+                // match self.handler1.lock().take() {
+                match hb {
                     Some(v) => {
+                        let gen_txn = || {
+                            (0..0)
+                                .map(|_| Transaction::get_tr1())
+                                .collect::<Vec<_>>()
+                        };
+
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses));
+                            v.run_node(Some(remote_addresses), Some(gen_txn));
                         });
                     },
                     None => {},
@@ -716,12 +716,20 @@ impl Session {
                 warn!("!!match out started Node: {:?}", num);
             }
             else if num == 1 {
-                *self.handler2.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
+                // *self.handler2.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
+                let hb = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
                 M_NUM_OF_CALLBACK += 1;
-                match self.handler2.lock().take() {
+                // match self.handler2.lock().take() {
+                match hb {
                     Some(v) => {
+                        let gen_txn = || {
+                            (0..0)
+                                .map(|_| Transaction::get_tr2())
+                                .collect::<Vec<_>>()
+                        };
+
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses));
+                            v.run_node(Some(remote_addresses), Some(gen_txn));
                         });
                     },
                     None => {},
@@ -729,13 +737,21 @@ impl Session {
                 warn!("!!match out started Node: {:?}", num);
             }
             else if num == 2 {
-                *self.handler3.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
+                // *self.handler3.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
+                let hb = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
                 M_NUM_OF_CALLBACK += 1;
 
-                match self.handler3.lock().take() {
+                // match self.handler3.lock().take() {
+                match hb {
                     Some(v) => {
+                        let gen_txn = || {
+                            (0..0)
+                                .map(|_| Transaction::get_tr3())
+                                .collect::<Vec<_>>()
+                        };
+
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses));
+                            v.run_node(Some(remote_addresses), Some(gen_txn));
                         });
                     },
                     None => {},
