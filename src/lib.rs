@@ -161,6 +161,7 @@ impl Transaction {
             match M_TEXT1 {
                 Some(ref mut x) => {
                     vec.push( Transaction(x.to_string()) );
+                    warn!("!!get_tr1: {:?}", M_TEXT1);
                     M_TEXT1 = None;
                     vec
                 }
@@ -177,6 +178,7 @@ impl Transaction {
             match M_TEXT2 {
                 Some(ref mut x) => {
                     vec.push( Transaction(x.to_string()) );
+                    warn!("!!get_tr2: {:?}", M_TEXT2);
                     M_TEXT2 = None;
                     vec
                 }
@@ -193,6 +195,7 @@ impl Transaction {
             match M_TEXT3 {
                 Some(ref mut x) => {
                     vec.push( Transaction(x.to_string()) );
+                    warn!("!!get_tr3: {:?}", M_TEXT3);
                     M_TEXT3 = None;
                     vec
                 }
@@ -640,22 +643,17 @@ impl Session {
 
     pub fn send_message(&self, num: i32, str1: String) {
         unsafe {
-            warn!("!!send_message: {:?}", str1);
-
             let new_string = format!("{}!", str1);
             warn!("!!send_message string: {:?}", new_string);
 
             if num == 0 {
                 M_TEXT1 = Some(new_string.clone());
-                warn!("!!send_message string1: {:?}", M_TEXT1);
             }
             else if num == 1 {
                 M_TEXT2 = Some(new_string.clone());
-                warn!("!!send_message string1: {:?}", M_TEXT2);
             }
             else if num == 2 {
                 M_TEXT3 = Some(new_string.clone());
-                warn!("!!send_message string1: {:?}", M_TEXT3);
             }
         }
     }
@@ -702,8 +700,9 @@ impl Session {
                 match hb {
                     Some(v) => {
                         let gen_txn = || {
-                            (0..0)
+                            (0..1)
                                 .map(|_| Transaction::get_tr1())
+                                // .map(|_| Transaction::random(5))
                                 .collect::<Vec<_>>()
                         };
 
@@ -723,8 +722,9 @@ impl Session {
                 match hb {
                     Some(v) => {
                         let gen_txn = || {
-                            (0..0)
+                            (0..1)
                                 .map(|_| Transaction::get_tr2())
+                                // .map(|_| Transaction::random(5))
                                 .collect::<Vec<_>>()
                         };
 
@@ -745,7 +745,8 @@ impl Session {
                 match hb {
                     Some(v) => {
                         let gen_txn = || {
-                            (0..0)
+                            (0..1)
+                                // .map(|_| Transaction::random(5))
                                 .map(|_| Transaction::get_tr3())
                                 .collect::<Vec<_>>()
                         };

@@ -12,7 +12,7 @@ use super::{Error, Hydrabadger, InputOrMessage, State, StateDsct};
 use crossbeam::queue::SegQueue;
 use hbbft::{
     crypto::{PublicKey, PublicKeySet},
-    dynamic_honey_badger::{ChangeState, JoinPlan, Message as DhbMessage, Change as DhbChange, Input as DhbInput},
+    dynamic_honey_badger::{ChangeState, JoinPlan, Message as DhbMessage, Change as DhbChange, Input as DhbInput, Batch},
     // queueing_honey_badger::{Change as QhbChange, Input as QhbInput},
     sync_key_gen::{Ack, AckOutcome, Part, PartOutcome, SyncKeyGen},
     DistAlgorithm, Target
@@ -788,11 +788,34 @@ impl<T: Contribution> Future for Handler<T> {
         // Process all honey badger output batches:
         while let Some(mut step) = self.step_queue.try_pop() {
             for batch in step.output.drain(..) {
-                info!("A HONEY BADGER BATCH WITH CONTRIBUTIONS IS BEING STREAMED...");
+                info!("!! A HONEY BADGER BATCH WITH CONTRIBUTIONS IS BEING STREAMED...");
 
                 let batch_epoch = batch.epoch();
                 let prev_epoch = self.hdb.set_current_epoch(batch_epoch + 1);
                 assert_eq!(prev_epoch, batch_epoch);
+
+                // android fix
+                //TODO need compare on empty
+                // if !mybatch.is_empty() {
+                    for (uid, int_contrib) in batch.contributions() {
+                        let local_uid = *self.hdb.uid();
+                        //TODO need compare on empty
+                        // if !int_contrib.is_empty() {
+                            let id_string = format!("{}", uid);
+                            let trans_string = format!("{:?}", int_contrib);
+                            
+                            warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
+
+                            if local_uid == *uid {
+                                // call
+                                (self.callbackbatch)(self.num, true, id_string.clone(), trans_string.clone());
+                            }
+                            else {
+                                (self.callbackbatch)(self.num, false, id_string.clone(), trans_string.clone());
+                            }
+                        // }
+                    }
+                // }
 
                 // TODO: Remove
                 if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {

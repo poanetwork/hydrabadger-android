@@ -461,7 +461,7 @@ dependencies = [
 
 [[package]]
 name = "hydrabadger-android"
-version = "0.0.2"
+version = "0.0.5"
 dependencies = [
  "android_logger 0.6.0 (git+https://github.com/Nercury/android_logger-rs)",
  "bincode 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -483,7 +483,7 @@ dependencies = [
  "log 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "log-panics 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-bigint 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "num-traits 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)",
  "pairing 0.14.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",

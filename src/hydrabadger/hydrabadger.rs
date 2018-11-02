@@ -36,9 +36,9 @@ use {
 };
 
 // The number of random transactions to generate per interval.
-const DEFAULT_TXN_GEN_COUNT: usize = 5;
+const DEFAULT_TXN_GEN_COUNT: usize = 1;
 // The interval between randomly generated transactions.
-const DEFAULT_TXN_GEN_INTERVAL: u64 = 5000;
+const DEFAULT_TXN_GEN_INTERVAL: u64 = 10000;
 // The number of bytes per randomly generated transaction.
 const DEFAULT_TXN_GEN_BYTES: usize = 2;
 // The minimum number of peers needed to spawn a HB instance.
@@ -416,7 +416,6 @@ impl<T: Contribution> Hydrabadger<T>  {
             // }
     }
 
-
     fn generate_contributions(self, gen_txns: Option<fn() -> T>)
     // fn generate_contributions(self)
         -> impl Future<Item = (), Error = ()>
@@ -450,9 +449,11 @@ impl<T: Contribution> Hydrabadger<T>  {
 
 
                             // android fix
-                            //TODO message
+                            //TODO message 
+                            //TODO need not send empty
                             let txns = gen_txns();
-                            // if !txns.is_empty() {
+                            // let vec1;
+                            // if !vec1.is_empty() {
                                 warn!("!! {} - send_internal {}", self.num, *hdb.inner.addr);
                                 hdb.send_internal (
                                     InternalMessage::hb_input (
@@ -461,7 +462,7 @@ impl<T: Contribution> Hydrabadger<T>  {
                                         DhbInput::User(txns)
                                     )
                                 );
-                                warn!("!! {} - send_internal__ ", self.num);
+                            // warn!("!! {} - send_internal__ ", self.num);
                             // }
                         }
                         _ => {}

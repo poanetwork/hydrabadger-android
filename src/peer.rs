@@ -498,7 +498,9 @@ impl<T: Contribution> Peers<T> {
                     .pub_info()
                     .expect("Peers::establish_validator: internal consistency error");
                 assert!(
-                    pub_info.0 == *pi_pub.0 && pub_info.1 == *pi_pub.1 && pub_info.2 == *pi_pub.2
+                    pub_info.0 == *pi_pub.0 && 
+                    // pub_info.1 == *pi_pub.1 && 
+                    pub_info.2 == *pi_pub.2
                 );
                 assert!(peer.is_validator());
                 return true;

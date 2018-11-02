@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import android.widget.TextView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -77,34 +78,40 @@ class Tab1 : Fragment() {
 
     @SuppressLint("CheckResult")
     private fun startTimerThread1(str: String) {
+        Log.d("HYDRABADGERTAG", "!!startTimerThread1")
         Observable.just(Optional(null))
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { _ ->
                     val text = view?.findViewById<TextView>(R.id.Text1)
                     text?.text = str
+                    scrollView1?.fullScroll(ScrollView.FOCUS_DOWN)
                 }
     }
 
     @SuppressLint("CheckResult")
     private fun startTimerThread2(str: String) {
+        Log.d("HYDRABADGERTAG", "!!startTimerThread2")
         Observable.just(Optional(null))
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { _ ->
                     val text = view?.findViewById<TextView>(R.id.Text2)
                     text?.text = str
+                    scrollView2?.fullScroll(ScrollView.FOCUS_DOWN)
                 }
     }
 
     @SuppressLint("CheckResult")
     private fun startTimerThread3(str: String) {
+        Log.d("HYDRABADGERTAG", "!!startTimerThread3")
         Observable.just(Optional(null))
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { _ ->
                     val text = view?.findViewById<TextView>(R.id.Text3)
                     text?.text = str
+                    scrollView3?.fullScroll(ScrollView.FOCUS_DOWN)
                 }
     }
 
@@ -112,7 +119,8 @@ class Tab1 : Fragment() {
     @SuppressLint("CheckResult")
     private fun updateFloatBut1() {
         val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton1)
-        if(fab?.rippleColorStateList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+        if(fab?.backgroundTintList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+            Log.d("HYDRABADGERTAG", "!!updateFloatBut1")
             Observable.just(Optional(null))
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -126,7 +134,8 @@ class Tab1 : Fragment() {
     @SuppressLint("CheckResult")
     private fun updateFloatBut2() {
         val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton2)
-        if(fab?.rippleColorStateList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+        if(fab?.backgroundTintList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+            Log.d("HYDRABADGERTAG", "!!updateFloatBut2")
             Observable.just(Optional(null))
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -140,7 +149,8 @@ class Tab1 : Fragment() {
     @SuppressLint("CheckResult")
     private fun updateFloatBut3() {
         val fab = view?.findViewById<FloatingActionButton>(R.id.floatingActionButton3)
-        if(fab?.rippleColorStateList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+        if(fab?.backgroundTintList != ColorStateList.valueOf(0xFF4CAF50.toInt())) {
+            Log.d("HYDRABADGERTAG", "!!updateFloatBut3")
             Observable.just(Optional(null))
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -354,7 +364,6 @@ class Tab1 : Fragment() {
                             }
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show()
-
                 })
 
 

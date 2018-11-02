@@ -1,11 +1,11 @@
 [package]
 name = "hydrabadger-android"
-version = "0.0.2"
+version = "0.0.5"
 authors = ["Vladimir Orlov <korul1@yandex.ru>"]
 build = "build.rs"
 
 [lib]
-name = "mobcore"
+name = "hydra_android"
 crate-type = ["cdylib"]
 
 [build-dependencies]
