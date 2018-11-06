@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 
 /**
  * Created by korul on 16.03.17.
@@ -25,20 +26,7 @@ class hbbft : Application() {
         try {
             System.loadLibrary("hydra_android")
         } catch (e: UnsatisfiedLinkError) {
-
-            val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            } else {
-                AlertDialog.Builder(this)
-            }
-            builder.setTitle("Load libary ERROR")
-                    .setMessage(e.message)
-                    .setPositiveButton(android.R.string.yes) { dialog, which ->
-                        dialog.cancel()
-                    }
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show()
-
+            Toast.makeText(this, "Load libary ERROR ${e.toString()}", Toast.LENGTH_SHORT).show()
             Log.e(TAG, "Load libary ERROR: $e")
             return
         }

@@ -51,7 +51,7 @@ extern crate tokio_serde_bincode;
 // android fix
 use android_logger::Filter;
 use log::Level;
-use parking_lot::{Mutex};
+// use parking_lot::{Mutex};
 
 #[cfg(feature = "nightly")]
 use alloc_system::System;
@@ -78,11 +78,11 @@ use std::{
     ops::Deref,
     
     // android fix
-    sync::{
-        Arc,
-    },
+    // sync::{
+    //     Arc,
+    // },
     thread,
-    mem,
+    // mem,
 };
 use tokio::{io, net::TcpStream, prelude::*, codec::{Framed, LengthDelimitedCodec}};
 use uuid::Uuid;
@@ -155,6 +155,51 @@ impl Transaction {
         Transaction(result)
     }
 
+    fn is_empty1() -> bool {
+        unsafe {
+            match M_TEXT1 {
+                Some(ref mut _x) => {
+                    warn!("!!is_empty1: false");
+                    false
+                }
+                None => {
+                    warn!("!!is_empty1: true");
+                    true
+                }
+            }
+        }
+    }
+
+    fn is_empty2() -> bool {
+        unsafe {
+            match M_TEXT2 {
+                Some(ref mut _x) => {
+                    warn!("!!is_empty2: false");
+                    false
+                }
+                None => {
+                    warn!("!!is_empty2: true");
+                    true
+                }
+            }
+        }
+    }
+
+    fn is_empty3() -> bool {
+        unsafe {
+            match M_TEXT3 {
+                Some(ref mut _x) => {
+                    warn!("!!is_empty3: false");
+                    false
+                }
+                None => {
+                    warn!("!!is_empty3: true");
+                    true
+                }
+            }
+        }
+    }
+
     fn get_tr1() -> Vec<Transaction> {
         unsafe {
             let mut vec: Vec<Transaction> = Vec::new();
@@ -166,6 +211,7 @@ impl Transaction {
                     vec
                 }
                 None => {
+                    warn!("!!get_tr1: Empty");
                     vec
                 }
             }
@@ -183,6 +229,7 @@ impl Transaction {
                     vec
                 }
                 None => {
+                    warn!("!!get_tr2: Empty");
                     vec
                 }
             }
@@ -200,6 +247,7 @@ impl Transaction {
                     vec
                 }
                 None => {
+                    warn!("!!get_tr3: Empty");
                     vec
                 }
             }
@@ -706,8 +754,12 @@ impl Session {
                                 .collect::<Vec<_>>()
                         };
 
+                        let is_empty = || {
+                            Transaction::is_empty1()
+                        };
+
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses), Some(gen_txn));
+                            v.run_node(Some(remote_addresses), Some(gen_txn), is_empty);
                         });
                     },
                     None => {},
@@ -728,8 +780,12 @@ impl Session {
                                 .collect::<Vec<_>>()
                         };
 
+                        let is_empty = || {
+                            Transaction::is_empty2()
+                        };
+
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses), Some(gen_txn));
+                            v.run_node(Some(remote_addresses), Some(gen_txn), is_empty);
                         });
                     },
                     None => {},
@@ -751,8 +807,12 @@ impl Session {
                                 .collect::<Vec<_>>()
                         };
 
+                        let is_empty = || {
+                            Transaction::is_empty3()
+                        };
+
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses), Some(gen_txn));
+                            v.run_node(Some(remote_addresses), Some(gen_txn), is_empty);
                         });
                     },
                     None => {},

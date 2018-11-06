@@ -206,15 +206,15 @@ class Tab1 : Fragment() {
 
             updateFloatBut1()
 
-            if(!uid.isEmpty() && !mes.isEmpty()) {
+            if(!uid.isEmpty() && !mes.isEmpty() && mes != "[[]]") {
                 val text1 = view.findViewById<TextView>(R.id.Text1)
                 if (you) {
                     val str = SpannableStringBuilder()
                     str.append(text1.text)
                     str.append("\n")
                     str.append("you: ")
-                    var mess = mes.removeRange(0, 15)
-                    mess = mess.removeRange(mess.count()-5, mess.count())
+                    var mess = mes.removeRange(0, 14)
+                    mess = mess.removeRange(mess.count() - 3, mess.count())
                     str.append(mess)
 
                     startTimerThread1(str.toString())
@@ -225,8 +225,8 @@ class Tab1 : Fragment() {
                     str.append("\n")
                     str.append(uid)
                     str.append(": ")
-                    var mess = mes.removeRange(0, 15)
-                    mess = mess.removeRange(mess.count()-5, mess.count())
+                    var mess = mes.removeRange(0, 14)
+                    mess = mess.removeRange(mess.count() - 3, mess.count())
                     str.append(mess)
 
                     startTimerThread1(str.toString())
@@ -238,15 +238,15 @@ class Tab1 : Fragment() {
 
             updateFloatBut2()
 
-            if(!uid.isEmpty() && !mes.isEmpty()) {
+            if(!uid.isEmpty() && !mes.isEmpty() && mes != "[[]]") {
                 val text1 = view.findViewById<TextView>(R.id.Text2)
                 if (you) {
                     val str = SpannableStringBuilder()
                     str.append(text1.text)
                     str.append("\n")
                     str.append("you: ")
-                    var mess = mes.removeRange(0, 15)
-                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    var mess = mes.removeRange(0, 14)
+                    mess = mess.removeRange(mess.count() - 3, mess.count())
                     str.append(mess)
 
                     startTimerThread2(str.toString())
@@ -256,8 +256,8 @@ class Tab1 : Fragment() {
                     str.append("\n")
                     str.append(uid)
                     str.append(": ")
-                    var mess = mes.removeRange(0, 15)
-                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    var mess = mes.removeRange(0, 14)
+                    mess = mess.removeRange(mess.count() - 3, mess.count())
                     str.append(mess)
 
                     startTimerThread2(str.toString())
@@ -269,15 +269,15 @@ class Tab1 : Fragment() {
 
             updateFloatBut3()
 
-            if(!uid.isEmpty() && !mes.isEmpty()) {
+            if(!uid.isEmpty() && !mes.isEmpty() && mes != "[[]]") {
                 val text1 = view.findViewById<TextView>(R.id.Text3)
                 if (you) {
                     val str = SpannableStringBuilder()
                     str.append(text1.text)
                     str.append("\n")
                     str.append("you: ")
-                    var mess = mes.removeRange(0, 15)
-                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    var mess = mes.removeRange(0, 14)
+                    mess = mess.removeRange(mess.count() - 3, mess.count())
                     str.append(mess)
 
                     startTimerThread3(str.toString())
@@ -287,8 +287,8 @@ class Tab1 : Fragment() {
                     str.append("\n")
                     str.append(uid)
                     str.append(": ")
-                    var mess = mes.removeRange(0, 15)
-                    mess = mess.removeRange(mess.count() - 5, mess.count())
+                    var mess = mes.removeRange(0, 14)
+                    mess = mess.removeRange(mess.count() - 3, mess.count())
                     str.append(mess)
 
                     startTimerThread3(str.toString())

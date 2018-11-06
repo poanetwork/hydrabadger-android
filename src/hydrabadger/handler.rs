@@ -12,7 +12,7 @@ use super::{Error, Hydrabadger, InputOrMessage, State, StateDsct};
 use crossbeam::queue::SegQueue;
 use hbbft::{
     crypto::{PublicKey, PublicKeySet},
-    dynamic_honey_badger::{ChangeState, JoinPlan, Message as DhbMessage, Change as DhbChange, Input as DhbInput, Batch},
+    dynamic_honey_badger::{ChangeState, JoinPlan, Message as DhbMessage, Change as DhbChange, Input as DhbInput},
     // queueing_honey_badger::{Change as QhbChange, Input as QhbInput},
     sync_key_gen::{Ack, AckOutcome, Part, PartOutcome, SyncKeyGen},
     DistAlgorithm, Target
@@ -413,6 +413,10 @@ impl<T: Contribution> Handler<T>  {
                         )?);
                     }
                 }
+
+                // android fix
+                (self.callbackbatch)(self.num, true, "".to_string(), "".to_string());
+
                 for l in self.hdb.epoch_listeners().iter() {
                     l.unbounded_send(self.hdb.current_epoch())
                         .map_err(|_| Error::InstantiateHbListenerDropped)?;
@@ -505,9 +509,7 @@ impl<T: Contribution> Handler<T>  {
                 // android fix
                 && peer_info.in_addr != self.addr_out 
             {
-                
-                warn!("@@@@@@@@@@@@@I am HERE suck {} - {} ", self.addr, self.addr_out);
-
+                warn!("@@ I am HERE {} - {} ", self.addr, self.addr_out);
                 let local_pk = self.hdb.secret_key().public_key();
                 tokio::spawn(self.hdb.clone().connect_outgoing(
                     peer_info.in_addr.0,
@@ -683,6 +685,8 @@ impl<T: Contribution> Handler<T>  {
                     assert!(src_uid_new == src_uid.clone().unwrap());
                     let mut peers = self.hdb.peers_mut();
 
+                    warn!("!! {} - handle_internal_message  WelcomeReceivedChangeAdd - {} - {}", self.num, src_out_addr, src_out_addr.0);
+
                     // Set new (outgoing-connection) peer's public info:
                     peers.establish_validator(
                         src_out_addr,
@@ -796,7 +800,7 @@ impl<T: Contribution> Future for Handler<T> {
 
                 // android fix
                 //TODO need compare on empty
-                // if !mybatch.is_empty() {
+                // if !batch.is_empty() {
                     for (uid, int_contrib) in batch.contributions() {
                         let local_uid = *self.hdb.uid();
                         //TODO need compare on empty
@@ -804,23 +808,25 @@ impl<T: Contribution> Future for Handler<T> {
                             let id_string = format!("{}", uid);
                             let trans_string = format!("{:?}", int_contrib);
                             
-                            warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
-
-                            if local_uid == *uid {
-                                // call
-                                (self.callbackbatch)(self.num, true, id_string.clone(), trans_string.clone());
-                            }
-                            else {
-                                (self.callbackbatch)(self.num, false, id_string.clone(), trans_string.clone());
-                            }
+                            // if trans_string.is_empty() {
+                                warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
+                                if local_uid == *uid {
+                                    // call
+                                    (self.callbackbatch)(self.num, true, id_string.clone(), trans_string.clone());
+                                }
+                                else {
+                                    // call
+                                    (self.callbackbatch)(self.num, false, id_string.clone(), trans_string.clone());
+                                }
+                            // }
                         // }
-                    }
-                // }
-
-                // TODO: Remove
-                if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {
-                    return Ok(Async::Ready(()));
+                    // }
                 }
+
+                // // TODO: Remove
+                // if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {
+                //     return Ok(Async::Ready(()));
+                // }
 
                 if let Some(jp) = batch.join_plan() {
                     // FIXME: Only sent to unconnected nodes:
@@ -852,6 +858,7 @@ impl<T: Contribution> Future for Handler<T> {
                 }
 
                 // Send the batch along its merry way:
+                //TODO I comment not worked
                 // if !self.batch_tx.is_closed() {
                     if let Err(err) = self.batch_tx.unbounded_send(batch) {
                         error!("Unable to send batch output. Shutting down...");
@@ -914,66 +921,6 @@ impl<T: Contribution> Future for Handler<T> {
 }
 
 
-// impl<T: Contribution> Future for Handler<T> {
-//     type Item = ();
-//     type Error = Error;
-
-//     /// Polls the internal message receiver until all txs are dropped.
-//     fn poll(&mut self) -> Poll<(), Error> {
-//         // Ensure the loop can't hog the thread for too long:
-//         const MESSAGES_PER_TICK: usize = 50;
-
-//         trace!("hydrabadger::Handler::poll: Locking 'state' for writing...");
-//         let mut state = self.hdb.state_mut();
-//         trace!("hydrabadger::Handler::poll: 'state' locked for writing.");
-
-//         // Handle incoming internal messages:
-//         for i in 0..MESSAGES_PER_TICK {
-//             match self.peer_internal_rx.poll() {
-//                 Ok(Async::Ready(Some(i_msg))) => {
-//                     self.handle_internal_message(i_msg, &mut state)?;
-
-//                     // Exceeded max messages per tick, schedule notification:
-//                     if i + 1 == MESSAGES_PER_TICK {
-//                         task::current().notify();
-//                     }
-//                 }
-//                 Ok(Async::Ready(None)) => {
-//                     // The sending ends have all dropped.
-//                     info!("Shutting down Handler...");
-//                     return Ok(Async::Ready(()));
-//                 }
-//                 Ok(Async::NotReady) => {}
-//                 Err(()) => return Err(Error::HydrabadgerHandlerPoll),
-//             };
-//         }
-
-//         let peers = self.hdb.peers();
-
-//         // Process outgoing wire queue:
-//         while let Some((tar_uid, msg, retry_count)) = self.wire_queue.try_pop() {
-//             if retry_count < WIRE_MESSAGE_RETRY_MAX {
-//                 info!(
-//                     "Sending queued message from retry queue (retry_count: {})",
-//                     retry_count
-//                 );
-//                 self.wire_to(tar_uid, msg, retry_count, &peers);
-//             } else {
-//                 info!("Discarding queued message for '{}': {:?}", tar_uid, msg);
-//             }
-//         }
-
-//         trace!("hydrabadger::Handler: Processing step queue....");
-
-//         // Process all honey badger output batches:
-//         while let Some(mut step) = self.step_queue.try_pop() {
-//             for batch in step.output.drain(..) {
-//                 info!("A HONEY BADGER BATCH WITH CONTRIBUTIONS IS BEING STREAMED...");
-
-//                 let batch_epoch = batch.epoch();
-//                 let prev_epoch = self.hdb.set_current_epoch(batch_epoch + 1);
-//                 assert_eq!(prev_epoch, batch_epoch);
-
                 // android fix
                 // let mybatch = batch.clone();
                 // if !mybatch.is_empty() {
@@ -993,100 +940,4 @@ impl<T: Contribution> Future for Handler<T> {
                 //         }
                 //     }
                 // }
-
-//                 // TODO: Remove
-//                 if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {
-//                     return Ok(Async::Ready(()));
-//                 }
-
-//                 if let Some(jp) = batch.join_plan() {
-//                     // FIXME: Only sent to unconnected nodes:
-//                     debug!("Outputting join plan: {:?}", jp);
-//                     self.wire_to_all(WireMessage::join_plan(jp), &peers);
-//                 }
-
-//                 match batch.change() {
-//                     ChangeState::None => {}
-//                     ChangeState::InProgress(_change) => {}
-//                     ChangeState::Complete(change) => match change {
-//                         DhbChange::Add(uid, pk) => {
-//                             if uid == self.hdb.uid() {
-//                                 assert_eq!(*pk, self.hdb.secret_key().public_key());
-//                                 assert!(state.dhb().unwrap().netinfo().is_validator());
-//                                 state.promote_to_validator()?;
-//                                 self.hdb.set_state_discriminant(state.discriminant());
-//                             }
-//                         }
-//                         DhbChange::Remove(uid) => {}
-//                     },
-//                 }
-
-//                 let extra_delay = self.hdb.config().output_extra_delay_ms;
-
-//                 if extra_delay > 0 {
-//                     info!("Delaying batch processing thread for {}ms", extra_delay);
-//                     ::std::thread::sleep(::std::time::Duration::from_millis(extra_delay));
-//                 }
-
-//                 // Send the batch along its merry way:
-//                 if !self.batch_tx.is_closed() {
-//                     if let Err(err) = self.batch_tx.unbounded_send(batch) {
-//                         error!("Unable to send batch output. Shutting down...");
-//                         return Ok(Async::Ready(()));
-//                     } else {
-//                         // Notify epoch listeners that a batch has been output.
-//                         let mut dropped_listeners = Vec::new();
-//                         for (i, listener) in self.hdb.epoch_listeners().iter().enumerate() {
-//                             if let Err(err) = listener.unbounded_send(batch_epoch + 1) {
-//                                 dropped_listeners.push(i);
-//                                 error!("Epoch listener {} has dropped.", i);
-//                             }
-//                         }
-//                         // TODO: Remove dropped listeners from the list (see
-//                         // comment on `Inner::epoch_listeners`).
-//                     }
-//                 } else {
-//                     info!("Batch output receiver dropped. Shutting down...");
-//                     return Ok(Async::Ready(()));
-//                 }
-//             }
-
-//             for hb_msg in step.messages.drain(..) {
-//                 trace!("hydrabadger::Handler: Forwarding message: {:?}", hb_msg);
-//                 match hb_msg.target {
-//                     Target::Node(p_uid) => {
-//                         self.wire_to(
-//                             p_uid,
-//                             WireMessage::message(*self.hdb.uid(), hb_msg.message),
-//                             0,
-//                             &peers,
-//                         );
-//                     }
-//                     Target::All => {
-//                         self.wire_to_all(
-//                             WireMessage::message(*self.hdb.uid(), hb_msg.message),
-//                             &peers,
-//                         );
-//                     }
-//                 }
-//             }
-
-//             if !step.fault_log.is_empty() {
-//                 error!("    FAULT LOG: \n{:?}", step.fault_log);
-//             }
-//         }
-
-//         // TODO: Iterate through `state.dhb().unwrap().dyn_hb().netinfo()` and
-//         // `peers` to ensure that the lists match. Make adjustments where
-//         // necessary.
-
-//         trace!("hydrabadger::Handler: Step queue processing complete.");
-
-//         drop(peers);
-//         drop(state);
-//         trace!("hydrabadger::Handler::poll: 'state' unlocked for writing.");
-
-//         Ok(Async::NotReady)
-//     }
-// }
 

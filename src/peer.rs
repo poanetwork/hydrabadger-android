@@ -469,6 +469,7 @@ impl<T: Contribution> Peers<T> {
             out_addr.borrow()
         ));
 
+        // it s not mine
         // peer.establish_observer()
         panic!("Peer::set_pending: Do not use yet.");
     }
@@ -499,6 +500,7 @@ impl<T: Contribution> Peers<T> {
                     .expect("Peers::establish_validator: internal consistency error");
                 assert!(
                     pub_info.0 == *pi_pub.0 && 
+                    // android fix
                     // pub_info.1 == *pi_pub.1 && 
                     pub_info.2 == *pi_pub.2
                 );
