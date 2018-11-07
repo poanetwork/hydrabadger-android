@@ -468,8 +468,8 @@ impl<T: Contribution> Hydrabadger<T>  {
 
 
                             // android fix
-                            // let is_empty_ = is_empty();
-                            // if !is_empty_ {
+                            let is_empty_ = is_empty();
+                            if !is_empty_ {
                                 let txns = gen_txns();
                                 warn!("!! send_internal {} - {}", self.num, *hdb.inner.addr);
                                 hdb.send_internal (
@@ -479,10 +479,7 @@ impl<T: Contribution> Hydrabadger<T>  {
                                         DhbInput::User(txns)
                                     )
                                 );
-                            // }
-                            // else {
-
-                            // }
+                            }
                         }
                         _ => {}
                     }

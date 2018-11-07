@@ -808,7 +808,7 @@ impl<T: Contribution> Future for Handler<T> {
                             let id_string = format!("{}", uid);
                             let trans_string = format!("{:?}", int_contrib);
                             
-                            // if trans_string.is_empty() {
+                            if !trans_string.is_empty() {
                                 warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
                                 if local_uid == *uid {
                                     // call
@@ -818,10 +818,10 @@ impl<T: Contribution> Future for Handler<T> {
                                     // call
                                     (self.callbackbatch)(self.num, false, id_string.clone(), trans_string.clone());
                                 }
-                            // }
+                            }
                         // }
-                    // }
-                }
+                    }
+                // }
 
                 // // TODO: Remove
                 // if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {
@@ -859,7 +859,7 @@ impl<T: Contribution> Future for Handler<T> {
 
                 // Send the batch along its merry way:
                 //TODO I comment not worked
-                // if !self.batch_tx.is_closed() {
+                if !self.batch_tx.is_closed() {
                     if let Err(err) = self.batch_tx.unbounded_send(batch) {
                         error!("Unable to send batch output. Shutting down...");
                         return Ok(Async::Ready(()));
@@ -875,10 +875,10 @@ impl<T: Contribution> Future for Handler<T> {
                         // TODO: Remove dropped listeners from the list (see
                         // comment on `Inner::epoch_listeners`).
                     }
-                // } else {
-                //     info!("Batch output receiver dropped. Shutting down...");
-                //     return Ok(Async::Ready(()));
-                // }
+                } else {
+                    info!("Batch output receiver dropped. Shutting down...");
+                    return Ok(Async::Ready(()));
+                }
             }
 
             for hb_msg in step.messages.drain(..) {

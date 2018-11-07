@@ -737,7 +737,6 @@ impl Session {
 
         unsafe {
             let num = M_NUM_OF_CALLBACK.clone();
-            // let hb = Hydrabadger::new(bind_address, cfg, callback_, num);
 
             if num == 0 {
                 // *self.handler1.lock() = Some(Hydrabadger::new(bind_address, bind_address_out, cfg, callback_, num));
@@ -758,9 +757,9 @@ impl Session {
                             Transaction::is_empty1()
                         };
 
-                        thread::spawn(move || {
+                        // thread::spawn(move || {
                             v.run_node(Some(remote_addresses), Some(gen_txn), is_empty);
-                        });
+                        // });
                     },
                     None => {},
                 }
@@ -784,9 +783,9 @@ impl Session {
                             Transaction::is_empty2()
                         };
 
-                        thread::spawn(move || {
+                        // thread::spawn(move || {
                             v.run_node(Some(remote_addresses), Some(gen_txn), is_empty);
-                        });
+                        // });
                     },
                     None => {},
                 }
@@ -811,9 +810,9 @@ impl Session {
                             Transaction::is_empty3()
                         };
 
-                        thread::spawn(move || {
+                        // thread::spawn(move || {
                             v.run_node(Some(remote_addresses), Some(gen_txn), is_empty);
-                        });
+                        // });
                     },
                     None => {},
                 }
