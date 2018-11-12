@@ -81,6 +81,7 @@ You use the `sample/` project as an example.
 	```
 
 ### Android project
+================
 
 ```
 cd sample/android
@@ -89,6 +90,7 @@ cd sample/android
 Run this project in Android Studio, this project uses the compiled Hydrabadger.
 
 ### Current State
+================
 
 Network initialization node addition, transaction generation, consensus,
 and batch outputs are all generally working. Batch outputs for each epoch are
@@ -98,6 +100,7 @@ Overall the client is fragile and doesn't handle deviation from simple usage
 very well yet.
 
 ### Unimplemented
+================
 
 * **Many edge cases and exceptions:** disconnects, reconnects, etc.
   * Connecting to a network which is in the process of key generation causes
@@ -108,6 +111,7 @@ very well yet.
 * **Much, much more...**
 
 ### License
+================
 
 [![License: LGPL v3.0](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
