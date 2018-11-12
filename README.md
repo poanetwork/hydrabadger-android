@@ -52,7 +52,7 @@ and etc
 ### Creating the libraries
 ----------------------
 
-You use use the `sample/` project as an example.
+You use the `sample/` project as an example.
 
 
 1. Build the libraries.
@@ -74,7 +74,7 @@ You use use the `sample/` project as an example.
 
 	or
 
-	run 
+	run in `sample/` directory
 
 	```
 	build.sh
