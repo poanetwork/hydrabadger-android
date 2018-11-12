@@ -26,7 +26,7 @@ and etc
     curl https://sh.rustup.rs -sSf | sh
     ```
 
-5. Download targets for iOS and Android.
+5. Download targets for Android.
 
     ```sh
     # Android.
