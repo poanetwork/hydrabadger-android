@@ -6,7 +6,9 @@ Tolerant consensus algorithm](https://github.com/poanetwork/hbbft) and Mobile me
 
 ## Usage
 
+
 ### Setup
+-----
 
 1. `git clone git@github.com:poanetwork/hydrabadger-android.git`
 
