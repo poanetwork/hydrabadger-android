@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Hydrabadger</string>
+    <string name="action_settings">Settings</string>
+    <string name="rust_add1_text">We can do math in Rust and get %1$d</string>
+
+    <string name="tab_text_1">Client 1</string>
+    <string name="tab_text_2">Client 2</string>
+    <string name="tab_text_3">Client 3</string>
+    <string name="tab_text_4">LogCat</string>
+
+</resources>

@@ -1,0 +1,25 @@
+use android_c_headers::*;
+use Session;
+
+use OnEvent;
+
+foreign_interface!(interface MyObserver {
+    self_type OnEvent;
+
+    onStateChanged = OnEvent::changed(&self, ItsMe: bool, id: String, trans: String);
+});
+
+foreigner_class!(class Session {
+    self_type Session;
+    constructor Session::new() -> Session;
+
+    method Session::send_message(&self, num: i32, str1: String);
+
+    method Session::start_node(&self, ipport_string_source: String, ipport_string_myout: String, ipports_string_remote: String);
+
+    method Session::subscribe(&mut self, _: Box<OnEvent>);
+    method Session::after_subscribe(&'static mut self);
+
+    method Session::change(&self, _: i32, ItsMe: bool, id: String, trans: String);
+});
+

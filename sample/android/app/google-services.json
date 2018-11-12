@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "791920377659",
+    "firebase_url": "https://hydrabadger.firebaseio.com",
+    "project_id": "hydrabadger",
+    "storage_bucket": "hydrabadger.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791920377659:android:3061da631fb15ab8",
+        "android_client_info": {
+          "package_name": "net.korul.hbbft"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "791920377659-mah07o08th1d41at8qbt02dfs13sl9c1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOFYxUVQLoQ464wImwlTzbj6xsQE2f0QY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

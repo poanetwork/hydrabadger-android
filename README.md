@@ -1,63 +1,90 @@
-# Hydrabadger
+Hydrabadger
+================
 
 An experimental peer-to-peer client using the [Honey Badger Byzantine Fault
 Tolerant consensus algorithm](https://github.com/poanetwork/hbbft) and Mobile messenger based on hbbft consensus 
 
 ## Usage
 
-### Compile
+### Setup
 
 1. `git clone git@github.com:poanetwork/hydrabadger-android.git`
 
-2. set needs environments 
+2. Download Android studio, NDK, rust etc..
+
+3. set needs environments 
 
 `export ANDROID_HOME=/Users/$USER/Library/Android/sdk`
 `export NDK_HOME=$ANDROID_HOME/ndk-bundle` 
 
 and etc
 
-3. make standalone NDK 
+4. Download [rustup](https://www.rustup.rs/). We will use this to setup Rust for
+   cross-compiling.
 
-`${NDK_HOME}/build/tools/make_standalone_toolchain.py --api 26 --arch arm64 --install-dir NDK/arm64`
-`${NDK_HOME}/build/tools/make_standalone_toolchain.py --api 26 --arch arm --install-dir NDK/arm`
-`${NDK_HOME}/build/tools/make_standalone_toolchain.py --api 26 --arch x86 --install-dir NDK/x86`
+    ```sh
+    curl https://sh.rustup.rs -sSf | sh
+    ```
 
-4. set environment to NDK compilers and linkers
+5. Download targets for iOS and Android.
 
-`export PATH=$PATH:<project path>/NDK/arm64/bin/`
-`export PATH=$PATH:<project path>/NDK/arm/bin/`
-`export PATH=$PATH:<project path>/NDK/x86/bin/`
+    ```sh
+    # Android.
+    rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android
+    ```
 
-5. make  cargo-config.toml 
+### Compile
+-----
 
-`[target.aarch64-linux-android]`
-`ar = "<project path>/NDK/arm64/bin/aarch64-linux-android-ar"`
-`linker = "<project path>/NDK/arm64/bin/aarch64-linux-android-clang"`
+1. Create the standalone NDKs.
 
-`[target.armv7-linux-androideabi]`
-`ar = "<project path>/NDK/arm/bin/arm-linux-androideabi-ar"`
-`linker = "<project path>/NDK/arm/bin/arm-linux-androideabi-clang"`
+    ```sh
+    ./create-ndk-standalone.sh
+    ```
 
-`[target.i686-linux-android]`
-`ar = "<project path>/NDK/x86/bin/i686-linux-android-ar"`
-`linker = "<project path>/NDK/x86/bin/i686-linux-android-clang"'`
+6. Copy the content of `cargo-config.toml` (consists of linker information of
+   the Android targets) to `~/.cargo/config`
 
-6. need copy this config file to our .cargo directory like this:
+    ```sh
+    cp cargo-config.toml ~/.cargo/config
+    ```
 
-`cp cargo-config.toml ~/.cargo/config`
+### Creating the libraries
+----------------------
 
-7. `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android`
+You use use the `sample/` project as an example.
 
-8. `cd hydrabadger-android`
 
-9. In folder ./cargo need some change in config like in  cargo-config.toml 
+1. Build the libraries.
 
-10. `./compile`
+    ```sh
+	#!/bin/sh
 
-It may also be necessary for the reed-solomon-erasure package to change the branch to dev
-And in mio-uds change 2 files 'as i32'
+	#set -euo pipefail
+
+	# Build the rust project.
+	cd cargo
+	cargo clean
+	#cargo test
+
+	# cargo lipo --release
+	$PWD/compile.sh
+	$PWD/move.sh
+    ```
+
+	or
+
+	run 
+
+	```
+	build.sh
+	```
 
 ### Android project
+
+```
+cd sample/android
+```
 
 Run this project in Android Studio, this project uses the compiled Hydrabadger.
 
