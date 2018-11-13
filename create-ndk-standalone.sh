@@ -37,8 +37,8 @@ create_ndk() {
 }
 
 create_ndk arm64 21
-create_ndk arm 16
-create_ndk x86 16
+create_ndk arm 19
+create_ndk x86 19
 
 echo 'Updating cargo-config.toml...'
 

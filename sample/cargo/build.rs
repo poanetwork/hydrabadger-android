@@ -33,7 +33,7 @@ fn main() {
     let target = env::var("TARGET").unwrap();
     if [
         "aarch64-linux-android",
-        "arm-linux-androideabi",
+        "armv7-linux-androideabi",
         "i686-linux-android",
     ].contains(&target.as_str())
     {

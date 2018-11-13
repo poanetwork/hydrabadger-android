@@ -45,7 +45,7 @@ class ClosingService : Service() {
     fun resetConnectOnServer(uniqueID: String) {
         try {
 //            62.176.10.54
-            Log.i(TAG, "Service: try connect")
+            Log.i(TAG, "Service: resetConnectOnServer")
             val soc = Socket("62.176.10.54", 49999)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())

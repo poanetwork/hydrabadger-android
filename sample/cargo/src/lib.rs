@@ -633,13 +633,18 @@ impl Session {
     }
 
     fn subscribe(&mut self, cb: Box<OnEvent>) {
+        warn!("subscribe");
+
         self.observers.push(cb);
     }
 
     pub fn after_subscribe(&'static mut self) {
+        warn!("!! after_subscribe");
         unsafe {
             M_SESSION_PTR = Some(self);
         }
+
+        callback(0, true, "test".to_string(), "test".to_string());
     }
 
     pub fn send_message(&self, num: i32, str1: String) {
@@ -659,6 +664,8 @@ impl Session {
     }
 
     pub fn change(&self, x: i32, its_me: bool, id: String, trans: String) {
+        warn!("!! callback");
+
         let mut i = 0;
         for cb in &self.observers {
             if i == x {
@@ -674,14 +681,20 @@ impl Session {
             warn!("enter to startNode: {:?}", M_NUM_OF_CALLBACK.clone());
         }
 
-        let bind_address: SocketAddr = ipport_string_source.parse().expect("Unable to parse socket address");
-        let bind_address_out: SocketAddr = ipport_string_myout.parse().expect("Unable to parse socket address");
+        warn!("parse 1 address");
+        let bind_address: SocketAddr = ipport_string_source.parse().expect("Unable to parse socket address bind_address");
+        warn!("parse 2 address");
+        let bind_address_out: SocketAddr = ipport_string_myout.parse().expect("Unable to parse socket address bind_address_out");
     
+        warn!("before remote_addresses");
         let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
-        let split = ipports_string_remote.split(";");
-        for address in split {
-            remote_addresses.insert(address.parse().expect("Unable to parse socket address"));
+        if !ipports_string_remote.is_empty() {
+            let split = ipports_string_remote.split(";");
+            for address in split {
+                remote_addresses.insert(address.parse().expect("Unable to parse socket address remote_addresses"));
+            }
         }
+        warn!("after remote_addresses");
 
         let cfg = Config::default();
          
@@ -703,7 +716,12 @@ impl Session {
                                 .collect::<Vec<_>>()
                         };
                         thread::spawn(move || {
-                            v.run_node(Some(remote_addresses), Some(gen_txn));
+                            if !ipports_string_remote.is_empty() {
+                                v.run_node(Some(remote_addresses), Some(gen_txn));
+                            }
+                            else {
+                                v.run_node(None, Some(gen_txn));
+                            }
                             warn!("!!run_node Node: {:?}", num);
                         });
                     },

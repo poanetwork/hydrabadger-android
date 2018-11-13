@@ -19,8 +19,26 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" android:layout_marginBottom="8dp">
 
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:text="IpServer"/>
+
+                <EditText
+                        android:id="@+id/ipserver"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="62.176.10.54"/>
+            </LinearLayout>
             <Button
-                    android:id="@+id/button1"
+                    android:id="@+id/startALL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lin1"
@@ -29,7 +47,7 @@
                     android:id="@+id/rel1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical" android:layout_marginTop="60dp">
 
 
                 <TextView
@@ -56,33 +74,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.1"
-                                android:text="IP SOURCE"/>
+                                android:text="Room Name"/>
 
                         <EditText
-                                android:id="@+id/ip1"
+                                android:id="@+id/room1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="127.0.0.1:50010" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="0.1"
-                                android:text="IP List Dest"/>
-
-                        <EditText
-                                android:id="@+id/iplist1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="62.176.10.54:50004;62.176.10.54:50006" />
+                                android:text="myRoom"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -130,7 +129,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/CommentEditText1"
                         android:layout_centerHorizontal="true"
-                        android:text="Send" />
+                        android:text="Send"/>
 
                 <ScrollView
                         android:id="@+id/scrollView1"
@@ -187,33 +186,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.1"
-                                android:text="IP SOURCE"/>
+                                android:text="Room Name"/>
 
                         <EditText
-                                android:id="@+id/ip2"
+                                android:id="@+id/room2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="127.0.0.1:50011" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="0.1"
-                                android:text="IP List Dest"/>
-
-                        <EditText
-                                android:id="@+id/iplist2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="62.176.10.54:50002;62.176.10.54:50006" />
+                                android:text="myRoom"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -318,33 +298,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.1"
-                                android:text="IP SOURCE"/>
+                                android:text="Room Name"/>
 
                         <EditText
-                                android:id="@+id/ip3"
+                                android:id="@+id/room3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="127.0.0.1:50012" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="0.1"
-                                android:text="IP List Dest"/>
-
-                        <EditText
-                                android:id="@+id/iplist3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="62.176.10.54:50002;62.176.10.54:50004" />
+                                android:text="myRoom"/>
                     </LinearLayout>
 
                 </LinearLayout>
