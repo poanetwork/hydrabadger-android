@@ -726,7 +726,7 @@ class MainActivity : AppCompatActivity() {
     fun resetConnectOnServer(uniqueID: String) {
         try {
 //            62.176.10.54
-            val soc = Socket("${ipserver.text}", 49999)
+            val soc = Socket("${ipserver.text}", 2999)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())
 
@@ -752,7 +752,7 @@ class MainActivity : AppCompatActivity() {
 
     fun connectToStun(uniqueID: String, numNode: Int) {
         try {
-            val soc = Socket("${ipserver.text}", 50000)
+            val soc = Socket("${ipserver.text}", 3000)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())
 
