@@ -3,8 +3,7 @@
 #include <utility>
 #include <QDateTime>
 
-
-TranslateToServerThread::TranslateToServerThread(int socketDescriptor, QObject *parent)
+TranslateToServerThread::TranslateToServerThread(qintptr socketDescriptor, QObject *parent)
     : QThread(parent), socketDescriptor(socketDescriptor), m_StopThread(false)
 {
 }
@@ -13,8 +12,6 @@ TranslateToServerThread::~TranslateToServerThread()
 {
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<"Destructor TranslateToServerThread";
     setStopThread(true);
-    wait();
-//    QThread::terminate();
     QThread::wait();
 }
 
@@ -121,8 +118,6 @@ void TranslateToServerThread::run()
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Was binded on port "<<localPort<<" From "<<tcpSocket->peerAddress().toString()<<" IP "<<tcpSocket->peerPort()<< " PORT "<<" - theadId "<<this->currentThreadId();
 
     connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SIGNAL(error(QAbstractSocket::SocketError)));
-    connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
 
     in.setDevice(Accessor::getInstance()->GetSocketTo(localPort).get());
@@ -140,12 +135,12 @@ void TranslateToServerThread::run()
 
             qint64 size = Accessor::getInstance()->GetSocketTo(localPort)->bytesAvailable();
             if(size > 0) {
-                waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), 2*sizeof(int));
+                waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), sizeof(int) + sizeof(qintptr));
 
                 int size1 = 0;
                 in >> size1;
 
-                int socketdescriptor = 0;
+                qintptr socketdescriptor = 0;
                 in >> socketdescriptor;
 
                 waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), size1);
@@ -156,8 +151,6 @@ void TranslateToServerThread::run()
                 int res = in.readRawData(data.data(), size1);
                 if(res == -1)
                     break;
-
-                qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread translate from "<<localPort<<" freedback data "<<size1<<" bytes";
 
                 ////Event LOOP
                 mIsBlockSend = false;

@@ -64,10 +64,10 @@ int main(int argc, char *argv[])
 
     QCoreApplication app(argc, argv);
 
-    QSharedPointer<Dialog> dialog = QSharedPointer<Dialog>(new Dialog());
+    auto dialog = QSharedPointer<Dialog>(new Dialog());
 
     QObject::connect(&app, SIGNAL(aboutToQuit()), dialog.data(), SLOT(deleteMe()));
-    QObject::connect(&app, SIGNAL(destroyed()), dialog.data(), SLOT(deleteMe()));
+    QObject::connect(&app, SIGNAL(destroyed()),   dialog.data(), SLOT(deleteMe()));
 
     return QCoreApplication::exec();
 }

@@ -25,9 +25,8 @@ void TranslateFromServer::incomingConnection(qintptr socketDescriptor)
     listOfThread.append(thread);
 
     connect(thread, SIGNAL(finished()), this, SLOT(deleteFromListThread()));
-//    connect(thread, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(deleteFromListThread(QAbstractSocket::SocketError)));
     connect(thread, SIGNAL(getSocketWithDescriptor(qintptr, bool)), Accessor::getInstance(), SLOT(getSocketWithDescriptor(qintptr, bool)), Qt::BlockingQueuedConnection);
-    connect(thread, SIGNAL(sendData(quint16, const char *, int, int)), Accessor::getInstance(), SLOT(sendData(quint16, const char *, int, int)), Qt::BlockingQueuedConnection);
+    connect(thread, SIGNAL(sendData(quint16, const char *, int, qintptr)), Accessor::getInstance(), SLOT(sendData(quint16, const char *, int, qintptr)), Qt::BlockingQueuedConnection);
 
     thread->start();
 
@@ -35,16 +34,6 @@ void TranslateFromServer::incomingConnection(qintptr socketDescriptor)
 }
 
 void TranslateFromServer::deleteFromListThread()
-{
-    TranslateFromServerThread *thread;
-    QObject* obj=QObject::sender();
-    if (auto *tb = qobject_cast<TranslateFromServerThread *>(obj)){
-        thread = tb;
-        deleteFromListThread(thread);
-    }
-}
-
-void TranslateFromServer::deleteFromListThread(QAbstractSocket::SocketError)
 {
     TranslateFromServerThread *thread;
     QObject* obj=QObject::sender();

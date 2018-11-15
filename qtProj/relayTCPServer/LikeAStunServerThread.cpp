@@ -5,7 +5,7 @@
 #include <QAbstractSocket>
 
 //! [0]
-LikeAStunServerThread::LikeAStunServerThread(int socketDescriptor, QObject *parent)
+LikeAStunServerThread::LikeAStunServerThread(qintptr socketDescriptor, QObject *parent)
     : QThread(parent), socketDescriptor(socketDescriptor), mStopThread(false)
 {
 }
@@ -13,7 +13,6 @@ LikeAStunServerThread::LikeAStunServerThread(int socketDescriptor, QObject *pare
 LikeAStunServerThread::~LikeAStunServerThread()
 {
     setStopThread(true);
-//    QThread::terminate();
     QThread::wait();
 }
 //! [0]
@@ -25,8 +24,6 @@ void LikeAStunServerThread::waitForByte(QTcpSocket &socket, int size)
         msleep(10);
     }
 }
-
-
 
 void LikeAStunServerThread::displayError(QAbstractSocket::SocketError socketError)
 {
@@ -99,19 +96,15 @@ void LikeAStunServerThread::run()
     QTcpSocket tcpSocket;
     connect(&tcpSocket, QOverload<QTcpSocket::SocketError>::of(&QTcpSocket::error),
             this, &LikeAStunServerThread::displayError);
-    connect(&tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SIGNAL(error(QAbstractSocket::SocketError)));
 
     if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(tcpSocket.error());
         return;
     }
 
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Income connection from "<<tcpSocket.peerAddress().toString()<<" IP "<<tcpSocket.peerPort()<< " PORT "<<" - Thread "<<this->currentThreadId();
     in.setDevice(&tcpSocket);
 
-    const int Timeout = 30 * 1000;     // wait 30sec
-    if (!tcpSocket.waitForReadyRead(Timeout)) {
+    if (!tcpSocket.waitForReadyRead()) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"LikeAStunServerThread return error from "<<tcpSocket.peerAddress().toString()<<" IP "<<tcpSocket.peerPort()<< " PORT error - "<<tcpSocket.errorString()<<" - Thread "<<this->currentThreadId();
 
         QByteArray block;
@@ -139,9 +132,6 @@ void LikeAStunServerThread::run()
         tcpSocket.waitForDisconnected();
         return;
     }
-    else {
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"MAGIC DONE "<<" - Thread "<<this->currentThreadId();
-    }
 
     // get size
     waitForByte(tcpSocket, sizeof (qint32));
@@ -157,7 +147,6 @@ void LikeAStunServerThread::run()
     // get time
     QTime time = QTime::currentTime();
 
-
     ////Event LOOP
     ports = Ports(-1,-1);
     mIsinitHandle = false;
@@ -167,9 +156,6 @@ void LikeAStunServerThread::run()
         msleep(1);
     }
     mIsinitHandle = false;
-//    Ports ports = Accessor::getInstance()->initHandle(UID, tcpSocket.peerAddress().toString(),
-//                                                      tcpSocket.peerPort(), (quint64)((quint64)time.msecsSinceStartOfDay()/(quint64)1000));
-
 
     if(ports == Ports(-1,-1)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"LikeAStunServerThread return ERROR - Thread "<<this->currentThreadId();

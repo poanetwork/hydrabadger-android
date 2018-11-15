@@ -30,7 +30,6 @@ void LikeAStunServer::incomingConnection(qintptr socketDescriptor)
     listOfThread.append(thread);
 
     connect(thread, SIGNAL(finished()), this, SLOT(deleteFromListThread()));
-    connect(thread, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(deleteFromListThread(QAbstractSocket::SocketError)));
     connect(thread, SIGNAL(initHandle(QString, QString, quint16, quint64)), Accessor::getInstance(), SLOT(initHandle(QString, QString, quint16, quint64)), Qt::BlockingQueuedConnection);
 
     thread->start();
@@ -38,20 +37,10 @@ void LikeAStunServer::incomingConnection(qintptr socketDescriptor)
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Thread LikeAStunServer start id - "<<thread->currentThreadId();
 }
 
-void LikeAStunServer::deleteFromListThread(QAbstractSocket::SocketError)
-{
-    LikeAStunServerThread *thread;
-    QObject* obj=QObject::sender();
-    if (auto *tb = qobject_cast<LikeAStunServerThread *>(obj)){
-        thread = tb;
-        deleteFromListThread(thread);
-    }
-}
-
 void LikeAStunServer::deleteFromListThread()
 {
     LikeAStunServerThread *thread;
-    QObject* obj=QObject::sender();
+    QObject* obj = QObject::sender();
     if (auto *tb = qobject_cast<LikeAStunServerThread *>(obj)){
         thread = tb;
         deleteFromListThread(thread);

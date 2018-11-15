@@ -17,7 +17,7 @@ class StopServerThread : public QThread
     Q_PROPERTY(bool StopThread READ StopThread WRITE setStopThread NOTIFY StopThreadChanged)
 
 public:
-    explicit StopServerThread(int socketDescriptor, QObject *parent = nullptr);
+    explicit StopServerThread(qintptr socketDescriptor, QObject *parent = nullptr);
     ~StopServerThread();
 
     bool StopThread() const;
@@ -27,10 +27,9 @@ private slots:
     void displayError(QAbstractSocket::SocketError socketError);
 
 signals:
-    void error(QAbstractSocket::SocketError socketError);
     void StopThreadChanged(bool StopThread);
-
     void stopHandleWithUID(QString UID);
+
 public slots:
     void setStopThread(bool StopThread);
 
@@ -40,7 +39,7 @@ private slots:
     void waitForByte(QTcpSocket &socket, int size);
 
 private:
-    int socketDescriptor;
+    qintptr socketDescriptor;
     bool m_StopThread;
 
     //inputstream

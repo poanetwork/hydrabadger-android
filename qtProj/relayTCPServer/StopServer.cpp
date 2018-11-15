@@ -9,7 +9,7 @@ StopServer::StopServer(QObject *parent) : QTcpServer(parent)
 StopServer::~StopServer()
 {
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Destructor StopServer";
-    foreach(StopServerThread *thread, listOfThread) {
+    foreach(auto thread, listOfThread) {
         deleteFromListThread(thread);
         thread->wait(10);
         thread->deleteLater();
@@ -24,7 +24,6 @@ void StopServer::incomingConnection(qintptr socketDescriptor)
 
     connect(thread, SIGNAL(stopHandleWithUID(QString)), Accessor::getInstance(), SLOT(stopHandleWithUID(QString)), Qt::BlockingQueuedConnection);
     connect(thread, SIGNAL(finished()), this, SLOT(deleteFromListThread()));
-    connect(thread, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(deleteFromListThread(QAbstractSocket::SocketError)));
 
     thread->start();
 
@@ -32,16 +31,6 @@ void StopServer::incomingConnection(qintptr socketDescriptor)
 }
 
 void StopServer::deleteFromListThread()
-{
-    StopServerThread *thread;
-    QObject* obj=QObject::sender();
-    if (auto *tb = qobject_cast<StopServerThread *>(obj)){
-        thread = tb;
-        deleteFromListThread(thread);
-    }
-}
-
-void StopServer::deleteFromListThread(QAbstractSocket::SocketError)
 {
     StopServerThread *thread;
     QObject* obj=QObject::sender();

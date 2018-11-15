@@ -13,8 +13,10 @@
 class TranslateToServer;
 class TranslateFromServer;
 
-#define STARTDIAPAZONPORT 50001
-#define ENDDIAPAZONPORT 65000
+#define DIFFDIAPAZONPORT 3000
+
+#define STARTDIAPAZONPORT 3001
+#define ENDDIAPAZONPORT 4001
 
 static QMutex MutexForServerWorkers;
 using Ports = std::pair<quint16, quint16>;
@@ -81,8 +83,6 @@ public slots:
     // II
     //  stopHandle (quint16 PORTFROMLISTEN)
     //  Function that stoping all connect from two servers that remembers in HandleConnect, set two ports available for other, delete Handle
-    ///  params:
-    // 1. quint16 PORTFROMLISTEN or handle or uid
     /// return:
     // true - if succesfull
     bool stopHandle(quint16 PORTFROMLISTEN);
@@ -101,8 +101,8 @@ public slots:
     ///  params:
     // 1. quint16 PORTFROMLISTEN
     // 2. char *data
-    // 3. int len
-    void sendData (quint16 PORTFROMLISTEN, const char *data, int len, int socketdescription);
+    // 3. qintptr len
+    void sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketdescription);
 
     // IV
     //  GetSocketFrom(quint16 PORTFROMLISTEN, qintptr socketDescriptor)
@@ -115,8 +115,6 @@ public slots:
     // V
     //  GetSocketTo(quint16 PORTTOSEND)
     //  Function that get  socket
-    ///  params:
-    // 1. quint16 PORTTOSEND or PORTFROMLISTEN
     std::shared_ptr<QTcpSocket> GetSocketTo(quint16 PORTTOSEND);
 
     std::shared_ptr<QTcpSocket> GetSocketTo(quint16 PORTFROMLISTEN, bool);
@@ -124,8 +122,6 @@ public slots:
     // VI
     //  isBinded(quint16 PORTFROMLISTEN)
     //  Function that get  socket
-    ///  params:
-    // 1. quint16 PORTFROMLISTEN - is bind
     bool isBinded(quint16 PORTFROMLISTEN);
 
     // VII
@@ -137,11 +133,11 @@ public slots:
     void getSocketWithDescriptor(qintptr socketDescriptor, bool fromto);
 
     // VIII
-    // sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, int socketDescriptor);
+    // sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
     //  send data to back
-    void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, int socketDescriptor);
+    void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
 
-protected slots:
+public slots:
     Ports getMeNotUsagePort();
     void  setThisPortNotUsage(Ports pair);
 
@@ -182,6 +178,8 @@ protected:
 private:
     // !For Simply i use fow key PORTFROMLISTEN that all know, value is HandleConnect where was info where send data!
     QHash<quint16, QSharedPointer<HandleConnect>> AllConnectHandles;
+
+    quint16 lastPortStart;
 };
 
 #endif // ACCESSOR_H

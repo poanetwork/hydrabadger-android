@@ -4,7 +4,7 @@
 #include <math.h>
 #include <QDateTime>
 
-TranslateFromServerThread::TranslateFromServerThread(int socketDescriptor, QObject *parent)
+TranslateFromServerThread::TranslateFromServerThread(qintptr socketDescriptor, QObject *parent)
     : QThread(parent), socketDescriptor(socketDescriptor), m_StopThread(false)
 {
 }
@@ -13,7 +13,6 @@ TranslateFromServerThread::~TranslateFromServerThread()
 {
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<"Destructor TranslateFromServerThread";
     setStopThread(true);
-//    QThread::terminate();
     QThread::wait();
 }
 
@@ -30,7 +29,6 @@ void TranslateFromServerThread::setStopThread(bool StopThread)
     m_StopThread = StopThread;
     emit StopThreadChanged(m_StopThread);
 }
-
 
 
 void TranslateFromServerThread::displayError(QAbstractSocket::SocketError socketError)
@@ -105,8 +103,6 @@ void TranslateFromServerThread::run()
 
     localPort = tcpSocket->localPort();
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread income in localPort "<<localPort<<" From "<<tcpSocket->peerAddress().toString()<<" IP "<<tcpSocket->peerPort()<< " PORT "<<" - Thread "<<this->currentThreadId();
-    connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SIGNAL(error(QAbstractSocket::SocketError)));
     connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
 

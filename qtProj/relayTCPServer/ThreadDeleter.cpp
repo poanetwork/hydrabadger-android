@@ -12,7 +12,6 @@ ThreadDeleter::~ThreadDeleter()
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<"Destructor ThreadDeleter";
 
     setStopThread(true);
-//    QThread::terminate();
     QThread::wait();
 }
 
@@ -43,7 +42,7 @@ void ThreadDeleter::run()
 
         QList<quint16> keys = Accessor::getInstance()->AllConnectHandles.keys();
 
-        foreach (quint16 portfrom, keys) {
+        foreach (auto portfrom, keys) {
             if(m_StopThread)
                 break;
 
@@ -60,6 +59,8 @@ void ThreadDeleter::run()
                     qDebug()<<"ThreadDeleter found not binded Port after 3 min portfrom - "<< portfrom;
                     ////Event LOOP
                     emit stopHandle(portfrom);
+
+                    sleep(3000);
                 }
                 // delete not active after 3 min
                 else if(Accessor::getInstance()->GetSocketTo(portfrom, true) != nullptr)
@@ -69,6 +70,8 @@ void ThreadDeleter::run()
                         qDebug()<<"ThreadDeleter found not active Port after 3 min portfrom - "<< portfrom;
                         ////Event LOOP
                         emit stopHandle(portfrom);
+
+                        sleep(3000);
                     }
                 }
                 else if(Accessor::getInstance()->GetSocketTo(portfrom, true) == nullptr &&
@@ -77,6 +80,8 @@ void ThreadDeleter::run()
                     qDebug()<<"ThreadDeleter found NULL Port portfrom - "<< portfrom;
                     ////Event LOOP
                     emit stopHandle(portfrom);
+
+                    sleep(3000);
                 }
             }
             else {
@@ -84,6 +89,6 @@ void ThreadDeleter::run()
             }
         }
 
-        msleep(100);
+        msleep(1000);
     }
 }

@@ -5,6 +5,7 @@
 #include "LikeAStunServer.h"
 #include "ThreadDeleter.h"
 #include "StopServer.h"
+#include "Pinger.h"
 #include <csignal>
 
 class Dialog : public QObject
@@ -24,6 +25,7 @@ private:
 private:
     LikeAStunServer server;
     StopServer mStopServer;
+    Pinger     mPingerServer;
 
     // waiter 3 min
     QSharedPointer<ThreadDeleter> threadDeleter;

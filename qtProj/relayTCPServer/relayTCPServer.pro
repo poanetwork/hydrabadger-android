@@ -14,7 +14,9 @@ HEADERS       = dialog.h \
     TranslateFromServerThread.h \
     ThreadDeleter.h \
     StopServer.h \
-    StopServerThread.h
+    StopServerThread.h \
+    Pinger.h \
+    PingerThread.h
 SOURCES       = dialog.cpp \
                 main.cpp \
     LikeAStunServer.cpp \
@@ -26,6 +28,8 @@ SOURCES       = dialog.cpp \
     TranslateFromServerThread.cpp \
     ThreadDeleter.cpp \
     StopServer.cpp \
-    StopServerThread.cpp
+    StopServerThread.cpp \
+    Pinger.cpp \
+    PingerThread.cpp
 
 

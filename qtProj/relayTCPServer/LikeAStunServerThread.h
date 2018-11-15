@@ -19,7 +19,7 @@ class LikeAStunServerThread : public QThread
     Q_PROPERTY(bool StopThread READ StopThread WRITE setStopThread NOTIFY StopThreadChanged)
 
 public:
-    LikeAStunServerThread(int socketDescriptor, QObject *parent = nullptr);
+    LikeAStunServerThread(qintptr socketDescriptor, QObject *parent = nullptr);
     ~LikeAStunServerThread();
 
     void run() override;
@@ -35,12 +35,11 @@ private slots:
     void displayError(QAbstractSocket::SocketError socketError);
 
 signals:
-    void error(QAbstractSocket::SocketError socketError);
     void StopThreadChanged(bool StopThread);
-
     void initHandle(QString UserGlobalUID, QString UserGlobalIP, quint16 UserGlobalPORT, quint64 secsSinceStartBindRequest);
+
 private:
-    int socketDescriptor;
+    qintptr socketDescriptor;
     bool mStopThread;
 
     bool mIsinitHandle{};

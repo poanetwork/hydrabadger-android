@@ -16,6 +16,7 @@ Accessor *Accessor::getInstance()
 Accessor::Accessor(QObject *parent) : QObject(parent)
 {
     mUsagePortNumber = 0;
+    lastPortStart    = 0;
 }
 
 Accessor::~Accessor()
@@ -50,14 +51,14 @@ void Accessor::initHandle(const QString& UserGlobalUID, const QString& UserGloba
 
     // start 2 servers
     AllConnectHandles[ports.second]->serverUserTo = QSharedPointer<TranslateToServer>(new TranslateToServer());
-    if (!AllConnectHandles[ports.second]->serverUserTo->listen(QHostAddress::Any, AllConnectHandles[ports.second]->PORTTOSEND)) {
+    if (!AllConnectHandles[ports.second]->serverUserTo->listen(QHostAddress::AnyIPv4, AllConnectHandles[ports.second]->PORTTOSEND)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded Server TranslateToServer "<<"Unable to start the server: "<<AllConnectHandles[ports.second]->serverUserTo->errorString();
         stopHandle(AllConnectHandles[ports.second]);
         QMetaObject::invokeMethod(sender(), "beenInitedHandle", Qt::DirectConnection, Q_ARG(Ports, Ports(-1,-1)));
     }
 
     AllConnectHandles[ports.second]->serverUsersFrom = QSharedPointer<TranslateFromServer>(new TranslateFromServer());
-    if (!AllConnectHandles[ports.second]->serverUsersFrom->listen(QHostAddress::Any, AllConnectHandles[ports.second]->PORTFROMLISTEN)) {
+    if (!AllConnectHandles[ports.second]->serverUsersFrom->listen(QHostAddress::AnyIPv4, AllConnectHandles[ports.second]->PORTFROMLISTEN)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded Server TranslateFromServer "<<"Unable to start the server: "<<AllConnectHandles[ports.second]->serverUsersFrom->errorString();
         stopHandle(AllConnectHandles[ports.second]);
         QMetaObject::invokeMethod(sender(), "beenInitedHandle", Qt::DirectConnection, Q_ARG(Ports, Ports(-1,-1)));
@@ -77,8 +78,7 @@ bool Accessor::stopHandle(QSharedPointer<HandleConnect> handle)
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"stopHandle - this is binded handle";
 
         try {
-            if(handle->socketBindedTO != nullptr)
-            {
+            if(handle->socketBindedTO != nullptr) {
                 qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"stopHandle - socketBindedTO close";
                 handle->socketBindedTO->disconnectFromHost();
                 handle->socketBindedTO->close();
@@ -88,7 +88,7 @@ bool Accessor::stopHandle(QSharedPointer<HandleConnect> handle)
             qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"ERR while socketBindedTO deleteLater";
         }
 
-        foreach (qintptr key, handle->PORTFROMLISTEN_SOCKETSLIST.keys()) {
+        foreach (auto key, handle->PORTFROMLISTEN_SOCKETSLIST.keys()) {
             try {
                 qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"stopHandle - try close sockets on socketDiscription - "<<key;
                 std::shared_ptr<QTcpSocket> soc = handle->PORTFROMLISTEN_SOCKETSLIST.take(key);
@@ -224,27 +224,22 @@ void Accessor::stopAllHandle()
     }
 }
 
-void Accessor::sendData(quint16 PORTFROMLISTEN, const char *data, int len, int socketdescription)
+void Accessor::sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketdescription)
 {
-    if(AllConnectHandles.contains(PORTFROMLISTEN)) {
-        if(AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO.get() != nullptr) {
-            if(AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->state() == QTcpSocket::ConnectedState) {
-                qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"write data "<<len<<" bytes "<<PORTFROMLISTEN<<" From, To - "<<
-                          AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->peerAddress().toString()<<" IP "<<AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->peerPort()<< " PORT ";
+    if(AllConnectHandles.contains(PORTFROMLISTEN)
+            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO.get() != nullptr
+            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->state() == QTcpSocket::ConnectedState) {
 
-                QByteArray block;
-                QDataStream out(&block, QIODevice::WriteOnly);
-                out << len;
-                out << socketdescription;
-                AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
-                AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
-                AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
-                AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->waitForBytesWritten();
-            }
-            else {
-                qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR unconnected for port "<<PORTFROMLISTEN<<" DROP "<<len<<" bytes";
-            }
-        }
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData "<<len<<" bytes "<<PORTFROMLISTEN<<" port from";
+
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out << len;
+        out << socketdescription;
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->waitForBytesWritten();
     }
     else {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR for port "<<PORTFROMLISTEN<<" DROP "<<len<<" bytes";
@@ -365,7 +360,7 @@ void Accessor::getSocketWithDescriptor(qintptr socketDescriptor, bool fromto)
 
 
     if (!tcpSocket->setSocketDescriptor(socketDescriptor)) {
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"QTcpSocket listened not start";
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Error QTcpSocket listened not start";
         QMetaObject::invokeMethod(sender(), "unblock", Qt::DirectConnection);
     }
 
@@ -378,11 +373,11 @@ void Accessor::getSocketWithDescriptor(qintptr socketDescriptor, bool fromto)
     else {
         setBinded(localPort, socketDescriptor, tcpSocket);
 
-        QMetaObject::invokeMethod(sender(), "initSocket", Qt::DirectConnection, Q_ARG(std::shared_ptr<QTcpSocket>, Accessor::getInstance()->GetSocketTo(localPort)));
+        QMetaObject::invokeMethod(sender(), "initSocket", Qt::DirectConnection, Q_ARG(std::shared_ptr<QTcpSocket>, GetSocketTo(localPort)));
     }
 }
 
-void Accessor::sendDataFreedBack(quint16 PORTTOSEND, const char *data, int len, int socketDescriptor)
+void Accessor::sendDataFreedBack(quint16 PORTTOSEND, const char *data, int len, qintptr socketDescriptor)
 {
     quint16 PORTFROMLISTEN = getPORTFROMLISTEN_fromPORTTOSend(PORTTOSEND);
     if(PORTFROMLISTEN == 0) {
@@ -390,26 +385,16 @@ void Accessor::sendDataFreedBack(quint16 PORTTOSEND, const char *data, int len, 
         QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
     }
 
-    if(AllConnectHandles.contains(PORTFROMLISTEN)) {
-        if(AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.contains(socketDescriptor)) {
-            if(AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor) != nullptr) {
-                if(AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->state() == QTcpSocket::ConnectedState) {
-                    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"write data "<<len<<" bytes "<<PORTTOSEND<<" From(portto), To - "
-                           <<AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->peerAddress().toString()<<" IP "
-                           <<AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->peerPort()<< " PORT ";
+    if(AllConnectHandles.contains(PORTFROMLISTEN)
+            && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.contains(socketDescriptor)
+            && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor) != nullptr
+            && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->state() == QTcpSocket::ConnectedState) {
 
-                    AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->write(data, len);
-                    AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->flush();
-                    AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->waitForBytesWritten();
-                }
-                else {
-                    qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack ERROR Unconnected for port "<<PORTTOSEND<<" DROP "<<len<<" bytes";
-                }
-            }
-        }
-        else {
-            qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack ERROR for port has not socketDescriptor "<<PORTTOSEND<<" DROP "<<len<<" bytes";
-        }
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack "<<len<<" bytes "<<PORTTOSEND<<" From(portto)";
+
+        AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->write(data, len);
+        AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->flush();
+        AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->waitForBytesWritten();
     }
     else {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack ERROR for port has not PORTFROMLISTEN "<<PORTTOSEND<<" DROP "<<len<<" bytes";
@@ -422,28 +407,38 @@ Ports Accessor::getMeNotUsagePort()
 {
     QMutexLocker locker(&MutexForServerWorkers);
 
-    for(quint16 i = STARTDIAPAZONPORT; i < ENDDIAPAZONPORT; i+=2) {
-        //
-        if(!mExistingUsagePort.contains(i) && !mExistingUsagePort.contains(i+1)) {
-            mExistingUsagePort[i  ] = true;
-            mExistingUsagePort[i+1] = true;
+    int diapazon = ENDDIAPAZONPORT - STARTDIAPAZONPORT;
+
+    for(quint16 i = 1; i < diapazon; i+=2) {
+        quint16 portStart = (lastPortStart + i) % diapazon;
+
+        if(!mExistingUsagePort.contains(portStart) && !mExistingUsagePort.contains(portStart+1)) {
+            mExistingUsagePort[portStart  ] = true;
+            mExistingUsagePort[portStart+1] = true;
             mUsagePortNumber++;
             mUsagePortNumber++;
-            return Ports(i, i+1);
+
+            lastPortStart = (portStart+1)%diapazon;
+
+            qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"setThisPortUsed "<<portStart+DIFFDIAPAZONPORT<<" "<<portStart+1+DIFFDIAPAZONPORT;
+
+            return Ports(portStart+DIFFDIAPAZONPORT, portStart+1+DIFFDIAPAZONPORT);
         }
-        else if(mExistingUsagePort.contains(i) && mExistingUsagePort.contains(i+1)) {
-            if(!mExistingUsagePort[i  ] && !mExistingUsagePort[i+1]) {
-                mExistingUsagePort[i  ] = true;
-                mExistingUsagePort[i+1] = true;
+        else if(mExistingUsagePort.contains(portStart) && mExistingUsagePort.contains(portStart+1)) {
+            if(!mExistingUsagePort[portStart ] && !mExistingUsagePort[portStart+1]) {
+                mExistingUsagePort[portStart  ] = true;
+                mExistingUsagePort[portStart+1] = true;
                 mUsagePortNumber++;
                 mUsagePortNumber++;
-                return Ports(i, i+1);
+
+                lastPortStart = (portStart+1)%diapazon;
+
+                qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"setThisPortUsed "<<portStart+DIFFDIAPAZONPORT<<" "<<portStart+DIFFDIAPAZONPORT+1;
+
+                return Ports(portStart+DIFFDIAPAZONPORT, portStart+DIFFDIAPAZONPORT+1);
             }
-            
-            continue;
         }
-        else
-            continue;
+
     }
 
     return Ports(-1, -1);
@@ -455,11 +450,10 @@ void Accessor::setThisPortNotUsage(Ports pair)
 
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"setThisPortNotUsage "<<pair.first<<" "<<pair.second;
 
-    mExistingUsagePort[pair.first ] = false;
-    mExistingUsagePort[pair.second] = false;
+    mExistingUsagePort[pair.first -DIFFDIAPAZONPORT] = false;
+    mExistingUsagePort[pair.second-DIFFDIAPAZONPORT] = false;
     mUsagePortNumber--;
     mUsagePortNumber--;
 
-    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Now decriment using numbers ports - "<<mUsagePortNumber;
 }
 

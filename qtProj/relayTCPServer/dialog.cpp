@@ -14,18 +14,23 @@ Dialog::Dialog(QObject *parent)
     signal(SIGINT, &Dialog::exitQt);
     signal(SIGTERM, &(Dialog::exitQt));
 
-    if (!server.listen(QHostAddress::Any, 50000)) {
+    if (!server.listen(QHostAddress::AnyIPv4, 3000)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Server "<<" Unable to start the server: "<<server.errorString();
         return;
     }
 
-    if (!mStopServer.listen(QHostAddress::Any, 49999)) {
+    if (!mStopServer.listen(QHostAddress::AnyIPv4, 2999)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Server "<<" Unable to start the StopServer: "<<mStopServer.errorString();
         return;
     }
 
+    if (!mPingerServer.listen(QHostAddress::AnyIPv4, 2998)) {
+        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Server "<<" Unable to start the StopServer: "<<mPingerServer.errorString();
+        return;
+    }
+
     QString ipAddress;
-    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    auto ipAddressesList = QNetworkInterface::allAddresses();
     // use the first non-localhost IPv4 address
     for (const auto & i : ipAddressesList) {
         if (i != QHostAddress::LocalHost &&
@@ -52,9 +57,11 @@ Dialog::~Dialog()
     try {
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Destructor";
         server.close();
-        Accessor::getInstance()->stopAllHandle();
+        mStopServer.close();
+        mPingerServer.close();
         threadDeleter->setStopThread(true);
-        threadDeleter.reset();
+        threadDeleter.reset(); 
+        Accessor::getInstance()->stopAllHandle();
         QThreadPool::globalInstance()->waitForDone(10000);
     }
     catch(...) {
@@ -67,10 +74,11 @@ void Dialog::deleteMe()
     try {
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" " << "Shutdown application deleteMe.";
         server.close();
+        mStopServer.close();
+        mPingerServer.close();
         threadDeleter->setStopThread(true);
-        threadDeleter->deleteLater();
+        threadDeleter.reset();
         Accessor::getInstance()->stopAllHandle();
-        Accessor::getInstance()->deleteLater();
         this->deleteLater();
     }
     catch(...) {

@@ -15,7 +15,7 @@ class TranslateToServerThread : public QThread
     Q_PROPERTY(bool StopThread READ StopThread WRITE setStopThread NOTIFY StopThreadChanged)
 
 public:
-    explicit TranslateToServerThread(int socketDescriptor, QObject *parent = nullptr);
+    explicit TranslateToServerThread(qintptr socketDescriptor, QObject *parent = nullptr);
     ~TranslateToServerThread();
 
     bool StopThread() const;
@@ -26,13 +26,12 @@ private slots:
     void waitForByte(QTcpSocket *socket, int size);
 
 signals:
-    void error(QAbstractSocket::SocketError socketError);
     void StopThreadChanged(bool StopThread);
 
     void getSocketWithDescriptor(qintptr socketDescriptor, bool fromto);
     void stopHandle(quint16 PORTFROMLISTEN, bool);
 
-    void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, int socketDescriptor);
+    void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
 public slots:
     void setStopThread(bool StopThread);
 
@@ -43,7 +42,7 @@ public slots:
 
     void disconnect();
 private:
-    int socketDescriptor;
+    qintptr socketDescriptor;
     bool m_StopThread;
 
     std::shared_ptr<QTcpSocket> tcpSocket;

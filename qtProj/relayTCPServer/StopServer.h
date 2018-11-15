@@ -23,7 +23,6 @@ protected:
 
 private slots:
     void deleteFromListThread();
-    void deleteFromListThread(QAbstractSocket::SocketError);
     void deleteFromListThread(StopServerThread *thread);
 
 private:

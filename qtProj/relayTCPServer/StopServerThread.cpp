@@ -3,7 +3,7 @@
 
 //quint32 MAGIC_NUMBER = (quint32)0xCAFECAFE;
 
-StopServerThread::StopServerThread(int socketDescriptor, QObject *parent)
+StopServerThread::StopServerThread(qintptr socketDescriptor, QObject *parent)
     : QThread(parent), socketDescriptor(socketDescriptor), m_StopThread(false)
 {
 }
@@ -11,7 +11,6 @@ StopServerThread::StopServerThread(int socketDescriptor, QObject *parent)
 StopServerThread::~StopServerThread()
 {
     setStopThread(true);
-//    QThread::terminate();
     QThread::wait();
 }
 
@@ -90,18 +89,15 @@ void StopServerThread::run()
     QTcpSocket tcpSocket;
     connect(&tcpSocket, QOverload<QTcpSocket::SocketError>::of(&QTcpSocket::error),
             this, &StopServerThread::displayError);
-    connect(&tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SIGNAL(error(QAbstractSocket::SocketError)));
 
     if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(tcpSocket.error());
         return;
     }
 
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"StopServerThread Income connection from "<<tcpSocket.peerAddress().toString()<<" IP "<<tcpSocket.peerPort()<< " PORT "<<" - Thread "<<this->currentThreadId();
     in.setDevice(&tcpSocket);
-    const int Timeout = 30 * 1000;     // wait 30sec
-    if (!tcpSocket.waitForReadyRead(Timeout)) {
+
+    if (!tcpSocket.waitForReadyRead()) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"StopServerThread return ERROR to con from "<<tcpSocket.peerAddress().toString()<<" IP "<<tcpSocket.peerPort()<< " PORT error - "<<tcpSocket.errorString()<<" - Thread "<<this->currentThreadId();
 
         QByteArray block;
@@ -128,9 +124,6 @@ void StopServerThread::run()
         tcpSocket.disconnectFromHost();
         tcpSocket.waitForDisconnected();
     }
-    else {
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"MAGIC DONE "<<" - Thread "<<this->currentThreadId();
-    }
 
     // get size
     waitForByte(tcpSocket, sizeof (qint32));
@@ -144,7 +137,6 @@ void StopServerThread::run()
     QString UID = QString::fromUtf8(uid.data(), sizeOfStringArray);
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Stoping all with UID - "<<UID<<" - Thread "<<LikeAStunServerThread::currentThreadId();
 
-
     ////Event LOOP
     mIsBlock = false;
     emit stopHandleWithUID(UID);
@@ -152,12 +144,10 @@ void StopServerThread::run()
         msleep(1);
     }
     mIsBlock = false;
-//    Accessor::getInstance()->stopHandleWithUID(UID);
-
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << QString("COMPLETED");
+    out << QString("OK");
 
     tcpSocket.write(block);
     tcpSocket.disconnectFromHost();
