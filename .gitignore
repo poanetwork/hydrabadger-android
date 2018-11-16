@@ -2,3 +2,23 @@
 sample/cargo/target/
 
 NDK/
+
+qtProj/build-Whatcher-Desktop_Qt_5_11_2_GCC_64bit-Release/
+
+qtProj/build-clientInitConnect-Desktop_Qt_5_11_2_GCC_64bit-Debug/
+
+qtProj/build-clientReciever-Desktop_Qt_5_11_2_GCC_64bit-Debug/
+
+qtProj/build-clientReciever-Desktop_Qt_5_11_2_GCC_64bit-Release/
+
+qtProj/build-clientReset-Desktop_Qt_5_11_2_GCC_64bit-Debug/
+
+qtProj/build-clientReset-Desktop_Qt_5_11_2_GCC_64bit-Release/
+
+qtProj/build-clientTransmit-Desktop_Qt_5_11_2_GCC_64bit-Debug/
+
+qtProj/build-clientTransmit-Desktop_Qt_5_11_2_GCC_64bit-Release/
+
+qtProj/build-relayTCPServer-Desktop_Qt_5_11_2_GCC_64bit-Debug/
+
+qtProj/build-relayTCPServer-Desktop_Qt_5_11_2_GCC_64bit-Release/
