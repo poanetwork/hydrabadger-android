@@ -137,7 +137,7 @@ public slots:
     //  send data to back
     void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
 
-public slots:
+protected slots:
     Ports getMeNotUsagePort();
     void  setThisPortNotUsage(Ports pair);
 

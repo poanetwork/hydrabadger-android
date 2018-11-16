@@ -174,7 +174,7 @@ Client::Client(QWidget *parent)
         networkSession->open();
     }
 
-    portLineEdit->setText("49999");
+    portLineEdit->setText("2999");
 //! [5]
 }
 //! [5]

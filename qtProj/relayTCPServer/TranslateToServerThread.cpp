@@ -135,12 +135,12 @@ void TranslateToServerThread::run()
 
             qint64 size = Accessor::getInstance()->GetSocketTo(localPort)->bytesAvailable();
             if(size > 0) {
-                waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), sizeof(int) + sizeof(qintptr));
+                waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), 2*sizeof(int));
 
                 int size1 = 0;
                 in >> size1;
 
-                qintptr socketdescriptor = 0;
+                int socketdescriptor = 0;
                 in >> socketdescriptor;
 
                 waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), size1);
@@ -152,6 +152,7 @@ void TranslateToServerThread::run()
                 if(res == -1)
                     break;
 
+//                Accessor::getInstance()->sendDataFreedBack(localPort, data.data(), size1, socketdescriptor);
                 ////Event LOOP
                 mIsBlockSend = false;
                 emit sendDataFreedBack(localPort, data.data(), size1, socketdescriptor);

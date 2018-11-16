@@ -1,59 +1,9 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
-** as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
 #include <QtWidgets>
 #include <QtNetwork>
 
 #include "client.h"
+#include <stdlib.h>
 
-//! [0]
 Client::Client(QWidget *parent)
     : QDialog(parent)
     , hostCombo(new QComboBox)
@@ -62,7 +12,7 @@ Client::Client(QWidget *parent)
     , tcpSocket(new QTcpSocket(this))
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-//! [0]
+
     hostCombo->setEditable(true);
     // find out name of this machine
     QString name = QHostInfo::localHostName();
@@ -107,10 +57,6 @@ Client::Client(QWidget *parent)
     buttonBox->addButton(getFortuneButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
 
-//! [1]
-    in.setDevice(tcpSocket);
-//! [1]
-
     connect(hostCombo, &QComboBox::editTextChanged,
             this, &Client::enableGetFortuneButton);
     connect(portLineEdit, &QLineEdit::textChanged,
@@ -118,13 +64,10 @@ Client::Client(QWidget *parent)
     connect(getFortuneButton, &QAbstractButton::clicked,
             this, &Client::requestNewFortune);
     connect(quitButton, &QAbstractButton::clicked, this, &QWidget::close);
-//! [2] //! [3]
-    connect(tcpSocket, &QIODevice::readyRead, this, &Client::readFortune);
-//! [2] //! [4]
-    connect(tcpSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),
-//! [3]
-            this, &Client::displayError);
-//! [4]
+
+    connect(tcpSocket, &QIODevice::readyRead, this, &Client::read);
+
+    in.setDevice(tcpSocket);
 
     QGridLayout *mainLayout = nullptr;
     if (QGuiApplication::styleHints()->showIsFullScreen() || QGuiApplication::styleHints()->showIsMaximized()) {
@@ -174,80 +117,103 @@ Client::Client(QWidget *parent)
         networkSession->open();
     }
 
-    portLineEdit->setText("50002");
-//! [5]
+    portLineEdit->setText("3002");
 }
-//! [5]
 
-//! [6]
 void Client::requestNewFortune()
 {
     getFortuneButton->setEnabled(false);
     tcpSocket->abort();
-//! [7]
+
     tcpSocket->connectToHost(hostCombo->currentText(),
                              portLineEdit->text().toInt());
 
+    session();
+}
+
+
+void Client::read()
+{
+    // get size
+    waitForByte(tcpSocket, sizeof (qint32));
+    QByteArray bytearay2;
+    bytearay2.clear();
+    bytearay2.resize(4096);
+
+    qint32 size = 0;
+    in >> size;
+    bytearay2.resize(size);
+    qint32 sizeavail = tcpSocket->bytesAvailable();
+    waitForByte(tcpSocket, size-sizeof(qint32));
+    size = in.readRawData(bytearay2.data(), size);
+
+    QString UID2 = QString::fromLocal8Bit(bytearay2);
+
+    if(UID2 == UID) {
+        qDebug()<<"Live is good";
+
+        QString str = QString("Success transmit and recive  - %1 bytes").arg(size);
+        statusLabel->setText(str);
+
+        int randTime = qrand()%100*10;
+        QTime dieTime= QTime::currentTime().addMSecs(randTime == 0 ? 100 : randTime);
+        while (QTime::currentTime() < dieTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+
+        session();
+    }
+    else {
+        qDebug()<<"Live is NOT good";
+        qDebug()<<"bytearay2 - "<<bytearay2.size();
+
+        QString str = QString("EROOR transmit - %1 bytes and recive  - %2 bytes").arg(UID.size()).arg(bytearay2.size());
+        statusLabel->setText(str);
+
+        QTime dieTime= QTime::currentTime().addSecs(5);
+        while (QTime::currentTime() < dieTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+
+        session();
+    }
+}
+
+void Client::session()
+{
     while(tcpSocket->state() != QAbstractSocket::ConnectedState) {
         QTime dieTime= QTime::currentTime().addSecs(1);
         while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
     }
 
-    int count = 0;
-    while(tcpSocket->state() == QAbstractSocket::ConnectedState) {
-        qDebug()<<"block "<<count;
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
 
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
+    UID = "UID";
 
-        QString UID = "UID-UID-UID-UID-UID";
-        qDebug()<<"Size "<<(qint32)UID.size();
-        out << (qint32)UID.size();
-        out.writeBytes(UID.toLocal8Bit().constData(), UID.size());
-        tcpSocket->write(block);
-        tcpSocket->waitForBytesWritten();
+    int cnt = qrand()%100;
+    for(int i = 0; i < cnt; i++)
+        UID += "-UID";
 
-        count++;
-
-        QTime dieTime= QTime::currentTime().addSecs(1);
-        while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
-
-
-//! [7]
+    qDebug()<<"Size "<<(qint32)UID.size();
+    QByteArray bytearay = UID.toLocal8Bit();
+    out << bytearay;
+    tcpSocket->write(block);
+    tcpSocket->flush();
+    tcpSocket->waitForBytesWritten();
 }
-//! [6]
+
 
 void Client::waitForByte(QTcpSocket *socket, int size)
 {
-    const int Timeout = 60 * 1000;
     while(socket->bytesAvailable() < size){
-        socket->waitForReadyRead(Timeout);
+        socket->waitForReadyRead(100);
+
+        QTime dieTime= QTime::currentTime().addMSecs(100);
+        while (QTime::currentTime() < dieTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
     }
 }
-//! [8]
-void Client::readFortune()
-{
-    in.startTransaction();
 
-    int bytes = tcpSocket->bytesAvailable();
-    std::vector<char> arr;
-    arr.resize(bytes);
-    in.readRawData(arr.data(), bytes);
-
-    qDebug()<<arr;
-
-    if (!in.commitTransaction())
-        return;
-
-    statusLabel->setText(currentFortune);
-    getFortuneButton->setEnabled(true);
-}
-//! [8]
-
-//! [13]
 void Client::displayError(QAbstractSocket::SocketError socketError)
 {
     switch (socketError) {

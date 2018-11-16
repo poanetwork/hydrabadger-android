@@ -16,17 +16,17 @@ Dialog::Dialog(QObject *parent)
 
     if (!server.listen(QHostAddress::AnyIPv4, 3000)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Server "<<" Unable to start the server: "<<server.errorString();
-        return;
+        QCoreApplication::exit(0);
     }
 
     if (!mStopServer.listen(QHostAddress::AnyIPv4, 2999)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Server "<<" Unable to start the StopServer: "<<mStopServer.errorString();
-        return;
+        QCoreApplication::exit(0);
     }
 
     if (!mPingerServer.listen(QHostAddress::AnyIPv4, 2998)) {
         qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Threaded TCP Relay Server "<<" Unable to start the StopServer: "<<mPingerServer.errorString();
-        return;
+        QCoreApplication::exit(0);
     }
 
     QString ipAddress;

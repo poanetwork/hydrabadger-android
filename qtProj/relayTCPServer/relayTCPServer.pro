@@ -4,6 +4,8 @@ QT += network
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
+DESTDIR = $$PWD/../RelayTCPServer_x64/
+
 HEADERS       = dialog.h \
     LikeAStunServer.h \
     LikeAStunServerThread.h \

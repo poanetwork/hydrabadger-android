@@ -115,6 +115,7 @@ void TranslateFromServerThread::run()
     std::vector<char> data;
     data.reserve(4096);
     in.setDevice(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor).get());
+
     forever {
         if(StopThread())
             break;
@@ -135,6 +136,7 @@ void TranslateFromServerThread::run()
                     break;
                 }
 
+//                Accessor::getInstance()->sendData(localPort, data.data(), reading, socketDescriptor);
                 ////Event LOOP
                 mIsBlockSend = false;
                 emit sendData(localPort, data.data(), reading, socketDescriptor);

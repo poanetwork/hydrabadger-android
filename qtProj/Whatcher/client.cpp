@@ -69,8 +69,10 @@ void Client::startPinged()
 
 void Client::processOutput()
 {
-    qDebug() << proc->readAllStandardOutput();  // read normal output
-    qDebug() << proc->readAllStandardError();  // read error channel
+    QByteArray array = proc->readAllStandardOutput();
+    qDebug(array.data());
+    QByteArray array2 = proc->readAllStandardError();
+    qDebug(array2.data());// read error channel
 }
 
 

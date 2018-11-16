@@ -224,29 +224,7 @@ void Accessor::stopAllHandle()
     }
 }
 
-void Accessor::sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketdescription)
-{
-    if(AllConnectHandles.contains(PORTFROMLISTEN)
-            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO.get() != nullptr
-            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->state() == QTcpSocket::ConnectedState) {
 
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData "<<len<<" bytes "<<PORTFROMLISTEN<<" port from";
-
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out << len;
-        out << socketdescription;
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->waitForBytesWritten();
-    }
-    else {
-        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR for port "<<PORTFROMLISTEN<<" DROP "<<len<<" bytes";
-    }
-
-    QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
-}
 
 void Accessor::Insert_SocketFrom(quint16 PORTFROMLISTEN, qintptr socketDescriptor, std::shared_ptr<QTcpSocket> soc)
 {
@@ -377,6 +355,37 @@ void Accessor::getSocketWithDescriptor(qintptr socketDescriptor, bool fromto)
     }
 }
 
+void Accessor::sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketdescription)
+{
+    if(AllConnectHandles.contains(PORTFROMLISTEN)
+            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO.get() != nullptr
+            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->state() == QTcpSocket::ConnectedState) {
+
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData "<<len<<" bytes "<<PORTFROMLISTEN<<" port from";        
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        int desc = (int)socketdescription;
+        out << len;
+        out << desc;
+
+//        QTcpSocket socket;
+//        socket.setSocketDescriptor(socketdescription);
+//        socket.write(block);
+//        socket.write(data, len);
+//        socket.flush();
+//        socket.waitForBytesWritten();
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
+        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->waitForBytesWritten();
+    }
+    else {
+        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR for port "<<PORTFROMLISTEN<<" DROP "<<len<<" bytes";
+    }
+
+    QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
+}
+
 void Accessor::sendDataFreedBack(quint16 PORTTOSEND, const char *data, int len, qintptr socketDescriptor)
 {
     quint16 PORTFROMLISTEN = getPORTFROMLISTEN_fromPORTTOSend(PORTTOSEND);
@@ -391,6 +400,12 @@ void Accessor::sendDataFreedBack(quint16 PORTTOSEND, const char *data, int len, 
             && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->state() == QTcpSocket::ConnectedState) {
 
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack "<<len<<" bytes "<<PORTTOSEND<<" From(portto)";
+
+//        QTcpSocket socket;
+//        socket.setSocketDescriptor(socketDescriptor);
+//        socket.write(data, len);
+//        socket.flush();
+//        socket.waitForBytesWritten();
 
         AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->write(data, len);
         AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->flush();
