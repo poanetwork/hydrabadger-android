@@ -8,28 +8,28 @@
     unreachable_code)]
 
 use super::WIRE_MESSAGE_RETRY_MAX;
-use super::{Error, Hydrabadger, InputOrMessage, State, StateDsct};
+use super::{Error, Hydrabadger, InputOrMessage, StateMachine, State, StateDsct};
 use crossbeam::queue::SegQueue;
 use hbbft::{
     crypto::{PublicKey, PublicKeySet},
-    dynamic_honey_badger::{ChangeState, JoinPlan, Message as DhbMessage, Change as DhbChange, Input as DhbInput},
-    // queueing_honey_badger::{Change as QhbChange, Input as QhbInput},
+    dynamic_honey_badger::{ChangeState, JoinPlan, Message as DhbMessage, Change as DhbChange,
+                           NodeChange},
     sync_key_gen::{Ack, AckOutcome, Part, PartOutcome, SyncKeyGen},
-    DistAlgorithm, Target
+    Target, Epoched,
 };
 use peer::Peers;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use tokio::{self, prelude::*};
 use {
-    Contribution, InAddr, Input, InternalMessage, InternalMessageKind, InternalRx, Message,
+    Change, Contribution, InAddr, InternalMessage, InternalMessageKind, InternalRx, Message,
     NetworkNodeInfo, NetworkState, OutAddr, Step, Uid, WireMessage, WireMessageKind, BatchTx,
 };
 use rand;
 
 // android fix
 type CallbackBatch = fn(num: i32, its_me: bool, id: String, trans: String);
-
+//
 
 /// Hydrabadger event (internal message) handler.
 pub struct Handler<T: Contribution> {
@@ -43,7 +43,6 @@ pub struct Handler<T: Contribution> {
     // TODO: Use a bounded tx/rx (find a sensible upper bound):
     batch_tx: BatchTx<T>,
 
-    
     // android fix
     // callback Batch
     callbackbatch: CallbackBatch,
@@ -51,23 +50,27 @@ pub struct Handler<T: Contribution> {
 
     addr: InAddr,
     addr_out: InAddr,
+    //
 }
 
-
-impl<T: Contribution> Handler<T>  {
+impl<T: Contribution> Handler<T> {
+    // android fix
+    // pub(super) fn new(hdb: Hydrabadger<T>, peer_internal_rx: InternalRx<T>, batch_tx: BatchTx<T>) -> Handler<T> {
     pub(super) fn new(hdb: Hydrabadger<T>, peer_internal_rx: InternalRx<T>, batch_tx: BatchTx<T>, callbackbatch: CallbackBatch, num: i32, addr: InAddr, addr_out: InAddr) -> Handler<T> {
-         Handler {
+    //
+        Handler {
             hdb,
             peer_internal_rx,
             wire_queue: SegQueue::new(),
             step_queue: SegQueue::new(),
             batch_tx,
-            
+
             // android fix
             callbackbatch,
             num,
             addr,
             addr_out,
+            //
         }
     }
 
@@ -110,15 +113,14 @@ impl<T: Contribution> Handler<T>  {
         _src_addr: OutAddr,
         src_pk: PublicKey,
         request_change_add: bool,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
         peers: &Peers<T>,
     ) -> Result<(), Error> {
-        match state.discriminant() {
-            StateDsct::Disconnected | StateDsct::DeterminingNetworkState => {
+        match state.state {
+            State::Disconnected { .. } | State::DeterminingNetworkState { .. } => {
                 state.update_peer_connection_added(&peers);
-                self.hdb.set_state_discriminant(state.discriminant());
             }
-            StateDsct::AwaitingMorePeersForKeyGeneration => {
+            State::AwaitingMorePeersForKeyGeneration { .. } => {
                 if peers.count_validators() >= self.hdb.config().keygen_peer_count {
                     info!("== BEGINNING KEY GENERATION ==");
 
@@ -132,7 +134,6 @@ impl<T: Contribution> Handler<T>  {
                         peers,
                         self.hdb.config(),
                     )?;
-                    self.hdb.set_state_discriminant(state.discriminant());
 
                     info!("KEY GENERATION: Sending initial parts and our own ack.");
                     self.wire_to_validators(
@@ -150,7 +151,7 @@ impl<T: Contribution> Handler<T>  {
                     self.wire_to_validators(WireMessage::key_gen_part_ack(ack), peers);
                 }
             }
-            StateDsct::GeneratingKeys { .. } => {
+            State::GeneratingKeys { .. } => {
                 // This *could* be called multiple times when initially
                 // establishing outgoing connections. Do nothing for now.
                 warn!(
@@ -158,14 +159,13 @@ impl<T: Contribution> Handler<T>  {
                      peer signal while `StateDsct::GeneratingKeys`."
                 );
             }
-            StateDsct::Observer | StateDsct::Validator => {
+            State::Observer { .. } | State::Validator { .. } => {
                 // If the new peer sends a request-change-add (to be a
                 // validator), input the change into HB and broadcast, etc.
                 if request_change_add {
                     let dhb = state.dhb_mut().unwrap();
                     info!("Change-Adding ('{}') to honey badger.", src_uid);
-                    let step = dhb
-                        .handle_input(DhbInput::Change(DhbChange::Add(src_uid, src_pk)))
+                    let step = dhb.vote_to_add(src_uid, src_pk)
                         .expect("Error adding new peer to HB");
                     self.step_queue.push(step);
                 }
@@ -174,31 +174,10 @@ impl<T: Contribution> Handler<T>  {
         Ok(())
     }
 
-    fn handle_input(&self, input: Input<T>, state: &mut State<T>) -> Result<(), Error> {
-        trace!("hydrabadger::Handler: About to input....");
-        if let Some(step_res) = state.input(input) {
-            let step = step_res.map_err(|err| {
-                error!("Honey Badger input error: {:?}", err);
-                Error::HbStepError
-            })?;
-            trace!("hydrabadger::Handler: Input step result added to queue....");
-            self.step_queue.push(step);
-        }
-        Ok(())
-    }
-
-    fn handle_message(
-        &self,
-        msg: Message,
-        src_uid: &Uid,
-        state: &mut State<T>,
-    ) -> Result<(), Error> {
-        trace!("hydrabadger::Handler: About to handle_message: {:?}", msg);
-        if let Some(step_res) = state.handle_message(src_uid, msg) {
-            let step = step_res.map_err(|err| {
-                error!("Honey Badger handle_message error: {:?}", err);
-                Error::HbStepError
-            })?;
+    fn handle_iom(&self, iom: InputOrMessage<T>, state: &mut StateMachine<T>) -> Result<(), Error> {
+        trace!("hydrabadger::Handler: About to handle_iom: {:?}", iom);
+        if let Some(step_res) = state.handle_iom(iom) {
+            let step = step_res.map_err(Error::HbStep)?;
             trace!("hydrabadger::Handler: Message step result added to queue....");
             self.step_queue.push(step);
         }
@@ -240,8 +219,8 @@ impl<T: Contribution> Handler<T>  {
         }
     }
 
-    fn handle_key_gen_part(&self, src_uid: &Uid, part: Part, state: &mut State<T>) {
-        match state {
+    fn handle_key_gen_part(&self, src_uid: &Uid, part: Part, state: &mut StateMachine<T>) {
+        match state.state {
             State::GeneratingKeys {
                 ref mut sync_key_gen,
                 ref ack_queue,
@@ -288,11 +267,13 @@ impl<T: Contribution> Handler<T>  {
                 debug!("   Part count: {}", part_count);
                 debug!("   Ack count: {}", ack_count);
             }
-            State::DeterminingNetworkState { network_state, .. } => match network_state.is_some() {
-                true => unimplemented!(),
-                false => unimplemented!(),
+            State::DeterminingNetworkState { ref network_state, .. } => {
+                match network_state.is_some() {
+                    true => unimplemented!(),
+                    false => unimplemented!(),
+                }
             },
-            s => panic!(
+            ref s => panic!(
                 "::handle_key_gen_part: State must be `GeneratingKeys`. \
                  State: \n{:?} \n\n[FIXME: Enqueue these parts!]\n\n",
                 s.discriminant()
@@ -304,11 +285,11 @@ impl<T: Contribution> Handler<T>  {
         &self,
         src_uid: &Uid,
         ack: Ack,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
         peers: &Peers<T>,
     ) -> Result<(), Error> {
         let mut keygen_is_complete = false;
-        match state {
+        match state.state {
             State::GeneratingKeys {
                 ref mut sync_key_gen,
                 ref ack_queue,
@@ -354,7 +335,7 @@ impl<T: Contribution> Handler<T>  {
     fn handle_join_plan(
         &self,
         jp: JoinPlan<Uid>,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
         peers: &Peers<T>,
     ) -> Result<(), Error> {
         debug!("Join plan: \n{:?}", jp);
@@ -384,7 +365,7 @@ impl<T: Contribution> Handler<T>  {
     fn instantiate_hb(
         &self,
         jp_opt: Option<JoinPlan<Uid>>,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
         peers: &Peers<T>,
     ) -> Result<(), Error> {
         let mut iom_queue_opt = None;
@@ -402,6 +383,8 @@ impl<T: Contribution> Handler<T>  {
                             self.hdb.config(),
                             &self.step_queue,
                         )?);
+                        let (era, epoch) = state.dhb().unwrap().epoch();
+                        self.hdb.set_current_epoch(era + epoch);
                     }
                     None => {
                         iom_queue_opt = Some(state.set_validator(
@@ -416,6 +399,7 @@ impl<T: Contribution> Handler<T>  {
 
                 // android fix
                 (self.callbackbatch)(self.num, true, "".to_string(), "".to_string());
+                //
 
                 for l in self.hdb.epoch_listeners().iter() {
                     l.unbounded_send(self.hdb.current_epoch())
@@ -435,29 +419,33 @@ impl<T: Contribution> Handler<T>  {
             }
         }
 
-        self.hdb.set_state_discriminant(state.discriminant());
-
         // Handle previously queued input and messages:
         if let Some(iom_queue) = iom_queue_opt {
             while let Some(iom) = iom_queue.try_pop() {
-                match iom {
-                    InputOrMessage::Input(input) => {
-                        self.handle_input(input, state)?;
-                    }
-                    InputOrMessage::Message(uid, msg) => {
-                        self.handle_message(msg, &uid, state)?;
-                    }
-                }
+                self.handle_iom(iom, state)?;
             }
         }
         Ok(())
     }
 
+    /// Resets all connections with peers.
+    ///
+    /// Used when state gets out of sync such as when key generation completed
+    /// without including this node.
+    fn reset_peer_connections(
+        &self,
+        state: &mut StateMachine<T>,
+        peers: &Peers<T>,
+    ) -> Result<(), Error> {
+        self.wire_to_validators(WireMessage::hello_request_change_add(*self.hdb.uid(),
+            *self.hdb.addr(), self.hdb.secret_key().public_key()), peers);
+        Ok(())
+    }
 
     fn handle_net_state(
         &self,
         net_state: NetworkState,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
         peers: &Peers<T>,
     ) -> Result<(), Error> {
         let peer_infos;
@@ -465,27 +453,28 @@ impl<T: Contribution> Handler<T>  {
             NetworkState::Unknown(p_infos) => {
                 peer_infos = p_infos;
                 state.update_peer_connection_added(peers);
-                self.hdb.set_state_discriminant(state.discriminant());
             }
             NetworkState::AwaitingMorePeersForKeyGeneration(p_infos) => {
                 peer_infos = p_infos;
                 state.set_awaiting_more_peers();
-                self.hdb.set_state_discriminant(state.discriminant());
             }
             NetworkState::GeneratingKeys(p_infos, public_keys) => {
                 peer_infos = p_infos;
             }
             NetworkState::Active(net_info) => {
                 peer_infos = net_info.0.clone();
-                match state {
-                    State::DeterminingNetworkState {
-                        ref mut network_state,
-                        ..
-                    } => {
+
+                match state.state {
+                    State::DeterminingNetworkState { ref mut network_state, .. } => {
                         *network_state = Some(NetworkState::Active(net_info));
                     }
+                    State::AwaitingMorePeersForKeyGeneration { .. } => {
+                        // Key generation has completed and we were not a part
+                        // of it. Need to restart as a freshly connecting node.
+                        state.set_determining_network_state_active(net_info);
+                        self.reset_peer_connections(state, peers)?;
+                    }
                     State::Disconnected { .. }
-                    | State::AwaitingMorePeersForKeyGeneration { .. }
                     | State::GeneratingKeys { .. } => {
                         panic!(
                             "Handler::net_state: Received `NetworkState::Active` while `{}`.",
@@ -494,7 +483,6 @@ impl<T: Contribution> Handler<T>  {
                     }
                     _ => {}
                 }
-
             }
             NetworkState::None => panic!("`NetworkState::None` received."),
         }
@@ -508,12 +496,12 @@ impl<T: Contribution> Handler<T>  {
                 && peers.get(&OutAddr(peer_info.in_addr.0)).is_none()
                 // android fix
                 && peer_info.in_addr != self.addr_out 
+                //
             {
-                warn!("@@ I am HERE {} - {} ", self.addr, self.addr_out);
-                let local_pk = self.hdb.secret_key().public_key();
+                let local_sk = self.hdb.secret_key().clone();
                 tokio::spawn(self.hdb.clone().connect_outgoing(
                     peer_info.in_addr.0,
-                    local_pk,
+                    local_sk,
                     Some((peer_info.uid, peer_info.in_addr, peer_info.pk)),
                     false,
                 ));
@@ -525,15 +513,14 @@ impl<T: Contribution> Handler<T>  {
     fn handle_peer_disconnect(
         &self,
         src_uid: Uid,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
         peers: &Peers<T>,
     ) -> Result<(), Error> {
         state.update_peer_connection_dropped(peers);
-        self.hdb.set_state_discriminant(state.discriminant());
 
         // TODO: Send a node removal (Change-Remove) vote?
 
-        match state {
+        match state.state {
             State::Disconnected { .. } => {
                 panic!("Received `WireMessageKind::PeerDisconnect` while disconnected.");
             }
@@ -542,7 +529,7 @@ impl<T: Contribution> Handler<T>  {
             }
             State::AwaitingMorePeersForKeyGeneration { .. } => {
                 // info!("Removing peer ({}: '{}') from await list.",
-                //     src_out_addr, src_uid.clone().unwrap());
+                //     src_out_addr, src_uid.unwrap());
                 // state.peer_connection_dropped(&*self.hdb.peers());
             }
             State::GeneratingKeys { .. } => {
@@ -550,17 +537,11 @@ impl<T: Contribution> Handler<T>  {
             }
             State::Observer { ref mut dhb } => {
                 // Do nothing instead?
-                let step = dhb
-                    .as_mut()
-                    .unwrap()
-                    .handle_input(DhbInput::Change(DhbChange::Remove(src_uid)))?;
+                let step = dhb.as_mut().unwrap().vote_to_remove(src_uid)?;
                 self.step_queue.push(step);
             }
             State::Validator { ref mut dhb } => {
-                let step = dhb
-                    .as_mut()
-                    .unwrap()
-                    .handle_input(DhbInput::Change(DhbChange::Remove(src_uid)))?;
+                let step = dhb.as_mut().unwrap().vote_to_remove(src_uid)?;
                 self.step_queue.push(step);
             }
         }
@@ -570,7 +551,7 @@ impl<T: Contribution> Handler<T>  {
     fn handle_internal_message(
         &self,
         i_msg: InternalMessage<T>,
-        state: &mut State<T>,
+        state: &mut StateMachine<T>,
     ) -> Result<(), Error> {
         let (src_uid, src_out_addr, w_msg) = i_msg.into_parts();
 
@@ -585,10 +566,9 @@ impl<T: Contribution> Handler<T>  {
 
                 let net_state;
 
-                match state {
+                match state.state {
                     State::Disconnected {} => {
                         state.set_awaiting_more_peers();
-                        self.hdb.set_state_discriminant(state.discriminant());
                         net_state = state.network_state(&peers);
                     }
                     State::DeterminingNetworkState {
@@ -600,16 +580,13 @@ impl<T: Contribution> Handler<T>  {
                     _ => net_state = state.network_state(&peers),
                 }
 
-                // // Get the current `NetworkState`:
-                // let net_state = state.network_state(&peers);
-
                 // Send response to remote peer:
                 peers
                     .get(&src_out_addr)
                     .unwrap()
                     .tx()
                     .unbounded_send(WireMessage::welcome_received_change_add(
-                        self.hdb.uid().clone(),
+                        *self.hdb.uid(),
                         self.hdb.secret_key().public_key(),
                         net_state,
                     ))
@@ -635,19 +612,22 @@ impl<T: Contribution> Handler<T>  {
 
                 let peers = self.hdb.peers();
                 state.update_peer_connection_added(&peers);
-                self.hdb.set_state_discriminant(state.discriminant());
             }
 
-            InternalMessageKind::HbInput(input) => {
-                self.handle_input(input, state)?;
+            InternalMessageKind::HbContribution(contrib) => {
+                self.handle_iom(InputOrMessage::Contribution(contrib), state)?;
+            }
+
+            InternalMessageKind::HbChange(change) => {
+                self.handle_iom(InputOrMessage::Change(change), state)?;
             }
 
             InternalMessageKind::HbMessage(msg) => {
-                self.handle_message(msg, src_uid.as_ref().unwrap(), state)?;
+                self.handle_iom(InputOrMessage::Message(src_uid.unwrap(), msg), state)?;
             }
 
             InternalMessageKind::PeerDisconnect => {
-                let dropped_src_uid = src_uid.clone().unwrap();
+                let dropped_src_uid = src_uid.unwrap();
                 info!(
                     "Peer disconnected: ({}: '{}').",
                     src_out_addr, dropped_src_uid
@@ -671,7 +651,7 @@ impl<T: Contribution> Handler<T>  {
                     match peers
                         .establish_validator(src_out_addr, (src_uid_new, src_in_addr, src_pk))
                     {
-                        true => debug_assert!(src_uid_new == src_uid.clone().unwrap()),
+                        true => debug_assert!(src_uid_new == src_uid.unwrap()),
                         false => debug_assert!(src_uid.is_none()),
                     }
 
@@ -679,13 +659,11 @@ impl<T: Contribution> Handler<T>  {
                     self.handle_net_state(net_state, state, &peers)?;
                 }
 
-                // New outgoing connection:
+                // New outgoing connection response:
                 WireMessageKind::WelcomeReceivedChangeAdd(src_uid_new, src_pk, net_state) => {
                     debug!("Received NetworkState: \n{:?}", net_state);
-                    assert!(src_uid_new == src_uid.clone().unwrap());
+                    assert!(src_uid_new == src_uid.unwrap());
                     let mut peers = self.hdb.peers_mut();
-
-                    warn!("!! {} - handle_internal_message  WelcomeReceivedChangeAdd - {} - {}", self.num, src_out_addr, src_out_addr.0);
 
                     // Set new (outgoing-connection) peer's public info:
                     peers.establish_validator(
@@ -727,7 +705,7 @@ impl<T: Contribution> Handler<T>  {
                     self.handle_join_plan(jp, state, &peers)?;
                 }
 
-                wm @ _ => warn!(
+                wm => warn!(
                     "hydrabadger::Handler::handle_internal_message: Unhandled wire message: \
                      \n{:?}",
                     wm,
@@ -792,7 +770,7 @@ impl<T: Contribution> Future for Handler<T> {
         // Process all honey badger output batches:
         while let Some(mut step) = self.step_queue.try_pop() {
             for batch in step.output.drain(..) {
-                info!("!! A HONEY BADGER BATCH WITH CONTRIBUTIONS IS BEING STREAMED...");
+                info!("A HONEY BADGER BATCH WITH CONTRIBUTIONS IS BEING STREAMED...");
 
                 let batch_epoch = batch.epoch();
                 let prev_epoch = self.hdb.set_current_epoch(batch_epoch + 1);
@@ -823,10 +801,11 @@ impl<T: Contribution> Future for Handler<T> {
                     }
                 // }
 
-                // // TODO: Remove
+                // TODO: Remove
                 // if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {
                 //     return Ok(Async::Ready(()));
                 // }
+                //
 
                 if let Some(jp) = batch.join_plan() {
                     // FIXME: Only sent to unconnected nodes:
@@ -838,15 +817,17 @@ impl<T: Contribution> Future for Handler<T> {
                     ChangeState::None => {}
                     ChangeState::InProgress(_change) => {}
                     ChangeState::Complete(change) => match change {
-                        DhbChange::Add(uid, pk) => {
+                        DhbChange::NodeChange(NodeChange::Add(uid, pk)) => {
                             if uid == self.hdb.uid() {
                                 assert_eq!(*pk, self.hdb.secret_key().public_key());
                                 assert!(state.dhb().unwrap().netinfo().is_validator());
                                 state.promote_to_validator()?;
-                                self.hdb.set_state_discriminant(state.discriminant());
                             }
                         }
-                        DhbChange::Remove(uid) => {}
+                        // FIXME
+                        DhbChange::NodeChange(NodeChange::Remove(_uid)) => {}
+                        // FIXME
+                        DhbChange::EncryptionSchedule(_schedule) => {}
                     },
                 }
 
@@ -939,4 +920,3 @@ impl<T: Contribution> Future for Handler<T> {
                 //         }
                 //     }
                 // }
-

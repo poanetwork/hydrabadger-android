@@ -16,10 +16,13 @@ rust_swig = "*"
 
 
 
-
 [features]
 # Used for debugging memory usage.
 exit_upon_epoch_1000 = []
+# Disables SIMD in reed-solomon-erasure, which currently doesn't work on Android.
+no-simd = ["hbbft/no-simd"]
+
+
 
 [dependencies]
 log = "0.4"
@@ -32,6 +35,9 @@ serde_json = "1.0"
 error-chain = "0.10.0"
 
 
+
+
+log = "0.4"
 # env_logger = "*"
 env_logger = "0.5"
 clap = "2"
@@ -51,7 +57,8 @@ serde_bytes = "~0.10.4"
 serde_derive = "1"
 signifix = "0.9"
 futures = "0.1"
-tokio = "~0.1.11"
+# tokio = "~0.1.11"
+tokio = { git = "https://github.com/tokio-rs/tokio", rev = "51e36e4" }
 tokio-codec = "~0.1.1"
 tokio-io = "~0.1.9"
 bincode = "1"
@@ -66,9 +73,7 @@ clear_on_drop = "0.2"
 [dependencies.hbbft]
 version = "*"
 git = "https://github.com/KORuL/hbbft.git"
-branch = "KORuL-patch-reed-solomon-erasure"
-# git = "https://github.com/poanetwork/hbbft"
-# branch = "master"
+branch = "master"
 
 [profile.release]
 debug = true

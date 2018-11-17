@@ -478,17 +478,18 @@ class MainActivity : AppCompatActivity() {
     fun subscribeSession() {
         session?.subscribe { you: Boolean, uid: String, mes: String ->
 
-            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[[]]") {
+            if(uid == "test" && mes == "test") {
+                Log.d(TAG, "subscribeSession - init")
+                showError = false
+                return@subscribe
+            }
+
+            updateFloatBut1()
+
+            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[None]") {
                 val text1 = Text1
+
                 if (you) {
-                    if(uid == "test" && mes == "test") {
-                        Log.d(TAG, "subscribeSession - init")
-                        showError = false
-                        return@subscribe
-                    }
-
-                    updateFloatBut1()
-
                     val str = SpannableStringBuilder()
                     str.append(text1.text)
                     str.append("\n")
@@ -499,8 +500,6 @@ class MainActivity : AppCompatActivity() {
 
                     setTextAndScrollDown1(str.toString())
                 } else {
-                    updateFloatBut1()
-
                     val str = SpannableStringBuilder()
                     str.append(text1.text)
                     str.append("\n")
@@ -519,7 +518,7 @@ class MainActivity : AppCompatActivity() {
 
             updateFloatBut2()
 
-            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[[]]") {
+            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[None]") {
                 val text1 = Text2
                 if (you) {
                     val str = SpannableStringBuilder()
@@ -550,7 +549,7 @@ class MainActivity : AppCompatActivity() {
 
             updateFloatBut3()
 
-            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[[]]") {
+            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[None]") {
                 val text1 = Text3
                 if (you) {
                     val str = SpannableStringBuilder()

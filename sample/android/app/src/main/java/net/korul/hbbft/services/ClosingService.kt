@@ -15,7 +15,7 @@ import kotlin.concurrent.thread
 
 class ClosingService : Service() {
 
-    private var TAG = "ClosingService"
+    private var TAG = "HYDRABADGERTAG:ClosingService"
 
     var uniqueID1: String? = null
     var uniqueID2: String? = null
@@ -46,7 +46,7 @@ class ClosingService : Service() {
         try {
 //            62.176.10.54
             Log.i(TAG, "Service: resetConnectOnServer")
-            val soc = Socket("62.176.10.54", 49999)
+            val soc = Socket("62.176.10.54", 2999)
             val dout = DataOutputStream(soc.getOutputStream())
             val din = DataInputStream(soc.getInputStream())
             Log.i(TAG, "Service: connected")

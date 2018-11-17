@@ -1,5 +1,9 @@
 #![cfg_attr(feature = "nightly", feature(alloc_system))]
 #![cfg_attr(feature = "nightly", feature(proc_macro))]
+#![cfg_attr(feature = "cargo-clippy",
+            allow(large_enum_variant, new_without_default_derive, expect_fun_call, or_fun_call,
+                  useless_format, cyclomatic_complexity, needless_pass_by_value, module_inception,
+                  match_bool))]
 
 // android fix
 #[cfg(target_os = "android")]
@@ -47,10 +51,11 @@ extern crate serde;
 extern crate serde_bytes;
 extern crate tokio_serde_bincode;
 
+
 // android fix
 use android_logger::Filter;
 use log::Level;
-// use parking_lot::{Mutex};
+// 
 
 #[cfg(feature = "nightly")]
 use alloc_system::System;
@@ -64,7 +69,6 @@ pub mod blockchain;
 pub mod hydrabadger;
 pub mod peer;
 
-
 use bytes::{Bytes, BytesMut};
 use futures::{sync::mpsc, AsyncSink, StartSend};
 use rand::{Rand, Rng};
@@ -75,24 +79,27 @@ use std::{
     marker::PhantomData,
     net::SocketAddr,
     ops::Deref,
-    
+
     // android fix
     sync::{
         Arc,
     },
     thread,
-    mem,
+    // mem,
     // Mutex,
+    //
 };
+// android fix
 use parking_lot::{Mutex};
+//
 
 use tokio::{io, net::TcpStream, prelude::*, codec::{Framed, LengthDelimitedCodec}};
 use uuid::Uuid;
 use hbbft::{
-    crypto::{PublicKey, PublicKeySet},
-    dynamic_honey_badger::{JoinPlan, Message as DhbMessage, DynamicHoneyBadger, Input as DhbInput},
+    crypto::{PublicKey, PublicKeySet, SecretKey, Signature},
+    dynamic_honey_badger::{JoinPlan, Message as DhbMessage, DynamicHoneyBadger, Change as DhbChange},
     sync_key_gen::{Ack, Part},
-    Step as MessagingStep,
+    DaStep as MessagingStep,
     Contribution as HbbftContribution,
 };
 
@@ -102,7 +109,6 @@ pub use hydrabadger::{Config, Hydrabadger, HydrabadgerWeak};
 pub use hydrabadger::Error;
 pub use hbbft::dynamic_honey_badger::Batch;
 pub use hydrabadger::StateDsct;
-
 
 /// Transmit half of the wire message channel.
 // TODO: Use a bounded tx/rx (find a sensible upper bound):
@@ -137,6 +143,7 @@ type EpochTx = mpsc::UnboundedSender<u64>;
 pub type EpochRx = mpsc::UnboundedReceiver<u64>;
 
 
+// android fix
 /// A transaction.
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Ord, PartialOrd, Debug, Clone)]
 pub struct Transaction(pub String);
@@ -208,6 +215,9 @@ impl Transaction {
         }
     }
 }
+//
+
+
 
 
 pub trait Contribution:
@@ -249,7 +259,7 @@ impl fmt::Debug for Uid {
 
 type Message = DhbMessage<Uid>;
 type Step<T> = MessagingStep<DynamicHoneyBadger<T, Uid>>;
-type Input<T> = DhbInput<T, Uid>;
+type Change = DhbChange<Uid>;
 
 /// A peer's incoming (listening) address.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -285,7 +295,6 @@ impl fmt::Display for OutAddr {
     }
 }
 
-
 /// Nodes of the network.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkNodeInfo {
@@ -294,6 +303,8 @@ pub struct NetworkNodeInfo {
     pub(crate) pk: PublicKey,
 }
 
+type ActiveNetworkInfo = (Vec<NetworkNodeInfo>, PublicKeySet, BTreeMap<Uid, PublicKey>);
+
 /// The current state of the network.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum NetworkState {
@@ -301,10 +312,13 @@ pub enum NetworkState {
     Unknown(Vec<NetworkNodeInfo>),
     AwaitingMorePeersForKeyGeneration(Vec<NetworkNodeInfo>),
     GeneratingKeys(Vec<NetworkNodeInfo>, BTreeMap<Uid, PublicKey>),
-    Active((Vec<NetworkNodeInfo>, PublicKeySet, BTreeMap<Uid, PublicKey>)),
+    Active(ActiveNetworkInfo),
 }
 
 /// Messages sent over the network between nodes.
+///
+/// Only [`Message`](enum.WireMessageKind.html#variant.Message) variants are
+/// verified.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum WireMessageKind<T> {
     HelloFromValidator(Uid, InAddr, PublicKey, NetworkState),
@@ -314,14 +328,19 @@ pub enum WireMessageKind<T> {
     NetworkState(NetworkState),
     Goodbye,
     #[serde(with = "serde_bytes")]
+    // TODO(c0gent): Remove.
     Bytes(Bytes),
+    /// A Honey Badger message.
+    ///
+    /// All received messages are verified against the senders public key
+    /// using an attached signature.
     Message(Uid, Message),
+    // TODO(c0gent): Remove.
     Transaction(Uid, T),
     KeyGenPart(Part),
     KeyGenAck(Ack),
-    JoinPlan(JoinPlan<Uid>), // TargetedMessage(TargetedMessage<Uid>)
+    JoinPlan(JoinPlan<Uid>),
 }
-
 
 /// Messages sent over the network between nodes.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -406,17 +425,27 @@ impl<T: Contribution> From<WireMessageKind<T>> for WireMessage<T> {
     }
 }
 
+/// A serialized `WireMessage` signed by the sender.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SignedWireMessage {
+    message: Vec<u8>,
+    sig: Signature,
+}
+
 /// A stream/sink of `WireMessage`s connected to a socket.
-#[derive(Debug)]
-pub struct WireMessages<T> {
+pub struct WireMessages<T: Contribution> {
     framed: Framed<TcpStream, LengthDelimitedCodec>,
+    our_key: SecretKey,
+    hdb: Hydrabadger<T>,
     _t: PhantomData<T>,
 }
 
 impl<T: Contribution> WireMessages<T> {
-    pub fn new(socket: TcpStream) -> WireMessages<T> {
+    pub fn new(socket: TcpStream, our_key: SecretKey, hdb: Hydrabadger<T>) -> WireMessages<T> {
         WireMessages {
             framed: Framed::new(socket, LengthDelimitedCodec::new()),
+            our_key,
+            hdb,
             _t: PhantomData,
         }
     }
@@ -439,10 +468,24 @@ impl<T: Contribution> Stream for WireMessages<T> {
     fn poll(&mut self) -> Poll<Option<Self::Item>, Self::Error> {
         match try_ready!(self.framed.poll()) {
             Some(frame) => {
-                Ok(Async::Ready(Some(
-                    // deserialize_from(frame.reader()).map_err(Error::Serde)?
-                    bincode::deserialize(&frame.freeze()).map_err(Error::Serde)?,
-                )))
+                let s_msg: SignedWireMessage =
+                    bincode::deserialize(&frame.freeze()).map_err(Error::Serde)?;
+                let msg: WireMessage<T> =
+                    bincode::deserialize(&s_msg.message).map_err(Error::Serde)?;
+
+                // Verify signature for `WireMessageKind::Message` variants.
+                if let WireMessageKind::Message(uid, _) = &msg.kind {
+                    match self.hdb.peers().get_by_uid(uid).and_then(|peer| peer.public_key()) {
+                        Some(pk) => {
+                            if !pk.verify(&s_msg.sig, &s_msg.message) {
+                                return Err(Error::InvalidSignature);
+                            }
+                        },
+                        None => return Err(Error::MessageReceivedUnknownPeer),
+                    }
+                }
+
+                Ok(Async::Ready(Some(msg)))
             }
             None => Ok(Async::Ready(None)),
         }
@@ -457,11 +500,10 @@ impl<T: Contribution> Sink for WireMessages<T> {
         // TODO: Reuse buffer:
         let mut serialized = BytesMut::new();
 
-        // Downgraded from bincode 1.0:
-        //
-        // Original: `bincode::serialize(&item)`
-        //
-        match bincode::serialize(&item) {
+        let message = bincode::serialize(&item).map_err(Error::Serde)?;
+        let sig = self.our_key.sign(&message);
+
+        match bincode::serialize(&SignedWireMessage { message, sig }) {
             Ok(s) => serialized.extend_from_slice(&s),
             Err(err) => return Err(Error::Io(io::Error::new(io::ErrorKind::Other, err))),
         }
@@ -483,14 +525,13 @@ impl<T: Contribution> Sink for WireMessages<T> {
     }
 }
 
-
-
 /// A message between internal threads/tasks.
 #[derive(Clone, Debug)]
 pub enum InternalMessageKind<T: Contribution> {
     Wire(WireMessage<T>),
     HbMessage(Message),
-    HbInput(Input<T>),
+    HbContribution(T),
+    HbChange(Change),
     PeerDisconnect,
     NewIncomingConnection(InAddr, PublicKey, bool),
     NewOutgoingConnection,
@@ -534,8 +575,12 @@ impl<T: Contribution> InternalMessage<T> {
         InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::HbMessage(msg))
     }
 
-    pub fn hb_input(src_uid: Uid, src_addr: OutAddr, input: Input<T>) -> InternalMessage<T> {
-        InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::HbInput(input))
+    pub fn hb_contribution(src_uid: Uid, src_addr: OutAddr, contrib: T) -> InternalMessage<T> {
+        InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::HbContribution(contrib))
+    }
+
+    pub fn hb_vote(src_uid: Uid, src_addr: OutAddr, change: Change) -> InternalMessage<T> {
+        InternalMessage::new(Some(src_uid), src_addr, InternalMessageKind::HbChange(change))
     }
 
     pub fn peer_disconnect(src_uid: Uid, src_addr: OutAddr) -> InternalMessage<T> {
@@ -580,7 +625,6 @@ impl<T: Contribution> InternalMessage<T> {
         (self.src_uid, self.src_addr, self.kind)
     }
 }
-
 
 
 
@@ -634,7 +678,6 @@ impl Session {
 
     fn subscribe(&mut self, cb: Box<OnEvent>) {
         warn!("subscribe");
-
         self.observers.push(cb);
     }
 
@@ -664,8 +707,6 @@ impl Session {
     }
 
     pub fn change(&self, x: i32, its_me: bool, id: String, trans: String) {
-        warn!("!! callback");
-
         let mut i = 0;
         for cb in &self.observers {
             if i == x {
@@ -777,3 +818,4 @@ impl Session {
     }
 
 }
+//
