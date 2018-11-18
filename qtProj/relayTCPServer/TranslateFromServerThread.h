@@ -29,7 +29,7 @@ signals:
     void StopThreadChanged(bool StopThread);
 
     void getSocketWithDescriptor(qintptr socketDescriptor, bool fromto);
-    void sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketDescriptor);
+    void sendData(quint16 PORTFROMLISTEN, QByteArray block, const char *data, int len);
 public slots:
     void setStopThread(bool StopThread);
 

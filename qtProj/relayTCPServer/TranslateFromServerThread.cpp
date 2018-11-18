@@ -120,7 +120,7 @@ void TranslateFromServerThread::run()
         if(StopThread())
             break;
 
-        if(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor) != nullptr) {
+        if(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor).get() != nullptr) {
             if(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor)->state() != QTcpSocket::ConnectedState)
                 break;
 
@@ -136,12 +136,25 @@ void TranslateFromServerThread::run()
                     break;
                 }
 
-//                Accessor::getInstance()->sendData(localPort, data.data(), reading, socketDescriptor);
-                ////Event LOOP
-                mIsBlockSend = false;
-                emit sendData(localPort, data.data(), reading, socketDescriptor);
-                while(!mIsBlockSend && !m_StopThread) {
-                    msleep(1);
+                bool valid = Accessor::getInstance()->isValidSocketsendData(localPort);
+                if(valid) {
+                    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData "<<reading<<" bytes for portfromlisten "<<localPort<<" sockdescr "<<socketDescriptor;
+
+                    QByteArray block;
+                    QDataStream out(&block, QIODevice::WriteOnly);
+                    qint32 desc = (qint32)socketDescriptor;
+                    out << (qint32)reading;
+                    out << (qint32)desc;
+
+                    ////Event LOOP
+                    mIsBlockSend = false;
+                    emit sendData(localPort, block, data.data(), reading);
+                    while(!mIsBlockSend && !m_StopThread) {
+                        msleep(1);
+                    }
+                }
+                else {
+                    qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR for portfromlisten "<<localPort<<" DROP "<<reading<<" bytes";
                 }
             }
         }

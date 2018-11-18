@@ -140,34 +140,30 @@ void Client::requestNewFortune()
 void Client::waitForByte(QTcpSocket *socket, int size)
 {
     while(socket->bytesAvailable() < size){
-        socket->waitForReadyRead(1000);
+        socket->waitForReadyRead(100);
 
-        QTime dieTime= QTime::currentTime().addSecs(1);
+        QTime dieTime= QTime::currentTime().addMSecs(10);
         while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
     }
 }
 
 
 void Client::read()
 {
-    while(tcpSocket->state() != QAbstractSocket::ConnectedState) {
-        QTime dieTime= QTime::currentTime().addSecs(1);
-        while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
-
-    waitForByte(tcpSocket, sizeof (qint32));
+    waitForByte(tcpSocket, 2*sizeof(qint32));
     qint32 sizeOfStringArray;
-    int socketdesc;
+    qint32 socketdesc;
     in >> sizeOfStringArray;
     in >> socketdesc;
     // get UID
     waitForByte(tcpSocket, sizeOfStringArray);
     QByteArray uid;
     uid.resize(sizeOfStringArray);
-    in >> uid;
+    in.readRawData(uid.data(), sizeOfStringArray);
     QString UID = QString::fromLocal8Bit(uid.data(), sizeOfStringArray);
+
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Read - "<<uid.size()<<" bytes";
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -180,11 +176,11 @@ void Client::read()
     out << (qint32)bytearay.size();
     out.writeRawData(bytearay.data(), bytearay.size());
 
-    qDebug()<<"bytearay - "<<bytearay.size();
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Write - "<<bytearay.size();
 
-    int write = tcpSocket->write(block);
-    bool flushed = tcpSocket->flush();
-    tcpSocket->waitForBytesWritten(1000);
+    tcpSocket->write(block);
+    tcpSocket->flush();
+    tcpSocket->waitForBytesWritten();
 }
 
 void Client::displayError(QAbstractSocket::SocketError socketError)

@@ -96,13 +96,16 @@ public slots:
     void stopHandleWithUID(const QString& UID);
 
     // III
-    //  sendData (quint16 PORTFROMLISTEN, char *data, int len)
+    //  sendData (quint16 PORTFROMLISTEN, QByteArray block, const char *data, int len)
     //  Function that send data
     ///  params:
     // 1. quint16 PORTFROMLISTEN
-    // 2. char *data
-    // 3. qintptr len
-    void sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketdescription);
+    // 2. QByteArray block
+    // 3. char *data
+    // 4. qintptr len
+    void sendData(quint16 PORTFROMLISTEN, QByteArray block, const char *data, int len);
+
+    bool isValidSocketsendData(quint16 PORTFROMLISTEN);
 
     // IV
     //  GetSocketFrom(quint16 PORTFROMLISTEN, qintptr socketDescriptor)
@@ -133,9 +136,14 @@ public slots:
     void getSocketWithDescriptor(qintptr socketDescriptor, bool fromto);
 
     // VIII
-    // sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
+    // sendDataFreedBack(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketDescriptor);
     //  send data to back
-    void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
+    void sendDataFreedBack(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketDescriptor);
+
+    // VIII
+    // quint16 isValidSocketFreedBack(quint16 PORTTOSEND, qintptr socketDescriptor);
+    //  if socket valid for    sendDataFreedBack return PORTFROMLISTEN, else return 0
+    quint16 isValidSocketFreedBack(quint16 PORTTOSEND, qintptr socketDescriptor);
 
 protected slots:
     Ports getMeNotUsagePort();

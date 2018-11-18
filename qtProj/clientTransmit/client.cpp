@@ -128,6 +128,12 @@ void Client::requestNewFortune()
     tcpSocket->connectToHost(hostCombo->currentText(),
                              portLineEdit->text().toInt());
 
+    while(tcpSocket->state() != QAbstractSocket::ConnectedState) {
+        QTime dieTime= QTime::currentTime().addSecs(1);
+        while (QTime::currentTime() < dieTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+
     session();
 }
 
@@ -135,7 +141,7 @@ void Client::requestNewFortune()
 void Client::read()
 {
     // get size
-    waitForByte(tcpSocket, sizeof (qint32));
+    waitForByte(tcpSocket, sizeof(int));
     QByteArray bytearay2;
     bytearay2.clear();
     bytearay2.resize(4096);
@@ -143,9 +149,10 @@ void Client::read()
     qint32 size = 0;
     in >> size;
     bytearay2.resize(size);
-    qint32 sizeavail = tcpSocket->bytesAvailable();
-    waitForByte(tcpSocket, size-sizeof(qint32));
+    waitForByte(tcpSocket, size);
     size = in.readRawData(bytearay2.data(), size);
+
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Read - "<<bytearay2.size()<<" bytes";
 
     QString UID2 = QString::fromLocal8Bit(bytearay2);
 
@@ -155,10 +162,10 @@ void Client::read()
         QString str = QString("Success transmit and recive  - %1 bytes").arg(size);
         statusLabel->setText(str);
 
-        int randTime = qrand()%100*10;
-        QTime dieTime= QTime::currentTime().addMSecs(randTime == 0 ? 100 : randTime);
-        while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+//        int randTime = 200;
+//        QTime dieTime= QTime::currentTime().addMSecs(randTime == 0 ? 100 : randTime);
+//        while (QTime::currentTime() < dieTime)
+//            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
 
         session();
     }
@@ -179,24 +186,22 @@ void Client::read()
 
 void Client::session()
 {
-    while(tcpSocket->state() != QAbstractSocket::ConnectedState) {
-        QTime dieTime= QTime::currentTime().addSecs(1);
-        while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-    }
-
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
     UID = "UID";
 
-    int cnt = qrand()%100;
+    int rnd = qrand()%2;
+//    int cnt = rnd > 0 ? 10 : 50;
+    int cnt = 10;
     for(int i = 0; i < cnt; i++)
         UID += "-UID";
 
-    qDebug()<<"Size "<<(qint32)UID.size();
     QByteArray bytearay = UID.toLocal8Bit();
-    out << bytearay;
+    out.writeRawData(bytearay.data(), bytearay.size());
+
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Write "<<(qint32)block.size();
+
     tcpSocket->write(block);
     tcpSocket->flush();
     tcpSocket->waitForBytesWritten();

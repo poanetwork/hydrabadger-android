@@ -141,9 +141,9 @@ void LikeAStunServerThread::run()
     waitForByte(tcpSocket, sizeOfStringArray);
     QByteArray uid;
     uid.resize(sizeOfStringArray);
-    in.readRawData(uid.data(), sizeOfStringArray);
+    in >> uid;
     QString UID = QString::fromUtf8(uid.data(), sizeOfStringArray);
-    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"UID "<<uid<<" - Thread "<<this->currentThreadId();
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"UID "<<UID<<" - Thread "<<this->currentThreadId();
     // get time
     QTime time = QTime::currentTime();
 
