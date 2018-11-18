@@ -21,7 +21,7 @@ Client::Client(QObject *parent)
 void Client::regenerateNewProc(QProcess::ProcessError err)
 {
     if(proc.data()) {
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"r!!egenerateNewProc "<<err;
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"regenerateNewProc "<<err;
         proc->kill();
         proc.clear();
         mPinger->setStopThread(true);
@@ -33,7 +33,7 @@ void Client::regenerateNewProc(QProcess::ProcessError err)
 
 void Client::regenerateNewProc()
 {
-    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"!!ProcessError not pinged";
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"ProcessError not pinged";
 
     QProcess::ProcessError er;
     regenerateNewProc(er);
@@ -41,7 +41,7 @@ void Client::regenerateNewProc()
 
 void Client::generateNewProc()
 {
-    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"!!generateNewProc - "<<program;
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"generateNewProc - "<<program;
 
     QStringList env = QProcess::systemEnvironment();
     env << QString("LD_LIBRARY_PATH=%1").arg(qApp->applicationDirPath());
@@ -61,7 +61,7 @@ void Client::generateNewProc()
 
 void Client::startPinged()
 {
-    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"!!start Pinged thread";
+    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"start Pinged thread";
 
     mPinger->setStopThread(false);
     mPinger->start();
@@ -70,9 +70,12 @@ void Client::startPinged()
 void Client::processOutput()
 {
     QByteArray array = proc->readAllStandardOutput();
-    qDebug(array.data());
+    QString str = QString(array.data());
+    if(array.size() > 0)
+        qDebug()<<str;
     QByteArray array2 = proc->readAllStandardError();
-    qDebug(array2.data());// read error channel
+    if(array2.size() > 0)
+        qDebug(array2.data());// read error channel
 }
 
 

@@ -134,6 +134,11 @@ void Client::requestNewFortune()
             QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
     }
 
+    averageSpeed = 0;
+    bytesWriteRead = 0;
+    cntIter = 0;
+
+    timer.start();
     session();
 }
 
@@ -156,10 +161,22 @@ void Client::read()
 
     QString UID2 = QString::fromLocal8Bit(bytearay2);
 
+    cntIter++;
+    bytesWriteRead += bytearay2.size();
+
+    if(!(cntIter%100)) {
+        qint64 ms = timer.elapsed();
+
+        averageSpeed = (double)bytesWriteRead/((double)ms/1000.);
+
+        bytesWriteRead = 0;
+        timer.start();
+    }
+
     if(UID2 == UID) {
         qDebug()<<"Live is good";
 
-        QString str = QString("Success transmit and recive  - %1 bytes").arg(size);
+        QString str = QString("Success transmit and recive  - %1 bytes - averageSpeed - %2 bytes/sec").arg(size).arg(averageSpeed);
         statusLabel->setText(str);
 
 //        int randTime = 200;
@@ -191,9 +208,10 @@ void Client::session()
 
     UID = "UID";
 
-    int rnd = qrand()%2;
-//    int cnt = rnd > 0 ? 10 : 50;
-    int cnt = 10;
+    int cnt = cntIter%1000;
+//    if(!(cntIter%10))
+//           cnt = 500;//qrand()%50+1;
+
     for(int i = 0; i < cnt; i++)
         UID += "-UID";
 

@@ -129,7 +129,9 @@ void TranslateFromServerThread::run()
                 data.resize(size);
 
             if(size > 0) {
+//                QMutexLocker locker(&MutexForServerWorkers);
                 int reading = in.readRawData(data.data(), size);
+//                locker.unlock();
 
                 if(reading == -1) {
                     qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"SomeBody close Socket";

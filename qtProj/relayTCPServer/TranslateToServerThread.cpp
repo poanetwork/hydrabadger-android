@@ -33,7 +33,8 @@ void TranslateToServerThread::setStopThread(bool StopThread)
 void TranslateToServerThread::waitForByte(QTcpSocket *socket, int size)
 {
     while(!m_StopThread && socket->state() == QTcpSocket::ConnectedState && socket->bytesAvailable() < size){
-        socket->waitForReadyRead(100);
+        socket->waitForReadyRead(1000);
+        sleep(1);
     }
 }
 
@@ -135,6 +136,7 @@ void TranslateToServerThread::run()
 
             qint64 size = Accessor::getInstance()->GetSocketTo(localPort)->bytesAvailable();
             if(size > 0) {
+//                QMutexLocker locker(&MutexForServerWorkers);
                 waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), 2*sizeof(qint32));
 
                 qint32 size1 = 0;
@@ -142,10 +144,6 @@ void TranslateToServerThread::run()
 
                 qint32 socketdescriptor = 0;
                 in >> socketdescriptor;
-
-                if(size1 != 47) {
-                    int a = 0;
-                }
 
                 waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), size1);
 
@@ -160,6 +158,7 @@ void TranslateToServerThread::run()
                         break;
                     bytesRead += res;
                 }
+//                locker.unlock();
 
                 quint16 portfromlisten = Accessor::getInstance()->isValidSocketFreedBack(localPort, socketdescriptor);
                 if(portfromlisten != 0) {
