@@ -354,7 +354,7 @@ void Accessor::getSocketWithDescriptor(qintptr socketDescriptor, bool fromto)
 
 void Accessor::sendData(quint16 PORTFROMLISTEN, QByteArray block, const char *data, int len)
 {
-    QMutexLocker locker(&MutexForServerWorkers);
+//    QMutexLocker locker(&MutexForServerWorkers);
     AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
     AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
     AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
@@ -377,11 +377,10 @@ bool Accessor::isValidSocketsendData(quint16 PORTFROMLISTEN)
 
 void Accessor::sendDataFreedBack(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketDescriptor)
 {
-    QMutexLocker locker(&MutexForServerWorkers);
+//    QMutexLocker locker(&MutexForServerWorkers);
     AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->write(data, len);
     AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->flush();
     AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->waitForBytesWritten();
-    QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
 }
 
 

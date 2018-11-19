@@ -23,7 +23,7 @@ public:
 
 private slots:
     void displayError(QAbstractSocket::SocketError socketError);
-    void waitForByte(QTcpSocket *socket, int size);
+    void onReadyRead();
 
 signals:
     void StopThreadChanged(bool StopThread);
@@ -31,27 +31,27 @@ signals:
     void getSocketWithDescriptor(qintptr socketDescriptor, bool fromto);
     void stopHandle(quint16 PORTFROMLISTEN, bool);
 
-    void sendDataFreedBack(quint16 PORTTOSend, const char *data, int len, qintptr socketDescriptor);
 public slots:
     void setStopThread(bool StopThread);
 
     void initSocket(std::shared_ptr<QTcpSocket> tcpSocket);
     void unblock();
 
-    void setUnblock();
-
     void disconnect();
+
 private:
+    QByteArray data;
+    bool    m_StopThread = false;
+
+    quint16 localPort = 0;
     qintptr socketDescriptor;
-    bool m_StopThread;
+
+    qint32 _blockSize   = 0;
+    qint32 _blockSizeLast = 0;
 
     std::shared_ptr<QTcpSocket> tcpSocket;
+
     bool mIsinit{};
-
-    //inputstream
-    QDataStream in;
-
-    bool mIsBlockSend{};
 };
 
 #endif // TRANSLATETOSERVERTHREAD_H

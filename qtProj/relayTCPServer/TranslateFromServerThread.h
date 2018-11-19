@@ -36,6 +36,9 @@ public slots:
     void initSocket(std::shared_ptr<QTcpSocket> tcpSocket);
     void setUnblock();
     void unblock();
+
+    void disconnect();
+
 private:
     qintptr socketDescriptor;
     bool m_StopThread;
