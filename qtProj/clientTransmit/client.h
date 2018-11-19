@@ -4,6 +4,7 @@
 #include <QDataStream>
 #include <QDialog>
 #include <QTcpSocket>
+#include <QElapsedTimer>
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -46,6 +47,12 @@ private:
     QNetworkSession *networkSession = nullptr;
 
     QString UID;
+
+    qint64 bytesWriteRead = 0;
+    double averageSpeed = 0;
+    qint64 cntIter = 0;
+
+    QElapsedTimer timer;
 };
 //! [0]
 

@@ -333,9 +333,6 @@ void Accessor::displayError(QAbstractSocket::SocketError socketError)
 void Accessor::getSocketWithDescriptor(qintptr socketDescriptor, bool fromto)
 {
     auto tcpSocket = std::shared_ptr<QTcpSocket>(new QTcpSocket());
-    connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(displayError(QAbstractSocket::SocketError)));
-
 
     if (!tcpSocket->setSocketDescriptor(socketDescriptor)) {
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Error QTcpSocket listened not start";
@@ -355,68 +352,53 @@ void Accessor::getSocketWithDescriptor(qintptr socketDescriptor, bool fromto)
     }
 }
 
-void Accessor::sendData(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketdescription)
+void Accessor::sendData(quint16 PORTFROMLISTEN, QByteArray block, const char *data, int len)
+{
+//    QMutexLocker locker(&MutexForServerWorkers);
+    AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
+    AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
+    AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
+    AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->waitForBytesWritten();
+    QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
+}
+
+bool Accessor::isValidSocketsendData(quint16 PORTFROMLISTEN)
 {
     if(AllConnectHandles.contains(PORTFROMLISTEN)
             && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO.get() != nullptr
-            && AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->state() == QTcpSocket::ConnectedState) {
-
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData "<<len<<" bytes "<<PORTFROMLISTEN<<" port from";        
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        int desc = (int)socketdescription;
-        out << len;
-        out << desc;
-
-//        QTcpSocket socket;
-//        socket.setSocketDescriptor(socketdescription);
-//        socket.write(block);
-//        socket.write(data, len);
-//        socket.flush();
-//        socket.waitForBytesWritten();
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(block);
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->write(data, len);
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->flush();
-        AllConnectHandles.value(PORTFROMLISTEN)->socketBindedTO->waitForBytesWritten();
-    }
-    else {
-        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR for port "<<PORTFROMLISTEN<<" DROP "<<len<<" bytes";
+            )
+    {
+        return true;
     }
 
-    QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
+    return false;
 }
 
-void Accessor::sendDataFreedBack(quint16 PORTTOSEND, const char *data, int len, qintptr socketDescriptor)
+
+void Accessor::sendDataFreedBack(quint16 PORTFROMLISTEN, const char *data, int len, qintptr socketDescriptor)
+{
+//    QMutexLocker locker(&MutexForServerWorkers);
+    AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->write(data, len);
+    AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->flush();
+    AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->waitForBytesWritten();
+}
+
+
+quint16 Accessor::isValidSocketFreedBack(quint16 PORTTOSEND, qintptr socketDescriptor)
 {
     quint16 PORTFROMLISTEN = getPORTFROMLISTEN_fromPORTTOSend(PORTTOSEND);
-    if(PORTFROMLISTEN == 0) {
-        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack ERROR for port "<<PORTTOSEND<<" DROP "<<len<<" bytes";
-        QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
-    }
 
     if(AllConnectHandles.contains(PORTFROMLISTEN)
             && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.contains(socketDescriptor)
-            && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor) != nullptr
-            && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->state() == QTcpSocket::ConnectedState) {
-
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack "<<len<<" bytes "<<PORTTOSEND<<" From(portto)";
-
-//        QTcpSocket socket;
-//        socket.setSocketDescriptor(socketDescriptor);
-//        socket.write(data, len);
-//        socket.flush();
-//        socket.waitForBytesWritten();
-
-        AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->write(data, len);
-        AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->flush();
-        AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor)->waitForBytesWritten();
-    }
-    else {
-        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack ERROR for port has not PORTFROMLISTEN "<<PORTTOSEND<<" DROP "<<len<<" bytes";
+            && AllConnectHandles.value(PORTFROMLISTEN)->PORTFROMLISTEN_SOCKETSLIST.value(socketDescriptor).get() != nullptr
+            )
+    {
+        return PORTFROMLISTEN;
     }
 
-    QMetaObject::invokeMethod(sender(), "setUnblock", Qt::DirectConnection);
+    return 0;
 }
+
 
 Ports Accessor::getMeNotUsagePort()
 {

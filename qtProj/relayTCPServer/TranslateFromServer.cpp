@@ -26,7 +26,7 @@ void TranslateFromServer::incomingConnection(qintptr socketDescriptor)
 
     connect(thread, SIGNAL(finished()), this, SLOT(deleteFromListThread()));
     connect(thread, SIGNAL(getSocketWithDescriptor(qintptr, bool)), Accessor::getInstance(), SLOT(getSocketWithDescriptor(qintptr, bool)), Qt::BlockingQueuedConnection);
-    connect(thread, SIGNAL(sendData(quint16, const char *, int, qintptr)), Accessor::getInstance(), SLOT(sendData(quint16, const char *, int, qintptr)), Qt::BlockingQueuedConnection);
+    connect(thread, SIGNAL(sendData(quint16, QByteArray, const char *, int)), Accessor::getInstance(), SLOT(sendData(quint16, QByteArray, const char *, int)), Qt::BlockingQueuedConnection);
 
     thread->start();
 

@@ -45,14 +45,14 @@ void pinger::error(QAbstractSocket::SocketError socketError)
 
 void pinger::run()
 {
-    msleep(60*1000);
+    msleep(30*1000);
 
     while (!m_StopThread) {
 
         tcpSocket.reset();
         tcpSocket = QSharedPointer<QTcpSocket>(new QTcpSocket());
         tcpSocket->connectToHost(ipAddress.toString(), 2998);
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"!!try connect to "<<ipAddress.toString()<<" "<<2998;
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"try connect to "<<ipAddress.toString()<<" "<<2998;
         tcpSocket->waitForConnected();
         connect(tcpSocket.data(), SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
         in.setDevice(tcpSocket.data());
@@ -76,13 +76,13 @@ void pinger::run()
         in >> nextFortune;
 
         if(nextFortune != "OK") {
-            qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"!!ping error";
+            qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"ping error";
 
             emit notPinged();
             return;
         }
 
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"!!ping success";
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"ping success";
 
         msleep(60*1000);
     }

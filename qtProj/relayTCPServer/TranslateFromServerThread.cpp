@@ -49,9 +49,9 @@ void TranslateFromServerThread::displayError(QAbstractSocket::SocketError socket
     case QAbstractSocket::SocketResourceError:
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread The local system ran out of resources (e.g., too many sockets).";
                 break;
-    case QAbstractSocket::SocketTimeoutError:
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread The socket operation timed out.";
-                break;
+//    case QAbstractSocket::SocketTimeoutError:
+//        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread The socket operation timed out.";
+//                break;
     case QAbstractSocket::DatagramTooLargeError:
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread The datagram was larger than the operating system's limit (which can be as low as 8192 bytes).";
                 break;
@@ -71,7 +71,8 @@ void TranslateFromServerThread::displayError(QAbstractSocket::SocketError socket
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread An unidentified error occurred.";
                 break;
     default:
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread An unidentified error occurred. 1";
+        ;
+//        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread An unidentified error occurred. 1";
     }
 }
 
@@ -86,6 +87,11 @@ void TranslateFromServerThread::unblock()
     mIsinit = true;
 }
 
+void TranslateFromServerThread::disconnect()
+{
+    m_StopThread = true;
+}
+
 void TranslateFromServerThread::setUnblock()
 {
     mIsBlockSend = true;
@@ -98,13 +104,14 @@ void TranslateFromServerThread::run()
     mIsinit = false;
     emit getSocketWithDescriptor(socketDescriptor, true);
     while(!mIsinit && !m_StopThread) {
-        msleep(1);
+        msleep(100);
     }
 
     localPort = tcpSocket->localPort();
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateFromServerThread income in localPort "<<localPort<<" From "<<tcpSocket->peerAddress().toString()<<" IP "<<tcpSocket->peerPort()<< " PORT "<<" - Thread "<<this->currentThreadId();
     connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
+    connect(tcpSocket.get(), SIGNAL(disconnected()), this, SLOT(disconnect()));
 
     while (!Accessor::getInstance()->isBinded(localPort) && !StopThread()) {
         msleep(100);
@@ -120,7 +127,7 @@ void TranslateFromServerThread::run()
         if(StopThread())
             break;
 
-        if(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor) != nullptr) {
+        if(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor).get() != nullptr) {
             if(Accessor::getInstance()->GetSocketFrom(localPort, socketDescriptor)->state() != QTcpSocket::ConnectedState)
                 break;
 
@@ -136,12 +143,25 @@ void TranslateFromServerThread::run()
                     break;
                 }
 
-//                Accessor::getInstance()->sendData(localPort, data.data(), reading, socketDescriptor);
-                ////Event LOOP
-                mIsBlockSend = false;
-                emit sendData(localPort, data.data(), reading, socketDescriptor);
-                while(!mIsBlockSend && !m_StopThread) {
-                    msleep(1);
+                bool valid = Accessor::getInstance()->isValidSocketsendData(localPort);
+                if(valid) {
+                    qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData "<<reading<<" bytes for portfromlisten "<<localPort<<" sockdescr "<<socketDescriptor;
+
+                    QByteArray block;
+                    QDataStream out(&block, QIODevice::WriteOnly);
+                    qint32 desc = (qint32)socketDescriptor;
+                    out << (qint32)reading;
+                    out << (qint32)desc;
+
+                    ////Event LOOP
+                    mIsBlockSend = false;
+                    emit sendData(localPort, block, data.data(), reading);
+                    while(!mIsBlockSend && !m_StopThread) {
+                        msleep(1);
+                    }
+                }
+                else {
+                    qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendData ERROR for portfromlisten "<<localPort<<" DROP "<<reading<<" bytes";
                 }
             }
         }

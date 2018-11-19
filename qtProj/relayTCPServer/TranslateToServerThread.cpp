@@ -4,8 +4,9 @@
 #include <QDateTime>
 
 TranslateToServerThread::TranslateToServerThread(qintptr socketDescriptor, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor), m_StopThread(false)
+    : QThread(parent), m_StopThread(false), socketDescriptor(socketDescriptor)
 {
+    data.reserve(4096);
 }
 
 TranslateToServerThread::~TranslateToServerThread()
@@ -30,13 +31,6 @@ void TranslateToServerThread::setStopThread(bool StopThread)
     emit StopThreadChanged(m_StopThread);
 }
 
-void TranslateToServerThread::waitForByte(QTcpSocket *socket, int size)
-{
-    while(!m_StopThread && socket->state() == QTcpSocket::ConnectedState && socket->bytesAvailable() < size){
-        msleep(100);
-    }
-}
-
 void TranslateToServerThread::displayError(QAbstractSocket::SocketError socketError)
 {
     switch (socketError) {
@@ -55,9 +49,9 @@ void TranslateToServerThread::displayError(QAbstractSocket::SocketError socketEr
     case QAbstractSocket::SocketResourceError:
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread The local system ran out of resources (e.g., too many sockets).";
                 break;
-    case QAbstractSocket::SocketTimeoutError:
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread The socket operation timed out.";
-                break;
+//    case QAbstractSocket::SocketTimeoutError:
+//        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread The socket operation timed out.";
+//                break;
     case QAbstractSocket::DatagramTooLargeError:
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread The datagram was larger than the operating system's limit (which can be as low as 8192 bytes).";
                 break;
@@ -77,7 +71,8 @@ void TranslateToServerThread::displayError(QAbstractSocket::SocketError socketEr
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread An unidentified error occurred.";
                 break;
     default:
-        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread An unidentified error occurred. 1";
+        ;
+//        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"TranslateToServerThread An unidentified error occurred. 1";
     }
 }
 
@@ -92,15 +87,57 @@ void TranslateToServerThread::unblock()
     mIsinit = true;
 }
 
-void TranslateToServerThread::setUnblock()
-{
-    mIsBlockSend = true;
-}
-
 void TranslateToServerThread::disconnect()
 {
+    setStopThread(true);
     if(tcpSocket.get() != NULL) {
         tcpSocket->disconnectFromHost();
+        if(localPort != 0)
+            emit stopHandle(localPort, true);
+    }
+}
+
+void TranslateToServerThread::onReadyRead()
+{
+    QDataStream in(tcpSocket.get());
+    //if we read the first block, the first qint32 bytes are its size
+    if (_blockSize == 0) {
+        //if it is less than qint32 bytes, wait until it is qint32 bytes
+        if (tcpSocket->bytesAvailable() < (int)sizeof(qint32))
+            return;
+        //read size (qint32 bytes)
+        in >> _blockSize;
+
+        _blockSizeLast = _blockSize;
+    }
+    //we wait until the block comes completely
+    if (tcpSocket->bytesAvailable() < _blockSize)
+        return;
+    else
+        //you can take a new block
+        _blockSize = 0;
+
+    qint32 socketdescriptor = 0;
+    in >> socketdescriptor;
+
+    if(data.size() < _blockSizeLast)
+        data.resize(_blockSizeLast);
+
+    int bytesRead = 0;
+    while (bytesRead < _blockSizeLast) {
+        int res = in.readRawData(&data.data()[bytesRead], _blockSizeLast-bytesRead);
+        if(res == -1)
+            break;
+        bytesRead += res;
+    }
+
+    quint16 portfromlisten = Accessor::getInstance()->isValidSocketFreedBack(localPort, socketdescriptor);
+    if(portfromlisten != 0) {
+        qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack "<<_blockSizeLast<<" bytes from portTO "<<localPort<<" for portfrom "<<portfromlisten<<" sockdescr "<<socketdescriptor;
+        Accessor::getInstance()->sendDataFreedBack(portfromlisten, data.data(), _blockSizeLast, socketdescriptor);
+    }
+    else {
+        qCritical()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"sendDataFreedBack ERROR from portTO "<<localPort<<" for portfrom "<<portfromlisten<<" DROP "<<_blockSizeLast<<" bytes";
     }
 }
 
@@ -111,62 +148,22 @@ void TranslateToServerThread::run()
     mIsinit = false;
     emit getSocketWithDescriptor(socketDescriptor, false);
     while(!mIsinit && !m_StopThread) {
-        msleep(1);
+        msleep(100);
     }
 
-    quint16 localPort = tcpSocket->localPort();
+    localPort = tcpSocket->localPort();
     qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"Was binded on port "<<localPort<<" From "<<tcpSocket->peerAddress().toString()<<" IP "<<tcpSocket->peerPort()<< " PORT "<<" - theadId "<<this->currentThreadId();
 
     connect(tcpSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
+    connect(tcpSocket.get(), SIGNAL(disconnected()), this, SLOT(disconnect()));
+    connect(tcpSocket.get(), SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-    in.setDevice(Accessor::getInstance()->GetSocketTo(localPort).get());
-    QByteArray data;
-    data.reserve(4096);
     forever {
         if(StopThread())
             break;
 
-        if(Accessor::getInstance()->GetSocketTo(localPort) != nullptr) {
-            if(Accessor::getInstance()->GetSocketTo(localPort)->state() != QTcpSocket::ConnectedState) {
-                emit stopHandle(localPort, true);
-                break;
-            }
-
-            qint64 size = Accessor::getInstance()->GetSocketTo(localPort)->bytesAvailable();
-            if(size > 0) {
-                waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), 2*sizeof(int));
-
-                int size1 = 0;
-                in >> size1;
-
-                int socketdescriptor = 0;
-                in >> socketdescriptor;
-
-                waitForByte(Accessor::getInstance()->GetSocketTo(localPort).get(), size1);
-
-                if(data.size() < size1)
-                    data.resize(size1);
-
-                int res = in.readRawData(data.data(), size1);
-                if(res == -1)
-                    break;
-
-//                Accessor::getInstance()->sendDataFreedBack(localPort, data.data(), size1, socketdescriptor);
-                ////Event LOOP
-                mIsBlockSend = false;
-                emit sendDataFreedBack(localPort, data.data(), size1, socketdescriptor);
-                while(!mIsBlockSend && !m_StopThread) {
-                    msleep(1);
-                }
-            }
-        }
-        else {
-            emit stopHandle(localPort, true);
-            break;
-        }
-
-        msleep(10);
+        msleep(100);
     }
 
     try {

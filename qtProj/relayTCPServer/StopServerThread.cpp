@@ -74,7 +74,7 @@ void StopServerThread::displayError(QAbstractSocket::SocketError socketError)
 void StopServerThread::waitForByte(QTcpSocket &socket, int size)
 {
     while(!m_StopThread && socket.bytesAvailable() < size){
-        socket.waitForReadyRead();
+        socket.waitForReadyRead(100);
         msleep(10);
     }
 }
