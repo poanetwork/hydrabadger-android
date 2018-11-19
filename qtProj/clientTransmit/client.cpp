@@ -208,9 +208,8 @@ void Client::session()
 
     UID = "UID";
 
-    int cnt = cntIter%1000;
-//    if(!(cntIter%10))
-//           cnt = 500;//qrand()%50+1;
+//    int cnt = cntIter%1000;
+    int cnt = qrand()%1000+1;
 
     for(int i = 0; i < cnt; i++)
         UID += "-UID";
