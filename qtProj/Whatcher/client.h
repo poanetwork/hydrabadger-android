@@ -8,6 +8,7 @@
 #include <QNetworkSession>
 #include <QProcess>
 #include <QDir>
+#include <QTimer>
 
 #include "pinger.h"
 
@@ -32,6 +33,8 @@ private:
     QSharedPointer<pinger>  mPinger;
 
     QString program;
+
+//    QTimer timer;
 };
 //! [0]
 

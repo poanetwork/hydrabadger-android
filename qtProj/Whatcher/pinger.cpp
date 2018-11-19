@@ -45,7 +45,7 @@ void pinger::error(QAbstractSocket::SocketError socketError)
 
 void pinger::run()
 {
-    msleep(60*1000);
+    msleep(30*1000);
 
     while (!m_StopThread) {
 

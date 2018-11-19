@@ -15,6 +15,9 @@ Client::Client(QObject *parent)
     mPinger = QSharedPointer<pinger>(new pinger(this));
     QObject::connect(mPinger.data(), SIGNAL(notPinged()), this, SLOT(regenerateNewProc()));
 
+//    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(regenerateNewProc()));
+//    timer.start(60000);
+
     generateNewProc();
 }
 
@@ -23,9 +26,10 @@ void Client::regenerateNewProc(QProcess::ProcessError err)
     if(proc.data()) {
         qDebug()<<QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz  --- ")<<" "<<"regenerateNewProc "<<err;
         proc->kill();
+        proc->terminate();
         proc.clear();
         mPinger->setStopThread(true);
-        mPinger->wait(30000);
+        mPinger->wait(100);
 
         generateNewProc();
     }
@@ -48,11 +52,11 @@ void Client::generateNewProc()
     env << QString("%1").arg(qApp->applicationDirPath());
 
     proc = QSharedPointer<QProcess>(new QProcess(this));
+    proc->setProcessChannelMode(QProcess::MergedChannels);
     connect(proc.data(), SIGNAL(started()), this, SLOT(startPinged()));
     connect(proc.data(), SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(regenerateNewProc(QProcess::ProcessError)));
 
     connect (proc.data(), SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()));  // connect process signals with your code
-    connect (proc.data(), SIGNAL(readyReadStandardError()), this, SLOT(processOutput()));  // same here
 
     proc->setEnvironment(env);
     proc->start(program);
@@ -69,14 +73,16 @@ void Client::startPinged()
 
 void Client::processOutput()
 {
-    QByteArray array = proc->readAllStandardOutput();
-    QString str = QString(array.data());
-    if(array.size() > 0)
-        qDebug()<<str;
-    QByteArray array2 = proc->readAllStandardError();
-    if(array2.size() > 0)
-        qDebug(array2.data());// read error channel
+    if(proc.data()) {
+        QByteArray result = proc->readAllStandardOutput();
+        QStringList lines = QString(result).split("\n");
+        foreach (QString line, lines) {
+            if(!line.isEmpty())
+                qDebug()<<qPrintable( line );
+        }
+    }
 }
+
 
 
 
