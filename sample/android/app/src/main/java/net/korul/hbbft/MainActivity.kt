@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
             }
             builder.setTitle("Error with dll")
                 .setMessage("")
-                .setPositiveButton(android.R.string.yes) { dialog, which ->
+                .setPositiveButton(android.R.string.yes) { dialog, _ ->
                     dialog.cancel()
                 }
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -219,7 +219,6 @@ class MainActivity : AppCompatActivity() {
             conn.connect()
             val `in` = conn.inputStream
             // 3. Download and decode the string response using builder
-            val stringBuilder = StringBuilder()
             val reader = BufferedReader(InputStreamReader(`in`))
             reader.readLine()
             reader.close()

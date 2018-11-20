@@ -30,6 +30,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
     sourceSets {
         main {
             jni.srcDirs = []
@@ -44,10 +49,20 @@ android {
     }
 }
 
+
+ext {
+    picassoVersion = '2.5.2'
+    circleImageViewVersion = '2.2.0'
+    shapeImageViewVersion = '0.9.3'
+    circleindicatorVersion = '1.2.2@aar'
+}
+
 dependencies {
+    implementation project(':chatkit')
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:appcompat-v7:26.0.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     testImplementation 'junit:junit:4.12'
@@ -68,6 +83,17 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
         transitive = true;
     }
+
+
+    //Picasso
+    implementation "com.squareup.picasso:picasso:$picassoVersion"
+
+    //ImageViews
+    implementation "de.hdodenhof:circleimageview:$circleImageViewVersion"
+    implementation "com.github.siyamed:android-shape-imageview:$shapeImageViewVersion"
+
+    //Utils
+    implementation "me.relex:circleindicator:$circleindicatorVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
