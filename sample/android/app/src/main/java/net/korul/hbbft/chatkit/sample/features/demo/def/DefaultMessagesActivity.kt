@@ -1,0 +1,165 @@
+package net.korul.hbbft.chatkit.sample.features.demo.def
+
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Toast
+import com.stfalcon.chatkit.messages.MessageHolders
+import com.stfalcon.chatkit.messages.MessageInput
+import com.stfalcon.chatkit.messages.MessagesList
+import com.stfalcon.chatkit.messages.MessagesListAdapter
+import com.stfalcon.chatkit.utils.DateFormatter
+import net.korul.hbbft.R
+import net.korul.hbbft.chatkit.sample.common.data.fixtures.MessagesFixtures
+import net.korul.hbbft.chatkit.sample.common.data.model.Message
+import net.korul.hbbft.chatkit.sample.features.demo.DemoMessagesActivity
+import net.korul.hbbft.chatkit.sample.features.demo.holder.IncomingVoiceMessageViewHolder
+import net.korul.hbbft.chatkit.sample.features.demo.holder.OutcomingVoiceMessageViewHolder
+import net.korul.hbbft.chatkit.sample.features.demo.holder.holders.messages.CustomIncomingImageMessageViewHolder
+import net.korul.hbbft.chatkit.sample.features.demo.holder.holders.messages.CustomIncomingTextMessageViewHolder
+import net.korul.hbbft.chatkit.sample.features.demo.holder.holders.messages.CustomOutcomingImageMessageViewHolder
+import net.korul.hbbft.chatkit.sample.features.demo.holder.holders.messages.CustomOutcomingTextMessageViewHolder
+import net.korul.hbbft.chatkit.sample.utils.AppUtils
+import java.util.*
+
+class DefaultMessagesActivity : DemoMessagesActivity(), MessageInput.InputListener, MessageInput.AttachmentsListener,
+    MessageInput.TypingListener, DateFormatter.Formatter, MessageHolders.ContentChecker<Message>,
+    DialogInterface.OnClickListener {
+
+    private var messagesList: MessagesList? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_default_messages)
+
+        this.messagesList = findViewById<View>(R.id.messagesList) as MessagesList
+        initAdapter()
+
+        val input = findViewById<View>(R.id.input) as MessageInput
+        input.setInputListener(this)
+        input.setTypingListener(this)
+        input.setAttachmentsListener(this)
+    }
+
+    override fun onSubmit(input: CharSequence): Boolean {
+        super.messagesAdapter!!.addToStart(
+            MessagesFixtures.getTextMessage(input.toString()), true
+        )
+        return true
+    }
+
+    override fun onAddAttachments() {
+        AlertDialog.Builder(this)
+            .setItems(R.array.view_types_dialog, this)
+            .show()
+    }
+
+    override fun format(date: Date): String {
+        return if (DateFormatter.isToday(date)) {
+            getString(R.string.date_header_today)
+        } else if (DateFormatter.isYesterday(date)) {
+            getString(R.string.date_header_yesterday)
+        } else {
+            DateFormatter.format(date, DateFormatter.Template.STRING_DAY_MONTH_YEAR)
+        }
+    }
+
+    override fun hasContentFor(message: Message, type: Byte): Boolean {
+        when (type) {
+            CONTENT_TYPE_VOICE -> return (message.voice != null
+                    && message.voice!!.url != null
+                    && !message.voice!!.url.isEmpty())
+        }
+        return false
+    }
+
+    override fun onClick(dialogInterface: DialogInterface, i: Int) {
+        when (i) {
+            0 -> messagesAdapter!!.addToStart(MessagesFixtures.imageMessage, true)
+            1 -> messagesAdapter!!.addToStart(MessagesFixtures.voiceMessage, true)
+        }
+    }
+
+    private fun initAdapter() {
+        //We can pass any data to ViewHolder with payload
+        val payload = CustomIncomingTextMessageViewHolder.Payload()
+        //For example click listener
+        payload.avatarClickListener = object : CustomIncomingTextMessageViewHolder.OnAvatarClickListener {
+            override fun onAvatarClick() {
+                Toast.makeText(
+                    this@DefaultMessagesActivity,
+                    "Text message avatar clicked", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        val holders = MessageHolders()
+            // custom layout
+            .setIncomingTextLayout(R.layout.item_custom_incoming_text_message)
+            .setOutcomingTextLayout(R.layout.item_custom_outcoming_text_message)
+            .setIncomingImageLayout(R.layout.item_custom_incoming_image_message)
+            .setOutcomingImageLayout(R.layout.item_custom_outcoming_image_message)
+            // custom type
+            .registerContentType(
+                CONTENT_TYPE_VOICE,
+                IncomingVoiceMessageViewHolder::class.java,
+                R.layout.item_custom_incoming_voice_message,
+                OutcomingVoiceMessageViewHolder::class.java,
+                R.layout.item_custom_outcoming_voice_message,
+                this
+            )
+            // custom holder
+            .setIncomingTextConfig(
+                CustomIncomingTextMessageViewHolder::class.java,
+                R.layout.item_custom_incoming_text_message,
+                payload
+            )
+            .setOutcomingTextConfig(
+                CustomOutcomingTextMessageViewHolder::class.java,
+                R.layout.item_custom_outcoming_text_message
+            )
+            .setIncomingImageConfig(
+                CustomIncomingImageMessageViewHolder::class.java,
+                R.layout.item_custom_incoming_image_message
+            )
+            .setOutcomingImageConfig(
+                CustomOutcomingImageMessageViewHolder::class.java,
+                R.layout.item_custom_outcoming_image_message
+            )
+
+        super.messagesAdapter = MessagesListAdapter<Message>(super.senderId, holders, super.imageLoader)
+        super.messagesAdapter!!.enableSelectionMode(this)
+        super.messagesAdapter!!.setLoadMoreListener(this)
+        super.messagesAdapter!!.registerViewClickListener(
+            R.id.messageUserAvatar
+        ) { view, message ->
+            AppUtils.showToast(
+                this@DefaultMessagesActivity,
+                message.user.name + " avatar click",
+                false
+            )
+        }
+        this.messagesList!!.setAdapter(super.messagesAdapter)
+    }
+
+    override fun onStartTyping() {
+        Log.v("Typing listener", getString(R.string.start_typing_status))
+    }
+
+    override fun onStopTyping() {
+        Log.v("Typing listener", getString(R.string.stop_typing_status))
+    }
+
+    companion object {
+
+        private val CONTENT_TYPE_VOICE: Byte = 1
+
+        fun open(context: Context) {
+            context.startActivity(Intent(context, DefaultMessagesActivity::class.java))
+        }
+    }
+}

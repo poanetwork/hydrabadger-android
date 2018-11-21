@@ -6,10 +6,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.support.annotation.Nullable
 import android.util.Log
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.net.Socket
-import java.nio.ByteBuffer
+import net.korul.hbbft.server.util.ServerUtil.Companion.resetConnectOnServer
 import kotlin.concurrent.thread
 
 
@@ -20,6 +17,8 @@ class ClosingService : Service() {
     var uniqueID1: String? = null
     var uniqueID2: String? = null
     var uniqueID3: String? = null
+
+    var server: String? = null
 
     @Nullable
     override fun onBind(intent: Intent): IBinder? {
@@ -34,43 +33,14 @@ class ClosingService : Service() {
         uniqueID2 = intent?.getStringExtra("uniqueID2")
         uniqueID3 = intent?.getStringExtra("uniqueID3")
 
+        server = intent?.getStringExtra("server")
+
         Log.i(TAG, "uniqueID1: $uniqueID1")
         Log.i(TAG, "uniqueID2: $uniqueID2")
         Log.i(TAG, "uniqueID3: $uniqueID3")
+        Log.i(TAG, "server:    $server")
 
         return super.onStartCommand(intent, flags, startId)
-    }
-
-
-    fun resetConnectOnServer(uniqueID: String) {
-        try {
-//            62.176.10.54
-            Log.i(TAG, "Service: resetConnectOnServer")
-            val soc = Socket("62.176.10.54", 2999)
-            val dout = DataOutputStream(soc.getOutputStream())
-            val din = DataInputStream(soc.getInputStream())
-            Log.i(TAG, "Service: connected")
-
-            val magick = byteArrayOf(0xCA.toByte(), 0xFE.toByte(), 0xCA.toByte(), 0xFE.toByte())
-            val bytesLengthString = ByteBuffer.allocate(4).putInt(uniqueID.count()).array()
-            val original = uniqueID
-            val utf8Bytes = original.toByteArray(charset("UTF8"))
-
-            dout.write(magick)
-            dout.write(bytesLengthString, 0, 4)
-            dout.write(utf8Bytes, 0, utf8Bytes.count())
-            dout.flush()
-
-            Log.i(TAG, "Service: write to socket")
-
-            dout.close()
-            din.close()
-            soc.close()
-        }
-        catch (e:Exception){
-            Log.i(TAG, "Service: not connected")
-            e.printStackTrace()
-        }
     }
 
     @SuppressLint("CheckResult")
@@ -79,23 +49,24 @@ class ClosingService : Service() {
 
         Log.i(TAG, "Service: start Init")
 
-        if(uniqueID1 != null)
-            thread {
-                resetConnectOnServer(uniqueID1!!)
-            }
+        if(!server.isNullOrEmpty()) {
+            if(uniqueID1 != null)
+                thread {
+                    resetConnectOnServer(uniqueID1!!, server!!)
+                }
 
 
-        if(uniqueID2 != null)
-            thread {
-                resetConnectOnServer(uniqueID2!!)
-            }
+            if(uniqueID2 != null)
+                thread {
+                    resetConnectOnServer(uniqueID2!!, server!!)
+                }
 
 
-        if(uniqueID3 != null)
-            thread {
-                resetConnectOnServer(uniqueID3!!)
-            }
-
+            if(uniqueID3 != null)
+                thread {
+                    resetConnectOnServer(uniqueID3!!, server!!)
+                }
+        }
 
         Log.i(TAG, "Service: finish Init")
         // Destroy the service

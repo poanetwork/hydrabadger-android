@@ -20,21 +20,21 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import net.korul.hbbft.server.util.ModelStun
+import net.korul.hbbft.server.util.ServerUtil.Companion.connectToStun
+import net.korul.hbbft.server.util.ServerUtil.Companion.requestDeleteClient
+import net.korul.hbbft.server.util.ServerUtil.Companion.requestGetClient
+import net.korul.hbbft.server.util.ServerUtil.Companion.requestInsertClient
+import net.korul.hbbft.server.util.ServerUtil.Companion.resetConnectOnServer
 import net.korul.hbbft.services.ClosingService
-import org.json.JSONArray
-import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import java.net.Socket
-import java.net.URL
-import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 
-data class Optional<M>(val value : M?)
+data class Optional<M>(val value: M?)
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,23 +66,12 @@ class MainActivity : AppCompatActivity() {
     private val use2 = true
     private val use3 = true
 
-
     private var mClose: Boolean = false
 
-    private var myIP1 = ""
-    private var myPort1: Int = 0
-    private var myRecievePort1: Int = 0
-    private var myPortForOther1: Int = 0
+    private var modelStun1 = ModelStun()
+    private var modelStun2 = ModelStun()
+    private var modelStun3 = ModelStun()
 
-    private var myIP2 = ""
-    private var myPort2: Int = 0
-    private var myRecievePort2: Int = 0
-    private var myPortForOther2: Int = 0
-
-    private var myIP3 = ""
-    private var myPort3: Int = 0
-    private var myRecievePort3: Int = 0
-    private var myPortForOther3: Int = 0
 
     private var showError = true
 
@@ -114,7 +103,7 @@ class MainActivity : AppCompatActivity() {
 
         session?.after_subscribe()
 
-        if(showError) {
+        if (showError) {
             val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             } else {
@@ -132,99 +121,6 @@ class MainActivity : AppCompatActivity() {
         resetAllConnectionsByUids()
 
         initConnect()
-
-        val serviceIntent = Intent(this, ClosingService::class.java)
-        serviceIntent.putExtra("uniqueID1", uniqueID1)
-        serviceIntent.putExtra("uniqueID2", uniqueID2)
-        serviceIntent.putExtra("uniqueID3", uniqueID3)
-
-        this.startService(serviceIntent)
-    }
-
-    fun requestGetClient(RoomName: String, myUid: String): MutableList<String> {
-        // 1. Declare a URL Connection
-        val arraysToSend: MutableList<String> = arrayListOf()
-        try {
-            //http://korul.esy.es/ServerSignal.php?action=GetClients&roomName=RoomName
-            val url = URL("http://korul.esy.es/ServerSignal.php?action=GetClients&roomName=$RoomName")
-            val conn = url.openConnection() as HttpURLConnection
-            // 2. Open InputStream to connection
-            conn.connect()
-            val `in` = conn.inputStream
-            // 3. Download and decode the string response using builder
-            val stringBuilder = StringBuilder()
-            val reader = BufferedReader(InputStreamReader(`in`))
-
-            var line: String?
-            do {
-                line = reader.readLine()
-                if (line == null)
-                    break
-
-                stringBuilder.append(line)
-            } while (true)
-
-            val jsonArr = JSONArray(stringBuilder.toString())
-            for (i in 0 until jsonArr.length()) {
-                val jsonObj = jsonArr.getJSONObject(i)
-
-                val tosend = jsonObj.getString("MyIpPort")
-                if (jsonObj.getString("Login") != myUid) {
-                    println(tosend)
-                    arraysToSend.add(tosend)
-                }
-            }
-            reader.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return arraysToSend
-    }
-
-
-    fun requestDeleteClient(args: Array<String>) {
-        if (args.isEmpty())
-            return
-
-        try {
-            // 1. Declare a URL Connection
-            //http://korul.esy.es/ServerSignal.php?action=DeleteClient&Login=author
-            val url = URL("http://korul.esy.es/ServerSignal.php?action=DeleteClient&login=${args[0]}")
-            val conn = url.openConnection() as HttpURLConnection
-            // 2. Open InputStream to connection
-            conn.connect()
-            val `in` = conn.inputStream
-            // 3. Download and decode the string response using builder
-            val stringBuilder = StringBuilder()
-            val reader = BufferedReader(InputStreamReader(`in`))
-            reader.readLine()
-            reader.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun requestInsertClient(args: Array<String>) {
-        if (args.size < 3)
-            return
-
-        try {
-            // 1. Declare a URL Connection
-            //http://korul.esy.es/ServerSignal.php?action=InsertClient&login=author&roomName=RoomName&myIpPort=ip;port1
-            val url =
-                URL("http://korul.esy.es/ServerSignal.php?action=InsertClient&login=${args[0]}&roomName=${args[1]}&myIpPort=${args[2]}")
-            val conn = url.openConnection() as HttpURLConnection
-            // 2. Open InputStream to connection
-            conn.connect()
-            val `in` = conn.inputStream
-            // 3. Download and decode the string response using builder
-            val reader = BufferedReader(InputStreamReader(`in`))
-            reader.readLine()
-            reader.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
 
@@ -237,28 +133,34 @@ class MainActivity : AppCompatActivity() {
                 .doOnNext {
                     if (use1) {
                         Log.d(TAG, "connectToStun uniqueID1")
-                        connectToStun(uniqueID1, 0)
+                        modelStun1 = connectToStun(uniqueID1, ipserver.text.toString())
                     }
                 }
-                .delay(10 , TimeUnit.MILLISECONDS)
+                .delay(10, TimeUnit.MILLISECONDS)
                 .doOnNext {
                     if (use1) {
                         Log.d(TAG, "requestInsertClient uniqueID1")
-                        val arr: Array<String> = arrayOf(uniqueID1, room1.text.toString(), "${ipserver.text}:${myPortForOther1}")
+                        val arr: Array<String> =
+                            arrayOf(uniqueID1, room1.text.toString(), "${ipserver.text}:${modelStun1.myPortForOther}")
                         requestInsertClient(arr)
                     }
                 }
-                .delay(10 , TimeUnit.MILLISECONDS)
+                .delay(10, TimeUnit.MILLISECONDS)
                 .doOnNext {
                     if (use1) {
                         Log.d(TAG, "requestGetClient uniqueID1")
                         val clients = requestGetClient(room1.text.toString(), uniqueID1)
 
                         Log.d(TAG, "retranslateAllToMainSocket 1")
-                        retranslateAllToMainSocket("${ipserver.text}", myRecievePort1, "127.0.0.1", myRecievePort1)
+                        retranslateAllToMainSocket(
+                            "${ipserver.text}",
+                            modelStun1.myRecievePort,
+                            "127.0.0.1",
+                            modelStun1.myRecievePort
+                        )
 
                         var strTosend = ""
-                        if(clients.isNotEmpty()) {
+                        if (clients.isNotEmpty()) {
                             strTosend = ""
 
                             for (ipport in clients) {
@@ -272,8 +174,8 @@ class MainActivity : AppCompatActivity() {
 
                         thread1 = Thread {
                             session?.start_node(
-                                "127.0.0.1:$myRecievePort1",
-                                "${ipserver.text}:$myPortForOther1",
+                                "127.0.0.1:${modelStun1.myRecievePort}",
+                                "${ipserver.text}:${modelStun1.myPortForOther}",
                                 strTosend
                             )
                         }
@@ -284,28 +186,34 @@ class MainActivity : AppCompatActivity() {
                 .doOnNext {
                     if (use2) {
                         Log.d(TAG, "connectToStun uniqueID2")
-                        connectToStun(uniqueID2, 1)
+                        modelStun2 = connectToStun(uniqueID2, ipserver.text.toString())
                     }
                 }
-                .delay(10 , TimeUnit.MILLISECONDS)
+                .delay(10, TimeUnit.MILLISECONDS)
                 .doOnNext {
                     if (use2) {
                         Log.d(TAG, "requestInsertClient uniqueID2")
-                        val arr: Array<String> = arrayOf(uniqueID2, room2.text.toString(), "${ipserver.text}:${myPortForOther2}")
+                        val arr: Array<String> =
+                            arrayOf(uniqueID2, room2.text.toString(), "${ipserver.text}:${modelStun2.myPortForOther}")
                         requestInsertClient(arr)
                     }
                 }
-                .delay(10 , TimeUnit.MILLISECONDS)
+                .delay(10, TimeUnit.MILLISECONDS)
                 .doOnNext {
                     if (use2) {
                         Log.d(TAG, "requestGetClient uniqueID2")
                         val clients = requestGetClient(room2.text.toString(), uniqueID2)
 
                         Log.d(TAG, "retranslateAllToMainSocket 2")
-                        retranslateAllToMainSocket("${ipserver.text}", myRecievePort2, "127.0.0.1", myRecievePort2)
+                        retranslateAllToMainSocket(
+                            "${ipserver.text}",
+                            modelStun2.myRecievePort,
+                            "127.0.0.1",
+                            modelStun2.myRecievePort
+                        )
 
                         var strTosend = ""
-                        if(clients.isNotEmpty()) {
+                        if (clients.isNotEmpty()) {
                             strTosend = ""
 
                             for (ipport in clients) {
@@ -319,8 +227,8 @@ class MainActivity : AppCompatActivity() {
 
                         thread2 = Thread {
                             session?.start_node(
-                                "127.0.0.1:$myRecievePort2",
-                                "${ipserver.text}:$myPortForOther2",
+                                "127.0.0.1:${modelStun2.myRecievePort}",
+                                "${ipserver.text}:${modelStun2.myPortForOther}",
                                 strTosend
                             )
                         }
@@ -331,28 +239,34 @@ class MainActivity : AppCompatActivity() {
                 .doOnNext {
                     if (use3) {
                         Log.d(TAG, "connectToStun uniqueID3")
-                        connectToStun(uniqueID3, 2)
+                        modelStun3 = connectToStun(uniqueID3, ipserver.text.toString())
                     }
                 }
-                .delay(10 , TimeUnit.MILLISECONDS)
+                .delay(10, TimeUnit.MILLISECONDS)
                 .doOnNext {
                     if (use3) {
                         Log.d(TAG, "requestInsertClient uniqueID3")
-                        val arr: Array<String> = arrayOf(uniqueID3, room3.text.toString(), "${ipserver.text}:${myPortForOther3}")
+                        val arr: Array<String> =
+                            arrayOf(uniqueID3, room3.text.toString(), "${ipserver.text}:${modelStun3.myPortForOther}")
                         requestInsertClient(arr)
                     }
                 }
-                .delay(100 , TimeUnit.MILLISECONDS)
+                .delay(100, TimeUnit.MILLISECONDS)
                 .doOnNext {
                     if (use3) {
                         Log.d(TAG, "requestGetClient uniqueID3")
                         val clients = requestGetClient(room3.text.toString(), uniqueID3)
 
                         Log.d(TAG, "retranslateAllToMainSocket 3")
-                        retranslateAllToMainSocket("${ipserver.text}", myRecievePort3, "127.0.0.1", myRecievePort3)
+                        retranslateAllToMainSocket(
+                            "${ipserver.text}",
+                            modelStun3.myRecievePort,
+                            "127.0.0.1",
+                            modelStun3.myRecievePort
+                        )
 
                         var strTosend = ""
-                        if(clients.isNotEmpty()) {
+                        if (clients.isNotEmpty()) {
                             strTosend = ""
 
                             for (ipport in clients) {
@@ -366,8 +280,8 @@ class MainActivity : AppCompatActivity() {
 
                         thread3 = Thread {
                             session?.start_node(
-                                "127.0.0.1:$myRecievePort3",
-                                "${ipserver.text}:$myPortForOther3",
+                                "127.0.0.1:${modelStun3.myRecievePort}",
+                                "${ipserver.text}:${modelStun3.myPortForOther}",
                                 strTosend
                             )
                         }
@@ -378,6 +292,14 @@ class MainActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     startALL.isEnabled = false
+
+                    val serviceIntent = Intent(this, ClosingService::class.java)
+                    serviceIntent.putExtra("uniqueID1", uniqueID1)
+                    serviceIntent.putExtra("uniqueID2", uniqueID2)
+                    serviceIntent.putExtra("uniqueID3", uniqueID3)
+                    serviceIntent.putExtra("server", ipserver.text.toString())
+                    this.startService(serviceIntent)
+
                 }, { it ->
                     startALL.isEnabled = true
 
@@ -407,17 +329,17 @@ class MainActivity : AppCompatActivity() {
                 if (use1) {
                     val arr: Array<String> = arrayOf(uniqueID1)
                     requestDeleteClient(arr)
-                    resetConnectOnServer(uniqueID1)
+                    resetConnectOnServer(uniqueID1, ipserver.text.toString())
                 }
                 if (use2) {
                     val arr: Array<String> = arrayOf(uniqueID2)
                     requestDeleteClient(arr)
-                    resetConnectOnServer(uniqueID2)
+                    resetConnectOnServer(uniqueID2, ipserver.text.toString())
                 }
                 if (use3) {
                     val arr: Array<String> = arrayOf(uniqueID3)
                     requestDeleteClient(arr)
-                    resetConnectOnServer(uniqueID3)
+                    resetConnectOnServer(uniqueID3, ipserver.text.toString())
                 }
             }
             .subscribeOn(Schedulers.newThread())
@@ -477,7 +399,7 @@ class MainActivity : AppCompatActivity() {
     fun subscribeSession() {
         session?.subscribe { you: Boolean, uid: String, mes: String ->
 
-            if(uid == "test" && mes == "test") {
+            if (uid == "test" && mes == "test") {
                 Log.d(TAG, "subscribeSession - init")
                 showError = false
                 return@subscribe
@@ -721,96 +643,6 @@ class MainActivity : AppCompatActivity() {
         dout.flush()
     }
 
-    fun resetConnectOnServer(uniqueID: String) {
-        try {
-//            62.176.10.54
-            val soc = Socket("${ipserver.text}", 2999)
-            val dout = DataOutputStream(soc.getOutputStream())
-            val din = DataInputStream(soc.getInputStream())
-
-            val magick = byteArrayOf(0xCA.toByte(), 0xFE.toByte(), 0xCA.toByte(), 0xFE.toByte())
-            val bytesLengthString = ByteBuffer.allocate(4).putInt(uniqueID.count()).array()
-            val original = uniqueID
-            val utf8Bytes = original.toByteArray(charset("UTF8"))
-
-            dout.write(magick)
-            dout.write(bytesLengthString, 0, 4)
-            dout.write(utf8Bytes, 0, utf8Bytes.count())
-            dout.flush()
-
-            dout.close()
-            din.close()
-            soc.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-
-            throw e
-        }
-    }
-
-    fun connectToStun(uniqueID: String, numNode: Int) {
-        try {
-            val soc = Socket("${ipserver.text}", 3000)
-            val dout = DataOutputStream(soc.getOutputStream())
-            val din = DataInputStream(soc.getInputStream())
-
-            val magick = byteArrayOf(0xCA.toByte(), 0xFE.toByte(), 0xCA.toByte(), 0xFE.toByte())
-            val bytesLengthString = ByteBuffer.allocate(4).putInt(uniqueID.count()).array()
-            val original = uniqueID
-            val utf8Bytes = original.toByteArray(charset("UTF8"))
-
-            dout.write(magick)
-            dout.write(bytesLengthString, 0, 4)
-            dout.write(utf8Bytes, 0, utf8Bytes.count())
-            dout.flush()
-
-            var bytesnum = din.available()
-            while (bytesnum < 10) {
-                Thread.sleep(10)
-                bytesnum = din.available()
-            }
-
-            when (numNode) {
-                0 -> {
-                    myRecievePort1 = din.readUnsignedShort()
-                    myPortForOther1 = din.readUnsignedShort()
-                    myPort1 = din.readUnsignedShort()
-                }
-                1 -> {
-                    myRecievePort2 = din.readUnsignedShort()
-                    myPortForOther2 = din.readUnsignedShort()
-                    myPort2 = din.readUnsignedShort()
-                }
-                2 -> {
-                    myRecievePort3 = din.readUnsignedShort()
-                    myPortForOther3 = din.readUnsignedShort()
-                    myPort3 = din.readUnsignedShort()
-                }
-            }
-
-            val sizeString = din.readInt()
-
-            bytesnum = din.available()
-            while (bytesnum < sizeString) {
-                Thread.sleep(10)
-                bytesnum = din.available()
-            }
-            val ip = din.readBytes()
-
-            when (numNode) {
-                0 -> myIP1 = String(ip, charset("UTF8"))
-                1 -> myIP2 = String(ip, charset("UTF8"))
-                2 -> myIP3 = String(ip, charset("UTF8"))
-            }
-
-            dout.close()
-            din.close()
-            soc.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw e
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
