@@ -60,7 +60,7 @@ ext {
     circleindicatorVersion = '1.2.2@aar'
 }
 
-def dbflow_version = "5.0.0-alpha1"
+def dbflow_version = "4.2.4"
 
 dependencies {
     implementation project(':chatkit')
@@ -85,7 +85,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crash:16.2.1'
     implementation 'com.google.firebase:firebase-core:16.0.5'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
         transitive = true;
     }
 
@@ -100,27 +100,14 @@ dependencies {
     //Utils
     implementation "me.relex:circleindicator:$circleindicatorVersion"
 
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.5'
 
-
-    // Use if Kotlin user.
-    kapt "com.github.agrosner.dbflow:processor:${dbflow_version}"
-
-
-    // core set of libraries
-    implementation "com.github.agrosner.dbflow:core:${dbflow_version}"
-    implementation "com.github.agrosner.dbflow:lib:${dbflow_version}"
-
-    // RXJava 2 support
-    implementation "com.github.agrosner.dbflow:reactive-streams:${dbflow_version}"
-
-    // Kotlin Coroutines
-//    implementation "com.github.agrosner.dbflow:coroutines:${dbflow_version}"
-
-    // Android Architecture Components Paging Library Support
-    implementation "com.github.agrosner.dbflow:paging:${dbflow_version}"
-
-    // adds generated content provider annotations + support.
-    implementation "com.github.agrosner.dbflow:contentprovider:${dbflow_version}"
+    // DBFlow
+    kapt "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
+    implementation "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    implementation "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+    implementation "com.github.Raizlabs.DBFlow:dbflow-kotlinextensions:${dbflow_version}"
 }
 
 apply plugin: 'com.google.gms.google-services'
