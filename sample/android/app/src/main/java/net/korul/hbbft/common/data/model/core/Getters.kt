@@ -8,6 +8,7 @@ import net.korul.hbbft.common.data.model.conversation.Conversations
 import net.korul.hbbft.common.data.model.conversation.Conversations.Companion.getDialog
 import net.korul.hbbft.common.data.model.conversation.Conversations.Companion.getUser
 import net.korul.hbbft.common.data.model.databaseModel.*
+import java.util.*
 
 
 object Getters {
@@ -22,16 +23,29 @@ object Getters {
             ddialog.lastMessage = Select()
                 .from(DMessage::class.java)
                 .where(DMessage_Table.id.eq(ddialog.lastMessageID) )
-                .querySingle()!!
+                .querySingle()
+
+            if(ddialog.lastMessage != null) {
+                val duser = Select()
+                    .from(DUser::class.java)
+                    .where(DUser_Table.idDialog.eq(ddialog.lastMessage?.userID) )
+                    .querySingle()
+
+                //TODO crash
+                ddialog.lastMessage?.user = duser!!
+            }
 
             ddialog.users.clear()
             for (id in ddialog.usersIDs) {
-                ddialog.users.add(
-                    Select()
-                        .from(DUser::class.java)
-                        .where(DUser_Table.id.eq(id) )
-                        .querySingle()!!
-                )
+                val us = Select()
+                    .from(DUser::class.java)
+                    .where(DUser_Table.id.eq(id) )
+                    .querySingle()
+
+                if(us != null)
+                    ddialog.users.add(
+                        us
+                    )
             }
 
             dialogs.add(getDialog(ddialog))
@@ -40,8 +54,8 @@ object Getters {
         return dialogs
     }
 
-    fun getUsers(id: String): MutableList<User> {
-        val users: MutableList<User> = arrayListOf()
+    fun getUsers(id: String): MutableList<User?> {
+        val users: MutableList<User?> = arrayListOf()
 
         val dusers = Select()
             .from(DUser::class.java)
@@ -55,8 +69,35 @@ object Getters {
         return users
     }
 
-    fun getMessages(id: String): MutableList<Message> {
-        val messages: MutableList<Message> = arrayListOf()
+    fun getUser(id: Long): User? {
+        val user = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.id.eq(id) )
+            .querySingle()
+
+        return Conversations.getUser(user!!)
+    }
+
+    fun getDUser(id: Long): DUser {
+        val user = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.id.eq(id) )
+            .querySingle()
+
+        return user!!
+    }
+
+    fun getDialog(id: String): Dialog {
+        val dialog = Select()
+            .from(DDialog::class.java)
+            .where(DDialog_Table.id.eq(id) )
+            .querySingle()
+
+        return Conversations.getDialog(dialog!!)
+    }
+
+    fun getMessages(id: String): MutableList<Message?> {
+        val messages: MutableList<Message?> = arrayListOf()
 
         val dmessages = Select()
             .from(DMessage::class.java)
@@ -64,33 +105,59 @@ object Getters {
             .queryList()
 
         for(dmessage in dmessages) {
+            dmessage.user = getDUser(dmessage.userID.toLong())
             messages.add(Conversations.getMessage(dmessage))
         }
 
         return messages
     }
 
-    fun getNextMessageID(id: String): Long {
-        val list = Select()
+    fun getMessagesLessDate(startDate: Date?, id: String): MutableList<Message?> {
+        val messages: MutableList<Message?> = arrayListOf()
+
+        val dmessages = Select()
             .from(DMessage::class.java)
             .where(DMessage_Table.idDialog.eq(id))
+            .and(DMessage_Table.createdAt.lessThan(startDate!!))
+            .queryList()
+
+        for(dmessage in dmessages) {
+            dmessage.user = getDUser(dmessage.userID.toLong())
+            messages.add(Conversations.getMessage(dmessage))
+        }
+
+        return messages
+    }
+
+    fun getNextDialogID(): String {
+        return java.lang.Long.toString(UUID.randomUUID().leastSignificantBits)
+    }
+
+    fun getNextMessageID(): Long {
+        val list = Select()
+            .from(DMessage::class.java)
             .orderBy(DMessage_Table.id, false)
             .queryList()
 
-        val ind = list.maxBy { it.id }!!.id
-
-        return (ind + 1L)
+        return if(list.isEmpty())
+            0
+        else {
+            val ind = list.maxBy { it.id }!!.id
+            (ind + 1L)
+        }
     }
 
-    fun getNextUserID(id: String): Long {
+    fun getNextUserID(): Long {
         val list = Select()
             .from(DUser::class.java)
-            .where(DUser_Table.idDialog.eq(id))
             .orderBy(DUser_Table.id, false)
             .queryList()
 
-        val ind = list.maxBy { it.id }!!.id
-
-        return (ind + 1L)
+        return if(list.isEmpty())
+            0
+        else {
+            val ind = list.maxBy { it.id }!!.id
+            (ind + 1L)
+        }
     }
 }

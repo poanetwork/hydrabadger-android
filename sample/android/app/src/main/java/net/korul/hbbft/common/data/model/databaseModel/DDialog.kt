@@ -26,9 +26,9 @@ class DDialog: BaseModel()
     var users: ArrayList<DUser> = arrayListOf()
 
     @Column(name = "lastMessageID")
-    var lastMessageID: Long = 0
+    var lastMessageID: Long? = null
 
-    var lastMessage: DMessage = DMessage()
+    var lastMessage: DMessage? = null
 
     @Column(name = "unreadCount")
     var unreadCount: Int = 0

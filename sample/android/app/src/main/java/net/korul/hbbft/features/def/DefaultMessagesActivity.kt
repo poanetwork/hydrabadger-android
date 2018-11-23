@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -61,24 +62,25 @@ class DefaultMessagesActivity :
 
     override fun onSubmit(input: CharSequence): Boolean {
         super.messagesAdapter!!.addToStart(
-            MessagesFixtures.getTextMessage(input.toString(), mCurDialog!!, mCurUser!!), true
+            MessagesFixtures.setNewMessage(input.toString(), mCurDialog!!, mCurUser!!), true
         )
+
+//        mCurDialog = getDialog(mCurDialog!!.id)
+
         return true
     }
 
     override fun onAddAttachments() {
-//        AlertDialog.Builder(this)
-//            .setItems(R.array.view_types_dialog, this)
-//            .show()
+        AlertDialog.Builder(this)
+            .setItems(R.array.view_types_dialog, this)
+            .show()
     }
 
     override fun format(date: Date): String {
-        return if (DateFormatter.isToday(date)) {
-            getString(R.string.date_header_today)
-        } else if (DateFormatter.isYesterday(date)) {
-            getString(R.string.date_header_yesterday)
-        } else {
-            DateFormatter.format(date, DateFormatter.Template.STRING_DAY_MONTH_YEAR)
+        return when {
+            DateFormatter.isToday(date) -> getString(R.string.date_header_today)
+            DateFormatter.isYesterday(date) -> getString(R.string.date_header_yesterday)
+            else -> DateFormatter.format(date, DateFormatter.Template.STRING_DAY_MONTH_YEAR)
         }
     }
 
@@ -93,8 +95,8 @@ class DefaultMessagesActivity :
 
     override fun onClick(dialogInterface: DialogInterface, i: Int) {
         when (i) {
-//            0 -> messagesAdapter!!.addToStart(MessagesFixtures.imageMessage, true)
-//            1 -> messagesAdapter!!.addToStart(MessagesFixtures.voiceMessage, true)
+            0 -> messagesAdapter!!.addToStart(MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!), true)
+            1 -> messagesAdapter!!.addToStart(MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!), true)
         }
     }
 
@@ -145,7 +147,7 @@ class DefaultMessagesActivity :
                 R.layout.item_custom_outcoming_image_message
             )
 
-        super.messagesAdapter = MessagesListAdapter<Message>(super.senderId, holders, super.imageLoader)
+        super.messagesAdapter = MessagesListAdapter(super.senderId, holders, super.imageLoader)
         super.messagesAdapter!!.enableSelectionMode(this)
         super.messagesAdapter!!.setLoadMoreListener(this)
         super.messagesAdapter!!.registerViewClickListener(
@@ -153,7 +155,7 @@ class DefaultMessagesActivity :
         ) { view, message ->
             AppUtils.showToast(
                 this@DefaultMessagesActivity,
-                message.user.name + " avatar click",
+                message.user?.name + " avatar click",
                 false
             )
         }

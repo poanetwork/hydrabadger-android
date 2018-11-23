@@ -37,6 +37,11 @@
         <item name="voice">Voice message (custom)</item>
     </string-array>
 
+    <string-array name="view_do_dialog">
+        <item name="image">Delete</item>
+        <item name="voice">Cancel</item>
+    </string-array>
+
     <string name="start_typing_status">Start typing</string>
     <string name="stop_typing_status">Stop typing</string>
 </resources>

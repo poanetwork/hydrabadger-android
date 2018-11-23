@@ -386,6 +386,16 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         return selectedMessages;
     }
 
+    public ArrayList<MESSAGE> getALLMessages() {
+        ArrayList<MESSAGE> allMessages = new ArrayList<>();
+        for (Wrapper wrapper : items) {
+            if (wrapper.item instanceof IMessage) {
+                allMessages.add((MESSAGE) wrapper.item);
+            }
+        }
+        return allMessages;
+    }
+
     /**
      * Returns selected messages text and do {@link #unselectAllItems()} for you.
      *

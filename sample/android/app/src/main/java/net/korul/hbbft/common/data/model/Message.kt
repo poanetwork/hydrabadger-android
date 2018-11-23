@@ -8,7 +8,7 @@ import java.util.*
  * Created by troy379 on 04.04.17.
  */
 class Message @JvmOverloads constructor(
-    private var id_: Long = 0,
+    var id_: Long = 0,
     private val id: String,
     private val user: User,
     private var text: String?,
@@ -22,6 +22,10 @@ class Message @JvmOverloads constructor(
 
     val status: String
         get() = "Sent"
+
+    fun getImage(): Image? {
+        return image
+    }
 
     override fun getId(): String {
         return id

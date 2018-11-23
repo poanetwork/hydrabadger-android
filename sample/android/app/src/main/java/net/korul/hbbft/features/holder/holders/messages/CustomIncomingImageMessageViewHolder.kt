@@ -21,8 +21,8 @@ class CustomIncomingImageMessageViewHolder(itemView: View, payload: Any) :
     override fun onBind(message: Message) {
         super.onBind(message)
 
-        val isOnline = message.user.isOnline
-        if (isOnline) {
+        val isOnline = message.user?.isOnline
+        if (isOnline != null && isOnline) {
             onlineIndicator.setBackgroundResource(R.drawable.shape_bubble_online)
         } else {
             onlineIndicator.setBackgroundResource(R.drawable.shape_bubble_offline)

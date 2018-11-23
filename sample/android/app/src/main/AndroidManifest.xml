@@ -35,7 +35,7 @@
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name=".MainActivity"
+            android:name="net.korul.hbbft.features.def.DefaultDialogsActivity"
             android:label="@string/app_name"
             android:theme="@style/BlueThemeNoActionBar" >
             <intent-filter>
@@ -49,8 +49,11 @@
                 android:name="net.korul.hbbft.features.def.DefaultMessagesActivity"
                 android:theme="@style/BlueTheme"/>
         <activity
-                android:name="net.korul.hbbft.features.def.DefaultDialogsActivity"
+                android:name="net.korul.hbbft.features.def.CreateNewDialog"
                 android:theme="@style/BlueTheme"/>
+        <!--<activity-->
+                <!--android:name="net.korul.hbbft.features.def.DefaultDialogsActivity"-->
+                <!--android:theme="@style/BlueTheme"/>-->
 
 
         <service android:name="net.korul.hbbft.services.ClosingService"

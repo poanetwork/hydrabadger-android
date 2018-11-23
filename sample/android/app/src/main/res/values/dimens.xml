@@ -1,6 +1,8 @@
-<resources>
-    <dimen name="fab_margin">16dp</dimen>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="fab_margin">25dp</dimen>
 
     <dimen name="activity_margin">16dp</dimen>
     <dimen name="card_padding">40dp</dimen>
+
+    <dimen name="design_fab_image_size" tools:override="true">36dp</dimen>
 </resources>

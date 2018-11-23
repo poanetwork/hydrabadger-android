@@ -11,6 +11,7 @@ import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
+import net.korul.hbbft.common.data.fixtures.MessagesFixtures.Companion.deleteMeseges
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
 import net.korul.hbbft.common.data.model.User
@@ -42,7 +43,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
 
             String.format(
                 Locale.getDefault(), "%s: %s (%s)",
-                message.user.name, text, createdAt
+                message.user?.name, text, createdAt
             )
         }
 
@@ -50,13 +51,20 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
         super.onCreate(savedInstanceState)
 
         imageLoader = ImageLoader { imageView, url, payload ->
-            Picasso.with(this@DemoMessagesActivity).load(url).into(imageView)
+            try {
+                Picasso.with(this@DemoMessagesActivity).load(url).into(imageView)
+            }
+            catch (e: IllegalArgumentException) {
+
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        messagesAdapter!!.addToStart(mCurDialog!!.lastMessage, true)
+        if (mCurDialog!!.lastMessage != null) {
+            messagesAdapter!!.addToStart(mCurDialog!!.lastMessage, true)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -68,7 +76,11 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_delete -> messagesAdapter!!.deleteSelectedMessages()
+            R.id.action_delete -> {
+                val sellmes = messagesAdapter!!.selectedMessages
+                deleteMeseges(sellmes)
+                messagesAdapter!!.deleteSelectedMessages()
+            }
             R.id.action_copy -> {
                 messagesAdapter!!.copySelectedMessagesText(this, messageStringFormatter, true)
                 AppUtils.showToast(this, R.string.copied_message, true)
@@ -98,17 +110,26 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
         menu!!.findItem(R.id.action_copy).isVisible = count > 0
     }
 
-    protected fun loadMessages() {
-        Handler().postDelayed(//imitation of internet connection
-        {
-            val messages = MessagesFixtures.getMessages(lastLoadedDate, mCurDialog!!)
-            lastLoadedDate = messages[messages.size - 1].createdAt
-            messagesAdapter!!.addToEnd(messages, false)
+    private fun loadMessages() {
+        Handler().postDelayed({
+            try {
+                val min = messagesAdapter!!.allMessages.minBy{ it.createdAt!!.time }
+                lastLoadedDate = min!!.createdAt
+
+                val messages = MessagesFixtures.getMessages(lastLoadedDate, mCurDialog!!)
+                messages.filterNotNull()
+
+                lastLoadedDate = messages[messages.size - 1]?.createdAt
+
+                messagesAdapter!!.addToEnd(messages, false)
+            }
+            catch (e: IndexOutOfBoundsException) {
+                e.printStackTrace()
+            }
         }, 1000)
     }
 
     companion object {
-
         private val TOTAL_MESSAGES_COUNT = 100
     }
 }

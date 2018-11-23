@@ -3,8 +3,12 @@ package net.korul.hbbft.common.data.fixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
 import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.conversation.Conversations
+import net.korul.hbbft.common.data.model.core.Getters
 import net.korul.hbbft.common.data.model.core.Getters.getNextMessageID
+import java.security.SecureRandom
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MessagesFixtures private constructor() {
@@ -14,47 +18,72 @@ class MessagesFixtures private constructor() {
 
     companion object {
 
-//        val imageMessage: Message
-//            get() {
-//                val message = Message(FixturesData.randomId, user, null)
-//                message.setImage(Message.Image(FixturesData.randomImage))
-//                return message
-//            }
-//
-//        val voiceMessage: Message
-//            get() {
-//                val message = Message(FixturesData.randomId, user, null)
-//                message.voice = Message.Voice("http://example.com", FixturesData.rnd.nextInt(200) + 30)
-//                return message
-//            }
+        var rnd = SecureRandom()
 
+        fun getImageMessage(curDialog: Dialog, user: User): Message {
+            val message = Message(getNextMessageID(), curDialog.id, user, null, Date())
+            message.setImage(Message.Image("https://habrastorage.org/getpro/habr/post_images/e4b/067/b17/e4b067b17a3e414083f7420351db272b.jpg"))
 
-        fun getTextMessage(text: String, curDialog: Dialog, user: User): Message {
-            return Message(getNextMessageID(curDialog.id), curDialog.id, user, text, Date())
+            val dmes = Conversations.getDMessage(message)
+            dmes?.insert()
+
+            curDialog.setLastMessage(message)
+            val ddialog = Conversations.getDDialog(curDialog)
+            ddialog.update()
+
+            return message
         }
 
-        // TODO podgruzka
-        fun getMessages(startDate: Date?, curDialog: Dialog): ArrayList<Message> {
-            val messages = ArrayList<Message>()
-//            for (i in 0..9/*days count*/) {
-//                val countPerDay = FixturesData.rnd.nextInt(5) + 1
-//
-//                for (j in 0 until countPerDay) {
-//                    val message: Message = if (i % 2 == 0 && j % 3 == 0) {
-//                        imageMessage
-//                    } else {
-//                        textMessage
-//                    }
-//
-//                    val calendar = Calendar.getInstance()
-//                    if (startDate != null) calendar.time = startDate
-//                    calendar.add(Calendar.DAY_OF_MONTH, -(i * i + 1))
-//
-//                    message.setCreatedAt(calendar.time)
-//                    messages.add(message)
-//                }
-//            }
-            return messages
+        fun getVoiceMessage(curDialog: Dialog, user: User): Message {
+            val message = Message(getNextMessageID(), curDialog.id, user, null, Date())
+            message.voice = Message.Voice("http://example.com", rnd.nextInt(200) + 30)
+
+            val dmes = Conversations.getDMessage(message)
+            dmes?.insert()
+
+            curDialog.setLastMessage(message)
+            val ddialog = Conversations.getDDialog(curDialog)
+            ddialog.update()
+
+            return message
+        }
+
+
+        // set new message
+        fun setNewMessage(text: String, curDialog: Dialog, user: User): Message {
+            user.id = curDialog.id
+            val mes = Message(getNextMessageID(), curDialog.id, user, text, Date())
+
+            val dmes = Conversations.getDMessage(mes)
+            dmes?.insert()
+
+            curDialog.setLastMessage(mes)
+            val ddialog = Conversations.getDDialog(curDialog)
+            ddialog.update()
+
+            return mes
+        }
+
+        fun deleteMeseges(messages: ArrayList<Message>) {
+            for(message in messages) {
+                val dmes = Conversations.getDMessage(message)
+                dmes?.delete()
+            }
+        }
+
+        fun getAllMessages(curDialog: Dialog): ArrayList<Message?> {
+            val messages = Getters.getMessages(curDialog.id)
+
+            return ArrayList(messages)
+        }
+
+        fun getMessages(startDate: Date?, curDialog: Dialog): ArrayList<Message?> {
+            val startDate_ = Date()
+            if (startDate != null) startDate_.time = startDate.time
+
+            val messages = Getters.getMessagesLessDate(startDate_, curDialog.id)
+
+            return ArrayList(messages)
         }
     }
 }

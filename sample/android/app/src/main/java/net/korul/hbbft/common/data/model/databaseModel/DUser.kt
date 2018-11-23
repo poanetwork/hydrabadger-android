@@ -12,6 +12,9 @@ class DUser : BaseModel() {
     @Column(name = "id")
     var id: Long = 0
 
+    @Column(name = "uid")
+    var uid: String = ""
+
     @Column(name = "idDialog")
     var idDialog: String = ""
 
