@@ -9,8 +9,8 @@ import net.korul.hbbft.common.data.model.Message
 /*
  * Created by troy379 on 05.04.17.
  */
-class CustomOutcomingImageMessageViewHolder(itemView: View, payload: Any) :
-    MessageHolders.OutcomingImageMessageViewHolder<Message>(itemView, payload) {
+class CustomOutcomingImageMessageViewHolder(itemView: View) :
+    MessageHolders.OutcomingImageMessageViewHolder<Message>(itemView) {
 
     override fun onBind(message: Message) {
         super.onBind(message)
@@ -23,4 +23,5 @@ class CustomOutcomingImageMessageViewHolder(itemView: View, payload: Any) :
         //For example you can pass size of placeholder before loading
         return Pair(100, 100)
     }
+
 }

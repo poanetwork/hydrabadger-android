@@ -12,7 +12,6 @@ import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
-import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.features.DemoDialogsActivity
 import net.korul.hbbft.features.holder.holders.dialogs.CustomDialogViewHolder
 import java.util.*
@@ -20,9 +19,6 @@ import java.util.*
 class DefaultDialogsActivity : DemoDialogsActivity(), DateFormatter.Formatter {
 
     private var dialogsList: DialogsList? = null
-
-    //TODO I Am
-    var mCurUser: User = User(Long.MAX_VALUE, "","", "name", "http://i.imgur.com/pv1tBmT.png", true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +39,7 @@ class DefaultDialogsActivity : DemoDialogsActivity(), DateFormatter.Formatter {
     }
 
     override fun onDialogClick(dialog: Dialog) {
-        DefaultMessagesActivity.open(this, dialog, mCurUser)
+        DefaultMessagesActivity.open(this, dialog, dialog.users[0])
     }
 
     override fun format(date: Date): String {

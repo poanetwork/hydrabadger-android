@@ -19,7 +19,7 @@ class DMessage:  BaseModel()
     var idDialog: String = ""
 
     @Column(name = "userID")
-    var userID: String = ""
+    var userID: Long = 0
 
     var user: DUser = DUser()
 

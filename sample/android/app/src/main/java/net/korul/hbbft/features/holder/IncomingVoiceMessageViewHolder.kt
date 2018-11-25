@@ -11,8 +11,8 @@ import net.korul.hbbft.common.utils.FormatUtils
 /*
  * Created by troy379 on 05.04.17.
  */
-class IncomingVoiceMessageViewHolder(itemView: View, payload: Any) :
-    MessageHolders.IncomingTextMessageViewHolder<Message>(itemView, payload) {
+class IncomingVoiceMessageViewHolder(itemView: View) :
+    MessageHolders.IncomingTextMessageViewHolder<Message>(itemView) {
 
     private val tvDuration: TextView
     private val tvTime: TextView

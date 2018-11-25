@@ -21,7 +21,8 @@ class MessagesFixtures private constructor() {
         var rnd = SecureRandom()
 
         fun getImageMessage(curDialog: Dialog, user: User): Message {
-            val message = Message(getNextMessageID(), curDialog.id, user, null, Date())
+            val id = getNextMessageID()
+            val message = Message(id, id.toString(), curDialog.id, user, null, Date())
             message.setImage(Message.Image("https://habrastorage.org/getpro/habr/post_images/e4b/067/b17/e4b067b17a3e414083f7420351db272b.jpg"))
 
             val dmes = Conversations.getDMessage(message)
@@ -35,7 +36,8 @@ class MessagesFixtures private constructor() {
         }
 
         fun getVoiceMessage(curDialog: Dialog, user: User): Message {
-            val message = Message(getNextMessageID(), curDialog.id, user, null, Date())
+            val id = getNextMessageID()
+            val message = Message(id, id.toString(), curDialog.id, user, null, Date())
             message.voice = Message.Voice("http://example.com", rnd.nextInt(200) + 30)
 
             val dmes = Conversations.getDMessage(message)
@@ -51,13 +53,15 @@ class MessagesFixtures private constructor() {
 
         // set new message
         fun setNewMessage(text: String, curDialog: Dialog, user: User): Message {
-            user.id = curDialog.id
-            val mes = Message(getNextMessageID(), curDialog.id, user, text, Date())
+            user.idDialog = curDialog.id
+            val id = getNextMessageID()
+            val mes = Message(id, id.toString(), curDialog.id, user, text, Date())
 
             val dmes = Conversations.getDMessage(mes)
             dmes?.insert()
 
             curDialog.setLastMessage(mes)
+            curDialog.lastMessage?.user = user
             val ddialog = Conversations.getDDialog(curDialog)
             ddialog.update()
 

@@ -37,7 +37,7 @@
         <activity
             android:name="net.korul.hbbft.features.def.DefaultDialogsActivity"
             android:label="@string/app_name"
-            android:theme="@style/BlueThemeNoActionBar" >
+            android:theme="@style/BlueTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,10 +51,13 @@
         <activity
                 android:name="net.korul.hbbft.features.def.CreateNewDialog"
                 android:theme="@style/BlueTheme"/>
-        <!--<activity-->
-                <!--android:name="net.korul.hbbft.features.def.DefaultDialogsActivity"-->
-                <!--android:theme="@style/BlueTheme"/>-->
 
+        <!--<activity-->
+                <!--android:name="net.korul.hbbft.features.def.StyledDialogsActivity"-->
+                <!--android:theme="@style/BlueTheme"/>-->
+        <!--<activity-->
+        <!--android:name="net.korul.hbbft.features.def.StyledMessagesActivity"-->
+        <!--android:theme="@style/BlueTheme"/>-->
 
         <service android:name="net.korul.hbbft.services.ClosingService"
                  android:stopWithTask="false"/>

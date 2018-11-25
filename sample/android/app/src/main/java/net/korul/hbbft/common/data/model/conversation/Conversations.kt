@@ -49,8 +49,13 @@ class Conversations
         fun getMessage(dmessage: DMessage?): Message? {
             return if(dmessage == null)
                 null
-            else
-                Message(dmessage.id, dmessage.idDialog, getUser(dmessage.user), dmessage.text, dmessage.createdAt)
+            else {
+                val mes = Message(dmessage.id, dmessage.id.toString(), dmessage.idDialog, getUser(dmessage.user), dmessage.text, dmessage.createdAt)
+                mes.voice = dmessage.voice
+                if(dmessage.image != null)
+                    mes.setImage(dmessage.image!!)
+                mes
+            }
         }
 
         fun getDMessage(message: Message?): DMessage? {
@@ -59,8 +64,8 @@ class Conversations
             else {
                 val dmessage = DMessage()
                 dmessage.id = message.id_
-                dmessage.idDialog = message.id
-                dmessage.userID = message.user?.id_.toString()
+                dmessage.idDialog = message.idDialog
+                dmessage.userID = message.user.id_
                 dmessage.user = getDUser(message.user)
                 dmessage.text = message.text
                 dmessage.createdAt = message.createdAt
@@ -73,14 +78,14 @@ class Conversations
         }
 
         fun getUser(duser: DUser): User {
-            return User(duser.id, duser.uid, duser.idDialog, duser.name, duser.avatar, duser.isOnline)
+            return User(duser.id, duser.uid, duser.id.toString(), duser.idDialog, duser.name, duser.avatar, duser.isOnline)
         }
 
         fun getDUser(user: User): DUser {
             val duser = DUser()
             duser.id = user.id_
             duser.uid = user.uid
-            duser.idDialog = user.id
+            duser.idDialog = user.idDialog
             duser.name = user.name
             duser.avatar = user.avatar
             duser.isOnline = user.isOnline

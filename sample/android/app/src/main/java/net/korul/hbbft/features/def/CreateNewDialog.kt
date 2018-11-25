@@ -12,14 +12,15 @@ import net.korul.hbbft.common.data.model.User
 class CreateNewDialog: AppCompatActivity()  {
 
     //TODO I Am
-    var mCurUser: User = User(Long.MAX_VALUE, "","", "name", "http://i.imgur.com/pv1tBmT.png", true)
+    var mCurUser: User = User(0, "", 0.toString(), "", "name", "http://i.imgur.com/pv1tBmT.png", true)
+    var mUser: User = User(0, "", 1.toString(), "", "name", "http://i.imgur.com/Qn9UesZ.png", true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_dialog)
 
         buttonAdd.setOnClickListener {
-            setNewDialog(nameRoom.text.toString(), mCurUser)
+            setNewDialog(nameRoom.text.toString(), mCurUser, mUser)
             super.onBackPressed()
         }
     }

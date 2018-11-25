@@ -19,6 +19,7 @@ import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
 import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.core.Getters.getDialog
 import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.features.DemoMessagesActivity
 import net.korul.hbbft.features.holder.IncomingVoiceMessageViewHolder
@@ -65,7 +66,7 @@ class DefaultMessagesActivity :
             MessagesFixtures.setNewMessage(input.toString(), mCurDialog!!, mCurUser!!), true
         )
 
-//        mCurDialog = getDialog(mCurDialog!!.id)
+        mCurDialog = getDialog(mCurDialog!!.id)
 
         return true
     }
@@ -95,8 +96,16 @@ class DefaultMessagesActivity :
 
     override fun onClick(dialogInterface: DialogInterface, i: Int) {
         when (i) {
-            0 -> messagesAdapter!!.addToStart(MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!), true)
-            1 -> messagesAdapter!!.addToStart(MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!), true)
+            0 ->  {
+                val mes = MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!)
+                mCurDialog = getDialog(mCurDialog!!.id)
+                messagesAdapter!!.addToStart(mes, true)
+            }
+            1 -> {
+                val mes = MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!)
+                mCurDialog = getDialog(mCurDialog!!.id)
+                messagesAdapter!!.addToStart(mes, true)
+            }
         }
     }
 
@@ -114,11 +123,6 @@ class DefaultMessagesActivity :
         }
 
         val holders = MessageHolders()
-            // custom layout
-            .setIncomingTextLayout(R.layout.item_custom_incoming_text_message)
-            .setOutcomingTextLayout(R.layout.item_custom_outcoming_text_message)
-            .setIncomingImageLayout(R.layout.item_custom_incoming_image_message)
-            .setOutcomingImageLayout(R.layout.item_custom_outcoming_image_message)
             // custom type
             .registerContentType(
                 CONTENT_TYPE_VOICE,
@@ -146,16 +150,23 @@ class DefaultMessagesActivity :
                 CustomOutcomingImageMessageViewHolder::class.java,
                 R.layout.item_custom_outcoming_image_message
             )
+            // custom layout
+            .setIncomingTextLayout(R.layout.item_custom_incoming_text_message)
+            .setOutcomingTextLayout(R.layout.item_custom_outcoming_text_message)
+            .setIncomingImageLayout(R.layout.item_custom_incoming_image_message)
+            .setOutcomingImageLayout(R.layout.item_custom_outcoming_image_message)
 
-        super.messagesAdapter = MessagesListAdapter(super.senderId, holders, super.imageLoader)
+
+        super.messagesAdapter = MessagesListAdapter(mCurUser?.id, holders, super.imageLoader)
         super.messagesAdapter!!.enableSelectionMode(this)
         super.messagesAdapter!!.setLoadMoreListener(this)
+        super.messagesAdapter!!.setDateHeadersFormatter(this)
         super.messagesAdapter!!.registerViewClickListener(
             R.id.messageUserAvatar
         ) { view, message ->
             AppUtils.showToast(
                 this@DefaultMessagesActivity,
-                message.user?.name + " avatar click",
+                message.user.name + " avatar click",
                 false
             )
         }

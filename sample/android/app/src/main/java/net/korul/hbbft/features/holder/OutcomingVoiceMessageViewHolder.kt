@@ -11,8 +11,8 @@ import net.korul.hbbft.common.utils.FormatUtils
 /*
  * Created by troy379 on 05.04.17.
  */
-class OutcomingVoiceMessageViewHolder(itemView: View, payload: Any) :
-    MessageHolders.OutcomingTextMessageViewHolder<Message>(itemView, payload) {
+class OutcomingVoiceMessageViewHolder(itemView: View) :
+    MessageHolders.OutcomingTextMessageViewHolder<Message>(itemView) {
 
     private val tvDuration: TextView
     private val tvTime: TextView
@@ -28,5 +28,13 @@ class OutcomingVoiceMessageViewHolder(itemView: View, payload: Any) :
             message.voice!!.duration
         )
         tvTime.text = DateFormatter.format(message.createdAt, DateFormatter.Template.TIME)
+    }
+
+    class Payload {
+        var avatarClickListener: OutcomingVoiceMessageViewHolder.OnAvatarClickListener? = null
+    }
+
+    interface OnAvatarClickListener {
+        fun onAvatarClick()
     }
 }

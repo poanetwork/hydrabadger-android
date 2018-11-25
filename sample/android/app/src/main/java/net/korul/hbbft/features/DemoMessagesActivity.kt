@@ -15,14 +15,16 @@ import net.korul.hbbft.common.data.fixtures.MessagesFixtures.Companion.deleteMes
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
 import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.core.Getters
+import net.korul.hbbft.common.data.model.core.Getters.setLastMessage
 import net.korul.hbbft.common.utils.AppUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
-abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.SelectionListener,
+abstract class DemoMessagesActivity : AppCompatActivity(),
+    MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
 
-    protected val senderId = "0"
     protected lateinit var imageLoader: ImageLoader
     protected var messagesAdapter: MessagesListAdapter<Message>? = null
 
@@ -43,7 +45,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
 
             String.format(
                 Locale.getDefault(), "%s: %s (%s)",
-                message.user?.name, text, createdAt
+                message.user.name, text, createdAt
             )
         }
 
@@ -65,6 +67,9 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
         if (mCurDialog!!.lastMessage != null) {
             messagesAdapter!!.addToStart(mCurDialog!!.lastMessage, true)
         }
+        else {
+            loadMessages()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,7 +84,10 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
             R.id.action_delete -> {
                 val sellmes = messagesAdapter!!.selectedMessages
                 deleteMeseges(sellmes)
+                setLastMessage(mCurDialog)
+                mCurDialog = Getters.getDialog(mCurDialog!!.id)
                 messagesAdapter!!.deleteSelectedMessages()
+                messagesAdapter!!.notifyDataSetChanged()
             }
             R.id.action_copy -> {
                 messagesAdapter!!.copySelectedMessagesText(this, messageStringFormatter, true)
@@ -113,15 +121,19 @@ abstract class DemoMessagesActivity : AppCompatActivity(), MessagesListAdapter.S
     private fun loadMessages() {
         Handler().postDelayed({
             try {
-                val min = messagesAdapter!!.allMessages.minBy{ it.createdAt!!.time }
-                lastLoadedDate = min!!.createdAt
+                lastLoadedDate = if(messagesAdapter!!.allMessages.size > 0) {
+                    val min = messagesAdapter!!.allMessages.minBy{ it.createdAt!!.time }
+                    min!!.createdAt
+                } else {
+                    Date()
+                }
 
                 val messages = MessagesFixtures.getMessages(lastLoadedDate, mCurDialog!!)
                 messages.filterNotNull()
-
-                lastLoadedDate = messages[messages.size - 1]?.createdAt
-
-                messagesAdapter!!.addToEnd(messages, false)
+                if(messages.isNotEmpty()) {
+                    lastLoadedDate = messages[messages.size - 1]?.createdAt
+                    messagesAdapter!!.addToEnd(messages, false)
+                }
             }
             catch (e: IndexOutOfBoundsException) {
                 e.printStackTrace()

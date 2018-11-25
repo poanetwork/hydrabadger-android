@@ -28,10 +28,9 @@ object Getters {
             if(ddialog.lastMessage != null) {
                 val duser = Select()
                     .from(DUser::class.java)
-                    .where(DUser_Table.idDialog.eq(ddialog.lastMessage?.userID) )
+                    .where(DUser_Table.id.eq(ddialog.lastMessage?.userID) )
                     .querySingle()
 
-                //TODO crash
                 ddialog.lastMessage?.user = duser!!
             }
 
@@ -88,12 +87,54 @@ object Getters {
     }
 
     fun getDialog(id: String): Dialog {
-        val dialog = Select()
+        val ddialog = Select()
             .from(DDialog::class.java)
             .where(DDialog_Table.id.eq(id) )
             .querySingle()
 
-        return Conversations.getDialog(dialog!!)
+        if(ddialog != null) {
+            ddialog.lastMessage = Select()
+                .from(DMessage::class.java)
+                .where(DMessage_Table.id.eq(ddialog.lastMessageID))
+                .querySingle()
+
+            if (ddialog.lastMessage != null) {
+                val duser = Select()
+                    .from(DUser::class.java)
+                    .where(DUser_Table.id.eq(ddialog.lastMessage?.userID))
+                    .querySingle()
+
+                ddialog.lastMessage?.user = duser!!
+            }
+
+            ddialog.users.clear()
+            for (id in ddialog.usersIDs) {
+                val us = Select()
+                    .from(DUser::class.java)
+                    .where(DUser_Table.id.eq(id))
+                    .querySingle()
+
+                if (us != null)
+                    ddialog.users.add(
+                        us
+                    )
+            }
+        }
+
+        return Conversations.getDialog(ddialog!!)
+    }
+
+    fun setLastMessage(dialog: Dialog?) {
+        val ddialog = Conversations.getDDialog(dialog!!)
+        val mes = getMessagesLessDate(Date(), ddialog.id)
+        if (mes.size > 0) {
+            ddialog.lastMessage = Conversations.getDMessage(mes[0])
+            ddialog.lastMessageID = mes[0]?.id_
+        }
+        else
+            ddialog.lastMessage = null
+
+        ddialog.update()
     }
 
     fun getMessages(id: String): MutableList<Message?> {
@@ -102,10 +143,11 @@ object Getters {
         val dmessages = Select()
             .from(DMessage::class.java)
             .where(DMessage_Table.idDialog.eq(id) )
+            .orderBy(DMessage_Table.createdAt, false)
             .queryList()
 
         for(dmessage in dmessages) {
-            dmessage.user = getDUser(dmessage.userID.toLong())
+            dmessage.user = getDUser(dmessage.userID)
             messages.add(Conversations.getMessage(dmessage))
         }
 
@@ -119,10 +161,11 @@ object Getters {
             .from(DMessage::class.java)
             .where(DMessage_Table.idDialog.eq(id))
             .and(DMessage_Table.createdAt.lessThan(startDate!!))
+            .orderBy(DMessage_Table.createdAt, false)
             .queryList()
 
         for(dmessage in dmessages) {
-            dmessage.user = getDUser(dmessage.userID.toLong())
+            dmessage.user = getDUser(dmessage.userID)
             messages.add(Conversations.getMessage(dmessage))
         }
 

@@ -4,13 +4,12 @@ import com.stfalcon.chatkit.commons.models.IMessage
 import com.stfalcon.chatkit.commons.models.MessageContentType
 import java.util.*
 
-/*
- * Created by troy379 on 04.04.17.
- */
-class Message @JvmOverloads constructor(
+
+class Message(
     var id_: Long = 0,
     private val id: String,
-    private val user: User,
+    var idDialog: String,
+    private var user: User,
     private var text: String?,
     private var createdAt: Date? = Date()
 ) : IMessage,
@@ -49,6 +48,10 @@ class Message @JvmOverloads constructor(
 
     fun setText(text: String) {
         this.text = text
+    }
+
+    fun setUser(user: User) {
+        this.user = user
     }
 
     fun setCreatedAt(createdAt: Date) {

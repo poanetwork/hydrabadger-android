@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import com.squareup.picasso.Picasso
 import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
@@ -12,7 +13,8 @@ import net.korul.hbbft.common.data.fixtures.DialogsFixtures.Companion.deleteDial
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.utils.AppUtils
 
-abstract class DemoDialogsActivity : AppCompatActivity(),
+abstract class DemoDialogsActivity :
+    AppCompatActivity(),
     DialogsListAdapter.OnDialogClickListener<Dialog>,
     DialogsListAdapter.OnDialogLongClickListener<Dialog>,
     DialogInterface.OnClickListener
@@ -22,6 +24,7 @@ abstract class DemoDialogsActivity : AppCompatActivity(),
     protected var dialogsAdapter: DialogsListAdapter<Dialog>? = null
 
     protected var mDialog: Dialog? = null
+    private var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,15 @@ abstract class DemoDialogsActivity : AppCompatActivity(),
             catch (e: IllegalArgumentException) {
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        super.onCreateOptionsMenu(menu)
+        this.menu = menu
+        menuInflater.inflate(R.menu.chat_actions_menu, menu)
+        menu.findItem(R.id.action_delete).isVisible = false
+        menu.findItem(R.id.action_copy).isVisible = false
+        return true
     }
 
     override fun onDialogLongClick(dialog: Dialog) {
