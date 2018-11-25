@@ -22,4 +22,9 @@
 
     <string name="start_typing_status">Start typing</string>
     <string name="stop_typing_status">Stop typing</string>
+
+    <string name="status">status</string>
+    <string name="start_1x">start_1x</string>
+    <string name="start_2x">start_2x</string>
+    <string name="start_3x">start_3x</string>
 </resources>

@@ -14,12 +14,18 @@ import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
 import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.conversation.Conversations
+import net.korul.hbbft.common.data.model.core.Getters
 import net.korul.hbbft.common.data.model.core.Getters.getDialog
+import net.korul.hbbft.common.data.model.core.Getters.getNextUserID
 import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.features.DemoMessagesActivity
 import net.korul.hbbft.features.holder.IncomingVoiceMessageViewHolder
@@ -37,9 +43,9 @@ class DefaultMessagesActivity :
     MessageInput.TypingListener,
     DateFormatter.Formatter,
     MessageHolders.ContentChecker<Message>,
-    DialogInterface.OnClickListener
+    DialogInterface.OnClickListener,
+    CoreHBBFTListener
 {
-
     private var messagesList: MessagesList? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,12 +65,17 @@ class DefaultMessagesActivity :
         input.setInputListener(this)
         input.setTypingListener(this)
         input.setAttachmentsListener(this)
+
+        CoreHBBFT.addListener(this)
     }
 
     override fun onSubmit(input: CharSequence): Boolean {
+        val mes = MessagesFixtures.setNewMessage(input.toString(), mCurDialog!!, mCurUser!!)
         super.messagesAdapter!!.addToStart(
-            MessagesFixtures.setNewMessage(input.toString(), mCurDialog!!, mCurUser!!), true
+            mes, true
         )
+
+        CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
 
         mCurDialog = getDialog(mCurDialog!!.id)
 
@@ -106,6 +117,33 @@ class DefaultMessagesActivity :
                 mCurDialog = getDialog(mCurDialog!!.id)
                 messagesAdapter!!.addToStart(mes, true)
             }
+        }
+    }
+
+    override fun updateStateToOnline() {
+        super.menu!!.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+    }
+
+    override fun reciveMessage(you: Boolean, uid: String, mes: String) {
+        if(mCurUser!!.uid != uid) {
+            var found = false
+            for (user in mCurDialog!!.users) {
+                if(user.uid == uid)
+                    found = true
+            }
+            if(!found) {
+                val id = getNextUserID()
+                val muser: User = User(id, uid, id.toString(), mCurDialog!!.id, "name${mCurDialog!!.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                mCurDialog!!.users.add(muser)
+                Conversations.getDUser(muser).insert()
+                Conversations.getDDialog(mCurDialog!!).update()
+            }
+
+            val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
+
+            super.messagesAdapter!!.addToStart(
+                MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
+            )
         }
     }
 

@@ -1,5 +1,7 @@
 package net.korul.hbbft.features
 
+import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
@@ -9,6 +11,8 @@ import android.view.MenuItem
 import com.squareup.picasso.Picasso
 import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessagesListAdapter
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures.Companion.deleteMeseges
@@ -28,7 +32,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
     protected lateinit var imageLoader: ImageLoader
     protected var messagesAdapter: MessagesListAdapter<Message>? = null
 
-    private var menu: Menu? = null
+    var menu: Menu? = null
     private var selectionCount: Int = 0
     private var lastLoadedDate: Date? = null
 
@@ -92,6 +96,69 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
             R.id.action_copy -> {
                 messagesAdapter!!.copySelectedMessagesText(this, messageStringFormatter, true)
                 AppUtils.showToast(this, R.string.copied_message, true)
+            }
+            R.id.action_1x -> {
+                CoreHBBFT.subscribeSession()
+                CoreHBBFT.afterSubscribeSession()
+
+                if(CoreHBBFT.mShowError) {
+                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        AlertDialog.Builder(DatabaseApplication.instance, android.R.style.Theme_Material_Dialog_Alert)
+                    } else {
+                        AlertDialog.Builder(DatabaseApplication.instance)
+                    }
+                    builder.setTitle("Error ")
+                        .setMessage("Dll Error")
+                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show()
+                }
+
+                CoreHBBFT.initConnectWithReset(this,true, false, false, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
+            }
+            R.id.action_2x -> {
+                CoreHBBFT.subscribeSession()
+                CoreHBBFT.afterSubscribeSession()
+
+                if(CoreHBBFT.mShowError) {
+                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        AlertDialog.Builder(DatabaseApplication.instance, android.R.style.Theme_Material_Dialog_Alert)
+                    } else {
+                        AlertDialog.Builder(DatabaseApplication.instance)
+                    }
+                    builder.setTitle("Error ")
+                        .setMessage("Dll Error")
+                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show()
+                }
+
+                CoreHBBFT.initConnectWithReset(this,true, true, false, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
+            }
+            R.id.action_3x -> {
+                CoreHBBFT.subscribeSession()
+                CoreHBBFT.afterSubscribeSession()
+
+                if(CoreHBBFT.mShowError) {
+                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        AlertDialog.Builder(DatabaseApplication.instance, android.R.style.Theme_Material_Dialog_Alert)
+                    } else {
+                        AlertDialog.Builder(DatabaseApplication.instance)
+                    }
+                    builder.setTitle("Error ")
+                        .setMessage("Dll Error")
+                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show()
+                }
+
+                CoreHBBFT.initConnectWithReset(this,true, true, true, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
             }
         }
         return true

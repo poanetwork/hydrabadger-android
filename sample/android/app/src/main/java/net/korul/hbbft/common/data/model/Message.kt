@@ -7,7 +7,7 @@ import java.util.*
 
 class Message(
     var id_: Long = 0,
-    private val id: String,
+    private var id: String,
     var idDialog: String,
     private var user: User,
     private var text: String?,
@@ -28,6 +28,10 @@ class Message(
 
     override fun getId(): String {
         return id
+    }
+
+    fun setId(id: String){
+        this.id = id
     }
 
     override fun getText(): String? {

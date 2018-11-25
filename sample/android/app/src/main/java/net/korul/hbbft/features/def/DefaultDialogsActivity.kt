@@ -8,6 +8,9 @@ import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.activity_default_dialogs.*
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.model.Dialog
@@ -16,8 +19,11 @@ import net.korul.hbbft.features.DemoDialogsActivity
 import net.korul.hbbft.features.holder.holders.dialogs.CustomDialogViewHolder
 import java.util.*
 
-class DefaultDialogsActivity : DemoDialogsActivity(), DateFormatter.Formatter {
-
+class DefaultDialogsActivity:
+    DemoDialogsActivity(),
+    DateFormatter.Formatter,
+    CoreHBBFTListener
+{
     private var dialogsList: DialogsList? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +35,8 @@ class DefaultDialogsActivity : DemoDialogsActivity(), DateFormatter.Formatter {
         addDialog.setOnClickListener {
             onAddDialog()
         }
+
+        CoreHBBFT.addListener(this)
     }
 
     override fun onResume() {
@@ -65,6 +73,14 @@ class DefaultDialogsActivity : DemoDialogsActivity(), DateFormatter.Formatter {
         super.dialogsAdapter!!.setDatesFormatter(this)
 
         dialogsList!!.setAdapter(super.dialogsAdapter)
+    }
+
+    override fun updateStateToOnline() {
+        menu!!.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+    }
+
+    override fun reciveMessage(you: Boolean, uid: String, mes: String) {
+
     }
 
     companion object {

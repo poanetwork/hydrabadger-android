@@ -20,27 +20,19 @@ class DialogsFixtures private constructor() {
                 return ArrayList(getAllDialog())
             }
 
-        fun setNewDialog(nameDialog: String, user: User, user2: User): Dialog {
+        fun setNewDialog(nameDialog: String, user: User): Dialog {
             val nextID = getNextDialogID()
 
             user.id_ = getNextUserID()
             user.idDialog = nextID
             user.id = user.id_.toString()
-            user.uid = "0"
             val duser = Conversations.getDUser(user)
             duser.insert()
 
-            user2.id_ = getNextUserID()
-            user2.id = user2.id_.toString()
-            user2.idDialog = nextID
-            val duser2 = Conversations.getDUser(user2)
-            duser2.insert()
-
             val users: MutableList<User> = arrayListOf()
             users.add(user)
-            users.add(user2)
-            val dialog = Dialog(nextID, nameDialog, user.avatar, ArrayList(users), null, 0)
 
+            val dialog = Dialog(nextID, nameDialog, user.avatar, ArrayList(users), null, 0)
             val ddialog = Conversations.getDDialog(dialog)
             ddialog.insert()
 

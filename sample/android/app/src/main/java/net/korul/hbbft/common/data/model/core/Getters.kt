@@ -77,6 +77,16 @@ object Getters {
         return Conversations.getUser(user!!)
     }
 
+    fun getUserbyUID(uid: String, idDialog: String): User? {
+        val user = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(uid))
+            .and(DUser_Table.idDialog.eq(idDialog))
+            .querySingle()
+
+        return Conversations.getUser(user!!)
+    }
+
     fun getDUser(id: Long): DUser {
         val user = Select()
             .from(DUser::class.java)

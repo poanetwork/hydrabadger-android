@@ -12,8 +12,7 @@
         android:layout_above="@+id/input"
         app:outcomingDefaultBubbleSelectedColor="@color/gray_dark_transparent"
         app:outcomingDefaultImageOverlayPressedColor="@color/black_10"
-        app:outcomingDefaultBubblePressedColor="@color/cornflower_blue_darkest"
-    />
+        app:outcomingDefaultBubblePressedColor="@color/cornflower_blue_darkest"/>
 
     <View
         android:layout_width="match_parent"
