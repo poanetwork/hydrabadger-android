@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
@@ -48,6 +49,9 @@ class DefaultMessagesActivity :
 {
     private var messagesList: MessagesList? = null
 
+    private var handlerMes = Handler()
+    private var handlerUpd = Handler()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default_messages)
@@ -76,7 +80,6 @@ class DefaultMessagesActivity :
         )
 
         CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
-
         mCurDialog = getDialog(mCurDialog!!.id)
 
         return true
@@ -98,9 +101,7 @@ class DefaultMessagesActivity :
 
     override fun hasContentFor(message: Message, type: Byte): Boolean {
         when (type) {
-            CONTENT_TYPE_VOICE -> return (message.voice != null
-                    && message.voice!!.url != null
-                    && !message.voice!!.url.isEmpty())
+            CONTENT_TYPE_VOICE -> return (message.voice != null && !message.voice!!.url.isEmpty())
         }
         return false
     }
@@ -109,42 +110,62 @@ class DefaultMessagesActivity :
         when (i) {
             0 ->  {
                 val mes = MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!)
-                mCurDialog = getDialog(mCurDialog!!.id)
                 messagesAdapter!!.addToStart(mes, true)
+
+                CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
+                mCurDialog = getDialog(mCurDialog!!.id)
             }
             1 -> {
                 val mes = MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!)
-                mCurDialog = getDialog(mCurDialog!!.id)
                 messagesAdapter!!.addToStart(mes, true)
+
+                CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
+                mCurDialog = getDialog(mCurDialog!!.id)
             }
         }
     }
 
     override fun updateStateToOnline() {
-        super.menu!!.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+        handlerUpd.postDelayed( {
+            progress.dismiss()
+            super.menu!!.findItem(R.id.action_online).icon =
+                    DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+            hideMenuHbbft()
+            super.invalidateOptionsMenu()
+        }, 0)
+    }
+
+    fun hideMenuHbbft() {
+        super.menu!!.findItem(R.id.action_1x).isVisible = false
+        super.menu!!.findItem(R.id.action_2x).isVisible = false
+        super.menu!!.findItem(R.id.action_3x).isVisible = false
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
-        if(mCurUser!!.uid != uid) {
-            var found = false
-            for (user in mCurDialog!!.users) {
-                if(user.uid == uid)
-                    found = true
-            }
-            if(!found) {
-                val id = getNextUserID()
-                val muser: User = User(id, uid, id.toString(), mCurDialog!!.id, "name${mCurDialog!!.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
-                mCurDialog!!.users.add(muser)
-                Conversations.getDUser(muser).insert()
-                Conversations.getDDialog(mCurDialog!!).update()
-            }
+        handlerMes.postDelayed({
+            if(!you) {
+                var found = false
+                for (user in mCurDialog!!.users) {
+                    if(user.uid == uid)
+                        found = true
+                }
+                if(!found) {
+                    val id = getNextUserID()
+                    val user = User(id, uid, id.toString(), mCurDialog!!.id, "name${mCurDialog!!.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                    mCurDialog!!.users.add(user)
+                    Conversations.getDUser(user).insert()
+                    Conversations.getDDialog(mCurDialog!!).update()
+                }
 
-            val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
+                val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
 
-            super.messagesAdapter!!.addToStart(
-                MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
-            )
-        }
+                super.messagesAdapter!!.addToStart(
+                    MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
+                )
+                super.messagesAdapter!!.notifyDataSetChanged()
+                mCurDialog = getDialog(mCurDialog!!.id)
+            }
+        }, 0)
     }
 
     private fun initAdapter() {

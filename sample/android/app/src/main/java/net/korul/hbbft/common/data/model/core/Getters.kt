@@ -96,6 +96,44 @@ object Getters {
         return user!!
     }
 
+    fun getDialogByRoomName(roomName: String): Dialog {
+        val ddialog = Select()
+            .from(DDialog::class.java)
+            .where(DDialog_Table.dialogName.eq(roomName) )
+            .querySingle()
+
+        if(ddialog != null) {
+            ddialog.lastMessage = Select()
+                .from(DMessage::class.java)
+                .where(DMessage_Table.id.eq(ddialog.lastMessageID))
+                .querySingle()
+
+            if (ddialog.lastMessage != null) {
+                val duser = Select()
+                    .from(DUser::class.java)
+                    .where(DUser_Table.id.eq(ddialog.lastMessage?.userID))
+                    .querySingle()
+
+                ddialog.lastMessage?.user = duser!!
+            }
+
+            ddialog.users.clear()
+            for (id in ddialog.usersIDs) {
+                val us = Select()
+                    .from(DUser::class.java)
+                    .where(DUser_Table.id.eq(id))
+                    .querySingle()
+
+                if (us != null)
+                    ddialog.users.add(
+                        us
+                    )
+            }
+        }
+
+        return Conversations.getDialog(ddialog!!)
+    }
+
     fun getDialog(id: String): Dialog {
         val ddialog = Select()
             .from(DDialog::class.java)

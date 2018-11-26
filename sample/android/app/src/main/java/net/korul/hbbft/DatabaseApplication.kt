@@ -1,11 +1,8 @@
 package net.korul.hbbft
 
 import android.app.Application
-import com.crashlytics.android.Crashlytics
-import com.google.firebase.FirebaseApp
 import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
-import io.fabric.sdk.android.Fabric
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 
 
@@ -19,8 +16,8 @@ class DatabaseApplication : Application() {
         super.onCreate()
         instance = this
         FlowManager.init(FlowConfig.Builder(this).build())
-        Fabric.with(this, Crashlytics())
-        FirebaseApp.initializeApp(this)
+//        Fabric.with(this, Crashlytics())
+//        FirebaseApp.initializeApp(this)
 
         val init = CoreHBBFT
 

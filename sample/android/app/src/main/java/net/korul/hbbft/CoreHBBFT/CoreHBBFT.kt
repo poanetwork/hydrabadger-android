@@ -66,7 +66,8 @@ object CoreHBBFT {
 
     private val listeners = ArrayList<CoreHBBFTListener?>()
 
-    private var mUpdateStateToOnline = false
+    var mUpdateStateToOnline = false
+    var mRoomName: String = ""
 
     // Used to load the 'native-lib' library on application startup.
     init {
@@ -161,34 +162,6 @@ object CoreHBBFT {
     }
 
     @SuppressLint("CheckResult")
-    fun resetConnectionByUid(context: Context, uniqueID: String) {
-        Observable.just(Optional(null))
-            .subscribeOn(Schedulers.newThread())
-            .doOnNext {
-                val arr: Array<String> = arrayOf(uniqueID)
-                ServerUtil.requestDeleteClient(arr)
-                ServerUtil.resetConnectOnServer(uniqueID, ipserver)
-            }
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-            }, { it ->
-                val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
-                } else {
-                    AlertDialog.Builder(context)
-                }
-                builder.setTitle("Error ")
-                    .setMessage(it.message)
-                    .setPositiveButton(android.R.string.yes) { dialog, _ ->
-                        dialog.cancel()
-                    }
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show()
-            })
-    }
-
-    @SuppressLint("CheckResult")
     fun initConnectWithReset(context: Context,
                              use1: Boolean,
                              use2: Boolean,
@@ -197,6 +170,8 @@ object CoreHBBFT {
                              uid2: String,
                              uid3: String,
                              roomName: String) {
+        mRoomName = roomName
+
         Observable.just(Optional(null))
             .subscribeOn(Schedulers.newThread())
             .doOnNext {
@@ -258,7 +233,7 @@ object CoreHBBFT {
                     thread1.start()
                 }
             }
-            .delay(1000, TimeUnit.MILLISECONDS)
+            .delay(10, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     val arr: Array<String> = arrayOf(uid2)
@@ -318,7 +293,7 @@ object CoreHBBFT {
                     thread2.start()
                 }
             }
-            .delay(1000, TimeUnit.MILLISECONDS)
+            .delay(10, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     val arr: Array<String> = arrayOf(uid3)
@@ -341,7 +316,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(100, TimeUnit.MILLISECONDS)
+            .delay(10, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     Log.d(TAG, "requestGetClient uniqueID3")

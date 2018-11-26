@@ -3,6 +3,7 @@ package net.korul.hbbft.features.def
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
@@ -10,11 +11,15 @@ import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.activity_default_dialogs.*
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
-import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
+import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
+import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.conversation.Conversations
+import net.korul.hbbft.common.data.model.core.Getters
+import net.korul.hbbft.common.data.model.core.Getters.getDialogByRoomName
 import net.korul.hbbft.features.DemoDialogsActivity
 import net.korul.hbbft.features.holder.holders.dialogs.CustomDialogViewHolder
 import java.util.*
@@ -25,6 +30,7 @@ class DefaultDialogsActivity:
     CoreHBBFTListener
 {
     private var dialogsList: DialogsList? = null
+    private var handlerMes = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,11 +82,34 @@ class DefaultDialogsActivity:
     }
 
     override fun updateStateToOnline() {
-        menu!!.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+//        menu!!.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
+        handlerMes.postDelayed({
+            if(!you) {
+                val roomName = CoreHBBFT.mRoomName
+                val dialog = getDialogByRoomName(roomName)
 
+                var found = false
+                for (user in dialog.users) {
+                    if(user.uid == uid)
+                        found = true
+                }
+                if(!found) {
+                    val id = Getters.getNextUserID()
+                    val user = User(id, uid, id.toString(), dialog.id, "name${dialog.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                    dialog.users.add(user)
+                    Conversations.getDUser(user).insert()
+                    Conversations.getDDialog(dialog).update()
+                }
+
+                val user = Getters.getUserbyUID(uid, dialog.id)
+                val mess =  MessagesFixtures.setNewMessage(mes, dialog, user!!)
+
+                onNewMessage(dialog.id, mess)
+            }
+        }, 0)
     }
 
     companion object {

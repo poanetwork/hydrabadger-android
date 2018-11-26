@@ -1,6 +1,7 @@
 package net.korul.hbbft.features
 
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -25,6 +26,8 @@ import net.korul.hbbft.common.utils.AppUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+
 abstract class DemoMessagesActivity : AppCompatActivity(),
     MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
@@ -38,6 +41,8 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 
     var mCurDialog: Dialog? = null
     var mCurUser: User? = null
+
+    lateinit var progress: ProgressDialog
 
     private val messageStringFormatter: MessagesListAdapter.Formatter<Message>
         get() = MessagesListAdapter.Formatter { message ->
@@ -61,9 +66,13 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 Picasso.with(this@DemoMessagesActivity).load(url).into(imageView)
             }
             catch (e: IllegalArgumentException) {
-
             }
         }
+
+        progress = ProgressDialog(this)
+        progress.setTitle("Connecting")
+        progress.setMessage("Wait while connecting...")
+        progress.setCancelable(false)
     }
 
     override fun onStart() {
@@ -80,7 +89,20 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         this.menu = menu
         menuInflater.inflate(R.menu.chat_actions_menu, menu)
         onSelectionChanged(0)
+
+        if(isNeedVilibleMenuHbbft()) {
+            menu.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+            hideMenuHbbft1()
+        }
+
+        super.onCreateOptionsMenu(menu)
         return true
+    }
+
+    fun hideMenuHbbft1() {
+        menu!!.findItem(R.id.action_1x).isVisible = false
+        menu!!.findItem(R.id.action_2x).isVisible = false
+        menu!!.findItem(R.id.action_3x).isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -98,14 +120,15 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 AppUtils.showToast(this, R.string.copied_message, true)
             }
             R.id.action_1x -> {
+                progress.show()
                 CoreHBBFT.subscribeSession()
                 CoreHBBFT.afterSubscribeSession()
 
                 if(CoreHBBFT.mShowError) {
                     val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(DatabaseApplication.instance, android.R.style.Theme_Material_Dialog_Alert)
+                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
                     } else {
-                        AlertDialog.Builder(DatabaseApplication.instance)
+                        AlertDialog.Builder(this)
                     }
                     builder.setTitle("Error ")
                         .setMessage("Dll Error")
@@ -119,14 +142,15 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 CoreHBBFT.initConnectWithReset(this,true, false, false, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
             }
             R.id.action_2x -> {
+                progress.show()
                 CoreHBBFT.subscribeSession()
                 CoreHBBFT.afterSubscribeSession()
 
                 if(CoreHBBFT.mShowError) {
                     val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(DatabaseApplication.instance, android.R.style.Theme_Material_Dialog_Alert)
+                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
                     } else {
-                        AlertDialog.Builder(DatabaseApplication.instance)
+                        AlertDialog.Builder(this)
                     }
                     builder.setTitle("Error ")
                         .setMessage("Dll Error")
@@ -140,14 +164,15 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 CoreHBBFT.initConnectWithReset(this,true, true, false, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
             }
             R.id.action_3x -> {
+                progress.show()
                 CoreHBBFT.subscribeSession()
                 CoreHBBFT.afterSubscribeSession()
 
                 if(CoreHBBFT.mShowError) {
                     val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(DatabaseApplication.instance, android.R.style.Theme_Material_Dialog_Alert)
+                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
                     } else {
-                        AlertDialog.Builder(DatabaseApplication.instance)
+                        AlertDialog.Builder(this)
                     }
                     builder.setTitle("Error ")
                         .setMessage("Dll Error")
@@ -183,6 +208,17 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         this.selectionCount = count
         menu!!.findItem(R.id.action_delete).isVisible = count > 0
         menu!!.findItem(R.id.action_copy).isVisible = count > 0
+
+        menu!!.findItem(R.id.action_1x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+        menu!!.findItem(R.id.action_2x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+        menu!!.findItem(R.id.action_3x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+//        invalidateOptionsMenu()
+    }
+
+
+
+    fun isNeedVilibleMenuHbbft(): Boolean {
+        return (CoreHBBFT.mUpdateStateToOnline && mCurDialog!!.dialogName == CoreHBBFT.mRoomName)
     }
 
     private fun loadMessages() {
@@ -205,7 +241,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
             catch (e: IndexOutOfBoundsException) {
                 e.printStackTrace()
             }
-        }, 1000)
+        }, 500)
     }
 
     companion object {
