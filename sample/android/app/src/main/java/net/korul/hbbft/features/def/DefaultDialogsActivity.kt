@@ -34,7 +34,12 @@ class DefaultDialogsActivity:
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_default_dialogs)
+        try {
+            setContentView(R.layout.activity_default_dialogs)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         dialogsList = findViewById<View>(R.id.dialogsList) as DialogsList
 
@@ -86,30 +91,37 @@ class DefaultDialogsActivity:
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
-        handlerMes.postDelayed({
-            if(!you) {
-                val roomName = CoreHBBFT.mRoomName
-                val dialog = getDialogByRoomName(roomName)
+        try {
+            handlerMes.postDelayed({
+                if(!you) {
+                    val roomName = CoreHBBFT.mRoomName
+                    val dialog = getDialogByRoomName(roomName)
 
-                var found = false
-                for (user in dialog.users) {
-                    if(user.uid == uid)
-                        found = true
-                }
-                if(!found) {
-                    val id = Getters.getNextUserID()
-                    val user = User(id, uid, id.toString(), dialog.id, "name${dialog.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
-                    dialog.users.add(user)
-                    Conversations.getDUser(user).insert()
+                    var found = false
+                    for (user in dialog.users) {
+                        if(user.uid == uid)
+                            found = true
+                    }
+                    if(!found) {
+                        val id = Getters.getNextUserID()
+                        val user = User(id, uid, id.toString(), dialog.id, "name${dialog.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                        dialog.users.add(user)
+                        Conversations.getDUser(user).insert()
+                    }
+
+                    val user = Getters.getUserbyUID(uid, dialog.id)
+                    val mess =  MessagesFixtures.setNewMessage(mes, dialog, user!!)
+
+                    dialog.unreadCount++
                     Conversations.getDDialog(dialog).update()
+
+                    onNewMessage(dialog.id, mess)
                 }
-
-                val user = Getters.getUserbyUID(uid, dialog.id)
-                val mess =  MessagesFixtures.setNewMessage(mes, dialog, user!!)
-
-                onNewMessage(dialog.id, mess)
-            }
-        }, 0)
+            }, 0)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     companion object {

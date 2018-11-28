@@ -187,7 +187,7 @@ object CoreHBBFT {
                     modelStun1 = connectToStun(uniqueID1, ipserver)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use1) {
                     Log.d(TAG, "requestInsertClient uniqueID1")
@@ -196,7 +196,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use1) {
                     Log.d(TAG, "requestGetClient uniqueID1")
@@ -233,7 +233,7 @@ object CoreHBBFT {
                     thread1.start()
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(300, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     val arr: Array<String> = arrayOf(uid2)
@@ -247,7 +247,7 @@ object CoreHBBFT {
                     modelStun2 = connectToStun(uniqueID2, ipserver.toString())
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     Log.d(TAG, "requestInsertClient uniqueID2")
@@ -256,7 +256,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     Log.d(TAG, "requestGetClient uniqueID2")
@@ -293,7 +293,7 @@ object CoreHBBFT {
                     thread2.start()
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(300, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     val arr: Array<String> = arrayOf(uid3)
@@ -307,7 +307,7 @@ object CoreHBBFT {
                     modelStun3 = connectToStun(uniqueID3, ipserver.toString())
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     Log.d(TAG, "requestInsertClient uniqueID3")
@@ -316,7 +316,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     Log.d(TAG, "requestGetClient uniqueID3")
@@ -390,7 +390,7 @@ object CoreHBBFT {
                     modelStun1 = connectToStun(uniqueID1, ipserver)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use1) {
                     Log.d(TAG, "requestInsertClient uniqueID1")
@@ -399,7 +399,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use1) {
                     Log.d(TAG, "requestGetClient uniqueID1")
@@ -436,14 +436,14 @@ object CoreHBBFT {
                     thread1.start()
                 }
             }
-            .delay(1000, TimeUnit.MILLISECONDS)
+            .delay(300, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     Log.d(TAG, "connectToStun uniqueID2")
                     modelStun2 = connectToStun(uniqueID2, ipserver.toString())
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     Log.d(TAG, "requestInsertClient uniqueID2")
@@ -452,7 +452,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use2) {
                     Log.d(TAG, "requestGetClient uniqueID2")
@@ -489,14 +489,14 @@ object CoreHBBFT {
                     thread2.start()
                 }
             }
-            .delay(1000, TimeUnit.MILLISECONDS)
+            .delay(300, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     Log.d(TAG, "connectToStun uniqueID3")
                     modelStun3 = connectToStun(uniqueID3, ipserver.toString())
                 }
             }
-            .delay(10, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     Log.d(TAG, "requestInsertClient uniqueID3")
@@ -505,7 +505,7 @@ object CoreHBBFT {
                     requestInsertClient(arr)
                 }
             }
-            .delay(100, TimeUnit.MILLISECONDS)
+            .delay(30, TimeUnit.MILLISECONDS)
             .doOnNext {
                 if (use3) {
                     Log.d(TAG, "requestGetClient uniqueID3")

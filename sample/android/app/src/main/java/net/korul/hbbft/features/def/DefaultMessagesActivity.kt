@@ -58,6 +58,8 @@ class DefaultMessagesActivity :
 
         val extraDialog = intent.getStringExtra("dialog")
         super.mCurDialog = Gson().fromJson(extraDialog, Dialog::class.java)
+        mCurDialog!!.unreadCount = 0
+        Conversations.getDDialog(mCurDialog!!).update()
 
         val extraUser = intent.getStringExtra("user")
         super.mCurUser = Gson().fromJson(extraUser, User::class.java)
@@ -126,13 +128,18 @@ class DefaultMessagesActivity :
     }
 
     override fun updateStateToOnline() {
-        handlerUpd.postDelayed( {
-            progress.dismiss()
-            super.menu!!.findItem(R.id.action_online).icon =
-                    DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
-            hideMenuHbbft()
-            super.invalidateOptionsMenu()
-        }, 0)
+        try {
+            handlerUpd.postDelayed( {
+                progress.dismiss()
+                super.menu!!.findItem(R.id.action_online).icon =
+                        DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+                hideMenuHbbft()
+                super.invalidateOptionsMenu()
+            }, 0)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun hideMenuHbbft() {
@@ -142,30 +149,35 @@ class DefaultMessagesActivity :
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
-        handlerMes.postDelayed({
-            if(!you) {
-                var found = false
-                for (user in mCurDialog!!.users) {
-                    if(user.uid == uid)
-                        found = true
-                }
-                if(!found) {
-                    val id = getNextUserID()
-                    val user = User(id, uid, id.toString(), mCurDialog!!.id, "name${mCurDialog!!.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
-                    mCurDialog!!.users.add(user)
-                    Conversations.getDUser(user).insert()
-                    Conversations.getDDialog(mCurDialog!!).update()
-                }
+        try {
+            handlerMes.postDelayed({
+                if(!you) {
+                    var found = false
+                    for (user in mCurDialog!!.users) {
+                        if(user.uid == uid)
+                            found = true
+                    }
+                    if(!found) {
+                        val id = getNextUserID()
+                        val user = User(id, uid, id.toString(), mCurDialog!!.id, "name${mCurDialog!!.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                        mCurDialog!!.users.add(user)
+                        Conversations.getDUser(user).insert()
+                        Conversations.getDDialog(mCurDialog!!).update()
+                    }
 
-                val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
+                    val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
 
-                super.messagesAdapter!!.addToStart(
-                    MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
-                )
-                super.messagesAdapter!!.notifyDataSetChanged()
-                mCurDialog = getDialog(mCurDialog!!.id)
-            }
-        }, 0)
+                    super.messagesAdapter!!.addToStart(
+                        MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
+                    )
+                    super.messagesAdapter!!.notifyDataSetChanged()
+                    mCurDialog = getDialog(mCurDialog!!.id)
+                }
+            }, 0)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun initAdapter() {
