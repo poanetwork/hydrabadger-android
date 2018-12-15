@@ -25,7 +25,7 @@ class DatabaseApplication : Application() {
         val init = CoreHBBFT
 
 
-        thread {
+//        thread {
 //            val r = AutoRefreshOperation()
 //            r.runSimulation()
 //            val r2 = AutoRefreshOperation2()
@@ -39,7 +39,7 @@ class DatabaseApplication : Application() {
 //            SaveStateTest.main(arrayOf())
 //            SaveStateTest2.main(arrayOf())
 //            SimpleMessageTest.main(arrayOf())
-        }
+//        }
 
 
 //        FlowManager.getDatabase(AppDatabase::class.java).reset(this)
