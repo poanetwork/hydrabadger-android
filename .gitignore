@@ -36,3 +36,7 @@ qtProj/clientInitConnect/clientInitConnect\.pro\.user
 qtProj/build-clientInitConnect-Desktop_Qt_5_11_2_GCC_64bit-Release/
 
 qtProj/build-Whatcher-Desktop_Qt_5_11_2_GCC_64bit-Debug/
+
+sample/android/app/\.idea/
+
+sample/android/\.idea/

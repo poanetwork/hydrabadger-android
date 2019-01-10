@@ -72,8 +72,9 @@ clear_on_drop = "0.2"
 
 [dependencies.hbbft]
 version = "*"
-git = "https://github.com/KORuL/hbbft.git"
-branch = "master"
+git = "https://github.com/poanetwork/hbbft"
+# branch = "master"
+rev = "ceb416a6"
 
 [profile.release]
 debug = true

@@ -15,7 +15,6 @@ import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -72,7 +71,7 @@ class DefaultMessagesActivity :
         input.setTypingListener(this)
         input.setAttachmentsListener(this)
 
-        CoreHBBFT.addListener(this)
+        DatabaseApplication.mCoreHBBFT.addListener(this)
     }
 
     override fun onSubmit(input: CharSequence): Boolean {
@@ -81,7 +80,7 @@ class DefaultMessagesActivity :
             mes, true
         )
 
-        CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
+        DatabaseApplication.mCoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
         mCurDialog = getDialog(mCurDialog!!.id)
 
         return true
@@ -114,14 +113,14 @@ class DefaultMessagesActivity :
                 val mes = MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
-                CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
+                DatabaseApplication.mCoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
                 mCurDialog = getDialog(mCurDialog!!.id)
             }
             1 -> {
                 val mes = MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
-                CoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
+                DatabaseApplication.mCoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
                 mCurDialog = getDialog(mCurDialog!!.id)
             }
         }

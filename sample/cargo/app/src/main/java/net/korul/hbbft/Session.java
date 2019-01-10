@@ -10,17 +10,17 @@ public final class Session {
     }
     private static native long init() ;
 
-    public final void send_message(int a0, @NonNull String a1)  {
+    public final void send_message(@NonNull String a0)  {
 
-        do_send_message(mNativeObj, a0, a1);
+        do_send_message(mNativeObj, a0);
     }
-    private static native void do_send_message(long me, int a0, String a1) ;
+    private static native void do_send_message(long me, String a0) ;
 
-    public final void start_node(@NonNull String a0, @NonNull String a1, @NonNull String a2)  {
+    public final void start_node(@NonNull String a0, @NonNull String a1)  {
 
-        do_start_node(mNativeObj, a0, a1, a2);
+        do_start_node(mNativeObj, a0, a1);
     }
-    private static native void do_start_node(long me, String a0, String a1, String a2) ;
+    private static native void do_start_node(long me, String a0, String a1) ;
 
     public final void subscribe(@NonNull MyObserver a0)  {
 
@@ -34,11 +34,11 @@ public final class Session {
     }
     private static native void do_after_subscribe(long me) ;
 
-    public final void change(int a0, boolean a1, @NonNull String a2, @NonNull String a3)  {
+    public final void change(boolean a0, @NonNull String a1, @NonNull String a2)  {
 
-        do_change(mNativeObj, a0, a1, a2, a3);
+        do_change(mNativeObj, a0, a1, a2);
     }
-    private static native void do_change(long me, int a0, boolean a1, String a2, String a3) ;
+    private static native void do_change(long me, boolean a0, String a1, String a2) ;
 
     public synchronized void delete() {
         if (mNativeObj != 0) {

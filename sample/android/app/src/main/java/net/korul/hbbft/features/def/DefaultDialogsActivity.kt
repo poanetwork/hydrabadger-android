@@ -9,8 +9,8 @@ import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.activity_default_dialogs.*
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
@@ -47,7 +47,7 @@ class DefaultDialogsActivity:
             onAddDialog()
         }
 
-        CoreHBBFT.addListener(this)
+        DatabaseApplication.mCoreHBBFT.addListener(this)
     }
 
     override fun onResume() {
@@ -94,7 +94,7 @@ class DefaultDialogsActivity:
         try {
             handlerMes.postDelayed({
                 if(!you) {
-                    val roomName = CoreHBBFT.mRoomName
+                    val roomName = DatabaseApplication.mCoreHBBFT.mRoomName
                     val dialog = getDialogByRoomName(roomName)
 
                     var found = false
