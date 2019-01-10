@@ -1,24 +1,26 @@
 //! A hydrabadger consensus node.
 //!
 
-#![allow(unused_imports, dead_code, unused_variables, unused_mut, unused_assignments,
-    unreachable_code)]
-
+use serde::de::DeserializeOwned;
+use super::{Error, Handler, StateDsct, StateMachine};
+use crate::peer::{PeerHandler, Peers};
+use crate::{
+    key_gen, BatchRx, Change, Contribution, EpochRx, EpochTx, InAddr, InternalMessage, InternalTx,
+    OutAddr, WireMessage, WireMessageKind, WireMessages, NodeId,
+    // android fix
+    Transaction,
+    //
+};
 use futures::{
     future::{self, Either},
     sync::mpsc,
 };
-use hbbft::{
-    crypto::{PublicKey, SecretKey},
-    dynamic_honey_badger::Input as DhbInput,
-};
+use hbbft::crypto::{PublicKey, SecretKey};
 use parking_lot::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard};
-use peer::{PeerHandler, Peers};
 use rand::{self, Rand};
-use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
-    net::{SocketAddr, ToSocketAddrs},
+    net::SocketAddr,
     sync::{
         atomic::{AtomicUsize, Ordering},
         Arc, Weak,
@@ -33,19 +35,11 @@ use tokio::{
     self,
     net::{TcpListener, TcpStream},
     prelude::*,
-    timer::{Interval, Delay},
+    timer::{Delay, Interval},
 };
-use {
-    Change, Contribution, InAddr, InternalMessage, InternalTx, OutAddr, Uid, WireMessage,
-    WireMessageKind, WireMessages, BatchRx, EpochTx, EpochRx,
-    // android fix
-    Transaction,
-    //
-};
-use super::{Error, Handler, StateMachine, State, StateDsct};
 
 // The number of random transactions to generate per interval.
-const DEFAULT_TXN_GEN_COUNT: usize = 1;
+const DEFAULT_TXN_GEN_COUNT: usize = 5;
 // The interval between randomly generated transactions.
 const DEFAULT_TXN_GEN_INTERVAL: u64 = 5000;
 // The number of bytes per randomly generated transaction.
@@ -92,31 +86,26 @@ impl Default for Config {
 /// The `Arc` wrapped portion of `Hydrabadger`.
 ///
 /// Shared all over the place.
-struct Inner<T: Contribution> {
-    /// Node uid:
-    uid: Uid,
+struct Inner<C: Contribution, N: NodeId> {
+    /// Node nid:
+    // nid: Uid,
+    nid: N,
     /// Incoming connection socket.
     addr: InAddr,
-
-
-    // android fix
-    addr_out: SocketAddr,
-    //
-
 
     /// This node's secret key.
     secret_key: SecretKey,
 
-    peers: RwLock<Peers<T>>,
+    peers: RwLock<Peers<C, N>>,
 
     /// The current state containing HB when connected.
-    state: RwLock<StateMachine<T>>,
+    state: RwLock<StateMachine<C, N>>,
 
     /// A reference to the last known state discriminant. May be stale when read.
     state_dsct_stale: Arc<AtomicUsize>,
 
     // TODO: Use a bounded tx/rx (find a sensible upper bound):
-    peer_internal_tx: InternalTx<T>,
+    peer_internal_tx: InternalTx<C, N>,
 
     /// The earliest epoch from which we have not yet received output.
     //
@@ -124,47 +113,41 @@ struct Inner<T: Contribution> {
     current_epoch: Mutex<u64>,
 
     // TODO: Create a separate type which uses a hashmap internally and allows
-    // for Tx removal. Altenratively just `Option` wrap Txs.
+    // for Tx removal. Alternatively just `Option` wrap Txs.
     epoch_listeners: RwLock<Vec<EpochTx>>,
 
     config: Config,
 }
 
 // android fix
-type CallbackBatch = fn(num: i32, its_me: bool, id: String, trans: String);
+type CallbackBatch = fn(its_me: bool, id: String, trans: String);
 //
 
 /// A `HoneyBadger` network node.
 #[derive(Clone)]
-pub struct Hydrabadger<T: Contribution> {
-    inner: Arc<Inner<T>>,
-    handler: Arc<Mutex<Option<Handler<T>>>>,
-    batch_rx: Arc<Mutex<Option<BatchRx<T>>>>,
+pub struct Hydrabadger<C: Contribution, N: NodeId> {
+    inner: Arc<Inner<C, N>>,
+    handler: Arc<Mutex<Option<Handler<C, N>>>>,
+    batch_rx: Arc<Mutex<Option<BatchRx<C, N>>>>,
 
     // android fix
     callbackbatch: CallbackBatch,
-    num: i32,
-    //
 }
 
-impl<T: Contribution> Hydrabadger<T> {
+impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> {
     /// Returns a new Hydrabadger node.
-    // pub fn new(addr: SocketAddr, cfg: Config) -> Self {
+    // pub fn new(addr: SocketAddr, cfg: Config, nid: N) -> Self {
     // android fix
-    pub fn new(addr: SocketAddr, addr_out: SocketAddr, cfg: Config, callbackbatch: CallbackBatch, num: i32) -> Self {
-        use chrono::Local;
-        use env_logger;
-        use std::env;
-
-        let uid = Uid::new();
-        let secret_key = SecretKey::rand(&mut rand::thread_rng());
+    pub fn new(addr: SocketAddr, cfg: Config, nid: N, callbackbatch: CallbackBatch) -> Self {
+        // let nid = Uid::new();
+        let secret_key = SecretKey::rand(&mut rand::OsRng::new().expect("Unable to create rng"));
 
         let (peer_internal_tx, peer_internal_rx) = mpsc::unbounded();
         let (batch_tx, batch_rx) = mpsc::unbounded();
 
         info!("");
         info!("Local Hydrabadger Node: ");
-        info!("    UID:             {}", uid);
+        info!("    UID:             {:?}", nid);
         info!("    Socket Address:  {}", addr);
         info!("    Public Key:      {:?}", secret_key.public_key());
 
@@ -178,15 +161,10 @@ impl<T: Contribution> Hydrabadger<T> {
         let state_dsct_stale = state.dsct.clone();
 
         let inner = Arc::new(Inner {
-            uid,
+            nid,
             addr: InAddr(addr),
-
-            // android fix
-            addr_out: addr_out,
-            //
-
             secret_key,
-            peers: RwLock::new(Peers::new()),
+            peers: RwLock::new(Peers::new(InAddr(addr))),
             state: RwLock::new(state),
             state_dsct_stale,
             peer_internal_tx,
@@ -199,45 +177,38 @@ impl<T: Contribution> Hydrabadger<T> {
             inner,
             handler: Arc::new(Mutex::new(None)),
             batch_rx: Arc::new(Mutex::new(Some(batch_rx))),
-
             // android fix
             callbackbatch,
-            num,
-            //
         };
 
-        // android fix
-        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, callbackbatch, num, InAddr(addr), InAddr(addr_out)));
-        //
-        // *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx));
+        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, callbackbatch, InAddr(addr)));
 
         hdb
     }
 
     // android fix
-    /// Returns a new Hydrabadger node.
-    // pub fn with_defaults(addr: SocketAddr) -> Self {
-    //     Hydrabadger::new(addr, Config::default())
+    // /// Returns a new Hydrabadger node.
+    // pub fn with_defaults(addr: SocketAddr, nid: N) -> Self {
+    //     Hydrabadger::new(addr, Config::default(), nid)
     // }
-    //
 
     /// Returns the pre-created handler.
-    pub fn handler(&self) -> Option<Handler<T>> {
+    pub fn handler(&self) -> Option<Handler<C, N>> {
         self.handler.lock().take()
     }
 
     /// Returns the batch output receiver.
-    pub fn batch_rx(&self) -> Option<BatchRx<T>> {
+    pub fn batch_rx(&self) -> Option<BatchRx<C, N>> {
         self.batch_rx.lock().take()
     }
 
     /// Returns a reference to the inner state.
-    pub fn state(&self) -> RwLockReadGuard<StateMachine<T>> {
+    pub fn state(&self) -> RwLockReadGuard<StateMachine<C, N>> {
         self.inner.state.read()
     }
 
     /// Returns a mutable reference to the inner state.
-    pub(crate) fn state_mut(&self) -> RwLockWriteGuard<StateMachine<T>> {
+    pub(crate) fn state_mut(&self) -> RwLockWriteGuard<StateMachine<C, N>> {
         self.inner.state.write()
     }
 
@@ -254,12 +225,12 @@ impl<T: Contribution> Hydrabadger<T> {
     }
 
     /// Returns a reference to the peers list.
-    pub fn peers(&self) -> RwLockReadGuard<Peers<T>> {
+    pub fn peers(&self) -> RwLockReadGuard<Peers<C, N>> {
         self.inner.peers.read()
     }
 
     /// Returns a mutable reference to the peers list.
-    pub(crate) fn peers_mut(&self) -> RwLockWriteGuard<Peers<T>> {
+    pub(crate) fn peers_mut(&self) -> RwLockWriteGuard<Peers<C, N>> {
         self.inner.peers.write()
     }
 
@@ -307,7 +278,7 @@ impl<T: Contribution> Hydrabadger<T> {
     }
 
     /// Sends a message on the internal tx.
-    pub(crate) fn send_internal(&self, msg: InternalMessage<T>) {
+    pub(crate) fn send_internal(&self, msg: InternalMessage<C, N>) {
         if let Err(err) = self.inner.peer_internal_tx.unbounded_send(msg) {
             error!(
                 "Unable to send on internal tx. Internal rx has dropped: {}",
@@ -318,10 +289,10 @@ impl<T: Contribution> Hydrabadger<T> {
     }
 
     /// Handles a incoming batch of user transactions.
-    pub fn propose_user_contribution(&self, txn: T) -> Result<(), Error> {
+    pub fn propose_user_contribution(&self, txn: C) -> Result<(), Error> {
         if self.is_validator() {
             self.send_internal(InternalMessage::hb_contribution(
-                self.inner.uid,
+                self.inner.nid.clone(),
                 OutAddr(*self.inner.addr),
                 txn,
             ));
@@ -332,10 +303,10 @@ impl<T: Contribution> Hydrabadger<T> {
     }
 
     /// Casts a vote for a change in the validator set or configuration.
-    pub fn vote_for(&self, change: Change) -> Result<(), Error> {
+    pub fn vote_for(&self, change: Change<N>) -> Result<(), Error> {
         if self.is_validator() {
             self.send_internal(InternalMessage::hb_vote(
-                self.inner.uid,
+                self.inner.nid.clone(),
                 OutAddr(*self.inner.addr),
                 change,
             ));
@@ -345,10 +316,22 @@ impl<T: Contribution> Hydrabadger<T> {
         }
     }
 
+    /// Begins a synchronous distributed key generation instance and returns a
+    /// stream which may be polled for events and messages.
+    pub fn new_key_gen_instance(&self) -> mpsc::UnboundedReceiver<key_gen::Message> {
+        let (tx, rx) = mpsc::unbounded();
+        self.send_internal(InternalMessage::new_key_gen_instance(
+            self.inner.nid.clone(),
+            OutAddr(*self.inner.addr),
+            tx,
+        ));
+        rx
+    }
+
     /// Returns a future that handles incoming connections on `socket`.
     fn handle_incoming(self, socket: TcpStream) -> impl Future<Item = (), Error = ()> {
         info!("Incoming connection from '{}'", socket.peer_addr().unwrap());
-        let wire_msgs = WireMessages::new(socket, self.inner.secret_key.clone(), self.clone());
+        let wire_msgs: WireMessages<C, N> = WireMessages::new(socket, self.inner.secret_key.clone());
 
         wire_msgs
             .into_future()
@@ -359,10 +342,10 @@ impl<T: Contribution> Hydrabadger<T> {
                 match msg_opt {
                     Some(msg) => match msg.into_kind() {
                         // The only correct entry point:
-                        WireMessageKind::HelloRequestChangeAdd(peer_uid, peer_in_addr, peer_pk) => {
+                        WireMessageKind::HelloRequestChangeAdd(peer_nid, peer_in_addr, peer_pk) => {
                             // Also adds a `Peer` to `self.peers`.
                             let peer_h = PeerHandler::new(
-                                Some((peer_uid, peer_in_addr, peer_pk)),
+                                Some((peer_nid.clone(), peer_in_addr, peer_pk)),
                                 self.clone(),
                                 w_messages,
                             );
@@ -371,7 +354,7 @@ impl<T: Contribution> Hydrabadger<T> {
                             peer_h
                                 .hdb()
                                 .send_internal(InternalMessage::new_incoming_connection(
-                                    peer_uid,
+                                    peer_nid.clone(),
                                     *peer_h.out_addr(),
                                     peer_in_addr,
                                     peer_pk,
@@ -403,13 +386,11 @@ impl<T: Contribution> Hydrabadger<T> {
         self,
         remote_addr: SocketAddr,
         local_sk: SecretKey,
-        pub_info: Option<(Uid, InAddr, PublicKey)>,
+        pub_info: Option<(N, InAddr, PublicKey)>,
         is_optimistic: bool,
     ) -> impl Future<Item = (), Error = ()> {
-        let uid = self.inner.uid;
+        let nid = self.inner.nid.clone();
         let in_addr = self.inner.addr;
-        // android fix
-        let in_addr_out = self.inner.addr_out;
 
         info!("Initiating outgoing connection to: {}", remote_addr);
 
@@ -418,15 +399,10 @@ impl<T: Contribution> Hydrabadger<T> {
             .and_then(move |socket| {
                 let local_pk = local_sk.public_key();
                 // Wrap the socket with the frame delimiter and codec:
-                let mut wire_msgs = WireMessages::new(socket, local_sk, self.clone());
-                // android fix
-                // let wire_hello_result = wire_msgs.send_msg(WireMessage::hello_request_change_add(
-                //     uid, in_addr, local_pk,
-                // ));     
+                let mut wire_msgs = WireMessages::new(socket, local_sk);
                 let wire_hello_result = wire_msgs.send_msg(WireMessage::hello_request_change_add(
-                    uid, InAddr(in_addr_out), local_pk,
+                    nid, in_addr, local_pk,
                 ));
-                //
                 match wire_hello_result {
                     Ok(_) => {
                         let peer = PeerHandler::new(pub_info, self.clone(), wire_msgs);
@@ -442,21 +418,24 @@ impl<T: Contribution> Hydrabadger<T> {
             })
             .map_err(move |err| {
                 if is_optimistic {
-                    warn!("Unable to connect to: {}", remote_addr);
+                    warn!(
+                        "Unable to connect to: {} ({e:?}: {e})",
+                        remote_addr,
+                        e = err
+                    );
                 } else {
-                    error!("Error connecting to: {} \n{:?}", remote_addr, err);
+                    error!("Error connecting to: {} ({e:?}: {e})", remote_addr, e = err);
                 }
             })
     }
 
-    fn generate_contributions(self,
-    // android fix
-    //  gen_txns: Option<fn(usize, usize) -> T>
-        gen_txns: Option<fn() -> T>
-    //
-    )
-        -> impl Future<Item = (), Error = ()>
-    {
+    fn generate_contributions(
+        self,
+        // gen_txns: Option<fn(usize, usize) -> C>,
+        // android fix
+        gen_txns: Option<fn() -> C>
+        //
+    ) -> impl Future<Item = (), Error = ()> {
         if let Some(gen_txns) = gen_txns {
             let epoch_stream = self.register_epoch_listener();
             let gen_delay = self.inner.config.txn_gen_interval;
@@ -470,6 +449,20 @@ impl<T: Contribution> Hydrabadger<T> {
                     let hdb = self.clone();
 
                     if let StateDsct::Validator = hdb.state_dsct_stale() {
+
+                        // android fix
+                        // let is_empty_ = is_empty();
+                        // if !is_empty_ {
+                            let txns = gen_txns();
+                            warn!("!! send_internal - {}", *hdb.inner.addr);
+                            hdb.send_internal(InternalMessage::hb_contribution(
+                                hdb.inner.nid.clone(),
+                                OutAddr(*hdb.inner.addr),
+                                txns,
+                            ));
+                        // }
+
+
                         // info!(
                         //     "Generating and inputting {} random transactions...",
                         //     self.inner.config.txn_gen_count
@@ -481,30 +474,16 @@ impl<T: Contribution> Hydrabadger<T> {
                         // );
 
                         // hdb.send_internal(InternalMessage::hb_contribution(
-                        //     hdb.inner.uid,
+                        //     hdb.inner.nid.clone(),
                         //     OutAddr(*hdb.inner.addr),
                         //     txns,
                         // ));
-
-                        // android fix
-                        // let is_empty_ = is_empty();
-                        // if !is_empty_ {
-                            let txns = gen_txns();
-                            warn!("!! send_internal {} - {}", self.num, *hdb.inner.addr);
-                            hdb.send_internal(InternalMessage::hb_contribution(
-                                hdb.inner.uid,
-                                OutAddr(*hdb.inner.addr),
-                                txns,
-                            ));
-                        // }
-
                     }
                     Ok(())
                 })
                 .map_err(|err| panic!("Contribution generation error: {:?}", err));
 
             Either::A(gen_cntrb)
-
         } else {
             Either::B(future::ok(()))
         }
@@ -554,9 +533,9 @@ impl<T: Contribution> Hydrabadger<T> {
     pub fn node(
         self,
         remotes: Option<HashSet<SocketAddr>>,
+        // gen_txns: Option<fn(usize, usize) -> C>,
         // android fix
-        // gen_txns: Option<fn(usize, usize) -> T>,
-        gen_txns: Option<fn() -> T>,
+        gen_txns: Option<fn() -> C>,
         //
     ) -> impl Future<Item = (), Error = ()> {
         let socket = TcpListener::bind(&self.inner.addr).unwrap();
@@ -577,10 +556,12 @@ impl<T: Contribution> Hydrabadger<T> {
         let local_sk = hdb.inner.secret_key.clone();
         let connect = future::lazy(move || {
             for &remote_addr in remotes.iter().filter(|&&ra| ra != hdb.inner.addr.0) {
-                tokio::spawn(
-                    hdb.clone()
-                        .connect_outgoing(remote_addr, local_sk.clone(), None, true),
-                );
+                tokio::spawn(hdb.clone().connect_outgoing(
+                    remote_addr,
+                    local_sk.clone(),
+                    None,
+                    true,
+                ));
             }
             Ok(())
         });
@@ -592,34 +573,6 @@ impl<T: Contribution> Hydrabadger<T> {
         let log_status = self.clone().log_status();
         let generate_contributions = self.clone().generate_contributions(gen_txns);
 
-
-        // let hdb = self.clone();
-
-        // thread::spawn(move || {
-        //     warn!("thread start");
-        //     loop { 
-        //         if(hdb.is_validator()) {
-        //             let txns = gen_txns.unwrap();
-        //             let tx = txns();
-        //             let tx_string = format!("{:?}", tx);
-
-        //             if tx_string != "[None]" {
-        //                 warn!("validator {}", self.num);
-        //                 warn!("!!tx {:?}", tx);
-        //                 // self.send_internal(InternalMessage::hb_input(
-        //                 //     self.inner.uid,
-        //                 //     OutAddr(*self.inner.addr),
-        //                 //     DhbInput::User(tx),
-        //                 // ));
-        //                 let res = hdb.propose_user_contribution(tx);
-        //                 warn!("!!res {:?}", res);
-        //             }
-        //         }
-        //         let ms = time::Duration::from_millis(100);
-        //         thread::sleep(ms);
-        //     }  
-        // }); 
-
         listen
             .join5(connect, hdb_handler, log_status, generate_contributions)
             .map(|(..)| ())
@@ -629,9 +582,9 @@ impl<T: Contribution> Hydrabadger<T> {
     pub fn run_node(
         self,
         remotes: Option<HashSet<SocketAddr>>,
+        // gen_txns: Option<fn(usize, usize) -> C>,
         // android fix
-        // gen_txns: Option<fn(usize, usize) -> T>,
-        gen_txns: Option<fn() -> T>,
+        gen_txns: Option<fn() -> C>,
     ) {
         tokio::run(self.node(remotes, gen_txns));
     }
@@ -640,15 +593,15 @@ impl<T: Contribution> Hydrabadger<T> {
         &self.inner.addr
     }
 
-    pub fn uid(&self) -> &Uid {
-        &self.inner.uid
+    pub fn node_id(&self) -> &N {
+        &self.inner.nid
     }
 
-    pub(super) fn secret_key(&self) -> &SecretKey {
+    pub fn secret_key(&self) -> &SecretKey {
         &self.inner.secret_key
     }
 
-    pub fn to_weak(&self) -> HydrabadgerWeak<T> {
+    pub fn to_weak(&self) -> HydrabadgerWeak<C, N> {
         HydrabadgerWeak {
             inner: Arc::downgrade(&self.inner),
             handler: Arc::downgrade(&self.handler),
@@ -657,18 +610,22 @@ impl<T: Contribution> Hydrabadger<T> {
     }
 }
 
-pub struct HydrabadgerWeak<T: Contribution> {
-    inner: Weak<Inner<T>>,
-    handler: Weak<Mutex<Option<Handler<T>>>>,
-    batch_rx: Weak<Mutex<Option<BatchRx<T>>>>,
+pub struct HydrabadgerWeak<C: Contribution, N: NodeId> {
+    inner: Weak<Inner<C, N>>,
+    handler: Weak<Mutex<Option<Handler<C, N>>>>,
+    batch_rx: Weak<Mutex<Option<BatchRx<C, N>>>>,
 }
 
-// impl<T: Contribution> HydrabadgerWeak<T> {
-//     pub fn upgrade(self) -> Option<Hydrabadger<T>> {
-//         self.inner.upgrade() .and_then(|inner| {
+// impl<C: Contribution, N: NodeId> HydrabadgerWeak<C, N> {
+//     pub fn upgrade(self) -> Option<Hydrabadger<C, N>> {
+//         self.inner.upgrade().and_then(|inner| {
 //             self.handler.upgrade().and_then(|handler| {
-//                 self.batch_rx.upgrade().and_then(|batch_rx|{
-//                     Some(Hydrabadger { inner, handler, batch_rx })
+//                 self.batch_rx.upgrade().and_then(|batch_rx| {
+//                     Some(Hydrabadger {
+//                         inner,
+//                         handler,
+//                         batch_rx,
+//                     })
 //                 })
 //             })
 //         })

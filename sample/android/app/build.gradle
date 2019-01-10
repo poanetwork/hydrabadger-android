@@ -23,9 +23,11 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         buildToolsVersion "28.0.3"
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 8
+        versionName "2.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -83,12 +85,13 @@ dependencies {
 
     // crashlytics
     implementation 'com.google.firebase:firebase-crash:16.2.1'
-    implementation 'com.google.firebase:firebase-core:16.0.5'
+    implementation 'com.google.firebase:firebase-core:16.0.6'
 
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
-        transitive = true;
+        transitive = true
     }
 
+    implementation 'com.android.support:multidex:1.0.3'
 
     //Picasso
     implementation "com.squareup.picasso:picasso:$picassoVersion"
@@ -108,6 +111,19 @@ dependencies {
     implementation "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
     implementation "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
     implementation "com.github.Raizlabs.DBFlow:dbflow-kotlinextensions:${dbflow_version}"
+
+    //
+    // nats
+    implementation 'io.nats:jnats:1.0'
+    //
+    // coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
+    //
+    // deepstream
+    implementation 'io.deepstream:deepstream.io-client-java:2.0.4'
+    //
+    // libjingle
+    implementation 'io.pristine:libjingle:11139@aar'
 }
 
 apply plugin: 'com.google.gms.google-services'

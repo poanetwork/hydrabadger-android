@@ -12,7 +12,6 @@ import android.view.MenuItem
 import com.squareup.picasso.Picasso
 import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessagesListAdapter
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
@@ -25,7 +24,6 @@ import net.korul.hbbft.common.data.model.core.Getters.setLastMessage
 import net.korul.hbbft.common.utils.AppUtils
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 
 abstract class DemoMessagesActivity : AppCompatActivity(),
@@ -120,70 +118,32 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 AppUtils.showToast(this, R.string.copied_message, true)
             }
             R.id.action_1x -> {
-                progress.show()
-                CoreHBBFT.subscribeSession()
-                CoreHBBFT.afterSubscribeSession()
+                try {
+                    progress.show()
+                    DatabaseApplication.mCoreHBBFT.subscribeSession()
+                    DatabaseApplication.mCoreHBBFT.afterSubscribeSession()
 
-                if(CoreHBBFT.mShowError) {
-                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                    } else {
-                        AlertDialog.Builder(this)
-                    }
-                    builder.setTitle("Error ")
-                        .setMessage("Dll Error")
-                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
-                            dialog.cancel()
+                    if(DatabaseApplication.mCoreHBBFT.mShowError) {
+                        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                        } else {
+                            AlertDialog.Builder(this)
                         }
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show()
-                }
-
-                CoreHBBFT.initConnectWithReset(this,true, false, false, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
-            }
-            R.id.action_2x -> {
-                progress.show()
-                CoreHBBFT.subscribeSession()
-                CoreHBBFT.afterSubscribeSession()
-
-                if(CoreHBBFT.mShowError) {
-                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                    } else {
-                        AlertDialog.Builder(this)
+                        builder.setTitle("Error ")
+                            .setMessage("Dll Error")
+                            .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                                dialog.cancel()
+                            }
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show()
                     }
-                    builder.setTitle("Error ")
-                        .setMessage("Dll Error")
-                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
-                            dialog.cancel()
-                        }
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show()
+
+                    DatabaseApplication.mCoreHBBFT.start_node(mCurDialog!!.dialogName)
                 }
-
-                CoreHBBFT.initConnectWithReset(this,true, true, false, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
-            }
-            R.id.action_3x -> {
-                progress.show()
-                CoreHBBFT.subscribeSession()
-                CoreHBBFT.afterSubscribeSession()
-
-                if(CoreHBBFT.mShowError) {
-                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                    } else {
-                        AlertDialog.Builder(this)
-                    }
-                    builder.setTitle("Error ")
-                        .setMessage("Dll Error")
-                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
-                            dialog.cancel()
-                        }
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show()
+                catch (e: Exception)
+                {
+                    e.printStackTrace()
                 }
-
-                CoreHBBFT.initConnectWithReset(this,true, true, true, CoreHBBFT.uniqueID1, CoreHBBFT.uniqueID2, CoreHBBFT.uniqueID3, mCurDialog!!.dialogName)
             }
         }
         return true
@@ -210,15 +170,15 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         menu!!.findItem(R.id.action_copy).isVisible = count > 0
 
         menu!!.findItem(R.id.action_1x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
-        menu!!.findItem(R.id.action_2x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
-        menu!!.findItem(R.id.action_3x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+        menu!!.findItem(R.id.action_2x).isVisible = false
+        menu!!.findItem(R.id.action_3x).isVisible = false
 //        invalidateOptionsMenu()
     }
 
 
 
     fun isNeedVilibleMenuHbbft(): Boolean {
-        return (CoreHBBFT.mUpdateStateToOnline && mCurDialog!!.dialogName == CoreHBBFT.mRoomName)
+        return (DatabaseApplication.mCoreHBBFT.mUpdateStateToOnline && mCurDialog!!.dialogName == DatabaseApplication.mCoreHBBFT.mRoomName)
     }
 
     private fun loadMessages() {
