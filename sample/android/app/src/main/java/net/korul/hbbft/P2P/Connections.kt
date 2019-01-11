@@ -1,8 +1,11 @@
 package ru.hintsolutions.myapplication2
 
 import android.content.Context
+import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import io.nats.client.Connection
+import net.korul.hbbft.DatabaseApplication
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
@@ -206,6 +209,14 @@ class Connections() {
 //            if(dataChannel!!.state() == DataChannel.State.OPEN) {
 //                DatabaseApplication.mCoreHBBFT.mUpdateStateToOnline = true
 //            }
+
+
+            //            if (dataChannel.state() == DataChannel.State.OPEN) {
+            //                String data = "from dataChannel to sendChannel";
+            //                ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+            //                dataChannel.send(new DataChannel.Buffer(buffer, false));
+            //            }
+
         }
 
         override fun onMessage(buffer: DataChannel.Buffer) {
@@ -217,7 +228,8 @@ class Connections() {
                 buffer.data.get(data)
 
                 Log.d(TAG, "Reciver ${data.size} bytes")
-                callback?.dataReceived(data)
+
+                callback?.dataReceived(myName!!, data)
             }
         }
     }

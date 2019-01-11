@@ -1,5 +1,5 @@
 package net.korul.hbbft.P2P
 
 interface INewUserInCon {
-    fun NewUser(uid: String)
+    fun NewUser(port: Int, uid: String)
 }

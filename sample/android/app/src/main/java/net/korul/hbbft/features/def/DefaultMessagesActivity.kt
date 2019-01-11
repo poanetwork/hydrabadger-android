@@ -80,7 +80,7 @@ class DefaultMessagesActivity :
             mes, true
         )
 
-        DatabaseApplication.mCoreHBBFT.sendMessage(mes.text.toString())
+        DatabaseApplication.mCoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
         mCurDialog = getDialog(mCurDialog!!.id)
 
         return true
@@ -113,14 +113,14 @@ class DefaultMessagesActivity :
                 val mes = MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
-                DatabaseApplication.mCoreHBBFT.sendMessage(mes.text.toString())
+                DatabaseApplication.mCoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
                 mCurDialog = getDialog(mCurDialog!!.id)
             }
             1 -> {
                 val mes = MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
-                DatabaseApplication.mCoreHBBFT.sendMessage(mes.text.toString())
+                DatabaseApplication.mCoreHBBFT.sendMessage(mCurUser!!.uid, mes.text.toString())
                 mCurDialog = getDialog(mCurDialog!!.id)
             }
         }
