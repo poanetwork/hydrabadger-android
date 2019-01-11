@@ -29,7 +29,7 @@ class CoreHBBFT: IGetData {
 
     lateinit var uniqueID1: String
 
-    private val TAG = "Hydrabadger"
+    private val TAG = "HYDRABADGERTAG"
 
     var session: Session? = null
 
@@ -70,7 +70,7 @@ class CoreHBBFT: IGetData {
         mSocketWrapper!!.initSocketWrapper(RoomName, uniqueID1)
 
         var strTosend = ""
-        for(clients in mSocketWrapper!!.clients) {
+        for(clients in mSocketWrapper!!.clientsBusyPorts) {
             if(clients.key != uniqueID1)
                 strTosend += "127.0.0.1:${clients.value};"
         }
@@ -81,7 +81,7 @@ class CoreHBBFT: IGetData {
             Thread.sleep(2000)
 
             session?.start_node(
-                    "127.0.0.1:${mSocketWrapper!!.mPortLoc}",
+                    "127.0.0.1:${mSocketWrapper!!.myLocalPort}",
                     strTosend
             )
         }
@@ -90,10 +90,11 @@ class CoreHBBFT: IGetData {
 
     fun Free() {
         mP2PMesh?.Free()
+        mSocketWrapper?.mAllStop = true
     }
 
-    override fun dataReceived(receiveFrom: String, bytes: ByteArray) {
-        mSocketWrapper?.sendToLocal(receiveFrom, bytes)
+    override fun dataReceived(bytes: ByteArray) {
+        mSocketWrapper?.sendReceivedDataToHydra(bytes)
     }
 
 
@@ -133,7 +134,7 @@ class CoreHBBFT: IGetData {
         }
     }
 
-    fun sendMessage(uid: String, str: String) {
+    fun sendMessage(str: String) {
         if(str.isNotEmpty()) {
             session?.send_message(str)
         }
