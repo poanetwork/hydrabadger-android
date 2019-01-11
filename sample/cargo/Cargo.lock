@@ -448,7 +448,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "hbbft"
 version = "0.1.0"
-source = "git+https://github.com/poanetwork/hbbft?rev=ceb416a6#ceb416a6e145a46898637377e05ded4422a1494e"
+source = "git+https://github.com/poanetwork/hbbft?rev=767944c0f6a69ef362d96a812a5282e2dbf3ac80#767944c0f6a69ef362d96a812a5282e2dbf3ac80"
 dependencies = [
  "bincode 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -499,7 +499,7 @@ dependencies = [
  "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
- "hbbft 0.1.0 (git+https://github.com/poanetwork/hbbft?rev=ceb416a6)",
+ "hbbft 0.1.0 (git+https://github.com/poanetwork/hbbft?rev=767944c0f6a69ef362d96a812a5282e2dbf3ac80)",
  "itertools 0.7.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "log-panics 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1664,7 +1664,7 @@ dependencies = [
 "checksum futures 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)" = "49e7653e374fe0d0c12de4250f0bdb60680b8c80eed558c5c7538eec9c89e21b"
 "checksum gcc 0.3.55 (registry+https://github.com/rust-lang/crates.io-index)" = "8f5f3913fa0bfe7ee1fd8248b6b9f42a5af4b9d65ec2dd2c3c26132b950ecfc2"
 "checksum glob 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)" = "8be18de09a56b60ed0edf84bc9df007e30040691af7acd1c41874faac5895bfb"
-"checksum hbbft 0.1.0 (git+https://github.com/poanetwork/hbbft?rev=ceb416a6)" = "<none>"
+"checksum hbbft 0.1.0 (git+https://github.com/poanetwork/hbbft?rev=767944c0f6a69ef362d96a812a5282e2dbf3ac80)" = "<none>"
 "checksum hex_fmt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "26f8338995cb8f0c6259c2a67692522bf16c5881176cada38dcd945376f7f88b"
 "checksum humantime 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0484fda3e7007f2a4a0d9c3a703ca38c71c54c55602ce4660c419fd32e188c9e"
 "checksum init_with 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0175f63815ce00183bf755155ad0cb48c65226c5d17a724e369c25418d2b7699"
