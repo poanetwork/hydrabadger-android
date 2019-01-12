@@ -5,6 +5,7 @@ import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import io.deepstream.DeepstreamClient
+import io.deepstream.ListChangedListener
 import io.nats.client.Connection
 import io.nats.client.ConnectionFactory
 import io.nats.client.Message
@@ -70,7 +71,9 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 return true
         }
         catch (e: Exception) {
-            Log.d(TAG, "P2PMesh initDeepStream catch exception")
+            val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
+            msg.obj = "DeepStream server not worked!"
+            handlerToast.sendMessage(msg)
 
             e.printStackTrace()
         }
@@ -108,20 +111,24 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                             continue
 
                         if (!mConnections.contains(user)) {
-                            val port = 2000 + users.entries.indexOf(user)
-                            callbackNewUser?.NewUser(port, user)
+                            callbackNewUser?.NewUser(user)
                             mConnections[ user ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
                         }
                     }
 
-                    lock.lock()
-                    for(name_ in mConnections.keys) {
-                        if(!users_.contains( name_ )) {
-                            mConnections[ name_ ]?.Free()
-                            mConnections.remove(name_)
+                    try {
+                        lock.lock()
+                        for(name_ in mConnections.keys) {
+                            if(!users_.contains( name_ )) {
+                                mConnections[ name_ ]?.Free()
+                                mConnections.remove(name_)
+                            }
                         }
+                        lock.unlock()
                     }
-                    lock.unlock()
+                    catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
@@ -133,8 +140,15 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     fun Free() {
         Log.d(TAG, "P2PMesh Free")
 
-        for (con in mConnections.values) {
-            con.Free()
+        try {
+            lock.lock()
+            for (con in mConnections.values) {
+                con?.Free()
+            }
+            lock.unlock()
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
         }
 
         for (roomName in roomNameList) {
@@ -156,7 +170,10 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 conNats
             }
             catch (e: Exception) {
-                e.printStackTrace()
+                val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
+                msg.obj = "Nats error - ${e.printStackTrace()}!"
+                handlerToast.sendMessage(msg)
+
                 null
             }
         }
@@ -171,11 +188,6 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val json2 = JSONObject(message)
             if(json2.getString("type") == "candidate") {
                 val uid = json2.getString("UID")
-
-                val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
-                msg.obj = "Message - set candidate to $uid"
-                handlerToast.sendMessage(msg)
-
                 val candidate = IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
                 mConnections[uid]?.peerConnection?.addIceCandidate(candidate)
             }

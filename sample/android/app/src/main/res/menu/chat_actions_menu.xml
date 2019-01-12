@@ -8,6 +8,12 @@
             android:title="@string/status"/>
 
     <item
+            android:id="@+id/clear"
+            android:icon="@drawable/clear"
+            app:showAsAction="always"
+            android:title="@string/clear"/>
+
+    <item
             android:id="@+id/action_1x"
             android:icon="@mipmap/ic_1x"
             app:showAsAction="always"

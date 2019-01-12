@@ -45,6 +45,7 @@ abstract class DemoDialogsActivity :
         menu.findItem(R.id.action_delete).isVisible = false
         menu.findItem(R.id.action_copy).isVisible = false
         menu.findItem(R.id.action_1x).isVisible = false
+        menu.findItem(R.id.clear).isVisible = false
         menu.findItem(R.id.action_2x).isVisible = false
         menu.findItem(R.id.action_3x).isVisible = false
         menu.findItem(R.id.action_online).isVisible = false
