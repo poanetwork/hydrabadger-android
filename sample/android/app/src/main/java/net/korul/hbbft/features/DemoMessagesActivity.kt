@@ -98,6 +98,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
     }
 
     fun hideMenuHbbft1() {
+        menu!!.findItem(R.id.clear).isVisible = false
         menu!!.findItem(R.id.action_1x).isVisible = false
         menu!!.findItem(R.id.action_2x).isVisible = false
         menu!!.findItem(R.id.action_3x).isVisible = false
@@ -116,6 +117,9 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
             R.id.action_copy -> {
                 messagesAdapter!!.copySelectedMessagesText(this, messageStringFormatter, true)
                 AppUtils.showToast(this, R.string.copied_message, true)
+            }
+            R.id.clear -> {
+                DatabaseApplication.mCoreHBBFT.neadClear(mCurDialog!!.dialogName)
             }
             R.id.action_1x -> {
                 try {
@@ -169,6 +173,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         menu!!.findItem(R.id.action_delete).isVisible = count > 0
         menu!!.findItem(R.id.action_copy).isVisible = count > 0
 
+        menu!!.findItem(R.id.clear)    .isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
         menu!!.findItem(R.id.action_1x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
         menu!!.findItem(R.id.action_2x).isVisible = false
         menu!!.findItem(R.id.action_3x).isVisible = false

@@ -1,16 +1,15 @@
 mod handler;
 mod hydrabadger;
+pub mod key_gen;
 mod state;
 
-use std;
-use bincode;
-use hbbft::{
-    dynamic_honey_badger::Error as DhbError,
-    sync_key_gen::Error as SyncKeyGenError,
-};
-use {Change, Message, Uid};
+use rand::Rand;
 use self::handler::Handler;
 use self::state::{State, StateMachine};
+use crate::{Change, Message};
+use bincode;
+use hbbft::{dynamic_honey_badger::Error as DhbError, sync_key_gen::Error as SyncKeyGenError};
+use std;
 
 pub use self::hydrabadger::{Config, Hydrabadger, HydrabadgerWeak};
 pub use self::state::StateDsct;
@@ -20,10 +19,10 @@ pub const WIRE_MESSAGE_RETRY_MAX: usize = 10;
 
 /// A HoneyBadger input or message.
 #[derive(Clone, Debug)]
-pub enum InputOrMessage<T> {
-    Change(Change),
+pub enum InputOrMessage<T, N: Ord + Rand> {
+    Change(Change<N>),
     Contribution(T),
-    Message(Uid, Message),
+    Message(N, Message<N>),
 }
 
 // TODO: Move this up to `lib.rs` or, preferably, create another error type
@@ -52,8 +51,8 @@ pub enum Error {
     VoteForNotValidator,
     #[fail(display = "Unable to transmit epoch status to listener, listener receiver dropped")]
     InstantiateHbListenerDropped,
-    #[fail(display = "Message received from unknown peer")]
-    MessageReceivedUnknownPeer,
+    #[fail(display = "Message received from unknown peer while attempting to verify")]
+    VerificationMessageReceivedUnknownPeer,
 }
 
 impl From<std::io::Error> for Error {
