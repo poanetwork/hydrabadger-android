@@ -15,8 +15,6 @@
     )
 )]
 
-
-
 // android fix
 #[cfg(target_os = "android")]
 extern crate android_logger;
@@ -28,7 +26,6 @@ mod android_c_headers;
 #[cfg(target_os = "android")]
 pub mod java_glue;
 ///
-
 
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
@@ -63,12 +60,10 @@ extern crate serde;
 extern crate serde_bytes;
 extern crate tokio_serde_bincode;
 
-
 // android fix
 use android_logger::Filter;
 use log::Level;
-// 
-
+//
 
 #[cfg(feature = "nightly")]
 use alloc_system::System;
@@ -101,16 +96,14 @@ use std::{
     net::SocketAddr,
     ops::Deref,
 
-    
     // android fix
-    sync::{
-        Arc,
-    },
+    sync::Arc,
     thread,
+    time,
 };
 
 // android fix
-use parking_lot::{Mutex};
+use parking_lot::Mutex;
 //
 
 use tokio::{
@@ -129,9 +122,6 @@ pub use crate::hydrabadger::Error;
 pub use crate::hydrabadger::StateDsct;
 pub use hbbft::dynamic_honey_badger::Batch;
 
-
-
-
 // android fix
 /// A transaction.
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Ord, PartialOrd, Debug, Clone)]
@@ -144,7 +134,7 @@ impl Transaction {
         let consonants = "bcdfghjk lmnpqrstvwxyz ";
         let mut result = String::new();
 
-        for _i in 0..len  {
+        for _i in 0..len {
             result.push(rand::sample(&mut rand::thread_rng(), consonants.chars(), 1)[0]);
         }
 
@@ -161,16 +151,12 @@ impl Transaction {
                     M_TEXT = None;
                     vec
                 }
-                None => {
-                    vec
-                }
+                None => vec,
             }
         }
     }
 }
 //
-
-
 
 /// Transmit half of the wire message channel.
 // TODO: Use a bounded tx/rx (find a sensible upper bound):
@@ -211,8 +197,7 @@ pub trait Contribution:
 
 impl<C> Contribution for C where
     C: HbbftContribution + Clone + Debug + Serialize + DeserializeOwned + 'static
-{
-}
+{}
 
 pub trait NodeId: NodeIdT + Serialize + DeserializeOwned + Rand + 'static {}
 
@@ -293,7 +278,11 @@ pub struct NetworkNodeInfo<N> {
     pub(crate) pk: PublicKey,
 }
 
-type ActiveNetworkInfo<N> = (Vec<NetworkNodeInfo<N>>, PublicKeySet, BTreeMap<N, PublicKey>);
+type ActiveNetworkInfo<N> = (
+    Vec<NetworkNodeInfo<N>>,
+    PublicKeySet,
+    BTreeMap<N, PublicKey>,
+);
 
 /// The current state of the network.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -554,7 +543,10 @@ impl<C: Contribution, N: NodeId> InternalMessage<C, N> {
     }
 
     /// Returns a new `InternalMessage` without a uid.
-    pub fn new_without_uid(src_addr: OutAddr, kind: InternalMessageKind<C, N>) -> InternalMessage<C, N> {
+    pub fn new_without_uid(
+        src_addr: OutAddr,
+        kind: InternalMessageKind<C, N>,
+    ) -> InternalMessage<C, N> {
         InternalMessage::new(None, src_addr, kind)
     }
 
@@ -641,12 +633,6 @@ impl<C: Contribution, N: NodeId> InternalMessage<C, N> {
     }
 }
 
-
-
-
-
-
-
 // android fix
 use std::collections::HashSet;
 
@@ -659,7 +645,7 @@ fn callback(its_me: bool, id: String, trans: String) {
         match M_SESSION_PTR {
             Some(ref mut x) => x.change(its_me, id, trans),
             None => panic!(),
-        } 
+        }
     }
 }
 
@@ -667,29 +653,32 @@ static mut M_SESSION_PTR: Option<&'static mut Session> = None;
 
 struct Session {
     observers: Vec<Box<OnEvent>>,
+    hydrabadger: Arc<Mutex<Option<Hydrabadger<std::vec::Vec<Option<Transaction>>, Uid>>>>,
 }
 
 impl Session {
     pub fn new() -> Session {
         android_logger::init_once(
-            Filter::default()
-                .with_min_level(Level::Trace), // limit log level
-            Some("HYDRABADGERTAG") // logs will show under mytag tag. If `None`, the crate name will be used
-        ); 
-           
+            Filter::default().with_min_level(Level::Trace), // limit log level
+            Some("HYDRABADGERTAG"), // logs will show under mytag tag. If `None`, the crate name will be used
+        );
+
         log_panics::init(); // log panics rather than printing them
         info!("init log system - done");
 
-        Session {  observers: Vec::new(), }
+        Session {
+            observers: Vec::new(),
+            hydrabadger: Arc::new(Mutex::new(None)),
+        }
     }
 
     fn subscribe(&mut self, cb: Box<OnEvent>) {
-        warn!("subscribe");
+        info!("subscribe");
         self.observers.push(cb);
     }
 
     pub fn after_subscribe(&'static mut self) {
-        warn!("!! after_subscribe");
+        info!("after_subscribe");
         unsafe {
             M_SESSION_PTR = Some(self);
         }
@@ -700,7 +689,7 @@ impl Session {
     pub fn send_message(&self, str1: String) {
         unsafe {
             let new_string = format!("{}!", str1);
-            warn!("!!send_message string: {:?}", new_string);
+            info!("!!send_message string: {:?}", new_string);
             M_TEXT = Some(new_string.clone());
         }
     }
@@ -713,43 +702,89 @@ impl Session {
     }
 
     pub fn start_node(&self, ipport_string_source: String, ipports_string_remote: String) {
-        let bind_address: SocketAddr = ipport_string_source.parse().expect("Unable to parse socket address bind_address");
-    
+        let bind_address: SocketAddr = ipport_string_source
+            .parse()
+            .expect("Unable to parse socket address bind_address");
+
         let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
         if !ipports_string_remote.is_empty() {
             let split = ipports_string_remote.split(";");
             for address in split {
-                remote_addresses.insert(address.parse().expect("Unable to parse socket address remote_addresses"));
+                remote_addresses.insert(
+                    address
+                        .parse()
+                        .expect("Unable to parse socket address remote_addresses"),
+                );
             }
         }
 
         let cfg = Config::default();
-         
-        let callback_ = callback;
+        let local_uid = Arc::new(Uid::new());
 
-        unsafe {
-            let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_));
+        *self.hydrabadger.lock() = Some(Hydrabadger::new(
+            bind_address,
+            cfg,
+            *local_uid.clone().deref(),
+        ));
 
-            let gen_txn = || {
-                (0..1)
-                    .map(|_| Transaction::get_tr())
-                    // .map(|_| Transaction::random(5))
-                    .collect::<Vec<_>>()
-            };
-            
-            match hbft {
-                Some(v) => {
-                    let gen_txn = || {
-                        (0..1)
-                            .map(|_| Transaction::get_tr())
-                            .collect::<Vec<_>>()
-                    };
+        let hdb = self.hydrabadger.lock().clone().unwrap();
+        // let gen_txn = || (0..1).map(|_| Transaction::get_tr()).collect::<Vec<_>>();
+        thread::spawn(move || {
+            // hdb.clone().run_node(Some(remote_addresses), Some(gen_txn));
+            hdb.clone().run_node(Some(remote_addresses), None);
+        });
 
-                    thread::spawn(move || {
-                        v.run_node(Some(remote_addresses), Some(gen_txn));
-                    });
-                },
-                None => {},
+        let one_sec = time::Duration::from_millis(1000);
+        thread::sleep(one_sec);
+
+        let batch_rx = self.hydrabadger.lock().take().unwrap().clone().batch_rx().unwrap();
+        tokio::spawn(batch_rx.for_each(move |batch| {
+            &Session::my_callback_function(batch, *local_uid.clone());
+            Ok(())
+        }));
+    }
+
+    pub fn send_transaction(&self, txn: String) {
+        let mut txn_: Option<Transaction> = None;
+        txn_ = Some(Transaction(txn.to_string()));
+
+        while self.hydrabadger.lock().clone().unwrap().is_validator() {
+            let ten_millis = time::Duration::from_millis(10);
+            thread::sleep(ten_millis);
+        }
+
+        match self.hydrabadger.lock().clone().unwrap().propose_user_contribution(vec![txn_])
+        {
+            Err(e) => {
+                warn!("send_transaction Error: {}", e.to_string());
+            }
+            _ => {
+                warn!("send_transaction success");
+            }
+        };
+    }
+
+    pub fn my_callback_function(
+        batch: hbbft::dynamic_honey_badger::Batch<std::vec::Vec<Option<Transaction>>, Uid>,
+        local_uid: Uid,
+    ) {
+        if !batch.is_empty() {
+            for (uid, int_contrib) in batch.contributions() {
+                if !int_contrib.is_empty() {
+                    let id_string = format!("{:?}", uid);
+                    let trans_string = format!("{:?}", int_contrib);
+
+                    if !trans_string.is_empty() {
+                        warn!("!!Future hydrabadger: {:?}, {:?}", id_string, trans_string);
+                        if local_uid == *uid {
+                            // call
+                            callback(true, id_string.clone(), trans_string.clone());
+                        } else {
+                            // call
+                            callback(false, id_string.clone(), trans_string.clone());
+                        }
+                    }
+                }
             }
         }
     }

@@ -21,10 +21,6 @@ use hbbft::{
 use std::{cell::RefCell, collections::HashMap};
 use tokio::{self, prelude::*};
 
-// android fix
-type CallbackBatch = fn(its_me: bool, id: String, trans: String);
-//
-
 /// Hydrabadger event (internal message) handler.
 pub struct Handler<C: Contribution, N: NodeId> {
     hdb: Hydrabadger<C, N>,
@@ -42,10 +38,7 @@ pub struct Handler<C: Contribution, N: NodeId> {
     key_gens: RefCell<HashMap<Uid, key_gen::Machine<N>>>,
 
 
-        // android fix
-    // callback Batch
-    callbackbatch: CallbackBatch,
-
+    // android fix
     addr: InAddr,
     //
 }
@@ -61,7 +54,7 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
         hdb: Hydrabadger<C, N>,
         peer_internal_rx: InternalRx<C, N>,
         batch_tx: BatchTx<C, N>,
-        callbackbatch: CallbackBatch, addr: InAddr,
+        addr: InAddr,
     ) 
     -> Handler<C, N> {
         Handler {
@@ -73,7 +66,6 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
             key_gens: RefCell::new(HashMap::new()),
 
             // android fix
-            callbackbatch,
             addr,
             //
         }
@@ -296,7 +288,7 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
                 }
 
                 // android fix
-                (self.callbackbatch)(true, "".to_string(), "".to_string());
+                // (self.callbackbatch)(true, "".to_string(), "".to_string());
                 //
 
                 for l in self.hdb.epoch_listeners().iter() {
@@ -704,26 +696,26 @@ impl<C: Contribution, N: NodeId> Future for Handler<C, N> {
                 // android fix
                 //TODO need compare on empty
                 // if !batch.is_empty() {
-                    for (uid, int_contrib) in batch.contributions() {
-                        let local_uid = self.hdb.node_id();
-                        //TODO need compare on empty
-                        // if !int_contrib.is_empty() {
-                            let id_string = format!("{:?}", uid);
-                            let trans_string = format!("{:?}", int_contrib);
+                    // for (uid, int_contrib) in batch.contributions() {
+                    //     let local_uid = self.hdb.node_id();
+                    //     //TODO need compare on empty
+                    //     // if !int_contrib.is_empty() {
+                    //         let id_string = format!("{:?}", uid);
+                    //         let trans_string = format!("{:?}", int_contrib);
                             
-                            if !trans_string.is_empty() {
-                                warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
-                                if local_uid == uid {
-                                    // call
-                                    (self.callbackbatch)(true, id_string.clone(), trans_string.clone());
-                                }
-                                else {
-                                    // call
-                                    (self.callbackbatch)(false, id_string.clone(), trans_string.clone());
-                                }
-                            }
-                        // }
-                    }
+                    //         if !trans_string.is_empty() {
+                    //             warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
+                    //             if local_uid == uid {
+                    //                 // call
+                    //                 (self.callbackbatch)(true, id_string.clone(), trans_string.clone());
+                    //             }
+                    //             else {
+                    //                 // call
+                    //                 (self.callbackbatch)(false, id_string.clone(), trans_string.clone());
+                    //             }
+                    //         }
+                    //     // }
+                    // }
                 // }
 
                 // TODO: Remove

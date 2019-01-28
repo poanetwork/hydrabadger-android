@@ -10,11 +10,11 @@ public final class Session {
     }
     private static native long init() ;
 
-    public final void send_message(@NonNull String a0)  {
+    public final void send_transaction(@NonNull String a0)  {
 
-        do_send_message(mNativeObj, a0);
+        do_send_transaction(mNativeObj, a0);
     }
-    private static native void do_send_message(long me, String a0) ;
+    private static native void do_send_transaction(long me, String a0) ;
 
     public final void start_node(@NonNull String a0, @NonNull String a1)  {
 

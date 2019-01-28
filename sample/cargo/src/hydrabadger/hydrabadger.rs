@@ -119,26 +119,19 @@ struct Inner<C: Contribution, N: NodeId> {
     config: Config,
 }
 
-// android fix
-type CallbackBatch = fn(its_me: bool, id: String, trans: String);
-//
-
 /// A `HoneyBadger` network node.
 #[derive(Clone)]
 pub struct Hydrabadger<C: Contribution, N: NodeId> {
     inner: Arc<Inner<C, N>>,
     handler: Arc<Mutex<Option<Handler<C, N>>>>,
     batch_rx: Arc<Mutex<Option<BatchRx<C, N>>>>,
-
-    // android fix
-    callbackbatch: CallbackBatch,
 }
 
 impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> {
     /// Returns a new Hydrabadger node.
     // pub fn new(addr: SocketAddr, cfg: Config, nid: N) -> Self {
     // android fix
-    pub fn new(addr: SocketAddr, cfg: Config, nid: N, callbackbatch: CallbackBatch) -> Self {
+    pub fn new(addr: SocketAddr, cfg: Config, nid: N) -> Self {
         // let nid = Uid::new();
         let secret_key = SecretKey::rand(&mut rand::OsRng::new().expect("Unable to create rng"));
 
@@ -148,7 +141,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
         info!("");
         info!("Local Hydrabadger Node: ");
         info!("    UID:             {:?}", nid);
-        info!("    Socket Address:  {}", addr);
+        info!("    Socket Address:  {}",  addr);
         info!("    Public Key:      {:?}", secret_key.public_key());
 
         warn!("");
@@ -177,11 +170,9 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
             inner,
             handler: Arc::new(Mutex::new(None)),
             batch_rx: Arc::new(Mutex::new(Some(batch_rx))),
-            // android fix
-            callbackbatch,
         };
 
-        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, callbackbatch, InAddr(addr)));
+        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, InAddr(addr)));
 
         hdb
     }
