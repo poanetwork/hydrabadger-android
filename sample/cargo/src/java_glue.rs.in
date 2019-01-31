@@ -13,7 +13,7 @@ foreigner_class!(class Session {
     self_type Session;
     constructor Session::new() -> Session;
 
-    method Session::send_transaction(&self, txn: String);
+    method Session::send_message(&self, str1: String);
 
     method Session::start_node(&self, ipport_string_source: String, ipports_string_remote: String);
 

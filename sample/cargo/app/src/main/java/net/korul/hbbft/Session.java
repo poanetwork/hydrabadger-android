@@ -10,11 +10,19 @@ public final class Session {
     }
     private static native long init() ;
 
+<<<<<<< HEAD
     public final void send_transaction(@NonNull String a0)  {
 
         do_send_transaction(mNativeObj, a0);
     }
     private static native void do_send_transaction(long me, String a0) ;
+=======
+    public final void send_message(int a0, @NonNull String a1)  {
+
+        do_send_message(mNativeObj, a0, a1);
+    }
+    private static native void do_send_message(long me, int a0, String a1) ;
+>>>>>>> parent of 2dc8e21... Revert "new features in hydrabadger"
 
     public final void start_node(@NonNull String a0, @NonNull String a1)  {
 
