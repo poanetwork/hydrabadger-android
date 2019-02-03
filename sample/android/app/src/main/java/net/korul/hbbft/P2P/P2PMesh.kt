@@ -1,18 +1,15 @@
-package ru.hintsolutions.myapplication2
+package net.korul.hbbft.P2P
 
 import android.content.Context
 import android.os.Handler
 import android.util.Log
 import android.widget.Toast
-import io.deepstream.DeepstreamClient
-import io.deepstream.ListChangedListener
 import io.nats.client.Connection
 import io.nats.client.ConnectionFactory
 import io.nats.client.Message
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import net.korul.hbbft.P2P.INewUserInCon
 import org.json.JSONObject
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
@@ -23,15 +20,12 @@ import java.util.concurrent.locks.ReentrantLock
 class P2PMesh(private val applicationContext: Context, private val callback: IGetData) {
     private var TAG = "HYDRABADGERTAG:P2PMesh"
 
-    var mDeepstreamClient: DeepstreamClient? = null
-
     var consNats: HashMap<String, Connection?> = hashMapOf()
     var mConnections: HashMap<String, Connections> = hashMapOf()
 
     var userName: MutableList<String?> = arrayListOf()
     var roomNameList: MutableList<String?> = arrayListOf()
 
-    var isInited = false
     val DISPLAY_UI_TOAST = 0
 
     private val lock = ReentrantLock()
@@ -53,97 +47,49 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         false
     })
 
-    init {
-        isInited = initDeepStream()
-    }
 
     fun setNewUserCallback(callback: INewUserInCon) {
         callbackNewUser = callback
     }
 
-    private fun initDeepStream(): Boolean {
-        try {
-            Log.d(TAG, "P2PMesh initDeepStream")
-
-            mDeepstreamClient = DeepstreamClient("62.176.10.54:6020/deepstream")
-            val loginResult = mDeepstreamClient?.login()
-            if(loginResult?.loggedIn() == true)
-                return true
-        }
-        catch (e: Exception) {
-            val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
-            msg.obj = "DeepStream server not worked!"
-            handlerToast.sendMessage(msg)
-
-            e.printStackTrace()
-        }
-        return false
-    }
-
-    fun clearAllUsersFromDataBase(roomName: String) {
-        val users = mDeepstreamClient?.record?.getList( "users:Room:$roomName")
-        try {
-            for (us in users!!.entries)
-                users.removeEntry( us )
-        }
-        catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     fun initOneMesh(roomName: String, UID: String) {
         try {
-            Log.d(TAG, "P2PMesh initOneMesh ${roomName} - roomName, ${UID} - UID")
+            Log.d(TAG, "P2PMesh initOneMesh $roomName - roomName, $UID - UID")
 
             roomNameList.add( roomName )
             userName.add( UID )
             consNats[UID] = initNatsSignalling(UID)
 
-            val users = mDeepstreamClient?.record?.getList( "users:Room:$roomName")
-            users?.removeEntry(UID)
-            users?.addEntry( UID )
-            users?.subscribe { _: String?, users_: Array<out String>? ->
-                if(users_ != null) {
-                    for(user in users_) {
-                        if( mConnections.contains(user))
-                            continue
-                        if( user == UID )
-                            continue
+            val nats = consNats[UID]
+            initNatsMeshInitiator(nats, UID, "users:Room:$roomName")
 
-                        if (!mConnections.contains(user)) {
-                            callbackNewUser?.NewUser(user)
-                            mConnections[ user ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
-                        }
-                    }
-
-                    try {
-                        lock.lock()
-                        for(name_ in mConnections.keys) {
-                            if(!users_.contains( name_ )) {
-                                mConnections[ name_ ]?.Free()
-                                mConnections.remove(name_)
-                            }
-                        }
-                        lock.unlock()
-                    }
-                    catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
         }
         catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun Free() {
-        Log.d(TAG, "P2PMesh Free")
+
+    fun publishAboutMe(roomName: String, UID: String) {
+        val json = JSONObject()
+        val message: String
+
+        json.put("type", "addUser")
+        json.put("user", UID)
+
+        message = json.toString()
+
+        consNats[UID]?.publish("users:Room:$roomName", message.toByteArray(StandardCharsets.UTF_8))
+    }
+
+    fun FreeConnect() {
+        Log.d(TAG, "P2PMesh FreeConnect")
 
         try {
             lock.lock()
             for (con in mConnections.values) {
-                con?.Free()
+                con.FreeConnect()
             }
             lock.unlock()
         }
@@ -155,9 +101,57 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             if(roomName.isNullOrEmpty())
                 continue
 
-            val users = mDeepstreamClient?.record?.getList( "users:Room:$roomName")
-            for (user in userName)
-                users?.removeEntry( user )
+            for (user in userName) {
+                val json = JSONObject()
+                val message: String
+
+                json.put("type", "deleteUser")
+                json.put("user", user)
+
+                message = json.toString()
+
+                consNats[user]?.publish("users:Room:$roomName", message.toByteArray(StandardCharsets.UTF_8))
+            }
+        }
+    }
+
+    fun initNatsMeshInitiator(nats: Connection?, UID: String, roomName: String) {
+        nats!!.subscribe(roomName) { msg: Message? ->
+            if (msg == null)
+                return@subscribe
+
+            val message = String(msg.data, StandardCharsets.UTF_8)
+            val json2 = JSONObject(message)
+
+            if (json2.getString("type") == "addUser") {
+                val user = json2.getString("user")
+                if( mConnections.contains(user))
+                    return@subscribe
+                if( user == UID )
+                    return@subscribe
+
+                if (!mConnections.contains(user)) {
+                    callbackNewUser?.NewUser(user)
+                    mConnections[ user ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
+                }
+            }
+            else if (json2.getString("type") == "deleteUser") {
+                try {
+                    val user = json2.getString("user")
+
+                    lock.lock()
+                    for(name_ in mConnections.keys) {
+                        if(user == name_) {
+                            mConnections[ user ]?.FreeConnect()
+                            mConnections.remove(user)
+                        }
+                    }
+                    lock.unlock()
+                }
+                catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
 
@@ -166,7 +160,10 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
         val async = GlobalScope.async {
             try {
-                val conNats = ConnectionFactory("nats://62.176.10.54:4222").createConnection()
+                val strUrls: MutableList<String> = arrayListOf()
+                strUrls.add("nats://62.176.10.54:4222")
+                strUrls.add("nats://108.61.190.95:4222")
+                val conNats = ConnectionFactory(strUrls.toTypedArray()).createConnection()
                 conNats
             }
             catch (e: Exception) {
