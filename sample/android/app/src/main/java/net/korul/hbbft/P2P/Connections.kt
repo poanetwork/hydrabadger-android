@@ -1,8 +1,9 @@
-package ru.hintsolutions.myapplication2
+package net.korul.hbbft.P2P
 
 import android.content.Context
 import android.util.Log
 import io.nats.client.Connection
+import net.korul.hbbft.DatabaseApplication
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
@@ -35,7 +36,8 @@ class Connections() {
     var mIamReadyToDataTranfer = false
 
     constructor(context: Context, publishto: String, myName_: String,
-                conNats_: Connection, initiator: Boolean, callback_: IGetData) : this()
+                conNats_: Connection, initiator: Boolean, callback_: IGetData
+    ) : this()
     {
         publishTo = publishto
         myName = myName_
@@ -45,6 +47,9 @@ class Connections() {
         iceServers.add(PeerConnection.IceServer("stun:stun.l.google.com:19302"))
         iceServers.add(PeerConnection.IceServer("stun:62.176.10.54:3478"))
         iceServers.add(PeerConnection.IceServer("turn:62.176.10.54:3478", "test1", "test1"))
+
+        iceServers.add(PeerConnection.IceServer("stun:108.61.190.95:3478"))
+        iceServers.add(PeerConnection.IceServer("turn:108.61.190.95:3478", "test1", "test1"))
 
         Log.d(TAG, if (PeerConnectionFactory.initializeAndroidGlobals(context, true, true, true))
             "Success initAndroidGlobals"
@@ -62,7 +67,7 @@ class Connections() {
         mInited = true
     }
 
-    fun Free() {
+    fun FreeConnect() {
         if (dataChannel != null) {
             dataChannel!!.close()
             dataChannel!!.unregisterObserver()
@@ -207,7 +212,6 @@ class Connections() {
 
             if(dataChannel!!.state() == DataChannel.State.OPEN) {
                 mIamReadyToDataTranfer = true
-//                DatabaseApplication.mCoreHBBFT.mUpdateStateToOnline = true
             }
         }
 

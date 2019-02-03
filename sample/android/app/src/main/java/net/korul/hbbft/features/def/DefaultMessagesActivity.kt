@@ -142,7 +142,7 @@ class DefaultMessagesActivity :
     }
 
     fun hideMenuHbbft() {
-        super.menu!!.findItem(R.id.clear)    .isVisible = false
+//        super.menu!!.findItem(R.id.clear)    .isVisible = false
         super.menu!!.findItem(R.id.action_1x).isVisible = false
         super.menu!!.findItem(R.id.action_2x).isVisible = false
         super.menu!!.findItem(R.id.action_3x).isVisible = false

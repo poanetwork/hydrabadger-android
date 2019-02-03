@@ -7,9 +7,9 @@ import android.util.Log
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.Session
 import net.korul.hbbft.services.ClosingService
-import ru.hintsolutions.myapplication2.IGetData
-import ru.hintsolutions.myapplication2.P2PMesh
-import ru.hintsolutions.myapplication2.SocketWrapper
+import net.korul.hbbft.P2P.IGetData
+import net.korul.hbbft.P2P.P2PMesh
+import net.korul.hbbft.P2P.SocketWrapper
 import java.util.*
 
 interface CoreHBBFTListener {
@@ -64,7 +64,24 @@ class CoreHBBFT: IGetData {
 
         mP2PMesh?.initOneMesh(RoomName, uniqueID1)
 
-        mSocketWrapper!!.initSocketWrapper(RoomName, uniqueID1)
+        mP2PMesh?.publishAboutMe(RoomName, uniqueID1)
+
+        var ready = false
+        while (!ready) {
+            ready = true
+            Thread.sleep(1000)
+            for(con in mP2PMesh?.mConnections!!.values) {
+                if(con.mIamReadyToDataTranfer) {
+                    ready = true
+                }
+                else {
+                    ready = false
+                    break
+                }
+            }
+        }
+
+        mSocketWrapper!!.initSocketWrapper(RoomName, uniqueID1, mP2PMesh!!.mConnections.keys.toList())
 
         var strTosend = ""
         for(clients in mSocketWrapper!!.clientsBusyPorts) {
@@ -73,18 +90,6 @@ class CoreHBBFT: IGetData {
         }
         if (strTosend.endsWith(";"))
             strTosend = strTosend.substring(0, strTosend.length - 1)
-
-        var ready = false
-        while (!ready) {
-            ready = true
-            Thread.sleep(1000)
-            for(con in mP2PMesh?.mConnections!!.values) {
-                if(!con.mIamReadyToDataTranfer) {
-                    ready = false
-                    break
-                }
-            }
-        }
 
         thread = Thread {
             session?.start_node(
@@ -95,13 +100,8 @@ class CoreHBBFT: IGetData {
         thread!!.start()
     }
 
-    fun neadClear(RoomName: String) {
-        Log.d(TAG, "clear users from deepstream")
-        mP2PMesh?.clearAllUsersFromDataBase(RoomName)
-    }
-
     fun Free() {
-        mP2PMesh?.Free()
+        mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
     }
 

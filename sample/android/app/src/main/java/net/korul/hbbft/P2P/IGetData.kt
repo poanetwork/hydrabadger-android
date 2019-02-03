@@ -1,4 +1,4 @@
-package ru.hintsolutions.myapplication2
+package net.korul.hbbft.P2P
 import java.nio.ByteBuffer
 
 interface IGetData {

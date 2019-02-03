@@ -1,16 +1,18 @@
-package ru.hintsolutions.myapplication2
+package net.korul.hbbft.P2P
 
 import android.util.Base64
 import android.util.Log
-import net.korul.hbbft.P2P.INewUserInCon
 import org.json.JSONObject
 import org.webrtc.DataChannel
+import java.math.BigInteger
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.locks.ReentrantLock
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import kotlin.concurrent.thread
+import kotlin.experimental.and
 
 class SocketWrapper: INewUserInCon {
     private var TAG = "HYDRABADGERTAG:SocketWrapper"
@@ -29,6 +31,8 @@ class SocketWrapper: INewUserInCon {
 
     var mAllStop = false
 
+    var inc = 1
+
 //    private val lock = ReentrantLock()
 
     lateinit var mRoomName: String
@@ -43,17 +47,29 @@ class SocketWrapper: INewUserInCon {
         addUser(uid)
     }
 
-    fun initSocketWrapper(roomName: String, myUID_: String) {
+    fun initSocketWrapper(roomName: String, myUID_: String, users: List<String>) {
         Log.d(TAG, "SocketWrapper initSocketWrapper ${roomName} - roomName, ${myUID_} - myUID")
 
         myUID = myUID_
         mRoomName = roomName
-        val users = mP2PMesh?.mDeepstreamClient?.record?.getList( "users:Room:$mRoomName")
-        myLocalPort = 2000 + users!!.entries.indexOf(myUID)
+        var port: BigInteger
+        try {
+            val digest = MessageDigest.getInstance("SHA1")
+            digest.update(myUID_.toByteArray())
+            val output = digest.digest()
+            val hex = output.joinToString("") { String.format("%02X", (it.toInt() and 0xFF)) }
+
+            port = hex.toBigInteger(16)
+        } catch (e: Exception) {
+            port = inc.toBigInteger()
+            inc++
+            println("SHA1 not implemented in this system")
+        }
+
+        myLocalPort = (2000 + CongruentPseudoGen(port))
         clientsBusyPorts[myUID] = myLocalPort
 
-        val clientsUIDs =  users.entries
-        for (uid in clientsUIDs) {
+        for (uid in users) {
             if(uid == myUID)
                 break
 
@@ -61,14 +77,35 @@ class SocketWrapper: INewUserInCon {
         }
     }
 
-    private fun addUser(uid: String) {
-        val users = mP2PMesh?.mDeepstreamClient?.record?.getList( "users:Room:$mRoomName")
-        val port = 2000 + users!!.entries.indexOf(uid)
+    private fun CongruentPseudoGen(x: BigInteger): Int {
+        val a: BigInteger = 1664525.toBigInteger()
+        val c: BigInteger  = 1013904223.toBigInteger()
+        val m: BigInteger  = (Math.pow(2.0, 15.0)-1).toInt().toBigInteger()
 
-        if(!clientsBusyPorts.values.contains(port)) {
-            Log.d(TAG, "SocketWrapper addUser ${port} - port, ${uid} - uid")
-            clientsBusyPorts[uid] = port
-            startPseudoNotLocalSocketALoop(uid, port)
+        return (((a * x) + c)%m).toInt()
+    }
+
+    private fun addUser(uid: String) {
+        var port: BigInteger
+        try {
+            val digest = MessageDigest.getInstance("SHA1")
+            digest.update(uid.toByteArray())
+            val output = digest.digest()
+            val hex = output.joinToString("") { String.format("%02X", (it.toInt() and 0xFF)) }
+
+            port = hex.toBigInteger(16)
+        } catch (e: Exception) {
+            port = inc.toBigInteger()
+            inc++
+            println("SHA1 not implemented in this system")
+        }
+
+        val port1 = 2000 + CongruentPseudoGen(port)
+
+        if(!clientsBusyPorts.values.contains(port1)) {
+            Log.d(TAG, "SocketWrapper addUser ${port1} - port, ${uid} - uid")
+            clientsBusyPorts[uid] = port1
+            startPseudoNotLocalSocketALoop(uid, port1)
         }
     }
 
@@ -86,7 +123,6 @@ class SocketWrapper: INewUserInCon {
         while (mLocalALoopSocket[uid] == null && mPseudoNotLocalSocket[uid] == null)
             Thread.sleep(10)
 
-//        lock.lock()
         if (mPseudoNotLocalSocket[uid] != null) {
             val socket = mPseudoNotLocalSocket[uid]
             val dout = socket?.getOutputStream()
@@ -106,7 +142,6 @@ class SocketWrapper: INewUserInCon {
             dout?.write(bytes)
             dout?.flush()
         }
-//        lock.unlock()
     }
 
     fun startPseudoNotLocalSocketALoop(uid: String, port: Int) {
@@ -119,7 +154,6 @@ class SocketWrapper: INewUserInCon {
                 val din = clientSocket.getInputStream()
                 val bytesnum = din.available()
                 if(bytesnum > 0) {
-//                    lock.lock()
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
 
@@ -138,7 +172,6 @@ class SocketWrapper: INewUserInCon {
 
                         mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
                     }
-//                    lock.unlock()
                 }
                 else
                     Thread.sleep(10)
@@ -153,7 +186,6 @@ class SocketWrapper: INewUserInCon {
                 val din = mLocalALoopSocket[uid]?.getInputStream()
                 val bytesnum = din?.available()
                 if (bytesnum!! > 0) {
-//                    lock.lock()
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
 
@@ -172,7 +204,6 @@ class SocketWrapper: INewUserInCon {
 
                         mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
                     }
-//                    lock.unlock()
                 }
                 else
                     Thread.sleep(10)
