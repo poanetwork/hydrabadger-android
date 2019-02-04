@@ -60,10 +60,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             roomNameList.add( roomName )
             userName.add( UID )
             consNats[UID] = initNatsSignalling(UID)
-
-            val nats = consNats[UID]
-            initNatsMeshInitiator(nats, UID, "users:Room:$roomName")
-
+            initNatsMeshInitiator(consNats[UID], UID, "users:Room:$roomName")
         }
         catch (e: Exception) {
             e.printStackTrace()
@@ -73,12 +70,10 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
     fun publishAboutMe(roomName: String, UID: String) {
         val json = JSONObject()
-        val message: String
-
         json.put("type", "addUser")
         json.put("user", UID)
 
-        message = json.toString()
+        val message = json.toString()
 
         consNats[UID]?.publish("users:Room:$roomName", message.toByteArray(StandardCharsets.UTF_8))
     }
@@ -156,7 +151,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     }
 
     private fun initNatsSignalling(listenFrom: String): Connection {
-        Log.d(TAG, "P2PMesh initNatsSignalling ${listenFrom} - listenFrom")
+        Log.d(TAG, "P2PMesh initNatsSignalling $listenFrom - listenFrom")
 
         val async = GlobalScope.async {
             try {

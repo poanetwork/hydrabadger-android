@@ -11,6 +11,7 @@ import net.korul.hbbft.P2P.IGetData
 import net.korul.hbbft.P2P.P2PMesh
 import net.korul.hbbft.P2P.SocketWrapper
 import java.util.*
+import kotlin.concurrent.thread
 
 interface CoreHBBFTListener {
     fun updateStateToOnline()
@@ -37,8 +38,6 @@ class CoreHBBFT: IGetData {
 
     private val listeners = ArrayList<CoreHBBFTListener?>()
 
-    var thread: Thread? = null
-
     var mUpdateStateToOnline = false
     var mRoomName: String = ""
 
@@ -63,7 +62,6 @@ class CoreHBBFT: IGetData {
         mRoomName = RoomName
 
         mP2PMesh?.initOneMesh(RoomName, uniqueID1)
-
         mP2PMesh?.publishAboutMe(RoomName, uniqueID1)
 
         var ready = false
@@ -83,21 +81,20 @@ class CoreHBBFT: IGetData {
 
         mSocketWrapper!!.initSocketWrapper(RoomName, uniqueID1, mP2PMesh!!.mConnections.keys.toList())
 
-        var strTosend = ""
-        for(clients in mSocketWrapper!!.clientsBusyPorts) {
-            if(clients.key != uniqueID1)
-                strTosend += "127.0.0.1:${clients.value};"
-        }
-        if (strTosend.endsWith(";"))
-            strTosend = strTosend.substring(0, strTosend.length - 1)
+        thread {
+            var strTosend = ""
+            for(clients in mSocketWrapper!!.clientsBusyPorts) {
+                if(clients.key != uniqueID1)
+                    strTosend += "127.0.0.1:${clients.value};"
+            }
+            if (strTosend.endsWith(";"))
+                strTosend = strTosend.substring(0, strTosend.length - 1)
 
-        thread = Thread {
             session?.start_node(
                     "127.0.0.1:${mSocketWrapper!!.myLocalPort}",
                     strTosend
             )
         }
-        thread!!.start()
     }
 
     fun Free() {

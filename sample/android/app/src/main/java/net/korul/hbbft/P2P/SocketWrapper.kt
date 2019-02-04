@@ -10,9 +10,7 @@ import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import kotlin.concurrent.thread
-import kotlin.experimental.and
 
 class SocketWrapper: INewUserInCon {
     private var TAG = "HYDRABADGERTAG:SocketWrapper"
@@ -31,10 +29,6 @@ class SocketWrapper: INewUserInCon {
 
     var mAllStop = false
 
-    var inc = 1
-
-//    private val lock = ReentrantLock()
-
     lateinit var mRoomName: String
     lateinit var myUID: String
 
@@ -48,7 +42,7 @@ class SocketWrapper: INewUserInCon {
     }
 
     fun initSocketWrapper(roomName: String, myUID_: String, users: List<String>) {
-        Log.d(TAG, "SocketWrapper initSocketWrapper ${roomName} - roomName, ${myUID_} - myUID")
+        Log.d(TAG, "SocketWrapper initSocketWrapper $roomName - roomName, $myUID_ - myUID")
 
         myUID = myUID_
         mRoomName = roomName
@@ -61,18 +55,20 @@ class SocketWrapper: INewUserInCon {
 
             port = hex.toBigInteger(16)
         } catch (e: Exception) {
-            port = inc.toBigInteger()
-            inc++
+            port = 2000.toBigInteger()
             println("SHA1 not implemented in this system")
         }
 
-        myLocalPort = (2000 + CongruentPseudoGen(port))
+        var port1 = (2000 + CongruentPseudoGen(port))
+        while (clientsBusyPorts.values.contains(port1)) {
+            port1++
+        }
+        myLocalPort = port1
         clientsBusyPorts[myUID] = myLocalPort
 
         for (uid in users) {
             if(uid == myUID)
                 break
-
             addUser(uid)
         }
     }
@@ -95,18 +91,18 @@ class SocketWrapper: INewUserInCon {
 
             port = hex.toBigInteger(16)
         } catch (e: Exception) {
-            port = inc.toBigInteger()
-            inc++
+            port = 2000.toBigInteger()
             println("SHA1 not implemented in this system")
         }
 
-        val port1 = 2000 + CongruentPseudoGen(port)
-
-        if(!clientsBusyPorts.values.contains(port1)) {
-            Log.d(TAG, "SocketWrapper addUser ${port1} - port, ${uid} - uid")
-            clientsBusyPorts[uid] = port1
-            startPseudoNotLocalSocketALoop(uid, port1)
+        var port1 = 2000 + CongruentPseudoGen(port)
+        while (clientsBusyPorts.values.contains(port1)) {
+            port1++
         }
+
+        clientsBusyPorts[uid] = port1
+        Log.d(TAG, "SocketWrapper addUser $port1 - port, $uid - uid")
+        startPseudoNotLocalSocketALoop(uid, port1)
     }
 
     fun sendReceivedDataToHydra(messageBytes: ByteArray) {
@@ -157,21 +153,18 @@ class SocketWrapper: INewUserInCon {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
 
-                    Log.d(TAG, "SocketWrapper reed from ALoop Socket ${reads} - bytes")
+                    Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
                     while (mP2PMesh!!.mConnections[uid]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(10)
 
-                    if(mP2PMesh!!.mConnections[uid]?.dataChannel?.state() == DataChannel.State.OPEN) {
-                        Log.d(TAG, "SocketWrapper send to user from mConnections ${reads} - bytes")
+                    Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
+                    val json = JSONObject()
+                    val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
+                    json.put("bytes", base64String)
+                    json.put("myUID", myUID)
+                    val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
 
-                        val json = JSONObject()
-                        val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
-                        json.put("bytes", base64String)
-                        json.put("myUID", myUID)
-                        val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
-
-                        mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
-                    }
+                    mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
                 }
                 else
                     Thread.sleep(10)
@@ -189,21 +182,18 @@ class SocketWrapper: INewUserInCon {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
 
-                    Log.d(TAG, "SocketWrapper reed from ALoop Socket ${reads} - bytes")
+                    Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
                     while (mP2PMesh!!.mConnections[uid]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(1)
 
-                    if (mP2PMesh!!.mConnections[uid]?.dataChannel?.state() == DataChannel.State.OPEN) {
-                        Log.d(TAG, "SocketWrapper send to user from mConnections ${reads} - bytes")
+                    Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
+                    val json = JSONObject()
+                    val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
+                    json.put("bytes", base64String)
+                    json.put("myUID", myUID)
+                    val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
 
-                        val json = JSONObject()
-                        val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
-                        json.put("bytes", base64String)
-                        json.put("myUID", myUID)
-                        val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
-
-                        mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
-                    }
+                    mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
                 }
                 else
                     Thread.sleep(10)
