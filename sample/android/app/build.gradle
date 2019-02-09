@@ -124,6 +124,9 @@ dependencies {
     //
     // libjingle
     implementation 'io.pristine:libjingle:11139@aar'
+
+    // https://mvnrepository.com/artifact/com.google.common/google-collect
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

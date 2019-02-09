@@ -21,16 +21,16 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     private var TAG = "HYDRABADGERTAG:P2PMesh"
 
     var consNats: HashMap<String, Connection?> = hashMapOf()
-    var mConnections: HashMap<String, Connections> = hashMapOf()
+    var mConnections: HashMap<Pair<String, String>, Connections> = hashMapOf()
 
     var userName: MutableList<String?> = arrayListOf()
     var roomNameList: MutableList<String?> = arrayListOf()
 
+    var usersCon: MutableList<String> = arrayListOf()
+
     val DISPLAY_UI_TOAST = 0
 
     private val lock = ReentrantLock()
-
-    var callbackNewUser: INewUserInCon? = null
 
     var handlerToast = Handler(Handler.Callback { msg ->
         when (msg.what) {
@@ -46,11 +46,6 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         }
         false
     })
-
-
-    fun setNewUserCallback(callback: INewUserInCon) {
-        callbackNewUser = callback
-    }
 
 
     fun initOneMesh(roomName: String, UID: String) {
@@ -120,26 +115,29 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
             if (json2.getString("type") == "addUser") {
                 val user = json2.getString("user")
-                if( mConnections.contains(user))
-                    return@subscribe
+                val myUid = UID
+                val pair: Pair<String, String> = Pair(user, myUid)
                 if( user == UID )
                     return@subscribe
+                if (mConnections.keys.contains(pair))
+                    return@subscribe
 
-                if (!mConnections.contains(user)) {
-                    callbackNewUser?.NewUser(user)
-                    mConnections[ user ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
+                if (!mConnections.keys.contains(pair)) {
+                    if(!usersCon.contains(user))
+                        usersCon.add(user)
+                    mConnections[ pair ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
                 }
             }
             else if (json2.getString("type") == "deleteUser") {
                 try {
                     val user = json2.getString("user")
+                    val myUid = UID
 
+                    val pair: Pair<String, String> = Pair(user, myUid)
                     lock.lock()
-                    for(name_ in mConnections.keys) {
-                        if(user == name_) {
-                            mConnections[ user ]?.FreeConnect()
-                            mConnections.remove(user)
-                        }
+                    if(mConnections.keys.contains(pair)) {
+                        mConnections[ pair ]?.FreeConnect()
+                        mConnections.remove(pair)
                     }
                     lock.unlock()
                 }
@@ -178,14 +176,15 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val message = String(msg.data, StandardCharsets.UTF_8)
 
             val json2 = JSONObject(message)
+            val uid = json2.getString("UID")
+            val toUser = json2.getString("toUser")
+            val pair: Pair<String, String> = Pair(uid, toUser)
+
             if(json2.getString("type") == "candidate") {
-                val uid = json2.getString("UID")
                 val candidate = IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
-                mConnections[uid]?.peerConnection?.addIceCandidate(candidate)
+                mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
             }
             else {
-                val uid = json2.getString("UID")
-
                 val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
                 msg.obj = "Message - set SDP to $uid"
                 handlerToast.sendMessage(msg)
@@ -195,21 +194,22 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
                 val sdp2 = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
                 if(type == "offer") {
-                    if(!mConnections.contains(uid)) {
-                        mConnections[ uid ] =  Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
+                    if(!mConnections.keys.contains(pair)) {
+                        if(!usersCon.contains(uid))
+                            usersCon.add(uid)
+                        mConnections[ pair ] =  Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
                     }
 
-                    mConnections[uid]?.peerConnection?.setRemoteDescription(mConnections[uid]?.SessionObserver, sdp2)
+                    mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
                     val constraints = MediaConstraints()
-                    mConnections[uid]?.peerConnection?.createAnswer(mConnections[uid]?.SessionObserver, constraints)
+                    mConnections[pair]?.peerConnection?.createAnswer(mConnections[pair]?.SessionObserver, constraints)
                 }
                 else if(type == "answer") {
-                    mConnections[uid]?.peerConnection?.setRemoteDescription(mConnections[uid]?.SessionObserver, sdp2)
+                    mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
                 }
             }
         }
 
-        mConnections[listenFrom]?.conNats = conNats
         return conNats
     }
 }

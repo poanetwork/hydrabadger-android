@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import kotlin.concurrent.thread
 
-class SocketWrapper: INewUserInCon {
+class SocketWrapper {
     private var TAG = "HYDRABADGERTAG:SocketWrapper"
 
     private var mP2PMesh: P2PMesh? = null
@@ -28,17 +28,13 @@ class SocketWrapper: INewUserInCon {
     var myLocalPort = 0
 
     var mAllStop = false
+    var mStarted = false
 
     lateinit var mRoomName: String
     lateinit var myUID: String
 
-    constructor(P2PMesh_: P2PMesh) {
-        mP2PMesh = P2PMesh_
-        mP2PMesh?.setNewUserCallback(this)
-    }
-
-    override fun NewUser(uid: String) {
-        addUser(uid)
+    constructor(p_: P2PMesh) {
+        mP2PMesh = p_
     }
 
     fun initSocketWrapper(roomName: String, myUID_: String, users: List<String>) {
@@ -71,6 +67,8 @@ class SocketWrapper: INewUserInCon {
                 break
             addUser(uid)
         }
+
+        mStarted = true
     }
 
     private fun CongruentPseudoGen(x: BigInteger): Int {
@@ -109,9 +107,6 @@ class SocketWrapper: INewUserInCon {
         val message = String(messageBytes, StandardCharsets.UTF_8)
         val json = JSONObject(message)
         val uid = json.getString("myUID")
-
-        if(!mPseudoNotLocalSocketServer.contains(uid))
-            addUser(uid)
 
         if(!mPseudoNotLocalSocket.containsKey(uid) && !mLocalALoopSocket.contains(uid))
             startLocalSocketALoop(uid)
@@ -152,9 +147,10 @@ class SocketWrapper: INewUserInCon {
                 if(bytesnum > 0) {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
+                    val pair: Pair<String, String> = Pair(uid, myUID)
 
                     Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
-                    while (mP2PMesh!!.mConnections[uid]?.dataChannel?.state() != DataChannel.State.OPEN)
+                    while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(10)
 
                     Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
@@ -162,9 +158,10 @@ class SocketWrapper: INewUserInCon {
                     val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
                     json.put("bytes", base64String)
                     json.put("myUID", myUID)
+                    json.put("toUID", uid)
                     val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
 
-                    mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
+                    mP2PMesh!!.mConnections[pair]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
                 }
                 else
                     Thread.sleep(10)
@@ -181,9 +178,10 @@ class SocketWrapper: INewUserInCon {
                 if (bytesnum!! > 0) {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
+                    val pair: Pair<String, String> = Pair(uid, myUID)
 
                     Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
-                    while (mP2PMesh!!.mConnections[uid]?.dataChannel?.state() != DataChannel.State.OPEN)
+                    while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(1)
 
                     Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
@@ -191,9 +189,10 @@ class SocketWrapper: INewUserInCon {
                     val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
                     json.put("bytes", base64String)
                     json.put("myUID", myUID)
+                    json.put("toUID", uid)
                     val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
 
-                    mP2PMesh!!.mConnections[uid]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
+                    mP2PMesh!!.mConnections[pair]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
                 }
                 else
                     Thread.sleep(10)

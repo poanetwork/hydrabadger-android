@@ -31,7 +31,7 @@ class ClosingService : Service() {
 
         Log.i(TAG, "Service: start Init")
 
-        DatabaseApplication.mCoreHBBFT.Free()
+        DatabaseApplication.mCoreHBBFT2X.Free()
 
         Log.i(TAG, "Service: finish Init")
         // Destroy the service

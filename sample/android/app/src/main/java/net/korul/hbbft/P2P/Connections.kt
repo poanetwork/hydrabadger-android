@@ -117,6 +117,7 @@ class Connections() {
             try {
                 json.put("type", "candidate")
                 json.put("UID", myName)
+                json.put("toUser", publishTo)
                 json.put("sdpMLineIndex", iceCandidate.sdpMLineIndex)
                 json.put("sdpMid", iceCandidate.sdpMid)
                 json.put("candidate", iceCandidate.sdp)
@@ -170,6 +171,7 @@ class Connections() {
             try {
                 json.put("type", sessionDescription.type.toString().toLowerCase())
                 json.put("UID", myName)
+                json.put("toUser", publishTo)
                 json.put("sdp", sessionDescription.description)
 
                 message = json.toString()
