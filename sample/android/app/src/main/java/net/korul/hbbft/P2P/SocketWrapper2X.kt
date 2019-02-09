@@ -17,14 +17,14 @@ class SocketWrapper2X {
 
     private var mP2PMesh: P2PMesh? = null
 
-    private val mPseudoNotLocalThread: HashMap<String, Thread>  = hashMapOf()
+    private val mPseudoNotLocalThread: HashMap<Pair<String, String>, Thread>  = hashMapOf()
     private val mLocalALoopThread:     HashMap<String, Thread>  = hashMapOf()
     private val mLocalALoopThread1:     HashMap<String, Thread>  = hashMapOf()
-    private val mPseudoNotLocalSocket: HashMap<String, Socket?> = hashMapOf()
+    private val mPseudoNotLocalSocket: HashMap<Pair<String, String>, Socket?> = hashMapOf()
     private val mLocalALoopSocket:     HashMap<String, Socket?> = hashMapOf()
     private val mLocalALoopSocket1:     HashMap<String, Socket?> = hashMapOf()
 
-    private val mPseudoNotLocalSocketServer: HashMap<String, ServerSocket?> = hashMapOf()
+    private val mPseudoNotLocalSocketServer: HashMap<Pair<String, String>, ServerSocket?> = hashMapOf()
 
     val clientsBusyPorts: HashMap<String, Int> = hashMapOf()
     var myLocalPort1 = 0
@@ -88,7 +88,7 @@ class SocketWrapper2X {
 
         for (uid in users) {
             if(uid == myUID1 || uid == myUID2)
-                break
+                continue
             addUser(uid)
         }
 
@@ -124,7 +124,8 @@ class SocketWrapper2X {
 
         clientsBusyPorts[uid] = port1
         Log.d(TAG, "SocketWrapper addUser $port1 - port, $uid - uid")
-        startPseudoNotLocalSocketALoop(uid, port1)
+        startPseudoNotLocalSocketALoop(uid, port1, myUID1)
+        startPseudoNotLocalSocketALoop(uid, port1+1, myUID2)
     }
 
     fun sendReceivedDataToHydra(messageBytes: ByteArray) {
@@ -133,20 +134,23 @@ class SocketWrapper2X {
         val uid = json.getString("myUID")
         val touid = json.getString("toUID")
 
+        val pair: Pair<String, String> = Pair(touid, uid)
 
         if(touid == myUID1) {
-            if(!mPseudoNotLocalSocket.containsKey(uid) && !mLocalALoopSocket.contains(uid))
+            if(!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket.contains(uid))
                 startLocalSocketALoop1(uid)
 
-            while (mLocalALoopSocket[uid] == null && mPseudoNotLocalSocket[uid] == null)
+            while (mLocalALoopSocket[uid] == null && mPseudoNotLocalSocket[pair] == null)
                 Thread.sleep(10)
 
-            if (mPseudoNotLocalSocket[uid] != null) {
-                val socket = mPseudoNotLocalSocket[uid]
+            if (mPseudoNotLocalSocket[pair] != null) {
+                val socket = mPseudoNotLocalSocket[pair]
                 val dout = socket?.getOutputStream()
 
                 val bytesString = json.getString("bytes")
                 val bytes = Base64.decode(bytesString, Base64.DEFAULT)
+
+                Log.d(TAG, "SocketWrapper write to myUID1 mPseudoNotLocalSocket ${bytes.size} - bytes; pair - $pair")
 
                 dout?.write(bytes)
                 dout?.flush()
@@ -157,23 +161,27 @@ class SocketWrapper2X {
                 val bytesString = json.getString("bytes")
                 val bytes = Base64.decode(bytesString, Base64.DEFAULT)
 
+                Log.d(TAG, "SocketWrapper write to myUID1 mLocalALoopSocket ${bytes.size} - bytes; pair - $pair")
+
                 dout?.write(bytes)
                 dout?.flush()
             }
         }
         else if(touid == myUID2) {
-            if(!mPseudoNotLocalSocket.containsKey(uid) && !mLocalALoopSocket1.contains(uid))
+            if(!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket1.contains(uid))
                 startLocalSocketALoop2(uid)
 
-            while (mLocalALoopSocket1[uid] == null && mPseudoNotLocalSocket[uid] == null)
+            while (mLocalALoopSocket1[uid] == null && mPseudoNotLocalSocket[pair] == null)
                 Thread.sleep(10)
 
-            if (mPseudoNotLocalSocket[uid] != null) {
-                val socket = mPseudoNotLocalSocket[uid]
+            if (mPseudoNotLocalSocket[pair] != null) {
+                val socket = mPseudoNotLocalSocket[pair]
                 val dout = socket?.getOutputStream()
 
                 val bytesString = json.getString("bytes")
                 val bytes = Base64.decode(bytesString, Base64.DEFAULT)
+
+                Log.d(TAG, "SocketWrapper write to myUID2 mPseudoNotLocalSocket ${bytes.size} - bytes; pair - $pair")
 
                 dout?.write(bytes)
                 dout?.flush()
@@ -184,18 +192,22 @@ class SocketWrapper2X {
                 val bytesString = json.getString("bytes")
                 val bytes = Base64.decode(bytesString, Base64.DEFAULT)
 
+                Log.d(TAG, "SocketWrapper write to myUID2 mLocalALoopSocket ${bytes.size} - bytes; pair - $pair")
+
                 dout?.write(bytes)
                 dout?.flush()
             }
         }
     }
 
-    fun startPseudoNotLocalSocketALoop(uid: String, port: Int) {
-        mPseudoNotLocalThread[uid] = thread {
-            mPseudoNotLocalSocketServer[uid] = ServerSocket(port)
+    fun startPseudoNotLocalSocketALoop(uid: String, port: Int, myUID: String) {
+        val pair: Pair<String, String> = Pair(myUID, uid)
 
-            val clientSocket = mPseudoNotLocalSocketServer[uid]!!.accept()
-            mPseudoNotLocalSocket[uid] = clientSocket
+        mPseudoNotLocalThread[pair] = thread {
+            mPseudoNotLocalSocketServer[pair] = ServerSocket(port)
+
+            val clientSocket = mPseudoNotLocalSocketServer[pair]!!.accept()
+            mPseudoNotLocalSocket[pair] = clientSocket
             while (!mAllStop) {
                 val din = clientSocket.getInputStream()
                 val bytesnum = din.available()
@@ -209,16 +221,15 @@ class SocketWrapper2X {
                         pair = pair2
                     }
 
-                    Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
+                    Log.d(TAG, "SocketWrapper reed from startPseudoNotLocalSocketALoop Socket $reads - bytes")
                     while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(10)
 
-                    Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
+                    Log.d(TAG, "SocketWrapper send startPseudoNotLocalSocketALoop $reads - bytes; myUID - $myUID  uid -  $uid")
                     val json = JSONObject()
                     val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
                     json.put("bytes", base64String)
-                    //TODO
-                    json.put("myUID", myUID1)
+                    json.put("myUID", myUID)
                     json.put("toUID", uid)
                     val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
 
@@ -250,7 +261,7 @@ class SocketWrapper2X {
                     while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(1)
 
-                    Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
+                    Log.d(TAG, "SocketWrapper send to user from ALoop mConnections $reads - bytes; myUID - $myUID1  uid -  $uid")
                     val json = JSONObject()
                     val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
                     json.put("bytes", base64String)
@@ -287,7 +298,7 @@ class SocketWrapper2X {
                     while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
                         Thread.sleep(1)
 
-                    Log.d(TAG, "SocketWrapper send to user from mConnections $reads - bytes")
+                    Log.d(TAG, "SocketWrapper send to user from ALoop mConnections $reads - bytes; myUID - $myUID1  uid -  $uid")
                     val json = JSONObject()
                     val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
                     json.put("bytes", base64String)

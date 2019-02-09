@@ -64,7 +64,7 @@ class SocketWrapper {
 
         for (uid in users) {
             if(uid == myUID)
-                break
+                continue
             addUser(uid)
         }
 

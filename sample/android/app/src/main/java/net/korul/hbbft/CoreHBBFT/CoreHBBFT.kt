@@ -48,7 +48,7 @@ class CoreHBBFT: IGetData {
     var lastMes: String = ""
     var lastMestime = Calendar.getInstance().timeInMillis
 
-    // Used to load the 'native-lib' library on application startup.
+
     init {
         System.loadLibrary("hydra_android")
 
@@ -101,7 +101,7 @@ class CoreHBBFT: IGetData {
         Thread.sleep(100)
         mP2PMesh?.publishAboutMe(RoomName, uniqueID2)
 
-//        waitForConnect()
+        waitForConnect2()
 
         mSocketWrapper2X!!.initSocketWrapper(RoomName, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
@@ -121,8 +121,12 @@ class CoreHBBFT: IGetData {
 
             strTosend = ""
             for(clients in mSocketWrapper2X!!.clientsBusyPorts) {
-                if(clients.key != uniqueID2)
-                    strTosend += "127.0.0.1:${clients.value};"
+                if(clients.key != uniqueID2) {
+                    strTosend += if(clients.key != uniqueID1)
+                        "127.0.0.1:${clients.value+1};"
+                    else
+                        "127.0.0.1:${clients.value};"
+                }
             }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
@@ -132,6 +136,28 @@ class CoreHBBFT: IGetData {
                 strTosend
             )
         }
+    }
+
+    fun waitForConnect2() {
+        val async = GlobalScope.async {
+            var ready = false
+            while (!ready) {
+                Thread.sleep(1000)
+                ready = true
+                for (con in mP2PMesh?.mConnections!!.values) {
+                    if(con.myName == uniqueID1 || con.myName == uniqueID2)
+                        continue
+
+                    if (con.mIamReadyToDataTranfer) {
+                        ready = true
+                    } else {
+                        ready = false
+                        break
+                    }
+                }
+            }
+        }
+        runBlocking { async.await() }
     }
 
     fun waitForConnect() {
