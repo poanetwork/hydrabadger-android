@@ -117,12 +117,13 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 val user = json2.getString("user")
                 val myUid = UID
                 val pair: Pair<String, String> = Pair(user, myUid)
+                val pair2: Pair<String, String> = Pair(myUid, user)
                 if( user == UID )
                     return@subscribe
-                if (mConnections.keys.contains(pair))
+                if (mConnections.keys.contains(pair) || mConnections.keys.contains(pair2))
                     return@subscribe
 
-                if (!mConnections.keys.contains(pair)) {
+                if (!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2)) {
                     if(!usersCon.contains(user))
                         usersCon.add(user)
                     mConnections[ pair ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
@@ -134,10 +135,15 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                     val myUid = UID
 
                     val pair: Pair<String, String> = Pair(user, myUid)
+                    val pair2: Pair<String, String> = Pair(myUid, user)
                     lock.lock()
                     if(mConnections.keys.contains(pair)) {
                         mConnections[ pair ]?.FreeConnect()
                         mConnections.remove(pair)
+                    }
+                    if(mConnections.keys.contains(pair2)) {
+                        mConnections[ pair2 ]?.FreeConnect()
+                        mConnections.remove(pair2)
                     }
                     lock.unlock()
                 }
@@ -179,10 +185,16 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val uid = json2.getString("UID")
             val toUser = json2.getString("toUser")
             val pair: Pair<String, String> = Pair(uid, toUser)
+            val pair2: Pair<String, String> = Pair(toUser, uid)
 
             if(json2.getString("type") == "candidate") {
                 val candidate = IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
-                mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
+                if(mConnections.keys.contains(pair)) {
+                    mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
+                }
+                else if(mConnections.keys.contains(pair2)) {
+                    mConnections[pair2]?.peerConnection?.addIceCandidate(candidate)
+                }
             }
             else {
                 val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
@@ -194,18 +206,30 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
                 val sdp2 = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
                 if(type == "offer") {
-                    if(!mConnections.keys.contains(pair)) {
+                    if(!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2) ) {
                         if(!usersCon.contains(uid))
                             usersCon.add(uid)
                         mConnections[ pair ] =  Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
                     }
 
-                    mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
-                    val constraints = MediaConstraints()
-                    mConnections[pair]?.peerConnection?.createAnswer(mConnections[pair]?.SessionObserver, constraints)
+                    if(mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
+                        val constraints = MediaConstraints()
+                        mConnections[pair]?.peerConnection?.createAnswer(mConnections[pair]?.SessionObserver, constraints)
+                    }
+                    else if(mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.peerConnection?.setRemoteDescription(mConnections[pair2]?.SessionObserver, sdp2)
+                        val constraints = MediaConstraints()
+                        mConnections[pair2]?.peerConnection?.createAnswer(mConnections[pair2]?.SessionObserver, constraints)
+                    }
                 }
                 else if(type == "answer") {
-                    mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
+                    if(mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
+                    }
+                    else if(mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.peerConnection?.setRemoteDescription(mConnections[pair2]?.SessionObserver, sdp2)
+                    }
                 }
             }
         }

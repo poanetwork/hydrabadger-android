@@ -101,7 +101,7 @@ class CoreHBBFT: IGetData {
         Thread.sleep(100)
         mP2PMesh?.publishAboutMe(RoomName, uniqueID2)
 
-        waitForConnect()
+//        waitForConnect()
 
         mSocketWrapper2X!!.initSocketWrapper(RoomName, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 

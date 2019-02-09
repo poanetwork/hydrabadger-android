@@ -203,7 +203,11 @@ class SocketWrapper2X {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
 
-                    val pair: Pair<String, String> = Pair(uid, myUID1)
+                    var pair: Pair<String, String> = Pair(uid, myUID1)
+                    val pair2: Pair<String, String> = Pair(myUID1, uid)
+                    if(mP2PMesh!!.mConnections.contains(pair2)) {
+                        pair = pair2
+                    }
 
                     Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
                     while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
@@ -228,7 +232,7 @@ class SocketWrapper2X {
 
     fun startLocalSocketALoop1(uid: String) {
         mLocalALoopThread[uid] = thread {
-            //TODO 2
+
             mLocalALoopSocket[uid] = Socket("127.0.0.1", myLocalPort1)
             while (!mAllStop) {
                 val din = mLocalALoopSocket[uid]?.getInputStream()
@@ -236,7 +240,11 @@ class SocketWrapper2X {
                 if (bytesnum!! > 0) {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
-                    val pair: Pair<String, String> = Pair(uid, myUID1)
+                    var pair: Pair<String, String> = Pair(uid, myUID1)
+                    val pair2: Pair<String, String> = Pair(myUID1, uid)
+                    if(mP2PMesh!!.mConnections.contains(pair2)) {
+                        pair = pair2
+                    }
 
                     Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
                     while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)
@@ -261,7 +269,7 @@ class SocketWrapper2X {
 
     fun startLocalSocketALoop2(uid: String) {
         mLocalALoopThread1[uid] = thread {
-            //TODO 2
+
             mLocalALoopSocket1[uid] = Socket("127.0.0.1", myLocalPort2)
             while (!mAllStop) {
                 val din = mLocalALoopSocket1[uid]?.getInputStream()
@@ -269,7 +277,11 @@ class SocketWrapper2X {
                 if (bytesnum!! > 0) {
                     val bytes = ByteArray(bytesnum)
                     val reads = din.read(bytes, 0, bytesnum)
-                    val pair: Pair<String, String> = Pair(uid, myUID1)
+                    var pair: Pair<String, String> = Pair(uid, myUID2)
+                    val pair2: Pair<String, String> = Pair(myUID2, uid)
+                    if(mP2PMesh!!.mConnections.contains(pair2)) {
+                        pair = pair2
+                    }
 
                     Log.d(TAG, "SocketWrapper reed from ALoop Socket $reads - bytes")
                     while (mP2PMesh!!.mConnections[pair]?.dataChannel?.state() != DataChannel.State.OPEN)

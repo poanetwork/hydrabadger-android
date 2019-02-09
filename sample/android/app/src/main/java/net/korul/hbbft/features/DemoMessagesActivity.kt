@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+val handler = Handler()
+
 abstract class DemoMessagesActivity : AppCompatActivity(),
     MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
@@ -39,6 +41,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 
     var mCurDialog: Dialog? = null
     var mCurUser: User? = null
+
 
     lateinit var progress: ProgressDialog
 
@@ -123,7 +126,9 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 //            }
             R.id.action_1x -> {
                 try {
-                    progress.show()
+                    handler.post {
+                        progress.show()
+                    }
                     DatabaseApplication.mCoreHBBFT2X.subscribeSession()
                     DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
 
@@ -151,7 +156,9 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
             }
             R.id.action_2x -> {
                 try {
-                    progress.show()
+                    handler.post {
+                        progress.show()
+                    }
                     DatabaseApplication.mCoreHBBFT2X.subscribeSession()
                     DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
 
