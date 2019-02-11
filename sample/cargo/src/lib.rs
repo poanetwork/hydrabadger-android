@@ -138,6 +138,7 @@ pub use hbbft::dynamic_honey_badger::Batch;
 pub struct Transaction(pub String);
 
 static mut M_TEXT: Option<String> = None;
+static mut M_TEXT2: Option<String> = None;
 
 impl Transaction {
     fn random(len: usize) -> Option<Transaction> {
@@ -159,6 +160,23 @@ impl Transaction {
                     vec = Some(Transaction(x.to_string()));
                     warn!("!!get_tr: {:?}", M_TEXT);
                     M_TEXT = None;
+                    vec
+                }
+                None => {
+                    vec
+                }
+            }
+        }
+    }
+
+    fn get_tr2() -> Option<Transaction> {
+        unsafe {
+            let mut vec: Option<Transaction> = None;
+            match M_TEXT2 {
+                Some(ref mut x) => {
+                    vec = Some(Transaction(x.to_string()));
+                    warn!("!!get_tr2: {:?}", M_TEXT2);
+                    M_TEXT2 = None;
                     vec
                 }
                 None => {
@@ -664,6 +682,7 @@ fn callback(its_me: bool, id: String, trans: String) {
 }
 
 static mut M_SESSION_PTR: Option<&'static mut Session> = None;
+static mut M_NUM_OF_CALLBACK: i32 = 0;
 
 struct Session {
     observers: Vec<Box<OnEvent>>,
@@ -706,13 +725,20 @@ impl Session {
     }
 
     pub fn change(&self, its_me: bool, id: String, trans: String) {
+        let mut i = 0;
         for cb in &self.observers {
-            warn!("Call callback");
-            cb.changed(its_me, id.clone(), trans.clone());
+            if i == 0 {
+                warn!("Call callback");
+                cb.changed(its_me, id.clone(), trans.clone());
+            }
+            i += 1;
         }
     }
 
     pub fn start_node(&self, ipport_string_source: String, ipports_string_remote: String) {
+        unsafe {
+            warn!("enter to startNode: {:?}", M_NUM_OF_CALLBACK.clone());
+        }
         let bind_address: SocketAddr = ipport_string_source.parse().expect("Unable to parse socket address bind_address");
     
         let mut remote_addresses: HashSet<SocketAddr> = HashSet::new();
@@ -723,35 +749,60 @@ impl Session {
             }
         }
 
+        // let mut m_ipports_remote_ignore: Option<SocketAddr> = None;
+        // if !ipports_remote_ignore.is_empty() {
+        //     m_ipports_remote_ignore = Some(ipports_remote_ignore.parse().expect("Unable to parse socket address remote_addresses"));
+        // }
+
         let cfg = Config::default();
          
-        let callback_ = callback;
 
         unsafe {
-            let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_));
+            let num = M_NUM_OF_CALLBACK.clone();
 
-            let gen_txn = || {
-                (0..1)
-                    .map(|_| Transaction::get_tr())
-                    // .map(|_| Transaction::random(5))
-                    .collect::<Vec<_>>()
-            };
+            if num == 0 {
+                M_NUM_OF_CALLBACK += 1;
             
-            match hbft {
-                Some(v) => {
-                    let gen_txn = || {
-                        (0..1)
-                            .map(|_| Transaction::get_tr())
-                            .collect::<Vec<_>>()
-                    };
+                let callback_ = callback;
+                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
+            
+                match hbft {
+                    Some(v) => {
+                        let gen_txn = || {
+                            (0..1)
+                                .map(|_| Transaction::get_tr())
+                                .collect::<Vec<_>>()
+                        };
 
-                    thread::spawn(move || {
-                        v.run_node(Some(remote_addresses), Some(gen_txn));
-                    });
-                },
-                None => {},
+                        thread::spawn(move || {
+                            v.run_node(Some(remote_addresses), Some(gen_txn));
+                        });
+                    },
+                    None => {},
+                }
             }
-        }
+            else if num == 1 {
+                M_NUM_OF_CALLBACK += 1;
+
+                let callback_ = callback;
+                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
+            
+                match hbft {
+                    Some(v) => {
+                        let gen_txn = || {
+                            (0..1)
+                                .map(|_| Transaction::get_tr2())
+                                .collect::<Vec<_>>()
+                        };
+
+                        thread::spawn(move || {
+                            v.run_node(Some(remote_addresses), Some(gen_txn));
+                        });
+                    },
+                    None => {},
+                }
+            }
+        } 
     }
 }
 //

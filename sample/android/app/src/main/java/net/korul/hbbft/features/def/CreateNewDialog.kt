@@ -13,7 +13,7 @@ import net.korul.hbbft.common.data.model.User
 class CreateNewDialog: AppCompatActivity()  {
 
     //TODO I Am
-    var mCurUser: User = User(0, DatabaseApplication.mCoreHBBFT.uniqueID1, 0.toString(), "", "name", "http://i.imgur.com/pv1tBmT.png", true)
+    var mCurUser: User = User(0, DatabaseApplication.mCoreHBBFT2X.uniqueID1, 0.toString(), "", "name", "http://i.imgur.com/pv1tBmT.png", true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

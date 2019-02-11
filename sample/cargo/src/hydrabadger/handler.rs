@@ -47,6 +47,7 @@ pub struct Handler<C: Contribution, N: NodeId> {
     callbackbatch: CallbackBatch,
 
     addr: InAddr,
+    num: i32,
     //
 }
 
@@ -61,7 +62,9 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
         hdb: Hydrabadger<C, N>,
         peer_internal_rx: InternalRx<C, N>,
         batch_tx: BatchTx<C, N>,
-        callbackbatch: CallbackBatch, addr: InAddr,
+        // android fix
+        callbackbatch: CallbackBatch, num: i32, addr: InAddr,
+        //
     ) 
     -> Handler<C, N> {
         Handler {
@@ -74,6 +77,7 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
 
             // android fix
             callbackbatch,
+            num,
             addr,
             //
         }
@@ -296,7 +300,9 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
                 }
 
                 // android fix
-                (self.callbackbatch)(true, "".to_string(), "".to_string());
+                if self.num == 1 {
+                    (self.callbackbatch)(true, "".to_string(), "".to_string());
+                }
                 //
 
                 for l in self.hdb.epoch_listeners().iter() {
@@ -711,15 +717,17 @@ impl<C: Contribution, N: NodeId> Future for Handler<C, N> {
                             let id_string = format!("{:?}", uid);
                             let trans_string = format!("{:?}", int_contrib);
                             
-                            if !trans_string.is_empty() {
-                                warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
-                                if local_uid == uid {
-                                    // call
-                                    (self.callbackbatch)(true, id_string.clone(), trans_string.clone());
-                                }
-                                else {
-                                    // call
-                                    (self.callbackbatch)(false, id_string.clone(), trans_string.clone());
+                            if self.num == 1 {
+                                if !trans_string.is_empty() {
+                                    warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
+                                    if local_uid == uid {
+                                        // call
+                                        (self.callbackbatch)(true, id_string.clone(), trans_string.clone());
+                                    }
+                                    else {
+                                        // call
+                                        (self.callbackbatch)(false, id_string.clone(), trans_string.clone());
+                                    }
                                 }
                             }
                         // }

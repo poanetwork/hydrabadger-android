@@ -47,7 +47,7 @@ class DefaultDialogsActivity:
             onAddDialog()
         }
 
-        DatabaseApplication.mCoreHBBFT.addListener(this)
+        DatabaseApplication.mCoreHBBFT2X.addListener(this)
     }
 
     override fun onResume() {
@@ -94,7 +94,7 @@ class DefaultDialogsActivity:
         try {
             handlerMes.postDelayed({
                 if(!you) {
-                    val roomName = DatabaseApplication.mCoreHBBFT.mRoomName
+                    val roomName = DatabaseApplication.mCoreHBBFT2X.mRoomName
                     val dialog = getDialogByRoomName(roomName)
 
                     var found = false

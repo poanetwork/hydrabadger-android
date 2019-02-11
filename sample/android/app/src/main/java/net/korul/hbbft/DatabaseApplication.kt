@@ -13,7 +13,7 @@ class DatabaseApplication : Application() {
         lateinit var instance: DatabaseApplication
             private set
 
-        lateinit var mCoreHBBFT: CoreHBBFT
+        lateinit var mCoreHBBFT2X: CoreHBBFT
             private set
     }
 
@@ -24,8 +24,8 @@ class DatabaseApplication : Application() {
         Fabric.with(this, Crashlytics())
         FirebaseApp.initializeApp(this)
 
-        mCoreHBBFT = CoreHBBFT()
-        mCoreHBBFT.Init(this)
+        mCoreHBBFT2X = CoreHBBFT()
+        mCoreHBBFT2X.Init(this)
 
 //        FlowManager.getDatabase(AppDatabase::class.java).reset(this)
     }

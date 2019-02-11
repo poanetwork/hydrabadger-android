@@ -21,16 +21,16 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     private var TAG = "HYDRABADGERTAG:P2PMesh"
 
     var consNats: HashMap<String, Connection?> = hashMapOf()
-    var mConnections: HashMap<String, Connections> = hashMapOf()
+    var mConnections: HashMap<Pair<String, String>, Connections> = hashMapOf()
 
     var userName: MutableList<String?> = arrayListOf()
     var roomNameList: MutableList<String?> = arrayListOf()
 
+    var usersCon: MutableList<String> = arrayListOf()
+
     val DISPLAY_UI_TOAST = 0
 
     private val lock = ReentrantLock()
-
-    var callbackNewUser: INewUserInCon? = null
 
     var handlerToast = Handler(Handler.Callback { msg ->
         when (msg.what) {
@@ -48,11 +48,6 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     })
 
 
-    fun setNewUserCallback(callback: INewUserInCon) {
-        callbackNewUser = callback
-    }
-
-
     fun initOneMesh(roomName: String, UID: String) {
         try {
             Log.d(TAG, "P2PMesh initOneMesh $roomName - roomName, $UID - UID")
@@ -60,10 +55,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             roomNameList.add( roomName )
             userName.add( UID )
             consNats[UID] = initNatsSignalling(UID)
-
-            val nats = consNats[UID]
-            initNatsMeshInitiator(nats, UID, "users:Room:$roomName")
-
+            initNatsMeshInitiator(consNats[UID], UID, "users:Room:$roomName")
         }
         catch (e: Exception) {
             e.printStackTrace()
@@ -73,12 +65,10 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
     fun publishAboutMe(roomName: String, UID: String) {
         val json = JSONObject()
-        val message: String
-
         json.put("type", "addUser")
         json.put("user", UID)
 
-        message = json.toString()
+        val message = json.toString()
 
         consNats[UID]?.publish("users:Room:$roomName", message.toByteArray(StandardCharsets.UTF_8))
     }
@@ -125,26 +115,35 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
             if (json2.getString("type") == "addUser") {
                 val user = json2.getString("user")
-                if( mConnections.contains(user))
-                    return@subscribe
+                val myUid = UID
+                val pair: Pair<String, String> = Pair(user, myUid)
+                val pair2: Pair<String, String> = Pair(myUid, user)
                 if( user == UID )
                     return@subscribe
+                if (mConnections.keys.contains(pair) || mConnections.keys.contains(pair2))
+                    return@subscribe
 
-                if (!mConnections.contains(user)) {
-                    callbackNewUser?.NewUser(user)
-                    mConnections[ user ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
+                if (!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2)) {
+                    if(!usersCon.contains(user))
+                        usersCon.add(user)
+                    mConnections[ pair ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
                 }
             }
             else if (json2.getString("type") == "deleteUser") {
                 try {
                     val user = json2.getString("user")
+                    val myUid = UID
 
+                    val pair: Pair<String, String> = Pair(user, myUid)
+                    val pair2: Pair<String, String> = Pair(myUid, user)
                     lock.lock()
-                    for(name_ in mConnections.keys) {
-                        if(user == name_) {
-                            mConnections[ user ]?.FreeConnect()
-                            mConnections.remove(user)
-                        }
+                    if(mConnections.keys.contains(pair)) {
+                        mConnections[ pair ]?.FreeConnect()
+                        mConnections.remove(pair)
+                    }
+                    if(mConnections.keys.contains(pair2)) {
+                        mConnections[ pair2 ]?.FreeConnect()
+                        mConnections.remove(pair2)
                     }
                     lock.unlock()
                 }
@@ -156,7 +155,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     }
 
     private fun initNatsSignalling(listenFrom: String): Connection {
-        Log.d(TAG, "P2PMesh initNatsSignalling ${listenFrom} - listenFrom")
+        Log.d(TAG, "P2PMesh initNatsSignalling $listenFrom - listenFrom")
 
         val async = GlobalScope.async {
             try {
@@ -183,14 +182,21 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val message = String(msg.data, StandardCharsets.UTF_8)
 
             val json2 = JSONObject(message)
+            val uid = json2.getString("UID")
+            val toUser = json2.getString("toUser")
+            val pair: Pair<String, String> = Pair(uid, toUser)
+            val pair2: Pair<String, String> = Pair(toUser, uid)
+
             if(json2.getString("type") == "candidate") {
-                val uid = json2.getString("UID")
                 val candidate = IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
-                mConnections[uid]?.peerConnection?.addIceCandidate(candidate)
+                if(mConnections.keys.contains(pair)) {
+                    mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
+                }
+                else if(mConnections.keys.contains(pair2)) {
+                    mConnections[pair2]?.peerConnection?.addIceCandidate(candidate)
+                }
             }
             else {
-                val uid = json2.getString("UID")
-
                 val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
                 msg.obj = "Message - set SDP to $uid"
                 handlerToast.sendMessage(msg)
@@ -200,21 +206,34 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
 
                 val sdp2 = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
                 if(type == "offer") {
-                    if(!mConnections.contains(uid)) {
-                        mConnections[ uid ] =  Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
+                    if(!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2) ) {
+                        if(!usersCon.contains(uid))
+                            usersCon.add(uid)
+                        mConnections[ pair ] =  Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
                     }
 
-                    mConnections[uid]?.peerConnection?.setRemoteDescription(mConnections[uid]?.SessionObserver, sdp2)
-                    val constraints = MediaConstraints()
-                    mConnections[uid]?.peerConnection?.createAnswer(mConnections[uid]?.SessionObserver, constraints)
+                    if(mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
+                        val constraints = MediaConstraints()
+                        mConnections[pair]?.peerConnection?.createAnswer(mConnections[pair]?.SessionObserver, constraints)
+                    }
+                    else if(mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.peerConnection?.setRemoteDescription(mConnections[pair2]?.SessionObserver, sdp2)
+                        val constraints = MediaConstraints()
+                        mConnections[pair2]?.peerConnection?.createAnswer(mConnections[pair2]?.SessionObserver, constraints)
+                    }
                 }
                 else if(type == "answer") {
-                    mConnections[uid]?.peerConnection?.setRemoteDescription(mConnections[uid]?.SessionObserver, sdp2)
+                    if(mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
+                    }
+                    else if(mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.peerConnection?.setRemoteDescription(mConnections[pair2]?.SessionObserver, sdp2)
+                    }
                 }
             }
         }
 
-        mConnections[listenFrom]?.conNats = conNats
         return conNats
     }
 }

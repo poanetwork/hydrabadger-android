@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+val handler = Handler()
+
 abstract class DemoMessagesActivity : AppCompatActivity(),
     MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
@@ -39,6 +41,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 
     var mCurDialog: Dialog? = null
     var mCurUser: User? = null
+
 
     lateinit var progress: ProgressDialog
 
@@ -119,15 +122,17 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 AppUtils.showToast(this, R.string.copied_message, true)
             }
 //            R.id.clear -> {
-//                DatabaseApplication.mCoreHBBFT.neadClear(mCurDialog!!.dialogName)
+//                DatabaseApplication.mCoreHBBFT2X.neadClear(mCurDialog!!.dialogName)
 //            }
             R.id.action_1x -> {
                 try {
-                    progress.show()
-                    DatabaseApplication.mCoreHBBFT.subscribeSession()
-                    DatabaseApplication.mCoreHBBFT.afterSubscribeSession()
+                    handler.post {
+                        progress.show()
+                    }
+                    DatabaseApplication.mCoreHBBFT2X.subscribeSession()
+                    DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
 
-                    if(DatabaseApplication.mCoreHBBFT.mShowError) {
+                    if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
                         val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
                         } else {
@@ -142,7 +147,37 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                             .show()
                     }
 
-                    DatabaseApplication.mCoreHBBFT.start_node(mCurDialog!!.dialogName)
+                    DatabaseApplication.mCoreHBBFT2X.start_node(mCurDialog!!.dialogName)
+                }
+                catch (e: Exception)
+                {
+                    e.printStackTrace()
+                }
+            }
+            R.id.action_2x -> {
+                try {
+                    handler.post {
+                        progress.show()
+                    }
+                    DatabaseApplication.mCoreHBBFT2X.subscribeSession()
+                    DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
+
+                    if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
+                        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                        } else {
+                            AlertDialog.Builder(this)
+                        }
+                        builder.setTitle("Error ")
+                            .setMessage("Dll Error")
+                            .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                                dialog.cancel()
+                            }
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show()
+                    }
+
+                    DatabaseApplication.mCoreHBBFT2X.start_node_2x(mCurDialog!!.dialogName)
                 }
                 catch (e: Exception)
                 {
@@ -175,7 +210,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 
 //        menu!!.findItem(R.id.clear)    .isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
         menu!!.findItem(R.id.action_1x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
-        menu!!.findItem(R.id.action_2x).isVisible = false
+        menu!!.findItem(R.id.action_2x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
         menu!!.findItem(R.id.action_3x).isVisible = false
 //        invalidateOptionsMenu()
     }
@@ -183,7 +218,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 
 
     fun isNeedVilibleMenuHbbft(): Boolean {
-        return (DatabaseApplication.mCoreHBBFT.mUpdateStateToOnline && mCurDialog!!.dialogName == DatabaseApplication.mCoreHBBFT.mRoomName)
+        return (DatabaseApplication.mCoreHBBFT2X.mUpdateStateToOnline && mCurDialog!!.dialogName == DatabaseApplication.mCoreHBBFT2X.mRoomName)
     }
 
     private fun loadMessages() {
