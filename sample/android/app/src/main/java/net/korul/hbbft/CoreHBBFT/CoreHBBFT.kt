@@ -25,7 +25,6 @@ class CoreHBBFT: IGetData {
     // p2p
     var mP2PMesh: P2PMesh? = null
     var mSocketWrapper: SocketWrapper? = null
-    var mSocketWrapper2X: SocketWrapper2X? = null
 
     val APP_PREFERENCES = "mysettings"
     val APP_PREFERENCES_NAME1 = "UUID1" // UUID
@@ -62,8 +61,7 @@ class CoreHBBFT: IGetData {
         applicationContext.startService(serviceIntent)
 
         mP2PMesh  = P2PMesh(applicationContext, this)
-        mSocketWrapper2X = SocketWrapper2X(mP2PMesh!!)
-        mSocketWrapper   = SocketWrapper(mP2PMesh!!)
+        mSocketWrapper = SocketWrapper(mP2PMesh!!)
     }
 
     fun start_node(RoomName: String) {
@@ -86,7 +84,7 @@ class CoreHBBFT: IGetData {
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
             session?.start_node(
-                "127.0.0.1:${mSocketWrapper!!.myLocalPort}",
+                "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
                 strTosend
             )
         }
@@ -103,11 +101,11 @@ class CoreHBBFT: IGetData {
 
         waitForConnect2()
 
-        mSocketWrapper2X!!.initSocketWrapper(RoomName, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
+        mSocketWrapper!!.initSocketWrapper2X(RoomName, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
-            for(clients in mSocketWrapper2X!!.clientsBusyPorts) {
+            for(clients in mSocketWrapper!!.clientsBusyPorts) {
                 if(clients.key != uniqueID1 && clients.key != uniqueID2)
                     strTosend += "127.0.0.1:${clients.value};"
             }
@@ -115,12 +113,12 @@ class CoreHBBFT: IGetData {
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
             session?.start_node(
-                    "127.0.0.1:${mSocketWrapper2X!!.myLocalPort1}",
+                    "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
                     strTosend
             )
 
             strTosend = ""
-            for(clients in mSocketWrapper2X!!.clientsBusyPorts) {
+            for(clients in mSocketWrapper!!.clientsBusyPorts) {
                 if(clients.key != uniqueID2) {
                     strTosend += "127.0.0.1:${clients.value};"
                 }
@@ -129,7 +127,7 @@ class CoreHBBFT: IGetData {
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
             session?.start_node(
-                "127.0.0.1:${mSocketWrapper2X!!.myLocalPort2}",
+                "127.0.0.1:${mSocketWrapper!!.myLocalPort2}",
                 strTosend
             )
         }
@@ -178,13 +176,10 @@ class CoreHBBFT: IGetData {
 
     fun Free() {
         mP2PMesh?.FreeConnect()
-        mSocketWrapper2X?.mAllStop = true
         mSocketWrapper?.mAllStop = true
     }
 
     override fun dataReceived(bytes: ByteArray) {
-        if(mSocketWrapper2X?.mStarted != null && mSocketWrapper2X?.mStarted!!)
-            mSocketWrapper2X?.sendReceivedDataToHydra(bytes)
         if(mSocketWrapper?.mStarted != null && mSocketWrapper?.mStarted!!)
             mSocketWrapper?.sendReceivedDataToHydra(bytes)
     }

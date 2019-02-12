@@ -749,9 +749,13 @@ impl Session {
             }
         }
 
+        // let mut m_ipports_remote_ignore: Option<SocketAddr> = None;
+        // if !ipports_remote_ignore.is_empty() {
+        //     m_ipports_remote_ignore = Some(ipports_remote_ignore.parse().expect("Unable to parse socket address remote_addresses"));
+        // }
+
         let cfg = Config::default();
          
-        let callback_ = callback;
 
         unsafe {
             let num = M_NUM_OF_CALLBACK.clone();
@@ -759,6 +763,7 @@ impl Session {
             if num == 0 {
                 M_NUM_OF_CALLBACK += 1;
             
+                let callback_ = callback;
                 let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
             
                 match hbft {
@@ -779,6 +784,7 @@ impl Session {
             else if num == 1 {
                 M_NUM_OF_CALLBACK += 1;
 
+                let callback_ = callback;
                 let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
             
                 match hbft {

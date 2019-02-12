@@ -183,7 +183,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
             m_num: num,
         };
 
-        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, callbackbatch, InAddr(addr)));
+        *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, callbackbatch, num, InAddr(addr)));
 
         hdb
     }
