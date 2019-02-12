@@ -1,16 +1,26 @@
 package net.korul.hbbft.features.def
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.activity_default_dialogs.*
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
+import net.korul.hbbft.DatabaseApplication.Companion.mToken
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
@@ -31,6 +41,7 @@ class DefaultDialogsActivity:
 {
     private var dialogsList: DialogsList? = null
     private var handlerMes = Handler()
+    private var TAG = "HYDRABADGERTAG:DefaultDialogsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +58,36 @@ class DefaultDialogsActivity:
             onAddDialog()
         }
 
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            val channelId = getString(R.string.default_notification_channel_id)
+            val channelName = getString(R.string.default_notification_channel_name)
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(
+                NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_LOW)
+            )
+        }
+
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                val token = task.result?.token
+
+                // Log and toast
+                val msg = getString(R.string.msg_token_fmt, token)
+                Log.d(TAG, msg)
+                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
+                mToken = token.toString()
+            })
+
         DatabaseApplication.mCoreHBBFT2X.addListener(this)
     }
 
@@ -55,6 +96,18 @@ class DefaultDialogsActivity:
 
         super.dialogsAdapter?.clear()
         initAdapter()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+//        val SENDER_ID = mToken.toString()
+//        val fm = FirebaseMessaging.getInstance()
+//        fm.send(RemoteMessage.Builder("$SENDER_ID@gcm.googleapis.com")
+//            .setMessageId(Integer.toString(0))
+//            .addData("my_message", "Hello World")
+//            .addData("my_action", "SAY_HELLO")
+//            .build())
     }
 
     override fun onDialogClick(dialog: Dialog) {

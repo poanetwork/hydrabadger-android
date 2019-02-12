@@ -1,6 +1,10 @@
 package net.korul.hbbft
 
 import android.app.Application
+import android.util.Log
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
 import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
@@ -12,6 +16,10 @@ class DatabaseApplication : Application() {
 
         lateinit var mCoreHBBFT2X: CoreHBBFT
             private set
+
+        private var TAG = "HYDRABADGERTAG:DatabaseApplication"
+
+        var mToken = ""
     }
 
     override fun onCreate() {
