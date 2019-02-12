@@ -759,7 +759,7 @@ impl Session {
             if num == 0 {
                 M_NUM_OF_CALLBACK += 1;
             
-                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_));
+                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
             
                 match hbft {
                     Some(v) => {
@@ -779,7 +779,7 @@ impl Session {
             else if num == 1 {
                 M_NUM_OF_CALLBACK += 1;
 
-                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_));
+                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
             
                 match hbft {
                     Some(v) => {

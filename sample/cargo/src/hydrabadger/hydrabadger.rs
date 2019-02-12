@@ -132,13 +132,14 @@ pub struct Hydrabadger<C: Contribution, N: NodeId> {
 
     // android fix
     callbackbatch: CallbackBatch,
+    m_num: i32,
 }
 
 impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> {
     /// Returns a new Hydrabadger node.
     // pub fn new(addr: SocketAddr, cfg: Config, nid: N) -> Self {
     // android fix
-    pub fn new(addr: SocketAddr, cfg: Config, nid: N, callbackbatch: CallbackBatch) -> Self {
+    pub fn new(addr: SocketAddr, cfg: Config, nid: N, callbackbatch: CallbackBatch, num: i32) -> Self {
         // let nid = Uid::new();
         let secret_key = SecretKey::rand(&mut rand::OsRng::new().expect("Unable to create rng"));
 
@@ -148,7 +149,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
         info!("");
         info!("Local Hydrabadger Node: ");
         info!("    UID:             {:?}", nid);
-        info!("    Socket Address:  {}", addr);
+        info!("    Socket Address:  {}",   addr);
         info!("    Public Key:      {:?}", secret_key.public_key());
 
         warn!("");
@@ -179,6 +180,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
             batch_rx: Arc::new(Mutex::new(Some(batch_rx))),
             // android fix
             callbackbatch,
+            m_num: num,
         };
 
         *hdb.handler.lock() = Some(Handler::new(hdb.clone(), peer_internal_rx, batch_tx, callbackbatch, InAddr(addr)));
@@ -330,7 +332,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
 
     /// Returns a future that handles incoming connections on `socket`.
     fn handle_incoming(self, socket: TcpStream) -> impl Future<Item = (), Error = ()> {
-        info!("Incoming connection from '{}'", socket.peer_addr().unwrap());
+        info!("!! {} - Incoming connection from '{}'", self.m_num, socket.peer_addr().unwrap());
         let wire_msgs: WireMessages<C, N> = WireMessages::new(socket, self.inner.secret_key.clone());
 
         wire_msgs
@@ -392,7 +394,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
         let nid = self.inner.nid.clone();
         let in_addr = self.inner.addr;
 
-        info!("Initiating outgoing connection to: {}", remote_addr);
+        warn!("!! {} - Initiating outgoing connection to: {}", self.m_num, remote_addr);
 
         TcpStream::connect(&remote_addr)
             .map_err(Error::from)
@@ -406,11 +408,9 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
                 match wire_hello_result {
                     Ok(_) => {
                         let peer = PeerHandler::new(pub_info, self.clone(), wire_msgs);
-
                         self.send_internal(InternalMessage::new_outgoing_connection(
                             *peer.out_addr(),
                         ));
-
                         Either::A(peer)
                     }
                     Err(err) => Either::B(future::err(err)),
@@ -426,7 +426,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
                 } else {
                     error!("Error connecting to: {} ({e:?}: {e})", remote_addr, e = err);
                 }
-            })
+            }) 
     }
 
     fn generate_contributions(
@@ -554,6 +554,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
 
         let hdb = self.clone();
         let local_sk = hdb.inner.secret_key.clone();
+    
         let connect = future::lazy(move || {
             for &remote_addr in remotes.iter().filter(|&&ra| ra != hdb.inner.addr.0) {
                 tokio::spawn(hdb.clone().connect_outgoing(
@@ -562,7 +563,7 @@ impl<C: Contribution, N: NodeId + DeserializeOwned + 'static> Hydrabadger<C, N> 
                     None,
                     true,
                 ));
-            }
+            }  
             Ok(())
         });
 

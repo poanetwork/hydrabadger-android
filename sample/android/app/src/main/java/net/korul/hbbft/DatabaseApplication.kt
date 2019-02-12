@@ -12,9 +12,6 @@ class DatabaseApplication : Application() {
 
         lateinit var mCoreHBBFT2X: CoreHBBFT
             private set
-
-//        lateinit var mCoreHBBFT: CoreHBBFT
-//            private set
     }
 
     override fun onCreate() {
@@ -26,9 +23,6 @@ class DatabaseApplication : Application() {
 
         mCoreHBBFT2X = CoreHBBFT()
         mCoreHBBFT2X.Init(this)
-
-//        mCoreHBBFT = CoreHBBFT()
-//        mCoreHBBFT.Init(this)
 
 //        FlowManager.getDatabase(AppDatabase::class.java).reset(this)
     }

@@ -120,13 +120,16 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
     //
     // deepstream
-    implementation 'io.deepstream:deepstream.io-client-java:2.0.4'
+//    implementation 'io.deepstream:deepstream.io-client-java:2.0.4'
     //
     // libjingle
     implementation 'io.pristine:libjingle:11139@aar'
 
     // https://mvnrepository.com/artifact/com.google.common/google-collect
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+//    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+
+    // firebase push
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

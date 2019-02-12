@@ -122,10 +122,7 @@ class CoreHBBFT: IGetData {
             strTosend = ""
             for(clients in mSocketWrapper2X!!.clientsBusyPorts) {
                 if(clients.key != uniqueID2) {
-                    strTosend += if(clients.key != uniqueID1)
-                        "127.0.0.1:${clients.value+1};"
-                    else
-                        "127.0.0.1:${clients.value};"
+                    strTosend += "127.0.0.1:${clients.value};"
                 }
             }
             if (strTosend.endsWith(";"))

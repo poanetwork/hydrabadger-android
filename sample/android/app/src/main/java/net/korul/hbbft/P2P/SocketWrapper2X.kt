@@ -124,8 +124,7 @@ class SocketWrapper2X {
 
         clientsBusyPorts[uid] = port1
         Log.d(TAG, "SocketWrapper addUser $port1 - port, $uid - uid")
-        startPseudoNotLocalSocketALoop(uid, port1, myUID1)
-        startPseudoNotLocalSocketALoop(uid, port1+1, myUID2)
+        startPseudoNotLocalSocketALoop(uid, port1, "$myUID1:;:$myUID2")
     }
 
     fun sendReceivedDataToHydra(messageBytes: ByteArray) {
