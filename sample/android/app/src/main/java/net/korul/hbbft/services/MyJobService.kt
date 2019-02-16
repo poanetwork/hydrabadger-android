@@ -18,6 +18,6 @@ class MyJobService : JobService() {
 
     companion object {
 
-        private const val TAG = "HYDRABADGERTAG:MyJobService"
+        private const val TAG = "HYDRABADGERTAG:JobSer"
     }
 }

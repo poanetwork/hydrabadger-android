@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.text.SpannableStringBuilder
 import android.util.Log
+import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -14,6 +15,16 @@ import net.korul.hbbft.services.ClosingService
 import java.util.*
 import kotlin.concurrent.thread
 import kotlin.math.abs
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.HttpsCallableResult
+import org.json.JSONObject
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.AuthResult
+import com.google.android.gms.tasks.OnCompleteListener
+
 
 interface CoreHBBFTListener {
     fun updateStateToOnline()
@@ -47,6 +58,10 @@ class CoreHBBFT: IGetData {
     var lastMes: String = ""
     var lastMestime = Calendar.getInstance().timeInMillis
 
+    private val mFunctions: FirebaseFunctions
+    private lateinit var mAuth: FirebaseAuth
+
+    private lateinit var mApplicationContext: Context
 
     init {
         System.loadLibrary("hydra_android")
@@ -54,6 +69,9 @@ class CoreHBBFT: IGetData {
         session = net.korul.hbbft.Session()
 
         generateOrGetUID()
+
+        mFunctions = FirebaseFunctions.getInstance()
+        mAuth = FirebaseAuth.getInstance()
     }
 
     fun Init(applicationContext: Context) {
@@ -62,6 +80,58 @@ class CoreHBBFT: IGetData {
 
         mP2PMesh  = P2PMesh(applicationContext, this)
         mSocketWrapper = SocketWrapper(mP2PMesh!!)
+
+        mApplicationContext = applicationContext
+    }
+
+
+    fun auth() {
+        mAuth.signInAnonymously()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInAnonymously:success")
+                    val user = mAuth.currentUser
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInAnonymously:failure", task.exception)
+                    Toast.makeText(mApplicationContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+                }
+                sendPushToStart()
+            }
+            .addOnCanceledListener {
+                Toast.makeText(mApplicationContext, "Authentication canceled.",
+                    Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(mApplicationContext, "Authentication Failure.",
+                    Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    fun preSendPushToStart(){
+        val currentUser = mAuth.currentUser
+
+        if (currentUser == null)
+            auth()
+        else
+            sendPushToStart()
+    }
+
+    fun sendPushToStart(): Task<String> {
+        val json = JSONObject()
+        json.put("text", "hello")
+        json.put("idTo", "fAl5wYy3aIo:APA91bEdaGeztczsfl4rq1Mzoon1OaTksn5A9cAkqs-q8SIwPQMgMQZQpT4GgXiQeS4Jww29lBynOfXKBizag6gYzBUzqhRIYAcP60yu6dGwKYrlbi_lNfBt62NkdmGaOd6TZBAQqI6A")
+
+        return mFunctions
+            .getHttpsCallable("sendPush")
+            .call(json)
+            .continueWith(object :Continuation<HttpsCallableResult, String> {
+                override fun then(task: Task<HttpsCallableResult>): String {
+                    return task.result?.data.toString()
+                }
+            })
     }
 
     fun start_node(RoomName: String) {

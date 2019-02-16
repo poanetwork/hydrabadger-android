@@ -1,15 +1,13 @@
 package net.korul.hbbft
 
 import android.app.Application
-<<<<<<< HEAD
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
-=======
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
->>>>>>> new_features2
 import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
 import io.fabric.sdk.android.Fabric
@@ -22,13 +20,10 @@ class DatabaseApplication : Application() {
 
         lateinit var mCoreHBBFT2X: CoreHBBFT
             private set
-<<<<<<< HEAD
 
         private var TAG = "HYDRABADGERTAG:DatabaseApplication"
 
         var mToken = ""
-=======
->>>>>>> new_features2
     }
 
     override fun onCreate() {
