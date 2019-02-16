@@ -33,4 +33,8 @@
     <string name="default_notification_channel_name" translatable="true">fcm_default</string>
     <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
     <string name="fcm_message">FCM Message</string>
+
+    <string name="msg_subscribed">FCM subscribe</string>
+    <string name="msg_subscribe_failed">FCM unsubscribe</string>
+
 </resources>

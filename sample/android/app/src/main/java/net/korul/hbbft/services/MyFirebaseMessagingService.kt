@@ -23,6 +23,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      *
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
      */
+
+    // is active
     // [START receive_message]
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
         // [START_EXCLUDE]
@@ -134,6 +136,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        Log.d(TAG, " sendNotification  ")
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

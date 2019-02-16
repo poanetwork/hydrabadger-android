@@ -21,9 +21,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.HttpsCallableResult
 import org.json.JSONObject
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.AuthResult
-import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import net.korul.hbbft.R
+import java.util.concurrent.CountDownLatch
 
 
 interface CoreHBBFTListener {
@@ -82,10 +82,25 @@ class CoreHBBFT: IGetData {
         mSocketWrapper = SocketWrapper(mP2PMesh!!)
 
         mApplicationContext = applicationContext
+
+
+        FirebaseMessaging.getInstance().subscribeToTopic("$uniqueID1")
+            .addOnCompleteListener { task ->
+                var msg = mApplicationContext.getString(R.string.msg_subscribed)
+                if (!task.isSuccessful) {
+                    msg = mApplicationContext.getString(R.string.msg_subscribe_failed)
+                }
+                Log.d(TAG, msg)
+            }
+
+        thread {
+            authAnonymously()
+        }
     }
 
 
-    fun auth() {
+    fun authAnonymously(): CountDownLatch {
+        val latch = CountDownLatch(1)
         mAuth.signInAnonymously()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -98,7 +113,8 @@ class CoreHBBFT: IGetData {
                     Toast.makeText(mApplicationContext, "Authentication failed.",
                         Toast.LENGTH_SHORT).show()
                 }
-                sendPushToStart()
+
+                latch.countDown()
             }
             .addOnCanceledListener {
                 Toast.makeText(mApplicationContext, "Authentication canceled.",
@@ -108,21 +124,44 @@ class CoreHBBFT: IGetData {
                 Toast.makeText(mApplicationContext, "Authentication Failure.",
                     Toast.LENGTH_SHORT).show()
             }
+
+        return latch
     }
 
-    fun preSendPushToStart(){
+
+    fun preSendPushToStart(listOfUIDs: List<String>, text: String, title: String) {
         val currentUser = mAuth.currentUser
 
-        if (currentUser == null)
-            auth()
-        else
-            sendPushToStart()
+        if (currentUser == null) {
+            val latch = authAnonymously()
+            latch.await()
+        }
+
+        for (uid in listOfUIDs)
+            sendPushToTopic(uid, title, text)
     }
 
-    fun sendPushToStart(): Task<String> {
+    fun sendPushToTopic(UIDtopic: String, title: String, text: String): Task<String> {
         val json = JSONObject()
-        json.put("text", "hello")
-        json.put("idTo", "fAl5wYy3aIo:APA91bEdaGeztczsfl4rq1Mzoon1OaTksn5A9cAkqs-q8SIwPQMgMQZQpT4GgXiQeS4Jww29lBynOfXKBizag6gYzBUzqhRIYAcP60yu6dGwKYrlbi_lNfBt62NkdmGaOd6TZBAQqI6A")
+        json.put("text", text)
+        json.put("title", title)
+        json.put("topic", UIDtopic)
+
+        return mFunctions
+            .getHttpsCallable("sendToTopic")
+            .call(json)
+            .continueWith(object :Continuation<HttpsCallableResult, String> {
+                override fun then(task: Task<HttpsCallableResult>): String {
+                    return task.result?.data.toString()
+                }
+            })
+    }
+
+    fun sendPushStart(pushUID: String, title: String, text: String): Task<String> {
+        val json = JSONObject()
+        json.put("text", text)
+        json.put("title", title)
+        json.put("idTo", pushUID)
 
         return mFunctions
             .getHttpsCallable("sendPush")
@@ -136,6 +175,8 @@ class CoreHBBFT: IGetData {
 
     fun start_node(RoomName: String) {
         mRoomName = RoomName
+
+//        preSendPushToStart(listOf("160b4098-36fd-407b-92fc-83eab44ae17c"), RoomName, "lyalyalya")
 
         mP2PMesh?.initOneMesh(RoomName, uniqueID1)
         mP2PMesh?.publishAboutMe(RoomName, uniqueID1)
