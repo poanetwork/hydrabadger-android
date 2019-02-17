@@ -21,9 +21,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.HttpsCallableResult
 import org.json.JSONObject
 import android.widget.Toast
+import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
 import net.korul.hbbft.R
 import java.util.concurrent.CountDownLatch
+import com.google.firebase.database.GenericTypeIndicator
 
 
 interface CoreHBBFTListener {
@@ -31,6 +33,9 @@ interface CoreHBBFTListener {
 
     fun reciveMessage(you: Boolean, uid: String, mes: String)
 }
+
+data class Uids( var UID: String? = null,
+                 var isOnline: Boolean? = null )
 
 class CoreHBBFT: IGetData {
     // p2p
@@ -59,9 +64,10 @@ class CoreHBBFT: IGetData {
     var lastMestime = Calendar.getInstance().timeInMillis
 
     private val mFunctions: FirebaseFunctions
-    private lateinit var mAuth: FirebaseAuth
+    private var mAuth: FirebaseAuth
 
     private lateinit var mApplicationContext: Context
+    private lateinit var mDatabase: DatabaseReference
 
     init {
         System.loadLibrary("hydra_android")
@@ -157,26 +163,120 @@ class CoreHBBFT: IGetData {
             })
     }
 
-    fun sendPushStart(pushUID: String, title: String, text: String): Task<String> {
-        val json = JSONObject()
-        json.put("text", text)
-        json.put("title", title)
-        json.put("idTo", pushUID)
+//    fun sendPushStart(pushUID: String, title: String, text: String): Task<String> {
+//        val json = JSONObject()
+//        json.put("text", text)
+//        json.put("title", title)
+//        json.put("idTo", pushUID)
+//
+//        return mFunctions
+//            .getHttpsCallable("sendPush")
+//            .call(json)
+//            .continueWith(object :Continuation<HttpsCallableResult, String> {
+//                override fun then(task: Task<HttpsCallableResult>): String {
+//                    return task.result?.data.toString()
+//                }
+//            })
+//    }
 
-        return mFunctions
-            .getHttpsCallable("sendPush")
-            .call(json)
-            .continueWith(object :Continuation<HttpsCallableResult, String> {
-                override fun then(task: Task<HttpsCallableResult>): String {
-                    return task.result?.data.toString()
+    fun startAllNode(RoomName: String) {
+        val listObjectsOfUIds = getUIDsFromDataBase(RoomName)
+
+        val isSomebodyOnline = isSomeBodyOnline(listObjectsOfUIds)
+        val cntUsers = listObjectsOfUIds.count()
+
+        if (cntUsers < 2) {
+            Toast.makeText(mApplicationContext, "Room is empty", Toast.LENGTH_LONG).show()
+        }
+        else if(cntUsers == 2 && !isSomebodyOnline) {
+            start_node_2x(RoomName)
+
+            var uid = ""
+            for (ui in listObjectsOfUIds) {
+                if (ui.UID != uniqueID1) {
+                    uid = ui.UID!!
+                    break
                 }
-            })
+            }
+            if(uid.isNotEmpty()) {
+                //TODO some data to start node
+//                preSendPushToStart()
+            }
+            else {
+                Toast.makeText(mApplicationContext, "Room uid is empty", Toast.LENGTH_LONG).show()
+            }
+        }
+        else if(cntUsers == 2 && isSomebodyOnline) {
+            start_node(RoomName)
+        }
+        else if(cntUsers > 2 && !isSomebodyOnline) {
+            start_node(RoomName)
+
+            val uids = mutableListOf<String>()
+            for (ui in listObjectsOfUIds) {
+                if (ui.UID != uniqueID1) {
+                    uids.add(ui.UID!!)
+                }
+            }
+            if(uids.isNotEmpty()) {
+                for (uid in uids) {
+                    //TODO some data to start node
+//                    preSendPushToStart()
+                }
+            }
+            else {
+                Toast.makeText(mApplicationContext, "Room uids is empty", Toast.LENGTH_LONG).show()
+            }
+        }
+        else {
+            start_node(RoomName)
+        }
+    }
+
+    fun getUIDsFromDataBase(RoomName: String): MutableList<Uids> {
+        mDatabase = FirebaseDatabase.getInstance().reference
+
+        val ref = mDatabase.child("Rooms").child(RoomName)
+
+        val latch = CountDownLatch(1)
+        val listObjectsOfUIds: MutableList<Uids> = arrayListOf()
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val objectMap = dataSnapshot.value as HashMap<String, Object>
+                for (obj in objectMap.values) {
+                    val mapObj: Map<String, Object> = obj as Map<String, Object>
+                    val uids = Uids()
+                    uids.UID = mapObj["UID"] as String
+                    uids.isOnline = mapObj["isOnline"] as Boolean
+
+                    listObjectsOfUIds.add(uids)
+                }
+
+                latch.countDown()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        ref.addValueEventListener(postListener)
+        latch.await()
+
+        return listObjectsOfUIds
+    }
+
+    fun isSomeBodyOnline(listOfUids: List<Uids>): Boolean {
+        for (uids in listOfUids) {
+            if(uids.isOnline!!)
+                return true
+        }
+
+        return false
     }
 
     fun start_node(RoomName: String) {
         mRoomName = RoomName
-
-//        preSendPushToStart(listOf("160b4098-36fd-407b-92fc-83eab44ae17c"), RoomName, "lyalyalya")
 
         mP2PMesh?.initOneMesh(RoomName, uniqueID1)
         mP2PMesh?.publishAboutMe(RoomName, uniqueID1)
