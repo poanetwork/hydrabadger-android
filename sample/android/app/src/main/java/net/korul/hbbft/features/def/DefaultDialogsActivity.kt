@@ -58,36 +58,6 @@ class DefaultDialogsActivity:
             onAddDialog()
         }
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create channel to show notifications.
-            val channelId = getString(R.string.default_notification_channel_id)
-            val channelName = getString(R.string.default_notification_channel_name)
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(
-                NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_LOW)
-            )
-        }
-
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w(TAG, "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-
-                // Get new Instance ID token
-                val token = task.result?.token
-
-                // Log and toast
-                val msg = getString(R.string.msg_token_fmt, token)
-                Log.d(TAG, msg)
-//                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-
-                mToken = token.toString()
-            })
-
         DatabaseApplication.mCoreHBBFT2X.addListener(this)
     }
 
@@ -96,18 +66,6 @@ class DefaultDialogsActivity:
 
         super.dialogsAdapter?.clear()
         initAdapter()
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-//        val SENDER_ID = mToken.toString()
-//        val fm = FirebaseMessaging.getInstance()
-//        fm.send(RemoteMessage.Builder("$SENDER_ID@gcm.googleapis.com")
-//            .setMessageId(Integer.toString(0))
-//            .addData("my_message", "Hello World")
-//            .addData("my_action", "SAY_HELLO")
-//            .build())
     }
 
     override fun onDialogClick(dialog: Dialog) {

@@ -132,7 +132,7 @@ class DefaultMessagesActivity :
                 progress.dismiss()
                 super.menu!!.findItem(R.id.action_online).icon =
                         DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
-                hideMenuHbbft()
+                hideMenuHbbft1()
                 super.invalidateOptionsMenu()
             }, 0)
         }
@@ -141,11 +141,12 @@ class DefaultMessagesActivity :
         }
     }
 
-    fun hideMenuHbbft() {
+    fun hideMenuHbbft1() {
+        super.menu!!.findItem(R.id.action_startALL).isVisible = false
 //        super.menu!!.findItem(R.id.clear)    .isVisible = false
-        super.menu!!.findItem(R.id.action_1x).isVisible = false
-        super.menu!!.findItem(R.id.action_2x).isVisible = false
-        super.menu!!.findItem(R.id.action_3x).isVisible = false
+//        super.menu!!.findItem(R.id.action_1x).isVisible = false
+//        super.menu!!.findItem(R.id.action_2x).isVisible = false
+//        super.menu!!.findItem(R.id.action_3x).isVisible = false
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
@@ -253,7 +254,6 @@ class DefaultMessagesActivity :
     }
 
     companion object {
-
         private val CONTENT_TYPE_VOICE: Byte = 1
 
         fun open(context: Context, dialog: Dialog, user: User) {

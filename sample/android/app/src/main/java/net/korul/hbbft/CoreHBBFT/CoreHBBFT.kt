@@ -1,31 +1,37 @@
 package net.korul.hbbft.CoreHBBFT
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.text.SpannableStringBuilder
 import android.util.Log
+import android.widget.Toast
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.HttpsCallableResult
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import net.korul.hbbft.DatabaseApplication
-import net.korul.hbbft.P2P.*
+import net.korul.hbbft.P2P.IGetData
+import net.korul.hbbft.P2P.P2PMesh
+import net.korul.hbbft.P2P.SocketWrapper
+import net.korul.hbbft.R
 import net.korul.hbbft.Session
 import net.korul.hbbft.services.ClosingService
+import org.json.JSONObject
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 import kotlin.math.abs
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.functions.HttpsCallableResult
-import org.json.JSONObject
-import android.widget.Toast
-import com.google.firebase.database.*
-import com.google.firebase.messaging.FirebaseMessaging
-import net.korul.hbbft.R
-import java.util.concurrent.CountDownLatch
-import com.google.firebase.database.GenericTypeIndicator
 
 
 interface CoreHBBFTListener {
@@ -67,7 +73,7 @@ class CoreHBBFT: IGetData {
     private var mAuth: FirebaseAuth
 
     private lateinit var mApplicationContext: Context
-    private lateinit var mDatabase: DatabaseReference
+    private var mDatabase: DatabaseReference
 
     init {
         System.loadLibrary("hydra_android")
@@ -78,6 +84,8 @@ class CoreHBBFT: IGetData {
 
         mFunctions = FirebaseFunctions.getInstance()
         mAuth = FirebaseAuth.getInstance()
+
+        mDatabase = FirebaseDatabase.getInstance().reference
     }
 
     fun Init(applicationContext: Context) {
@@ -89,6 +97,7 @@ class CoreHBBFT: IGetData {
 
         mApplicationContext = applicationContext
 
+        registerForPush(applicationContext)
 
         FirebaseMessaging.getInstance().subscribeToTopic("$uniqueID1")
             .addOnCompleteListener { task ->
@@ -104,6 +113,34 @@ class CoreHBBFT: IGetData {
         }
     }
 
+    fun registerForPush(applicationContext: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            val channelId = applicationContext.getString(R.string.default_notification_channel_id)
+            val channelName = applicationContext.getString(R.string.default_notification_channel_name)
+            val notificationManager = applicationContext.getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(
+                NotificationChannel(channelId,
+                    channelName, NotificationManager.IMPORTANCE_LOW)
+            )
+        }
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                val token = task.result?.token
+
+                // Log
+                val msg = applicationContext.getString(R.string.msg_token_fmt, token)
+                Log.d(TAG, msg)
+
+                DatabaseApplication.mToken = token.toString()
+            })
+    }
 
     fun authAnonymously(): CountDownLatch {
         val latch = CountDownLatch(1)
@@ -179,80 +216,165 @@ class CoreHBBFT: IGetData {
 //            })
 //    }
 
+    fun unregisterInDatabase(RoomName: String) {
+        val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("UID").equalTo(uniqueID1)
+        queryRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChild: String?) {
+                snapshot.ref.setValue(null)
+                Log.d(TAG, "Succes unregisterInDatabase $uniqueID1")
+            }
+            override fun onCancelled(p0: DatabaseError) {
+            }
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            }
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+            }
+            override fun onChildRemoved(p0: DataSnapshot) {
+            }
+        })
+    }
+
+    fun registerInDatabase(RoomName: String) {
+        unregisterInDatabase(RoomName)
+
+        val ref = mDatabase.child("Rooms").child(RoomName)
+        val uid = Uids()
+        uid.UID = uniqueID1
+        uid.isOnline = false
+        ref.push().setValue(uid).addOnSuccessListener { void ->
+            Log.d(TAG, "Succes registerInDatabase $uniqueID1")
+        }
+    }
+
+    fun setOflineModeToDatabase(RoomName: String) {
+        val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("UID").equalTo(uniqueID1)
+        queryRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChild: String?) {
+                val uid = Uids()
+                uid.UID = uniqueID1
+                uid.isOnline = false
+                snapshot.ref.setValue(uid)
+                Log.d(TAG, "Succes setOflineModeToDatabase $uniqueID1")
+            }
+            override fun onCancelled(p0: DatabaseError) {
+            }
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            }
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+            }
+            override fun onChildRemoved(p0: DataSnapshot) {
+            }
+        })
+    }
+
+    fun setOnlineModeToDatabase(RoomName: String) {
+        val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("UID").equalTo(uniqueID1)
+        queryRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChild: String?) {
+                val uid = Uids()
+                uid.UID = uniqueID1
+                uid.isOnline = true
+                snapshot.ref.setValue(uid)
+                Log.d(TAG, "Succes setOnlineModeToDatabase $uniqueID1")
+            }
+            override fun onCancelled(p0: DatabaseError) {
+            }
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            }
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+            }
+            override fun onChildRemoved(p0: DataSnapshot) {
+            }
+        })
+    }
+
     fun startAllNode(RoomName: String) {
-        val listObjectsOfUIds = getUIDsFromDataBase(RoomName)
+        thread {
+            val listObjectsOfUIds = getUIDsFromDataBase(RoomName)
 
-        val isSomebodyOnline = isSomeBodyOnline(listObjectsOfUIds)
-        val cntUsers = listObjectsOfUIds.count()
+            val isSomebodyOnline = isSomeBodyOnline(listObjectsOfUIds)
+            val cntUsers = listObjectsOfUIds.count()
 
-        if (cntUsers < 2) {
-            Toast.makeText(mApplicationContext, "Room is empty", Toast.LENGTH_LONG).show()
-        }
-        else if(cntUsers == 2 && !isSomebodyOnline) {
-            start_node_2x(RoomName)
+            // if 1 user
+            if (cntUsers < 2) {
+                Toast.makeText(mApplicationContext, "Room is empty", Toast.LENGTH_LONG).show()
+                Log.d(TAG, "Room is empty $RoomName")
 
-            var uid = ""
-            for (ui in listObjectsOfUIds) {
-                if (ui.UID != uniqueID1) {
-                    uid = ui.UID!!
-                    break
+            }
+            // if 2 users and i am first
+            else if(cntUsers == 2 && !isSomebodyOnline) {
+                start_node_2x(RoomName)
+
+                var uid = ""
+                for (ui in listObjectsOfUIds) {
+                    if (ui.UID != uniqueID1) {
+                        uid = ui.UID!!
+                        break
+                    }
+                }
+                if(uid.isNotEmpty()) {
+                    Log.d(TAG, "2 users and i am first in room $RoomName")
+                    preSendPushToStart(listOf(uid), RoomName, RoomName)
+                }
+                else {
+                    Log.d(TAG, "Room uid is empty $RoomName")
+                    Toast.makeText(mApplicationContext, "Room uid is empty", Toast.LENGTH_LONG).show()
                 }
             }
-            if(uid.isNotEmpty()) {
-                //TODO some data to start node
-//                preSendPushToStart()
+            // if 2 users and second start
+            else if(cntUsers == 2 && isSomebodyOnline) {
+                Log.d(TAG, "2 users and second start in room $RoomName")
+                start_node(RoomName)
             }
+            // if many users and i am first
+            else if(cntUsers > 2 && !isSomebodyOnline) {
+                start_node(RoomName)
+
+                val uids = mutableListOf<String>()
+                for (ui in listObjectsOfUIds) {
+                    if (ui.UID != uniqueID1) {
+                        uids.add(ui.UID!!)
+                    }
+                }
+                if(uids.isNotEmpty()) {
+                    Log.d(TAG, "many users and i am first in room $RoomName")
+                    preSendPushToStart(uids, RoomName, RoomName)
+                }
+                else {
+                    Log.d(TAG, "Room uid is empty $RoomName")
+                    Toast.makeText(mApplicationContext, "Room uids is empty", Toast.LENGTH_LONG).show()
+                }
+            }
+            // if many users and i am not first
             else {
-                Toast.makeText(mApplicationContext, "Room uid is empty", Toast.LENGTH_LONG).show()
+                Log.d(TAG, "many users and i am not first in room $RoomName")
+                start_node(RoomName)
             }
-        }
-        else if(cntUsers == 2 && isSomebodyOnline) {
-            start_node(RoomName)
-        }
-        else if(cntUsers > 2 && !isSomebodyOnline) {
-            start_node(RoomName)
-
-            val uids = mutableListOf<String>()
-            for (ui in listObjectsOfUIds) {
-                if (ui.UID != uniqueID1) {
-                    uids.add(ui.UID!!)
-                }
-            }
-            if(uids.isNotEmpty()) {
-                for (uid in uids) {
-                    //TODO some data to start node
-//                    preSendPushToStart()
-                }
-            }
-            else {
-                Toast.makeText(mApplicationContext, "Room uids is empty", Toast.LENGTH_LONG).show()
-            }
-        }
-        else {
-            start_node(RoomName)
         }
     }
 
     fun getUIDsFromDataBase(RoomName: String): MutableList<Uids> {
-        mDatabase = FirebaseDatabase.getInstance().reference
-
         val ref = mDatabase.child("Rooms").child(RoomName)
 
         val latch = CountDownLatch(1)
         val listObjectsOfUIds: MutableList<Uids> = arrayListOf()
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val objectMap = dataSnapshot.value as HashMap<String, Object>
+                val objectMap = dataSnapshot.value as HashMap<String, Any>
                 for (obj in objectMap.values) {
-                    val mapObj: Map<String, Object> = obj as Map<String, Object>
+                    val mapObj: Map<String, Any> = obj as Map<String, Any>
                     val uids = Uids()
-                    uids.UID = mapObj["UID"] as String
-                    uids.isOnline = mapObj["isOnline"] as Boolean
+                    uids.UID = mapObj["uid"] as String
+                    uids.isOnline = mapObj["online"] as Boolean
 
                     listObjectsOfUIds.add(uids)
                 }
-
-                latch.countDown()
+                try {
+                    latch.countDown()
+                }
+                catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -271,11 +393,12 @@ class CoreHBBFT: IGetData {
             if(uids.isOnline!!)
                 return true
         }
-
         return false
     }
 
     fun start_node(RoomName: String) {
+        setOnlineModeToDatabase(RoomName)
+
         mRoomName = RoomName
 
         mP2PMesh?.initOneMesh(RoomName, uniqueID1)
@@ -302,6 +425,8 @@ class CoreHBBFT: IGetData {
     }
 
     fun start_node_2x(RoomName: String) {
+        setOnlineModeToDatabase(RoomName)
+
         mRoomName = RoomName
 
         mP2PMesh?.initOneMesh(RoomName, uniqueID1)
@@ -388,6 +513,8 @@ class CoreHBBFT: IGetData {
     fun Free() {
         mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
+
+        setOflineModeToDatabase(mRoomName)
     }
 
     override fun dataReceived(bytes: ByteArray) {

@@ -27,7 +27,6 @@ import java.util.*
 
 
 val handler = Handler()
-
 abstract class DemoMessagesActivity : AppCompatActivity(),
     MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
@@ -93,18 +92,19 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
 
         if(isNeedVilibleMenuHbbft()) {
             menu.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
-            hideMenuHbbft1()
+            hideMenuHbbft()
         }
 
         super.onCreateOptionsMenu(menu)
         return true
     }
 
-    fun hideMenuHbbft1() {
+    fun hideMenuHbbft() {
 //        menu!!.findItem(R.id.clear).isVisible = false
-        menu!!.findItem(R.id.action_1x).isVisible = false
-        menu!!.findItem(R.id.action_2x).isVisible = false
-        menu!!.findItem(R.id.action_3x).isVisible = false
+//        menu!!.findItem(R.id.action_1x).isVisible = false
+//        menu!!.findItem(R.id.action_2x).isVisible = false
+//        menu!!.findItem(R.id.action_3x).isVisible = false
+        menu!!.findItem(R.id.action_startALL).isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -121,69 +121,93 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
                 messagesAdapter!!.copySelectedMessagesText(this, messageStringFormatter, true)
                 AppUtils.showToast(this, R.string.copied_message, true)
             }
+            R.id.action_startALL -> {
+                handler.post {
+                    progress.show()
+                }
+                DatabaseApplication.mCoreHBBFT2X.subscribeSession()
+                DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
+
+                if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
+                    val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                    } else {
+                        AlertDialog.Builder(this)
+                    }
+                    builder.setTitle("Error ")
+                        .setMessage("Dll Error")
+                        .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show()
+                }
+
+                DatabaseApplication.mCoreHBBFT2X.startAllNode(mCurDialog!!.dialogName)
+            }
 //            R.id.clear -> {
 //                DatabaseApplication.mCoreHBBFT2X.neadClear(mCurDialog!!.dialogName)
 //            }
-            R.id.action_1x -> {
-                try {
-                    handler.post {
-                        progress.show()
-                    }
-                    DatabaseApplication.mCoreHBBFT2X.subscribeSession()
-                    DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
-
-                    if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
-                        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                        } else {
-                            AlertDialog.Builder(this)
-                        }
-                        builder.setTitle("Error ")
-                            .setMessage("Dll Error")
-                            .setPositiveButton(android.R.string.yes) { dialog, _ ->
-                                dialog.cancel()
-                            }
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show()
-                    }
-
-                    DatabaseApplication.mCoreHBBFT2X.start_node(mCurDialog!!.dialogName)
-                }
-                catch (e: Exception)
-                {
-                    e.printStackTrace()
-                }
-            }
-            R.id.action_2x -> {
-                try {
-                    handler.post {
-                        progress.show()
-                    }
-                    DatabaseApplication.mCoreHBBFT2X.subscribeSession()
-                    DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
-
-                    if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
-                        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                        } else {
-                            AlertDialog.Builder(this)
-                        }
-                        builder.setTitle("Error ")
-                            .setMessage("Dll Error")
-                            .setPositiveButton(android.R.string.yes) { dialog, _ ->
-                                dialog.cancel()
-                            }
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show()
-                    }
-
-                    DatabaseApplication.mCoreHBBFT2X.start_node_2x(mCurDialog!!.dialogName)
-                }
-                catch (e: Exception)
-                {
-                    e.printStackTrace()
-                }
-            }
+//            R.id.action_1x -> {
+//                try {
+//                    handler.post {
+//                        progress.show()
+//                    }
+//                    DatabaseApplication.mCoreHBBFT2X.subscribeSession()
+//                    DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
+//
+//                    if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
+//                        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+//                        } else {
+//                            AlertDialog.Builder(this)
+//                        }
+//                        builder.setTitle("Error ")
+//                            .setMessage("Dll Error")
+//                            .setPositiveButton(android.R.string.yes) { dialog, _ ->
+//                                dialog.cancel()
+//                            }
+//                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show()
+//                    }
+//
+//                    DatabaseApplication.mCoreHBBFT2X.start_node(mCurDialog!!.dialogName)
+//                }
+//                catch (e: Exception)
+//                {
+//                    e.printStackTrace()
+//                }
+//            }
+//            R.id.action_2x -> {
+//                try {
+//                    handler.post {
+//                        progress.show()
+//                    }
+//                    DatabaseApplication.mCoreHBBFT2X.subscribeSession()
+//                    DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
+//
+//                    if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
+//                        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+//                        } else {
+//                            AlertDialog.Builder(this)
+//                        }
+//                        builder.setTitle("Error ")
+//                            .setMessage("Dll Error")
+//                            .setPositiveButton(android.R.string.yes) { dialog, _ ->
+//                                dialog.cancel()
+//                            }
+//                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show()
+//                    }
+//
+//                    DatabaseApplication.mCoreHBBFT2X.start_node_2x(mCurDialog!!.dialogName)
+//                }
+//                catch (e: Exception)
+//                {
+//                    e.printStackTrace()
+//                }
+//            }
         }
         return true
     }
@@ -208,10 +232,12 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         menu!!.findItem(R.id.action_delete).isVisible = count > 0
         menu!!.findItem(R.id.action_copy).isVisible = count > 0
 
+        menu!!.findItem(R.id.action_startALL).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+
 //        menu!!.findItem(R.id.clear)    .isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
-        menu!!.findItem(R.id.action_1x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
-        menu!!.findItem(R.id.action_2x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
-        menu!!.findItem(R.id.action_3x).isVisible = false
+//        menu!!.findItem(R.id.action_1x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+//        menu!!.findItem(R.id.action_2x).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+//        menu!!.findItem(R.id.action_3x).isVisible = false
 //        invalidateOptionsMenu()
     }
 
