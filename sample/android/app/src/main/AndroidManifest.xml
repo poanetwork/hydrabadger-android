@@ -71,6 +71,33 @@
         <service android:name="net.korul.hbbft.services.ClosingService"
                  android:stopWithTask="false"/>
 
+        <service android:name=".services.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+                android:name=".services.MyJobService"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@mipmap/ic_launcher" />
+        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="@color/colorAccent" />
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_channel_id"
+                android:value="@string/default_notification_channel_id" />
+
         <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="2c2aec185f79a030d6b4fd365a79c1ece65a02fc" />

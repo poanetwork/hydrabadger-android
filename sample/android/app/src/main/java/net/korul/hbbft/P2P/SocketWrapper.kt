@@ -114,10 +114,12 @@ class SocketWrapper {
     fun sendReceivedDataToHydra(messageBytes: ByteArray) {
         val message = String(messageBytes, StandardCharsets.UTF_8)
         val json = JSONObject(message)
+
         val uid = json.getString("myUID")
         val touid = json.getString("toUID")
 
         val pair: Pair<String, String> = Pair(touid, uid)
+
 
         if(touid == myUID1) {
             if(!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket.contains(uid))

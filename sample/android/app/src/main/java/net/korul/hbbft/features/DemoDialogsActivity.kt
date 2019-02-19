@@ -44,10 +44,11 @@ abstract class DemoDialogsActivity :
         menuInflater.inflate(R.menu.chat_actions_menu, menu)
         menu.findItem(R.id.action_delete).isVisible = false
         menu.findItem(R.id.action_copy).isVisible = false
-        menu.findItem(R.id.action_1x).isVisible = false
+        menu.findItem(R.id.action_startALL).isVisible = false
+//        menu.findItem(R.id.action_1x).isVisible = false
 //        menu.findItem(R.id.clear).isVisible = false
-        menu.findItem(R.id.action_2x).isVisible = false
-        menu.findItem(R.id.action_3x).isVisible = false
+//        menu.findItem(R.id.action_2x).isVisible = false
+//        menu.findItem(R.id.action_3x).isVisible = false
         menu.findItem(R.id.action_online).isVisible = false
         return true
     }

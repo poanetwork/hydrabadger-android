@@ -7,6 +7,7 @@ import android.widget.Toast
 import io.nats.client.Connection
 import io.nats.client.ConnectionFactory
 import io.nats.client.Message
+import io.nats.client.Subscription
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -27,6 +28,8 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     var roomNameList: MutableList<String?> = arrayListOf()
 
     var usersCon: MutableList<String> = arrayListOf()
+
+    var listOfSub: MutableList<Subscription> = arrayListOf()
 
     val DISPLAY_UI_TOAST = 0
 
@@ -87,6 +90,15 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             e.printStackTrace()
         }
 
+        for(sub in listOfSub) {
+            try {
+                sub.unsubscribe()
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         for (roomName in roomNameList) {
             if(roomName.isNullOrEmpty())
                 continue
@@ -106,7 +118,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     }
 
     fun initNatsMeshInitiator(nats: Connection?, UID: String, roomName: String) {
-        nats!!.subscribe(roomName) { msg: Message? ->
+        val sub = nats!!.subscribe(roomName) { msg: Message? ->
             if (msg == null)
                 return@subscribe
 
@@ -152,6 +164,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 }
             }
         }
+        listOfSub.add(sub)
     }
 
     private fun initNatsSignalling(listenFrom: String): Connection {
@@ -175,7 +188,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         }
         val conNats = runBlocking { async.await() }
 
-        conNats!!.subscribe(listenFrom) { msg: Message? ->
+        val sub = conNats!!.subscribe(listenFrom) { msg: Message? ->
             if(msg == null)
                 return@subscribe
 
@@ -233,6 +246,8 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 }
             }
         }
+
+        listOfSub.add(sub)
 
         return conNats
     }

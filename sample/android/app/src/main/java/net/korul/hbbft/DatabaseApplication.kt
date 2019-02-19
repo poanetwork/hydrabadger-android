@@ -1,12 +1,25 @@
 package net.korul.hbbft
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent.getActivity
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
 import io.fabric.sdk.android.Fabric
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import android.content.Intent.getIntent
+import android.content.Intent
+
+
 
 class DatabaseApplication : Application() {
     companion object {
@@ -15,16 +28,22 @@ class DatabaseApplication : Application() {
 
         lateinit var mCoreHBBFT2X: CoreHBBFT
             private set
+
+        private var TAG = "HYDRABADGERTAG:DatabaseApplication"
+
+        var mToken = ""
     }
 
     override fun onCreate() {
+        Log.d(TAG, "onCreate DatabaseApplication")
+
         super.onCreate()
         instance = this
         FlowManager.init(FlowConfig.Builder(this).build())
         Fabric.with(this, Crashlytics())
         FirebaseApp.initializeApp(this)
 
-        mCoreHBBFT2X = CoreHBBFT()
+        mCoreHBBFT2X = CoreHBBFT
         mCoreHBBFT2X.Init(this)
 
 //        FlowManager.getDatabase(AppDatabase::class.java).reset(this)

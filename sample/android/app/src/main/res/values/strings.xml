@@ -25,7 +25,17 @@
 
     <string name="clear">clear</string>
     <string name="status">status</string>
+    <string name="start">Start</string>
     <string name="start_1x">start_1x</string>
     <string name="start_2x">start_2x</string>
     <string name="start_3x">start_3x</string>
+
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="default_notification_channel_name" translatable="true">fcm_default</string>
+    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+    <string name="fcm_message">FCM Message</string>
+
+    <string name="msg_subscribed">FCM subscribe</string>
+    <string name="msg_subscribe_failed">FCM unsubscribe</string>
+
 </resources>

@@ -1,16 +1,26 @@
 package net.korul.hbbft.features.def
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.activity_default_dialogs.*
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
+import net.korul.hbbft.DatabaseApplication.Companion.mToken
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
@@ -31,6 +41,7 @@ class DefaultDialogsActivity:
 {
     private var dialogsList: DialogsList? = null
     private var handlerMes = Handler()
+    private var TAG = "HYDRABADGERTAG:DefaultDialogsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +59,21 @@ class DefaultDialogsActivity:
         }
 
         DatabaseApplication.mCoreHBBFT2X.addListener(this)
+
+        val intent = this.intent
+        val start_App = intent.getBooleanExtra("Start_App", false)
+        if(start_App) {
+            Log.d(TAG, "Receive push and start activity")
+            val roomName = intent.getStringExtra("RoomName")
+
+            val dialogs = DialogsFixtures.dialogs
+            for (diag in dialogs) {
+                if(diag.dialogName == roomName) {
+                    Log.d(TAG, "Found dialog and start it $roomName")
+                    startMesActivity(diag, true)
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -59,6 +85,10 @@ class DefaultDialogsActivity:
 
     override fun onDialogClick(dialog: Dialog) {
         DefaultMessagesActivity.open(this, dialog, dialog.users[0])
+    }
+
+    fun startMesActivity(dialog: Dialog, startHbbft: Boolean) {
+        DefaultMessagesActivity.open(this, dialog, dialog.users[0], startHbbft)
     }
 
     override fun format(date: Date): String {

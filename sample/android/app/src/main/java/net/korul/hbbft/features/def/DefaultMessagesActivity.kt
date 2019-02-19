@@ -3,10 +3,12 @@ package net.korul.hbbft.features.def
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.google.gson.Gson
@@ -15,8 +17,10 @@ import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
+import net.korul.hbbft.DatabaseApplication.Companion.mCoreHBBFT2X
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
@@ -28,6 +32,7 @@ import net.korul.hbbft.common.data.model.core.Getters.getDialog
 import net.korul.hbbft.common.data.model.core.Getters.getNextUserID
 import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.features.DemoMessagesActivity
+import net.korul.hbbft.features.handler
 import net.korul.hbbft.features.holder.IncomingVoiceMessageViewHolder
 import net.korul.hbbft.features.holder.OutcomingVoiceMessageViewHolder
 import net.korul.hbbft.features.holder.holders.messages.CustomIncomingImageMessageViewHolder
@@ -72,6 +77,11 @@ class DefaultMessagesActivity :
         input.setAttachmentsListener(this)
 
         DatabaseApplication.mCoreHBBFT2X.addListener(this)
+
+        val startHbbft = intent.getBooleanExtra("startHbbft", false)
+        if(startHbbft) {
+            startAll()
+        }
     }
 
     override fun onSubmit(input: CharSequence): Boolean {
@@ -84,6 +94,31 @@ class DefaultMessagesActivity :
         mCurDialog = getDialog(mCurDialog!!.id)
 
         return true
+    }
+
+    fun startAll() {
+        handler.post {
+            progress.show()
+        }
+        DatabaseApplication.mCoreHBBFT2X.subscribeSession()
+        DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
+
+        if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
+            val builder: android.app.AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            } else {
+                android.app.AlertDialog.Builder(this)
+            }
+            builder.setTitle("Error ")
+                .setMessage("Dll Error")
+                .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                    dialog.cancel()
+                }
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show()
+        }
+
+        DatabaseApplication.mCoreHBBFT2X.startAllNode(mCurDialog!!.dialogName)
     }
 
     override fun onAddAttachments() {
@@ -132,7 +167,7 @@ class DefaultMessagesActivity :
                 progress.dismiss()
                 super.menu!!.findItem(R.id.action_online).icon =
                         DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
-                hideMenuHbbft()
+                hideMenuHbbft1()
                 super.invalidateOptionsMenu()
             }, 0)
         }
@@ -141,11 +176,12 @@ class DefaultMessagesActivity :
         }
     }
 
-    fun hideMenuHbbft() {
+    fun hideMenuHbbft1() {
+        super.menu!!.findItem(R.id.action_startALL).isVisible = false
 //        super.menu!!.findItem(R.id.clear)    .isVisible = false
-        super.menu!!.findItem(R.id.action_1x).isVisible = false
-        super.menu!!.findItem(R.id.action_2x).isVisible = false
-        super.menu!!.findItem(R.id.action_3x).isVisible = false
+//        super.menu!!.findItem(R.id.action_1x).isVisible = false
+//        super.menu!!.findItem(R.id.action_2x).isVisible = false
+//        super.menu!!.findItem(R.id.action_3x).isVisible = false
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
@@ -253,13 +289,25 @@ class DefaultMessagesActivity :
     }
 
     companion object {
-
         private val CONTENT_TYPE_VOICE: Byte = 1
 
         fun open(context: Context, dialog: Dialog, user: User) {
+            mCoreHBBFT2X.setRoomName(dialog.dialogName)
+
             val intent = Intent(context, DefaultMessagesActivity::class.java)
             intent.putExtra("dialog", Gson().toJson(dialog))
             intent.putExtra("user", Gson().toJson(user))
+            intent.putExtra("startHbbft", false)
+            context.startActivity(intent)
+        }
+
+        fun open(context: Context, dialog: Dialog, user: User, startHbbft: Boolean) {
+            mCoreHBBFT2X.setRoomName(dialog.dialogName)
+
+            val intent = Intent(context, DefaultMessagesActivity::class.java)
+            intent.putExtra("dialog", Gson().toJson(dialog))
+            intent.putExtra("user", Gson().toJson(user))
+            intent.putExtra("startHbbft", startHbbft)
             context.startActivity(intent)
         }
     }

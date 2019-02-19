@@ -1,5 +1,7 @@
 package net.korul.hbbft.common.data.fixtures
 
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures.Companion.getAllMessages
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.User
@@ -36,11 +38,15 @@ class DialogsFixtures private constructor() {
             val ddialog = Conversations.getDDialog(dialog)
             ddialog.insert()
 
+            DatabaseApplication.mCoreHBBFT2X.registerInDatabase(nameDialog)
+
             return dialog
         }
 
         fun deleteDialog(dialog: Dialog) {
             val ddialog = Conversations.getDDialog(dialog)
+
+            DatabaseApplication.mCoreHBBFT2X.unregisterInDatabase(dialog.dialogName)
 
             val messages = getAllMessages(dialog)
             for (mes in messages) {
@@ -54,7 +60,6 @@ class DialogsFixtures private constructor() {
             }
 
             ddialog.lastMessage?.delete()
-
 
             ddialog.delete()
         }

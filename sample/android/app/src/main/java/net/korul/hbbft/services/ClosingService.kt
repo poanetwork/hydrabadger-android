@@ -7,6 +7,9 @@ import android.os.IBinder
 import android.support.annotation.Nullable
 import android.util.Log
 import net.korul.hbbft.DatabaseApplication
+import net.korul.hbbft.services.MyFirebaseMessagingService.Companion.scheduleJob
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 
 class ClosingService : Service() {
@@ -29,11 +32,11 @@ class ClosingService : Service() {
     override fun onTaskRemoved(rootIntent: Intent) {
         super.onTaskRemoved(rootIntent)
 
-        Log.i(TAG, "Service: start Init")
+        Log.i(TAG, "Service: start close app")
 
         DatabaseApplication.mCoreHBBFT2X.Free()
 
-        Log.i(TAG, "Service: finish Init")
+        Log.i(TAG, "Service: finish close app")
         // Destroy the service
         stopSelf()
     }
