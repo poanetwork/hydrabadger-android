@@ -1,24 +1,13 @@
 package net.korul.hbbft
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent.getActivity
-import android.content.Context
-import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
 import io.fabric.sdk.android.Fabric
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
-import android.content.Intent.getIntent
-import android.content.Intent
-
 
 
 class DatabaseApplication : Application() {

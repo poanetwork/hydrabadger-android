@@ -69,7 +69,7 @@ class MessagesFixtures private constructor() {
         }
 
         fun deleteMeseges(messages: ArrayList<Message>) {
-            for(message in messages) {
+            for (message in messages) {
                 val dmes = Conversations.getDMessage(message)
                 dmes?.delete()
             }

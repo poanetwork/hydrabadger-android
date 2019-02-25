@@ -12,7 +12,7 @@ class VoiceConverter : TypeConverter<String?, Message.Voice?>() {
     }
 
     override fun getDBValue(model: Message.Voice?): String? {
-        return if(model == null)
+        return if (model == null)
             null
         else {
             val str: String = model.url + SEPARATE_SYMBOL + model.duration.toString()
@@ -21,8 +21,8 @@ class VoiceConverter : TypeConverter<String?, Message.Voice?>() {
     }
 
     override fun getModelValue(data: String?): Message.Voice? {
-        return if(data != null) {
-            val list = data?.split(SEPARATE_SYMBOL) ?: listOf()
+        return if (data != null) {
+            val list = data.split(SEPARATE_SYMBOL)
             val date = Message.Voice(list[0], list[1].toInt())
             date
         } else

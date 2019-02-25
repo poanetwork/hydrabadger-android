@@ -3,7 +3,6 @@ package net.korul.hbbft.P2P
 import android.content.Context
 import android.util.Log
 import io.nats.client.Connection
-import net.korul.hbbft.DatabaseApplication
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
@@ -35,10 +34,10 @@ class Connections() {
 
     var mIamReadyToDataTranfer = false
 
-    constructor(context: Context, publishto: String, myName_: String,
-                conNats_: Connection, initiator: Boolean, callback_: IGetData
-    ) : this()
-    {
+    constructor(
+        context: Context, publishto: String, myName_: String,
+        conNats_: Connection, initiator: Boolean, callback_: IGetData
+    ) : this() {
         publishTo = publishto
         myName = myName_
         conNats = conNats_
@@ -51,10 +50,12 @@ class Connections() {
         iceServers.add(PeerConnection.IceServer("stun:108.61.190.95:3478"))
         iceServers.add(PeerConnection.IceServer("turn:108.61.190.95:3478", "test1", "test1"))
 
-        Log.d(TAG, if (PeerConnectionFactory.initializeAndroidGlobals(context, true, true, true))
-            "Success initAndroidGlobals"
-        else
-            "Failed initAndroidGlobals")
+        Log.d(
+            TAG, if (PeerConnectionFactory.initializeAndroidGlobals(context, true, true, true))
+                "Success initAndroidGlobals"
+            else
+                "Failed initAndroidGlobals"
+        )
 
         peerConnectionFactory = PeerConnectionFactory()
 
@@ -212,7 +213,7 @@ class Connections() {
         override fun onStateChange() {
             Log.d(TAG, "remoteDataChannel onStateChange() " + dataChannel!!.state().name)
 
-            if(dataChannel!!.state() == DataChannel.State.OPEN) {
+            if (dataChannel!!.state() == DataChannel.State.OPEN) {
                 mIamReadyToDataTranfer = true
             }
         }
@@ -220,7 +221,7 @@ class Connections() {
         override fun onMessage(buffer: DataChannel.Buffer) {
             Log.d(TAG, "onMessage ")
 
-            if(buffer.binary) {
+            if (buffer.binary) {
                 val limit = buffer.data.limit()
                 val data = ByteArray(limit)
                 buffer.data.get(data)

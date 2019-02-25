@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Hydrabadger</string>
 
 
@@ -38,4 +38,12 @@
     <string name="msg_subscribed">FCM subscribe</string>
     <string name="msg_subscribe_failed">FCM unsubscribe</string>
 
+
+
+    <string name="sync">Загрузка</string>
+    <string name="syncing" tools:ignore="TypographyEllipsis">Загрузка...</string>
+    <string name="syncing_completed_well">Загрузка выполнена</string>
+    <string name="syncing_error">Ошибка при загрузке</string>
+    <string name="syncing_error_sign">Для загрузки необходимо в настройках привязать аккаунт</string>
+    <string name="syncing_completed_well_">Загрузка выполнена успешно</string>
 </resources>

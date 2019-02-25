@@ -6,7 +6,6 @@ import net.korul.hbbft.common.data.model.databaseModel.usersIDsModelList
 import com.raizlabs.android.dbflow.annotation.TypeConverter as TypeConverterAnnotation
 
 
-
 @TypeConverterAnnotation
 class ArrayListUserConverter : TypeConverter<String, usersIDsModelList>() {
 

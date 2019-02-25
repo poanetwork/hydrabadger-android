@@ -1,4 +1,4 @@
-package net.korul.hbbft.features.def
+package net.korul.hbbft
 
 import android.content.Context
 import android.content.DialogInterface
@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.google.gson.Gson
@@ -17,11 +16,8 @@ import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
-import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.DatabaseApplication.Companion.mCoreHBBFT2X
-import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
@@ -49,8 +45,7 @@ class DefaultMessagesActivity :
     DateFormatter.Formatter,
     MessageHolders.ContentChecker<Message>,
     DialogInterface.OnClickListener,
-    CoreHBBFTListener
-{
+    CoreHBBFTListener {
     private var messagesList: MessagesList? = null
 
     private var handlerMes = Handler()
@@ -78,8 +73,7 @@ class DefaultMessagesActivity :
 
         DatabaseApplication.mCoreHBBFT2X.addListener(this)
 
-        val startHbbft = intent.getBooleanExtra("startHbbft", false)
-        if(startHbbft) {
+        if (intent.getBooleanExtra("startHbbft", false)) {
             startAll()
         }
     }
@@ -103,7 +97,7 @@ class DefaultMessagesActivity :
         DatabaseApplication.mCoreHBBFT2X.subscribeSession()
         DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
 
-        if(DatabaseApplication.mCoreHBBFT2X.mShowError) {
+        if (DatabaseApplication.mCoreHBBFT2X.mShowError) {
             val builder: android.app.AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             } else {
@@ -144,7 +138,7 @@ class DefaultMessagesActivity :
 
     override fun onClick(dialogInterface: DialogInterface, i: Int) {
         when (i) {
-            0 ->  {
+            0 -> {
                 val mes = MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
@@ -163,39 +157,42 @@ class DefaultMessagesActivity :
 
     override fun updateStateToOnline() {
         try {
-            handlerUpd.postDelayed( {
+            handlerUpd.postDelayed({
                 progress.dismiss()
                 super.menu!!.findItem(R.id.action_online).icon =
-                        DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+                    DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
                 hideMenuHbbft1()
                 super.invalidateOptionsMenu()
             }, 0)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun hideMenuHbbft1() {
         super.menu!!.findItem(R.id.action_startALL).isVisible = false
-//        super.menu!!.findItem(R.id.clear)    .isVisible = false
-//        super.menu!!.findItem(R.id.action_1x).isVisible = false
-//        super.menu!!.findItem(R.id.action_2x).isVisible = false
-//        super.menu!!.findItem(R.id.action_3x).isVisible = false
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
         try {
             handlerMes.postDelayed({
-                if(!you) {
+                if (!you) {
                     var found = false
                     for (user in mCurDialog!!.users) {
-                        if(user.uid == uid)
+                        if (user.uid == uid)
                             found = true
                     }
-                    if(!found) {
+                    if (!found) {
                         val id = getNextUserID()
-                        val user = User(id, uid, id.toString(), mCurDialog!!.id, "name${mCurDialog!!.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                        val user = User(
+                            id,
+                            uid,
+                            id.toString(),
+                            mCurDialog!!.id,
+                            "name${mCurDialog!!.users.size}",
+                            "http://i.imgur.com/pv1tBmT.png",
+                            true
+                        )
                         mCurDialog!!.users.add(user)
                         Conversations.getDUser(user).insert()
                         Conversations.getDDialog(mCurDialog!!).update()
@@ -210,8 +207,7 @@ class DefaultMessagesActivity :
                     mCurDialog = getDialog(mCurDialog!!.id)
                 }
             }, 0)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

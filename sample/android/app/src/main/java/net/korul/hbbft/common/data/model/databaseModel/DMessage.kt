@@ -9,8 +9,7 @@ import net.korul.hbbft.common.data.model.coreDataBase.AppDatabase
 import java.util.*
 
 @Table(name = "DMessage", database = AppDatabase::class)
-class DMessage:  BaseModel()
-{
+class DMessage : BaseModel() {
     @PrimaryKey()
     @Column(name = "id")
     var id: Long = 0

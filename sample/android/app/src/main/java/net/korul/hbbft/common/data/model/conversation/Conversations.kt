@@ -8,8 +8,7 @@ import net.korul.hbbft.common.data.model.databaseModel.DMessage
 import net.korul.hbbft.common.data.model.databaseModel.DUser
 import net.korul.hbbft.common.data.model.databaseModel.usersIDsModelList
 
-class Conversations
-{
+class Conversations {
     companion object {
         fun getDialog(ddialog: DDialog): Dialog {
             val listUsers: MutableList<User> = arrayListOf()
@@ -17,11 +16,18 @@ class Conversations
                 listUsers.add(getUser(user))
             }
 
-            return Dialog(ddialog.id, ddialog.dialogName, ddialog.dialogPhoto, ArrayList(listUsers), getMessage(ddialog.lastMessage), ddialog.unreadCount)
+            return Dialog(
+                ddialog.id,
+                ddialog.dialogName,
+                ddialog.dialogPhoto,
+                ArrayList(listUsers),
+                getMessage(ddialog.lastMessage),
+                ddialog.unreadCount
+            )
         }
 
         fun getDDialog(dialog: Dialog): DDialog {
-            val ddialog= DDialog()
+            val ddialog = DDialog()
             ddialog.id = dialog.id
             ddialog.dialogName = dialog.dialogName
             ddialog.dialogPhoto = dialog.dialogPhoto
@@ -47,19 +53,26 @@ class Conversations
         }
 
         fun getMessage(dmessage: DMessage?): Message? {
-            return if(dmessage == null)
+            return if (dmessage == null)
                 null
             else {
-                val mes = Message(dmessage.id, dmessage.id.toString(), dmessage.idDialog, getUser(dmessage.user), dmessage.text, dmessage.createdAt)
+                val mes = Message(
+                    dmessage.id,
+                    dmessage.id.toString(),
+                    dmessage.idDialog,
+                    getUser(dmessage.user),
+                    dmessage.text,
+                    dmessage.createdAt
+                )
                 mes.voice = dmessage.voice
-                if(dmessage.image != null)
+                if (dmessage.image != null)
                     mes.setImage(dmessage.image!!)
                 mes
             }
         }
 
         fun getDMessage(message: Message?): DMessage? {
-            return if(message == null)
+            return if (message == null)
                 null
             else {
                 val dmessage = DMessage()
@@ -78,7 +91,15 @@ class Conversations
         }
 
         fun getUser(duser: DUser): User {
-            return User(duser.id, duser.uid, duser.id.toString(), duser.idDialog, duser.name, duser.avatar, duser.isOnline)
+            return User(
+                duser.id,
+                duser.uid,
+                duser.id.toString(),
+                duser.idDialog,
+                duser.name,
+                duser.avatar,
+                duser.isOnline
+            )
         }
 
         fun getDUser(user: User): DUser {

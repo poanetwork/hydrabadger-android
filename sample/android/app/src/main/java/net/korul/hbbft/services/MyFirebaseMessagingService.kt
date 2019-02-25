@@ -14,9 +14,8 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
-import net.korul.hbbft.features.def.DefaultDialogsActivity
+import net.korul.hbbft.DefaultDialogsActivity
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -42,13 +41,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         try {
             val roomname = remoteMessage?.data!!["body"]!!
-            val uidsFrom = remoteMessage?.data!!["title"]!!
+            val uidsFrom = remoteMessage.data!!["title"]!!
 
             Log.d(TAG, "onMessageReceived from uid: $uidsFrom and roomname $roomname")
 
             sendNotification(roomname)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -124,16 +122,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val intent = Intent(this, DefaultDialogsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        intent.putExtra("Start_App" , true)
-        intent.putExtra("RoomName" , roomname)
-        val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT)
+        intent.putExtra("Start_App", true)
+        intent.putExtra("RoomName", roomname)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0 /* Request code */, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         val channelId = getString(R.string.default_notification_channel_id)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon( BitmapFactory.decodeResource(this.resources, R.mipmap.ic_launcher))
+            .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.mipmap.ic_launcher))
             .setContentTitle("Start connect?")
             .setContentText("User want start messaging in Room - $roomname")
             .setAutoCancel(true)
@@ -147,9 +147,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelName = getString(R.string.default_notification_channel_name)
-            val channel = NotificationChannel(channelId,
+            val channel = NotificationChannel(
+                channelId,
                 channelName,
-                NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             notificationManager.createNotificationChannel(channel)
         }
 

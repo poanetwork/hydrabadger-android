@@ -1,27 +1,17 @@
-package net.korul.hbbft.features.def
+package net.korul.hbbft
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
+
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
-import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
 import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.activity_default_dialogs.*
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
-import net.korul.hbbft.DatabaseApplication
-import net.korul.hbbft.DatabaseApplication.Companion.mToken
-import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
@@ -34,21 +24,21 @@ import net.korul.hbbft.features.DemoDialogsActivity
 import net.korul.hbbft.features.holder.holders.dialogs.CustomDialogViewHolder
 import java.util.*
 
-class DefaultDialogsActivity:
+
+private var handlerMes = Handler()
+
+class DefaultDialogsActivity :
     DemoDialogsActivity(),
     DateFormatter.Formatter,
-    CoreHBBFTListener
-{
+    CoreHBBFTListener {
     private var dialogsList: DialogsList? = null
-    private var handlerMes = Handler()
     private var TAG = "HYDRABADGERTAG:DefaultDialogsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
             setContentView(R.layout.activity_default_dialogs)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -60,15 +50,13 @@ class DefaultDialogsActivity:
 
         DatabaseApplication.mCoreHBBFT2X.addListener(this)
 
-        val intent = this.intent
-        val start_App = intent.getBooleanExtra("Start_App", false)
-        if(start_App) {
+        if (this.intent.getBooleanExtra("Start_App", false)) {
             Log.d(TAG, "Receive push and start activity")
             val roomName = intent.getStringExtra("RoomName")
 
             val dialogs = DialogsFixtures.dialogs
             for (diag in dialogs) {
-                if(diag.dialogName == roomName) {
+                if (diag.dialogName == roomName) {
                     Log.d(TAG, "Found dialog and start it $roomName")
                     startMesActivity(diag, true)
                 }
@@ -123,24 +111,32 @@ class DefaultDialogsActivity:
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
         try {
             handlerMes.postDelayed({
-                if(!you) {
+                if (!you) {
                     val roomName = DatabaseApplication.mCoreHBBFT2X.mRoomName
                     val dialog = getDialogByRoomName(roomName)
 
                     var found = false
                     for (user in dialog.users) {
-                        if(user.uid == uid)
+                        if (user.uid == uid)
                             found = true
                     }
-                    if(!found) {
+                    if (!found) {
                         val id = Getters.getNextUserID()
-                        val user = User(id, uid, id.toString(), dialog.id, "name${dialog.users.size}", "http://i.imgur.com/pv1tBmT.png", true)
+                        val user = User(
+                            id,
+                            uid,
+                            id.toString(),
+                            dialog.id,
+                            "name${dialog.users.size}",
+                            "http://i.imgur.com/pv1tBmT.png",
+                            true
+                        )
                         dialog.users.add(user)
                         Conversations.getDUser(user).insert()
                     }
 
                     val user = Getters.getUserbyUID(uid, dialog.id)
-                    val mess =  MessagesFixtures.setNewMessage(mes, dialog, user!!)
+                    val mess = MessagesFixtures.setNewMessage(mes, dialog, user!!)
 
                     dialog.unreadCount++
                     Conversations.getDDialog(dialog).update()
@@ -148,8 +144,7 @@ class DefaultDialogsActivity:
                     onNewMessage(dialog.id, mess)
                 }
             }, 0)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

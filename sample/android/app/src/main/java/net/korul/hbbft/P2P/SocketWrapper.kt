@@ -17,14 +17,14 @@ class SocketWrapper {
 
     private var mP2PMesh: P2PMesh? = null
 
-    private val mPseudoNotLocalThread:  HashMap<String, Thread>  = hashMapOf()
-    private val mLocalALoopThread:      HashMap<String, Thread>  = hashMapOf()
-    private val mLocalALoopThread2:     HashMap<String, Thread>  = hashMapOf()
+    private val mPseudoNotLocalThread: HashMap<String, Thread> = hashMapOf()
+    private val mLocalALoopThread: HashMap<String, Thread> = hashMapOf()
+    private val mLocalALoopThread2: HashMap<String, Thread> = hashMapOf()
 
     private val mPseudoNotLocalSocketServer: HashMap<String, ServerSocket?> = hashMapOf()
-    private val mPseudoNotLocalSocket:  HashMap<Pair<String,String>, Socket?> = hashMapOf()
-    private val mLocalALoopSocket:      HashMap<String, Socket?> = hashMapOf()
-    private val mLocalALoopSocket2:     HashMap<String, Socket?> = hashMapOf()
+    private val mPseudoNotLocalSocket: HashMap<Pair<String, String>, Socket?> = hashMapOf()
+    private val mLocalALoopSocket: HashMap<String, Socket?> = hashMapOf()
+    private val mLocalALoopSocket2: HashMap<String, Socket?> = hashMapOf()
 
 
     val clientsBusyPorts: HashMap<String, Int> = hashMapOf()
@@ -51,7 +51,7 @@ class SocketWrapper {
         myLocalPort1 = getPortForUID(myUID1)
 
         for (uid in users) {
-            if(uid == myUID1)
+            if (uid == myUID1)
                 continue
             addUser(uid)
         }
@@ -69,7 +69,7 @@ class SocketWrapper {
         myLocalPort2 = getPortForUID(myUID2)
 
         for (uid in users) {
-            if(uid == myUID1 || uid == myUID2)
+            if (uid == myUID1 || uid == myUID2)
                 continue
             addUser(uid)
         }
@@ -101,10 +101,10 @@ class SocketWrapper {
 
     private fun CongruentPseudoGen(x: BigInteger): Int {
         val a: BigInteger = 1664525.toBigInteger()
-        val c: BigInteger  = 1013904223.toBigInteger()
-        val m: BigInteger  = (Math.pow(2.0, 15.0)-1).toInt().toBigInteger()
+        val c: BigInteger = 1013904223.toBigInteger()
+        val m: BigInteger = (Math.pow(2.0, 15.0) - 1).toInt().toBigInteger()
 
-        return (((a * x) + c)%m).toInt()
+        return (((a * x) + c) % m).toInt()
     }
 
     private fun addUser(uid: String) {
@@ -121,25 +121,25 @@ class SocketWrapper {
         val pair: Pair<String, String> = Pair(touid, uid)
 
 
-        if(touid == myUID1) {
-            if(!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket.contains(uid))
+        if (touid == myUID1) {
+            if (!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket.contains(uid))
                 startLocalSocketALoop(myLocalPort1, uid, myUID1, mLocalALoopThread, mLocalALoopSocket)
 
             flushToLocalHydra(pair, uid, mPseudoNotLocalSocket, mLocalALoopSocket, json)
 
-        }
-        else if(touid == myUID2) {
-            if(!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket2.contains(uid))
+        } else if (touid == myUID2) {
+            if (!mPseudoNotLocalSocket.containsKey(pair) && !mLocalALoopSocket2.contains(uid))
                 startLocalSocketALoop(myLocalPort2, uid, myUID2, mLocalALoopThread2, mLocalALoopSocket2)
 
             flushToLocalHydra(pair, uid, mPseudoNotLocalSocket, mLocalALoopSocket2, json)
         }
     }
 
-    fun flushToLocalHydra(pair: Pair<String, String>, uid: String,
-                          PseudoNotLocalSocket: HashMap<Pair<String,String>, Socket?>,
-                          LocalALoopSocket: HashMap<String, Socket?>,
-                          json: JSONObject
+    fun flushToLocalHydra(
+        pair: Pair<String, String>, uid: String,
+        PseudoNotLocalSocket: HashMap<Pair<String, String>, Socket?>,
+        LocalALoopSocket: HashMap<String, Socket?>,
+        json: JSONObject
     ) {
         while (!mAllStop && LocalALoopSocket[uid] == null && PseudoNotLocalSocket[pair] == null)
             Thread.sleep(10)
@@ -183,7 +183,7 @@ class SocketWrapper {
                     while (!mAllStop) {
                         var din = clientSocket.getInputStream()
                         var bytesnum = din.available()
-                        if(bytesnum > 0) {
+                        if (bytesnum > 0) {
                             var bytes = ByteArray(bytesnum)
                             var reads = din.read(bytes, 0, bytesnum)
                             Log.d(TAG, "SocketWrapper reed from startPseudoNotLocalSocketALoop Socket $reads - bytes")
@@ -201,16 +201,17 @@ class SocketWrapper {
                                 if (bytesnum > 0) {
                                     bytes = ByteArray(bytesnum)
                                     reads = din.read(bytes, 0, bytesnum)
-                                    Log.d(TAG, "SocketWrapper reed from startPseudoNotLocalSocketALoop Socket $reads - bytes")
+                                    Log.d(
+                                        TAG,
+                                        "SocketWrapper reed from startPseudoNotLocalSocketALoop Socket $reads - bytes"
+                                    )
 
                                     sendBytesToDataChannel(uid, uid_, bytes)
-                                }
-                                else
+                                } else
                                     Thread.sleep(10)
                             }
                             break
-                        }
-                        else
+                        } else
                             Thread.sleep(10)
                     }
                 }
@@ -230,9 +231,10 @@ class SocketWrapper {
         return uid_
     }
 
-    fun startLocalSocketALoop(myLocalPort: Int, uid: String, myUID: String,
-                              LocalALoopThread: HashMap<String, Thread>,
-                              LocalALoopSocket: HashMap<String, Socket?>
+    fun startLocalSocketALoop(
+        myLocalPort: Int, uid: String, myUID: String,
+        LocalALoopThread: HashMap<String, Thread>,
+        LocalALoopSocket: HashMap<String, Socket?>
     ) {
         LocalALoopThread[uid] = thread {
             LocalALoopSocket[uid] = Socket("127.0.0.1", myLocalPort)
@@ -244,8 +246,7 @@ class SocketWrapper {
                     din.read(bytes, 0, bytesnum)
 
                     sendBytesToDataChannel(uid, myUID, bytes)
-                }
-                else
+                } else
                     Thread.sleep(10)
             }
         }
@@ -255,7 +256,7 @@ class SocketWrapper {
         var pair: Pair<String, String> = Pair(uid, touid)
         val pair2: Pair<String, String> = Pair(touid, uid)
 
-        if(mP2PMesh!!.mConnections.contains(pair2)) {
+        if (mP2PMesh!!.mConnections.contains(pair2)) {
             pair = pair2
         }
 

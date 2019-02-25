@@ -12,7 +12,7 @@ class ImageConverter : TypeConverter<String, Message.Image?>() {
     }
 
     override fun getModelValue(data: String?): Message.Image? {
-        return if(data != null) {
+        return if (data != null) {
             val date = Message.Image(data)
             date
         } else {

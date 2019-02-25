@@ -12,7 +12,8 @@ class User(
     var idDialog: String,
     private val name: String,
     private val avatar: String,
-    val isOnline: Boolean) :
+    val isOnline: Boolean
+) :
     IUser {
 
     override fun getId(): String {

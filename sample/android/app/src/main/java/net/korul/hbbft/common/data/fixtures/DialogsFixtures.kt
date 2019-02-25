@@ -1,6 +1,5 @@
 package net.korul.hbbft.common.data.fixtures
 
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures.Companion.getAllMessages
 import net.korul.hbbft.common.data.model.Dialog
@@ -55,7 +54,7 @@ class DialogsFixtures private constructor() {
             }
 
             for (duser in ddialog.users) {
-                if(duser.idDialog != "")
+                if (duser.idDialog != "")
                     duser.delete()
             }
 

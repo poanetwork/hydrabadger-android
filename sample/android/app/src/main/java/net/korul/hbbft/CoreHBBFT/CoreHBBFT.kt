@@ -40,10 +40,12 @@ interface CoreHBBFTListener {
     fun reciveMessage(you: Boolean, uid: String, mes: String)
 }
 
-data class Uids( var UID: String? = null,
-                 var isOnline: Boolean? = null )
+data class Uids(
+    var UID: String? = null,
+    var isOnline: Boolean? = null
+)
 
-object CoreHBBFT: IGetData {
+object CoreHBBFT : IGetData {
     // p2p
     var mP2PMesh: P2PMesh? = null
     var mSocketWrapper: SocketWrapper? = null
@@ -94,7 +96,7 @@ object CoreHBBFT: IGetData {
         val serviceIntent = Intent(applicationContext, ClosingService::class.java)
         applicationContext.startService(serviceIntent)
 
-        mP2PMesh  = P2PMesh(applicationContext, this)
+        mP2PMesh = P2PMesh(applicationContext, this)
         mSocketWrapper = SocketWrapper(mP2PMesh!!)
 
         mApplicationContext = applicationContext
@@ -131,8 +133,10 @@ object CoreHBBFT: IGetData {
             val channelName = applicationContext.getString(R.string.default_notification_channel_name)
             val notificationManager = applicationContext.getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(
-                NotificationChannel(channelId,
-                    channelName, NotificationManager.IMPORTANCE_LOW)
+                NotificationChannel(
+                    channelId,
+                    channelName, NotificationManager.IMPORTANCE_LOW
+                )
             )
         }
         FirebaseInstanceId.getInstance().instanceId
@@ -164,19 +168,25 @@ object CoreHBBFT: IGetData {
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInAnonymously:failure", task.exception)
-                    Toast.makeText(mApplicationContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        mApplicationContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 latch.countDown()
             }
             .addOnCanceledListener {
-                Toast.makeText(mApplicationContext, "Authentication canceled.",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    mApplicationContext, "Authentication canceled.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             .addOnFailureListener {
-                Toast.makeText(mApplicationContext, "Authentication Failure.",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    mApplicationContext, "Authentication Failure.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         return latch
@@ -204,7 +214,7 @@ object CoreHBBFT: IGetData {
         return mFunctions
             .getHttpsCallable("sendToTopic")
             .call(json)
-            .continueWith(object :Continuation<HttpsCallableResult, String> {
+            .continueWith(object : Continuation<HttpsCallableResult, String> {
                 override fun then(task: Task<HttpsCallableResult>): String {
                     return task.result?.data.toString()
                 }
@@ -232,6 +242,7 @@ object CoreHBBFT: IGetData {
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     for (postsnapshot in snapshot.children) {
@@ -239,8 +250,7 @@ object CoreHBBFT: IGetData {
                         postsnapshot.ref.removeValue()
                     }
                     Log.d(TAG, "Succes unregisterInDatabase $uniqueID1")
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
@@ -263,6 +273,7 @@ object CoreHBBFT: IGetData {
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 val uid = Uids()
                 uid.UID = uniqueID1
@@ -284,6 +295,7 @@ object CoreHBBFT: IGetData {
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 val uid = Uids()
                 uid.UID = uniqueID1
@@ -319,7 +331,7 @@ object CoreHBBFT: IGetData {
 
             }
             // if 2 users and i am first
-            else if(cntUsers == 2 && !isSomebodyOnline) {
+            else if (cntUsers == 2 && !isSomebodyOnline) {
                 start_node_2x(RoomName)
 
                 var uid = ""
@@ -329,22 +341,21 @@ object CoreHBBFT: IGetData {
                         break
                     }
                 }
-                if(uid.isNotEmpty()) {
+                if (uid.isNotEmpty()) {
                     Log.d(TAG, "2 users and i am first in room $RoomName")
                     preSendPushToStart(listOf(uid), RoomName, uniqueID1)
-                }
-                else {
+                } else {
                     Log.d(TAG, "Room uid is empty $RoomName")
                     Toast.makeText(mApplicationContext, "Room uid is empty", Toast.LENGTH_LONG).show()
                 }
             }
             // if 2 users and second start
-            else if(cntUsers == 2 && isSomebodyOnline) {
+            else if (cntUsers == 2 && isSomebodyOnline) {
                 Log.d(TAG, "2 users and second start in room $RoomName")
                 start_node(RoomName)
             }
             // if many users and i am first
-            else if(cntUsers > 2 && !isSomebodyOnline) {
+            else if (cntUsers > 2 && !isSomebodyOnline) {
                 start_node(RoomName)
 
                 val uids = mutableListOf<String>()
@@ -353,11 +364,10 @@ object CoreHBBFT: IGetData {
                         uids.add(ui.UID!!)
                     }
                 }
-                if(uids.isNotEmpty()) {
+                if (uids.isNotEmpty()) {
                     Log.d(TAG, "many users and i am first in room $RoomName")
                     preSendPushToStart(uids, RoomName, uniqueID1)
-                }
-                else {
+                } else {
                     Log.d(TAG, "Room uid is empty $RoomName")
                     Toast.makeText(mApplicationContext, "Room uids is empty", Toast.LENGTH_LONG).show()
                 }
@@ -388,8 +398,7 @@ object CoreHBBFT: IGetData {
                 }
                 try {
                     latch.countDown()
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
@@ -407,7 +416,7 @@ object CoreHBBFT: IGetData {
 
     fun isSomeBodyOnline(listOfUids: List<Uids>): Boolean {
         for (uids in listOfUids) {
-            if(uids.isOnline!!)
+            if (uids.isOnline!!)
                 return true
         }
         return false
@@ -427,8 +436,8 @@ object CoreHBBFT: IGetData {
 
         thread {
             var strTosend = ""
-            for(clients in mSocketWrapper!!.clientsBusyPorts) {
-                if(clients.key != uniqueID1)
+            for (clients in mSocketWrapper!!.clientsBusyPorts) {
+                if (clients.key != uniqueID1)
                     strTosend += "127.0.0.1:${clients.value};"
             }
             if (strTosend.endsWith(";"))
@@ -458,21 +467,21 @@ object CoreHBBFT: IGetData {
 
         thread {
             var strTosend = ""
-            for(clients in mSocketWrapper!!.clientsBusyPorts) {
-                if(clients.key != uniqueID1 && clients.key != uniqueID2)
+            for (clients in mSocketWrapper!!.clientsBusyPorts) {
+                if (clients.key != uniqueID1 && clients.key != uniqueID2)
                     strTosend += "127.0.0.1:${clients.value};"
             }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
             session?.start_node(
-                    "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
-                    strTosend
+                "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
+                strTosend
             )
 
             strTosend = ""
-            for(clients in mSocketWrapper!!.clientsBusyPorts) {
-                if(clients.key != uniqueID2) {
+            for (clients in mSocketWrapper!!.clientsBusyPorts) {
+                if (clients.key != uniqueID2) {
                     strTosend += "127.0.0.1:${clients.value};"
                 }
             }
@@ -493,7 +502,7 @@ object CoreHBBFT: IGetData {
                 Thread.sleep(1000)
                 ready = true
                 for (con in mP2PMesh?.mConnections!!.values) {
-                    if(con.myName == uniqueID1 || con.myName == uniqueID2)
+                    if (con.myName == uniqueID1 || con.myName == uniqueID2)
                         continue
 
                     if (con.mIamReadyToDataTranfer) {
@@ -535,7 +544,7 @@ object CoreHBBFT: IGetData {
     }
 
     override fun dataReceived(bytes: ByteArray) {
-        if(mSocketWrapper?.mStarted != null && mSocketWrapper?.mStarted!!)
+        if (mSocketWrapper?.mStarted != null && mSocketWrapper?.mStarted!!)
             mSocketWrapper?.sendReceivedDataToHydra(bytes)
     }
 
@@ -549,14 +558,14 @@ object CoreHBBFT: IGetData {
     }
 
     fun subscribeSession() {
-        session?.subscribe {you: Boolean, uid: String, mes: String ->
+        session?.subscribe { you: Boolean, uid: String, mes: String ->
             if (uid == "test" && mes == "test") {
                 Log.d(TAG, "subscribeSession - init")
                 mShowError = false
                 return@subscribe
             }
 
-            if(!mUpdateStateToOnline) {
+            if (!mUpdateStateToOnline) {
                 for (hl in listeners) {
                     hl?.updateStateToOnline()
                     mUpdateStateToOnline = true
@@ -564,9 +573,9 @@ object CoreHBBFT: IGetData {
             }
 
             if (!uid.isEmpty() && !mes.isEmpty() && mes != "[None]" && uid != uniqueID2) {
-                if(lastMes == mes) {
+                if (lastMes == mes) {
                     val mestime = Calendar.getInstance().timeInMillis
-                    if(abs(mestime - lastMestime) < 500) {
+                    if (abs(mestime - lastMestime) < 500) {
                         lastMestime = Calendar.getInstance().timeInMillis
                         return@subscribe
                     }
@@ -588,7 +597,7 @@ object CoreHBBFT: IGetData {
     }
 
     fun sendMessage(str: String) {
-        if(str.isNotEmpty()) {
+        if (str.isNotEmpty()) {
             session?.send_message(str)
         }
     }

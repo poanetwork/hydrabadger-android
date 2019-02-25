@@ -3,9 +3,7 @@ package net.korul.hbbft.services
 import android.util.Log
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
-import net.korul.hbbft.DatabaseApplication
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
+
 
 class MyJobService : JobService() {
 

@@ -55,12 +55,11 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         try {
             Log.d(TAG, "P2PMesh initOneMesh $roomName - roomName, $UID - UID")
 
-            roomNameList.add( roomName )
-            userName.add( UID )
+            roomNameList.add(roomName)
+            userName.add(UID)
             consNats[UID] = initNatsSignalling(UID)
             initNatsMeshInitiator(consNats[UID], UID, "users:Room:$roomName")
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -85,22 +84,20 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 con.FreeConnect()
             }
             lock.unlock()
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        for(sub in listOfSub) {
+        for (sub in listOfSub) {
             try {
                 sub.unsubscribe()
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
 
         for (roomName in roomNameList) {
-            if(roomName.isNullOrEmpty())
+            if (roomName.isNullOrEmpty())
                 continue
 
             for (user in userName) {
@@ -130,18 +127,17 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 val myUid = UID
                 val pair: Pair<String, String> = Pair(user, myUid)
                 val pair2: Pair<String, String> = Pair(myUid, user)
-                if( user == UID )
+                if (user == UID)
                     return@subscribe
                 if (mConnections.keys.contains(pair) || mConnections.keys.contains(pair2))
                     return@subscribe
 
                 if (!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2)) {
-                    if(!usersCon.contains(user))
+                    if (!usersCon.contains(user))
                         usersCon.add(user)
-                    mConnections[ pair ] = Connections(applicationContext, user, UID, consNats[UID]!!,true, callback)
+                    mConnections[pair] = Connections(applicationContext, user, UID, consNats[UID]!!, true, callback)
                 }
-            }
-            else if (json2.getString("type") == "deleteUser") {
+            } else if (json2.getString("type") == "deleteUser") {
                 try {
                     val user = json2.getString("user")
                     val myUid = UID
@@ -149,17 +145,16 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                     val pair: Pair<String, String> = Pair(user, myUid)
                     val pair2: Pair<String, String> = Pair(myUid, user)
                     lock.lock()
-                    if(mConnections.keys.contains(pair)) {
-                        mConnections[ pair ]?.FreeConnect()
+                    if (mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.FreeConnect()
                         mConnections.remove(pair)
                     }
-                    if(mConnections.keys.contains(pair2)) {
-                        mConnections[ pair2 ]?.FreeConnect()
+                    if (mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.FreeConnect()
                         mConnections.remove(pair2)
                     }
                     lock.unlock()
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
@@ -177,8 +172,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 strUrls.add("nats://108.61.190.95:4222")
                 val conNats = ConnectionFactory(strUrls.toTypedArray()).createConnection()
                 conNats
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
                 msg.obj = "Nats error - ${e.printStackTrace()}!"
                 handlerToast.sendMessage(msg)
@@ -189,7 +183,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         val conNats = runBlocking { async.await() }
 
         val sub = conNats!!.subscribe(listenFrom) { msg: Message? ->
-            if(msg == null)
+            if (msg == null)
                 return@subscribe
 
             val message = String(msg.data, StandardCharsets.UTF_8)
@@ -200,16 +194,15 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val pair: Pair<String, String> = Pair(uid, toUser)
             val pair2: Pair<String, String> = Pair(toUser, uid)
 
-            if(json2.getString("type") == "candidate") {
-                val candidate = IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
-                if(mConnections.keys.contains(pair)) {
+            if (json2.getString("type") == "candidate") {
+                val candidate =
+                    IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
+                if (mConnections.keys.contains(pair)) {
                     mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
-                }
-                else if(mConnections.keys.contains(pair2)) {
+                } else if (mConnections.keys.contains(pair2)) {
                     mConnections[pair2]?.peerConnection?.addIceCandidate(candidate)
                 }
-            }
-            else {
+            } else {
                 val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
                 msg.obj = "Message - set SDP to $uid"
                 handlerToast.sendMessage(msg)
@@ -218,30 +211,46 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 val sdp = json2.getString("sdp")
 
                 val sdp2 = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-                if(type == "offer") {
-                    if(!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2) ) {
-                        if(!usersCon.contains(uid))
+                if (type == "offer") {
+                    if (!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2)) {
+                        if (!usersCon.contains(uid))
                             usersCon.add(uid)
-                        mConnections[ pair ] =  Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
+                        mConnections[pair] =
+                            Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
                     }
 
-                    if(mConnections.keys.contains(pair)) {
-                        mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
+                    if (mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.peerConnection?.setRemoteDescription(
+                            mConnections[pair]?.SessionObserver,
+                            sdp2
+                        )
                         val constraints = MediaConstraints()
-                        mConnections[pair]?.peerConnection?.createAnswer(mConnections[pair]?.SessionObserver, constraints)
-                    }
-                    else if(mConnections.keys.contains(pair2)) {
-                        mConnections[pair2]?.peerConnection?.setRemoteDescription(mConnections[pair2]?.SessionObserver, sdp2)
+                        mConnections[pair]?.peerConnection?.createAnswer(
+                            mConnections[pair]?.SessionObserver,
+                            constraints
+                        )
+                    } else if (mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.peerConnection?.setRemoteDescription(
+                            mConnections[pair2]?.SessionObserver,
+                            sdp2
+                        )
                         val constraints = MediaConstraints()
-                        mConnections[pair2]?.peerConnection?.createAnswer(mConnections[pair2]?.SessionObserver, constraints)
+                        mConnections[pair2]?.peerConnection?.createAnswer(
+                            mConnections[pair2]?.SessionObserver,
+                            constraints
+                        )
                     }
-                }
-                else if(type == "answer") {
-                    if(mConnections.keys.contains(pair)) {
-                        mConnections[pair]?.peerConnection?.setRemoteDescription(mConnections[pair]?.SessionObserver, sdp2)
-                    }
-                    else if(mConnections.keys.contains(pair2)) {
-                        mConnections[pair2]?.peerConnection?.setRemoteDescription(mConnections[pair2]?.SessionObserver, sdp2)
+                } else if (type == "answer") {
+                    if (mConnections.keys.contains(pair)) {
+                        mConnections[pair]?.peerConnection?.setRemoteDescription(
+                            mConnections[pair]?.SessionObserver,
+                            sdp2
+                        )
+                    } else if (mConnections.keys.contains(pair2)) {
+                        mConnections[pair2]?.peerConnection?.setRemoteDescription(
+                            mConnections[pair2]?.SessionObserver,
+                            sdp2
+                        )
                     }
                 }
             }

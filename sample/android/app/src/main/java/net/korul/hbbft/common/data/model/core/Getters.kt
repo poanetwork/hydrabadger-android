@@ -22,13 +22,13 @@ object Getters {
         for (ddialog in ddialogs) {
             ddialog.lastMessage = Select()
                 .from(DMessage::class.java)
-                .where(DMessage_Table.id.eq(ddialog.lastMessageID) )
+                .where(DMessage_Table.id.eq(ddialog.lastMessageID))
                 .querySingle()
 
-            if(ddialog.lastMessage != null) {
+            if (ddialog.lastMessage != null) {
                 val duser = Select()
                     .from(DUser::class.java)
-                    .where(DUser_Table.id.eq(ddialog.lastMessage?.userID) )
+                    .where(DUser_Table.id.eq(ddialog.lastMessage?.userID))
                     .querySingle()
 
                 ddialog.lastMessage?.user = duser!!
@@ -38,10 +38,10 @@ object Getters {
             for (id in ddialog.usersIDs) {
                 val us = Select()
                     .from(DUser::class.java)
-                    .where(DUser_Table.id.eq(id) )
+                    .where(DUser_Table.id.eq(id))
                     .querySingle()
 
-                if(us != null)
+                if (us != null)
                     ddialog.users.add(
                         us
                     )
@@ -58,10 +58,10 @@ object Getters {
 
         val dusers = Select()
             .from(DUser::class.java)
-            .where(DUser_Table.idDialog.eq(id) )
+            .where(DUser_Table.idDialog.eq(id))
             .queryList()
 
-        for(duser in dusers) {
+        for (duser in dusers) {
             users.add(getUser(duser))
         }
 
@@ -71,7 +71,7 @@ object Getters {
     fun getUser(id: Long): User? {
         val user = Select()
             .from(DUser::class.java)
-            .where(DUser_Table.id.eq(id) )
+            .where(DUser_Table.id.eq(id))
             .querySingle()
 
         return Conversations.getUser(user!!)
@@ -90,7 +90,7 @@ object Getters {
     fun getDUser(id: Long): DUser {
         val user = Select()
             .from(DUser::class.java)
-            .where(DUser_Table.id.eq(id) )
+            .where(DUser_Table.id.eq(id))
             .querySingle()
 
         return user!!
@@ -99,10 +99,10 @@ object Getters {
     fun getDialogByRoomName(roomName: String): Dialog {
         val ddialog = Select()
             .from(DDialog::class.java)
-            .where(DDialog_Table.dialogName.eq(roomName) )
+            .where(DDialog_Table.dialogName.eq(roomName))
             .querySingle()
 
-        if(ddialog != null) {
+        if (ddialog != null) {
             ddialog.lastMessage = Select()
                 .from(DMessage::class.java)
                 .where(DMessage_Table.id.eq(ddialog.lastMessageID))
@@ -137,10 +137,10 @@ object Getters {
     fun getDialog(id: String): Dialog {
         val ddialog = Select()
             .from(DDialog::class.java)
-            .where(DDialog_Table.id.eq(id) )
+            .where(DDialog_Table.id.eq(id))
             .querySingle()
 
-        if(ddialog != null) {
+        if (ddialog != null) {
             ddialog.lastMessage = Select()
                 .from(DMessage::class.java)
                 .where(DMessage_Table.id.eq(ddialog.lastMessageID))
@@ -178,8 +178,7 @@ object Getters {
         if (mes.size > 0) {
             ddialog.lastMessage = Conversations.getDMessage(mes[0])
             ddialog.lastMessageID = mes[0]?.id_
-        }
-        else
+        } else
             ddialog.lastMessage = null
 
         ddialog.update()
@@ -190,11 +189,11 @@ object Getters {
 
         val dmessages = Select()
             .from(DMessage::class.java)
-            .where(DMessage_Table.idDialog.eq(id) )
+            .where(DMessage_Table.idDialog.eq(id))
             .orderBy(DMessage_Table.createdAt, false)
             .queryList()
 
-        for(dmessage in dmessages) {
+        for (dmessage in dmessages) {
             dmessage.user = getDUser(dmessage.userID)
             messages.add(Conversations.getMessage(dmessage))
         }
@@ -212,7 +211,7 @@ object Getters {
             .orderBy(DMessage_Table.createdAt, false)
             .queryList()
 
-        for(dmessage in dmessages) {
+        for (dmessage in dmessages) {
             dmessage.user = getDUser(dmessage.userID)
             messages.add(Conversations.getMessage(dmessage))
         }
@@ -230,7 +229,7 @@ object Getters {
             .orderBy(DMessage_Table.id, false)
             .queryList()
 
-        return if(list.isEmpty())
+        return if (list.isEmpty())
             0
         else {
             val ind = list.maxBy { it.id }!!.id
@@ -244,7 +243,7 @@ object Getters {
             .orderBy(DUser_Table.id, false)
             .queryList()
 
-        return if(list.isEmpty())
+        return if (list.isEmpty())
             0
         else {
             val ind = list.maxBy { it.id }!!.id

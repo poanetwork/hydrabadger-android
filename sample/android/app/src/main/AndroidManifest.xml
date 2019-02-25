@@ -50,7 +50,7 @@
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name="net.korul.hbbft.features.def.DefaultDialogsActivity"
+            android:name="net.korul.hbbft.DefaultDialogsActivity"
             android:label="@string/app_name"
             android:theme="@style/BlueTheme" >
             <intent-filter>
@@ -61,10 +61,10 @@
         </activity>
 
         <activity
-                android:name="net.korul.hbbft.features.def.DefaultMessagesActivity"
+                android:name="net.korul.hbbft.DefaultMessagesActivity"
                 android:theme="@style/BlueTheme"/>
         <activity
-                android:name="net.korul.hbbft.features.def.CreateNewDialog"
+                android:name="net.korul.hbbft.CreateNewDialog"
                 android:theme="@style/BlueTheme"/>
 
 
@@ -76,6 +76,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <service
                 android:name=".services.MyJobService"
                 android:exported="false">
@@ -83,6 +84,14 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
+
+        <service
+                android:name=".firebaseStorage.MyDownloadService"
+                android:exported="false"/>
+
+        <service
+                android:name=".firebaseStorage.MyUploadService"
+                android:exported="false" />
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"

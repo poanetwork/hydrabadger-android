@@ -17,13 +17,12 @@ abstract class DemoDialogsActivity :
     AppCompatActivity(),
     DialogsListAdapter.OnDialogClickListener<Dialog>,
     DialogsListAdapter.OnDialogLongClickListener<Dialog>,
-    DialogInterface.OnClickListener
-{
+    DialogInterface.OnClickListener {
 
     protected lateinit var imageLoader: ImageLoader
     protected var dialogsAdapter: DialogsListAdapter<Dialog>? = null
 
-    protected var mDialog: Dialog? = null
+    private var mDialog: Dialog? = null
     var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +31,7 @@ abstract class DemoDialogsActivity :
         imageLoader = ImageLoader { imageView, url, payload ->
             try {
                 Picasso.with(this@DemoDialogsActivity).load(url).into(imageView)
-            }
-            catch (e: IllegalArgumentException) {
+            } catch (e: IllegalArgumentException) {
             }
         }
     }
@@ -45,10 +43,6 @@ abstract class DemoDialogsActivity :
         menu.findItem(R.id.action_delete).isVisible = false
         menu.findItem(R.id.action_copy).isVisible = false
         menu.findItem(R.id.action_startALL).isVisible = false
-//        menu.findItem(R.id.action_1x).isVisible = false
-//        menu.findItem(R.id.clear).isVisible = false
-//        menu.findItem(R.id.action_2x).isVisible = false
-//        menu.findItem(R.id.action_3x).isVisible = false
         menu.findItem(R.id.action_online).isVisible = false
         return true
     }

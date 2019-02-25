@@ -7,9 +7,6 @@ import android.os.IBinder
 import android.support.annotation.Nullable
 import android.util.Log
 import net.korul.hbbft.DatabaseApplication
-import net.korul.hbbft.services.MyFirebaseMessagingService.Companion.scheduleJob
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 
 class ClosingService : Service() {

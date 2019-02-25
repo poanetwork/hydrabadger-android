@@ -14,8 +14,7 @@ class Message(
     private var createdAt: Date? = Date()
 ) : IMessage,
     MessageContentType.Image, /*this is for default image messages implementation*/
-    MessageContentType /*and this one is for custom content type (in this case - voice message)*/
-{
+    MessageContentType /*and this one is for custom content type (in this case - voice message)*/ {
     private var image: Image? = null
     var voice: Voice? = null
 
@@ -30,7 +29,7 @@ class Message(
         return id
     }
 
-    fun setId(id: String){
+    fun setId(id: String) {
         this.id = id
     }
 
