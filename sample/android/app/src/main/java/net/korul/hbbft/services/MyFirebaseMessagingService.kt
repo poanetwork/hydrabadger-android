@@ -14,8 +14,8 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import net.korul.hbbft.DefaultDialogsFragment
 import net.korul.hbbft.R
-import net.korul.hbbft.DefaultDialogsActivity
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -119,7 +119,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * @param messageBody FCM message body received.
      */
     private fun sendNotification(roomname: String) {
-        val intent = Intent(this, DefaultDialogsActivity::class.java).apply {
+        val intent = Intent(this, DefaultDialogsFragment::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         intent.putExtra("Start_App", true)

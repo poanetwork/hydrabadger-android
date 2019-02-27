@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24.0dip" android:width="24.0dip" android:viewportWidth="24.0"
+        android:viewportHeight="24.0">
+    <path android:fillColor="?icon_background"
+          android:pathData="M24,12C24,18.627 18.627,24 12,24C5.373,24 0,18.627 0,12C0,5.373 5.373,0 12,0C18.627,0 24,5.373 24,12Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M14,9.6L6.6,9.6L6.6,13L7.807,13C7.909,11.436 9.21,10.2 10.8,10.2C12.39,10.2 13.69,11.436 13.793,13L14,13L14,9.6Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M14,6.6L8.4,6.6C7.406,6.6 6.6,7.406 6.6,8.4L6.6,9L14,9L14,8.4L13.2,8.4L13.2,7.2L14,7.2L14,6.6Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M13.192,13C13.09,11.768 12.058,10.8 10.8,10.8C9.542,10.8 8.51,11.768 8.408,13L9.011,13C9.11,12.1 9.874,11.4 10.8,11.4C11.726,11.4 12.49,12.1 12.589,13L13.192,13Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M11.983,13C11.888,12.433 11.395,12 10.8,12C10.205,12 9.712,12.433 9.617,13L11.983,13Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M6.6,13L6.6,15.6C6.6,16.594 7.406,17.4 8.4,17.4L15.6,17.4C16.594,17.4 17.4,16.594 17.4,15.6L17.4,9.6L14,9.6L14,13L13.793,13C13.798,13.066 13.8,13.133 13.8,13.2C13.8,14.857 12.457,16.2 10.8,16.2C9.143,16.2 7.8,14.857 7.8,13.2C7.8,13.133 7.802,13.066 7.807,13L6.6,13Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M8.408,13C8.403,13.066 8.4,13.133 8.4,13.2C8.4,14.526 9.475,15.6 10.8,15.6C12.126,15.6 13.2,14.526 13.2,13.2C13.2,13.133 13.197,13.066 13.192,13L12.589,13C12.596,13.066 12.6,13.132 12.6,13.2C12.6,14.194 11.794,15 10.8,15C9.806,15 9,14.194 9,13.2C9,13.132 9.004,13.066 9.011,13L8.408,13Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M9.617,13C9.606,13.065 9.6,13.132 9.6,13.2C9.6,13.863 10.137,14.4 10.8,14.4C11.463,14.4 12,13.863 12,13.2C12,13.132 11.994,13.065 11.983,13L9.617,13Z"/>
+    <path android:fillColor="?icon_foreground"
+          android:pathData="M14,9L17.4,9L17.4,8.4C17.4,7.406 16.594,6.6 15.6,6.6L14,6.6L14,7.2L15,7.2L15,8.4L14,8.4L14,9Z"/>
+</vector>

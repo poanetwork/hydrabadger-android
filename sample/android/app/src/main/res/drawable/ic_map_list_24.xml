@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="17.0dip" android:width="22.0dip" android:viewportWidth="22.0"
+        android:viewportHeight="17.0">
+    <path android:fillColor="?icon_map_active_color"
+          android:pathData="M6,8L6,16.281L10.526,15.149L17.526,16.149L22,15.031L22,8L21,8L21,14.25L18,15L18,8L17,8L17,15.064L11,14.207L11,8L10,8L10,14.25L7,15L7,8L6,8Z"/>
+    <path android:fillColor="?icon_map_active_color"
+          android:pathData="M22,8L22,0L17.474,1.132L10.474,0.132L6,1.25L6,8L7,8L7,2.031L10,1.281L10,8L11,8L11,1.217L17,2.074L17,8L18,8L18,2.031L21,1.281L21,8L22,8Z"/>
+    <path android:fillColor="?icon_map_active_color" android:pathData="M0,2L5,2L5,3L0,3L0,2Z"/>
+    <path android:fillColor="?icon_map_active_color" android:pathData="M0,5L5,5L5,6L0,6L0,5Z"/>
+    <path android:fillColor="?icon_map_active_color" android:pathData="M5,8L0,8L0,9L5,9L5,8Z"/>
+    <path android:fillColor="?icon_map_active_color" android:pathData="M0,11L5,11L5,12L0,12L0,11Z"/>
+    <path android:fillColor="?icon_map_active_color" android:pathData="M5,14L0,14L0,15L5,15L5,14Z"/>
+</vector>

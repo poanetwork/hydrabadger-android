@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+    <android.support.constraint.ConstraintLayout android:layout_gravity="fill" android:id="@+id/toolbar"
+                                                 android:layout_width="fill_parent"
+                                                 android:layout_height="?actionBarSize"
+                                                 app:layout_constraintStart_toStartOf="parent" style="@style/Toolbar">
+        <RelativeLayout android:id="@+id/contacts_manager" android:layout_width="fill_parent"
+                        android:layout_height="fill_parent" app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent">
+            <include android:id="@+id/action_back" android:layout_width="wrap_content"
+                     android:layout_height="wrap_content" android:layout_alignParentLeft="true"
+                     android:layout_alignParentTop="true" android:layout_alignParentBottom="true"
+                     layout="@layout/toolbar_button_back"/>
+            <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:text="@string/contact_add_title"
+                      android:layout_centerHorizontal="true" android:layout_centerVertical="true"
+                      style="@style/toolbar_not_caps_text"/>
+        </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
+
+    <LinearLayout android:orientation="vertical" android:paddingLeft="32.0dip" android:paddingTop="16.0dip"
+                  android:paddingRight="32.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content"
+                  android:layout_above="@id/save_qr_code" android:layout_below="@id/toolbar">
+        <TextView android:id="@+id/contact_id_hint" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content" android:text="@string/contact_request_prompt_email_or_id"
+                  app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                  style="@style/TextView.Text"/>
+        <android.support.design.widget.TextInputLayout android:id="@+id/contact_id_or_email_layout"
+                                                       android:layout_width="fill_parent"
+                                                       android:layout_height="wrap_content"
+                                                       android:layout_marginTop="2.0dip"
+                                                       app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
+                                                       style="@style/TextInputLayout.Fragments">
+            <AutoCompleteTextView android:id="@+id/contact_id_or_email" android:focusable="true"
+                                  android:layout_width="fill_parent" android:layout_height="wrap_content"
+                                  android:maxLines="1" android:inputType="text"
+                                  android:imeOptions="actionNext|flagNoExtractUi" style="@style/EditText.Fragments"/>
+        </android.support.design.widget.TextInputLayout>
+        <Button android:layout_gravity="center" android:id="@+id/button_add_contact" android:paddingLeft="10.0dip"
+                android:paddingRight="10.0dip" android:layout_width="250.0dip" android:layout_height="wrap_content"
+                android:layout_marginTop="16.0dip" android:text="@string/contact_add" android:drawablePadding="-16.0dip"
+                style="@style/button.green"/>
+        <TextView android:textSize="16.0sp" android:textStyle="bold" android:layout_gravity="center"
+                  android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:layout_marginTop="16.0dip" android:text="@string/or" style="@style/TextView.Text"/>
+        <Button android:layout_gravity="center" android:id="@+id/button_open_qr_scanner" android:paddingLeft="10.0dip"
+                android:paddingRight="10.0dip" android:layout_width="250.0dip" android:layout_height="wrap_content"
+                android:layout_marginTop="16.0dip" android:text="@string/contact_qr_scan"
+                android:drawablePadding="-16.0dip" style="@style/button.green"/>
+        <ImageView android:layout_gravity="center_horizontal" android:id="@+id/my_qr_code_view"
+                   android:layout_width="fill_parent" android:layout_height="fill_parent"
+                   android:layout_marginTop="16.0dip" android:layout_marginBottom="8.0dip"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:id="@+id/save_qr_code" android:paddingLeft="32.0dip"
+                  android:paddingRight="32.0dip" android:paddingBottom="16.0dip" android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" android:layout_marginBottom="8.0dip"
+                  android:layout_alignParentLeft="true" android:layout_alignParentBottom="true"
+                  style="@style/SubTitle.Clicked">
+        <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                   android:layout_height="wrap_content" app:srcCompat="@drawable/ic_qr_save"/>
+        <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                     android:layout_width="wrap_content"
+                                                     android:layout_height="wrap_content"
+                                                     android:text="@string/account_qr_save"
+                                                     style="@style/SubTitleText.BigMargin"/>
+    </LinearLayout>
+</RelativeLayout>

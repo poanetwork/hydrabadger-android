@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+              android:background="?dialog_background"
+              android:padding="16.0dip" android:layout_width="wrap_content"
+              android:layout_height="wrap_content">
+    <RadioGroup android:id="@+id/app_theme_radio_group" android:layout_width="fill_parent"
+                android:layout_height="wrap_content" android:divider="@drawable/radio_group_divider"
+                android:showDividers="middle" android:dividerPadding="60.0dip">
+        <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start" android:id="@+id/healin_app_theme"
+                                                        android:layout_width="fill_parent"
+                                                        android:layout_height="58.0dip"
+                                                        android:text="@string/settings_app_theme_light"
+                                                        android:selectAllOnFocus="false"
+                                                        android:drawableRight="@drawable/radio_button_healin_theme"
+                                                        android:drawablePadding="20.0dip"
+                                                        android:drawableEnd="@drawable/radio_button_healin_theme"
+                                                        style="@style/dialog_list_item"/>
+        <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start" android:id="@+id/mib_app_theme"
+                                                        android:layout_width="fill_parent"
+                                                        android:layout_height="58.0dip"
+                                                        android:text="@string/settings_app_theme_dark"
+                                                        android:drawableRight="@drawable/radio_button_black_theme"
+                                                        android:drawablePadding="20.0dip"
+                                                        android:drawableEnd="@drawable/radio_button_black_theme"
+                                                        style="@style/dialog_list_item"/>
+    </RadioGroup>
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <Button android:id="@+id/theme_ok" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/action_ok" android:layout_alignParentRight="true" style="@style/Button"/>
+    </RelativeLayout>
+</LinearLayout>

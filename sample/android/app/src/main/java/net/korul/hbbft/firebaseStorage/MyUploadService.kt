@@ -12,7 +12,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
-import net.korul.hbbft.firebaseStorage.MyBaseTaskService
 import java.io.File
 
 /**
