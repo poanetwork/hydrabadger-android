@@ -221,21 +221,6 @@ object CoreHBBFT : IGetData {
             })
     }
 
-//    fun sendPushStart(pushUID: String, title: String, text: String): Task<String> {
-//        val json = JSONObject()
-//        json.put("text", text)
-//        json.put("title", title)
-//        json.put("idTo", pushUID)
-//
-//        return mFunctions
-//            .getHttpsCallable("sendPush")
-//            .call(json)
-//            .continueWith(object :Continuation<HttpsCallableResult, String> {
-//                override fun then(task: Task<HttpsCallableResult>): String {
-//                    return task.result?.data.toString()
-//                }
-//            })
-//    }
 
     fun unregisterInDatabase(RoomName: String) {
         val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("uid").equalTo(uniqueID1)
@@ -268,7 +253,6 @@ object CoreHBBFT : IGetData {
     }
 
     fun setOfflineModeToDatabase(RoomName: String) {
-//        val latch = CountDownLatch(1)
         val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("uid").equalTo(uniqueID1)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -284,10 +268,8 @@ object CoreHBBFT : IGetData {
                 }
                 snapshot.ref.push().setValue(uid)
                 Log.d(TAG, "Succes setOnlineModeToDatabase $uniqueID1")
-//                latch.countDown()
             }
         })
-//        latch.await()
     }
 
     fun setOnlineModeToDatabase(RoomName: String) {

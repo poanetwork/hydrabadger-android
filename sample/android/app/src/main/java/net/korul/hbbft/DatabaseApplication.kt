@@ -33,7 +33,7 @@ class DatabaseApplication : Application() {
 //        FirebaseApp.initializeApp(this)
 
         mCoreHBBFT2X = CoreHBBFT
-        mCoreHBBFT2X.Init(this)
+        mCoreHBBFT2X.Init(applicationContext)
 
 //        FlowManager.getDatabase(AppDatabase::class.java).reset(this)
     }

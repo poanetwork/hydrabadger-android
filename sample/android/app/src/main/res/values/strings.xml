@@ -50,8 +50,10 @@
     <string name="title_lenta">Лента</string>
 
     <string name="tag_chats">TAG_CHAT</string>
-    <string name="account_id">ID</string>
+    <string name="tag_contacts">TAG_CONTACTS</string>
+    <string name="tag_settings">TAG_SETTINGS</string>
 
+    <string name="account_id">ID</string>
 
 
     <string name="SelectFolder">Выбрать папку</string>
@@ -104,6 +106,7 @@
     <string name="action_cancel">Отмена</string>
     <string name="action_clear_message_history">Очистить историю сообщений</string>
     <string name="action_copy">Копир.</string>
+    <string name="action_add">Добавить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_delete_timer">Таймер</string>
     <string name="action_forgot_password">Забыли пароль?</string>
@@ -1013,4 +1016,7 @@
     </string>
     <string name="zxing_msg_default_status">Чтобы сканировать штрих-код, поместите его в прямоугольник видоискателя.
     </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

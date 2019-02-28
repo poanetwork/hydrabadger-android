@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/map_circle_healin_green" />
+    <item android:drawable="@drawable/map_circle_white" />
+    <item android:drawable="@drawable/map_circle_inner_inner" />
+    <item android:drawable="@drawable/map_circle_inner" />
+    <item android:drawable="@drawable/ic_map_on" android:left="19.0dip" android:top="19.0dip" android:right="19.0dip" android:bottom="19.0dip" />
+</layer-list>

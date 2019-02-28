@@ -91,8 +91,10 @@ abstract class DemoMessagesFragment : Fragment(),
         inflater!!.inflate(R.menu.chat_actions_menu, menu)
         onSelectionChanged(0)
 
+        menu!!.findItem(R.id.action_add).isVisible = false
+
         if (isNeedVilibleMenuHbbft()) {
-            menu!!.findItem(R.id.action_online).icon =
+            menu.findItem(R.id.action_online).icon =
                 DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
             hideMenuHbbft()
         }
@@ -119,7 +121,7 @@ abstract class DemoMessagesFragment : Fragment(),
                 AppUtils.showToast(context!!, R.string.copied_message, true)
             }
             R.id.action_online -> {
-                DatabaseApplication.mCoreHBBFT2X.setOfflineModeToDatabase(DatabaseApplication.mCoreHBBFT2X.mRoomName)
+//                DatabaseApplication.mCoreHBBFT2X.setOfflineModeToDatabase(DatabaseApplication.mCoreHBBFT2X.mRoomName)
             }
             R.id.action_startALL -> {
                 handler.post {

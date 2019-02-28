@@ -14,7 +14,7 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import net.korul.hbbft.DefaultDialogsFragment
+import net.korul.hbbft.features.DefaultDialogsFragment
 import net.korul.hbbft.R
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {

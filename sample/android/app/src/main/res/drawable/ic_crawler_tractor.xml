@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="192.0dip" android:width="192.0dip" android:viewportWidth="400.0"
-        android:viewportHeight="400.0">
-    <path android:fillColor="#ff0068c1"
-          android:pathData="M147.7,230L240,230L240,170L147.7,170L114.8,200L147.7,230ZM143.8,240L100,200L143.8,160L250,160L250,240L143.8,240Z"
-          android:strokeColor="#00000000" android:strokeWidth="1.0"/>
-    <path android:fillColor="#ff0068c1"
-          android:pathData="M269.6,197.8C269.8,196.5 270.2,195.2 270.7,194.1C272.2,190.8 274.9,189 280,189C285.1,189 287.6,190.8 289,194C289.5,195 289.7,196.2 289.9,197.4C290,198.3 290,199 290,199.5C290,199.6 289.6,204.6 289.6,204.6L299.5,205.4L300,200.4C300,200.3 300,200.2 300,200C300.1,197 299.7,193.5 298.2,190C295.3,183.2 289.2,179 280,179C270.9,179 264.7,183.2 261.6,189.9C260.9,191.6 260.3,193.3 260,195L240,195L240,205L269.7,205L269.5,199.8C269.5,199.4 269.5,198.7 269.6,197.8Z"
-          android:strokeColor="#00000000" android:strokeWidth="1.0"/>
+<vector android:height="192.0dip" android:width="192.0dip" android:viewportWidth="400.0" android:viewportHeight="400.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#ff0068c1" android:pathData="M147.7,230L240,230L240,170L147.7,170L114.8,200L147.7,230ZM143.8,240L100,200L143.8,160L250,160L250,240L143.8,240Z" android:strokeColor="#00000000" android:strokeWidth="1.0" />
+    <path android:fillColor="#ff0068c1" android:pathData="M269.6,197.8C269.8,196.5 270.2,195.2 270.7,194.1C272.2,190.8 274.9,189 280,189C285.1,189 287.6,190.8 289,194C289.5,195 289.7,196.2 289.9,197.4C290,198.3 290,199 290,199.5C290,199.6 289.6,204.6 289.6,204.6L299.5,205.4L300,200.4C300,200.3 300,200.2 300,200C300.1,197 299.7,193.5 298.2,190C295.3,183.2 289.2,179 280,179C270.9,179 264.7,183.2 261.6,189.9C260.9,191.6 260.3,193.3 260,195L240,195L240,205L269.7,205L269.5,199.8C269.5,199.4 269.5,198.7 269.6,197.8Z" android:strokeColor="#00000000" android:strokeWidth="1.0" />
 </vector>

@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24.0dip" android:width="24.0dip" android:viewportWidth="24.0"
-        android:viewportHeight="24.0">
+<vector android:height="24.0dip" android:width="24.0dip" android:viewportWidth="24.0" android:viewportHeight="24.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
     <group>
-        <clip-path android:pathData="M0,0L24,0L24,24L0,24L0,0Z M 0,0"/>
-        <path android:fillColor="?footer_icon_color"
-              android:pathData="M15,8C17.209,8 19,6.209 19,4C19,1.791 17.209,0 15,0C12.791,0 11,1.791 11,4C11,6.209 12.791,8 15,8ZM15,7C16.657,7 18,5.657 18,4C18,2.343 16.657,1 15,1C13.343,1 12,2.343 12,4C12,5.657 13.343,7 15,7Z"
-              android:fillType="evenOdd"/>
-        <path android:fillColor="?footer_icon_color"
-              android:pathData="M23.998,17C23.999,16.952 24,16.905 24,16.857C24,13.07 19.971,10 15,10C10.03,10 6,13.07 6,16.857C6,16.905 6.001,16.952 6.002,17L6,17L6,24L24,24L24,17L23.998,17ZM22.998,17C22.999,16.952 23,16.905 23,16.857C23,15.342 22.197,13.9 20.758,12.804C19.318,11.707 17.286,11 15,11C12.714,11 10.682,11.707 9.242,12.804C7.803,13.9 7,15.342 7,16.857C7,16.905 7.001,16.952 7.002,17L7,17L7,23L23,23L23,17L22.998,17Z"
-              android:fillType="evenOdd"/>
-        <path android:fillColor="?footer_icon_color" android:pathData="M6,10L6,11L8,9.5L6,8L6,9L0,9L0,10L6,10Z"/>
+        <clip-path android:pathData="M0,0L24,0L24,24L0,24L0,0Z M 0,0" />
+        <path android:fillColor="?footer_icon_color" android:pathData="M15,8C17.209,8 19,6.209 19,4C19,1.791 17.209,0 15,0C12.791,0 11,1.791 11,4C11,6.209 12.791,8 15,8ZM15,7C16.657,7 18,5.657 18,4C18,2.343 16.657,1 15,1C13.343,1 12,2.343 12,4C12,5.657 13.343,7 15,7Z" android:fillType="evenOdd" />
+        <path android:fillColor="?footer_icon_color" android:pathData="M23.998,17C23.999,16.952 24,16.905 24,16.857C24,13.07 19.971,10 15,10C10.03,10 6,13.07 6,16.857C6,16.905 6.001,16.952 6.002,17L6,17L6,24L24,24L24,17L23.998,17ZM22.998,17C22.999,16.952 23,16.905 23,16.857C23,15.342 22.197,13.9 20.758,12.804C19.318,11.707 17.286,11 15,11C12.714,11 10.682,11.707 9.242,12.804C7.803,13.9 7,15.342 7,16.857C7,16.905 7.001,16.952 7.002,17L7,17L7,23L23,23L23,17L22.998,17Z" android:fillType="evenOdd" />
+        <path android:fillColor="?footer_icon_color" android:pathData="M6,10L6,11L8,9.5L6,8L6,9L0,9L0,10L6,10Z" />
     </group>
 </vector>

@@ -145,7 +145,10 @@ dependencies {
 
     //BAR CODE
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
-
+    // swipe
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
 }
 
 apply plugin: 'com.google.gms.google-services'

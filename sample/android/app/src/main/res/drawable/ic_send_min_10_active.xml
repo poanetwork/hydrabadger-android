@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="18.0dip" android:width="18.0dip" android:autoMirrored="true"
-        android:viewportWidth="18.0"
-        android:viewportHeight="18.0">
-    <path android:fillColor="?footer_icon_color_active" android:pathData="M12,0V5H11V1H10V5H9V1H8V5H7V0H12Z"/>
-    <path android:fillColor="?footer_icon_color_active" android:pathData="M0,15L2.8235,14L0,13V10L8,14L0,18V15Z"/>
-    <path android:fillColor="?footer_icon_color_active" android:pathData="M15,0V5H16V1H17V5H18V0H15Z"/>
-    <path android:fillColor="?footer_icon_color_active" android:pathData="M14,0V5H13V0H14Z"/>
-    <path android:fillColor="?footer_icon_color_active" android:pathData="M2,0H5V5H2V0ZM3,4H4V1H3V4Z"
-          android:fillType="evenOdd"/>
-    <path android:fillColor="?footer_icon_color_active" android:pathData="M1,0H0V5H1V0Z"/>
+<vector android:height="18.0dip" android:width="18.0dip" android:autoMirrored="true" android:viewportWidth="18.0" android:viewportHeight="18.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="?footer_icon_color_active" android:pathData="M12,0V5H11V1H10V5H9V1H8V5H7V0H12Z" />
+    <path android:fillColor="?footer_icon_color_active" android:pathData="M0,15L2.8235,14L0,13V10L8,14L0,18V15Z" />
+    <path android:fillColor="?footer_icon_color_active" android:pathData="M15,0V5H16V1H17V5H18V0H15Z" />
+    <path android:fillColor="?footer_icon_color_active" android:pathData="M14,0V5H13V0H14Z" />
+    <path android:fillColor="?footer_icon_color_active" android:pathData="M2,0H5V5H2V0ZM3,4H4V1H3V4Z" android:fillType="evenOdd" />
+    <path android:fillColor="?footer_icon_color_active" android:pathData="M1,0H0V5H1V0Z" />
 </vector>

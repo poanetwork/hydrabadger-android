@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="18.0dip" android:width="18.0dip" android:viewportWidth="14.0"
-        android:viewportHeight="14.0">
-    <path android:fillColor="#ffd1eded"
-          android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z"/>
-    <path android:fillColor="#ff9dc7c7"
-          android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z"/>
-    <path android:fillColor="#ffe8e8e8"
-          android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z"/>
-    <path android:fillColor="#fffafafa"
-          android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z"/>
-    <path android:fillColor="?footer_icon_color"
-          android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z"/>
+<vector android:height="18.0dip" android:width="18.0dip" android:viewportWidth="14.0" android:viewportHeight="14.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#ffd1eded" android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z" />
+    <path android:fillColor="#ff9dc7c7" android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z" />
+    <path android:fillColor="#ffe8e8e8" android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z" />
+    <path android:fillColor="#fffafafa" android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z" />
+    <path android:fillColor="?footer_icon_color" android:pathData="M7.5,0.5L6.5,0.5L6.5,6.5L0.5,6.5L0.5,7.5L6.5,7.5L6.5,13.5L7.5,13.5L7.5,7.5L13.5,7.5L13.5,6.5L7.5,6.5L7.5,0.5Z" />
 </vector>

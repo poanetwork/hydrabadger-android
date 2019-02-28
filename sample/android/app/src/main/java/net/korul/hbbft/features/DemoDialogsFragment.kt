@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
 import com.squareup.picasso.Picasso
@@ -30,6 +31,7 @@ abstract class DemoDialogsFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.show()
 
         imageLoader = ImageLoader { imageView, url, payload ->
             try {
@@ -46,6 +48,7 @@ abstract class DemoDialogsFragment :
         menu.findItem(R.id.action_copy).isVisible = false
         menu.findItem(R.id.action_startALL).isVisible = false
         menu.findItem(R.id.action_online).isVisible = false
+        menu.findItem(R.id.action_add).isVisible = true
 
         super.onCreateOptionsMenu(menu, inflater)
     }

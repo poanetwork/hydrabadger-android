@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24.0dip" android:width="24.0dip" android:viewportWidth="24.0"
-        android:viewportHeight="24.0">
-    <path android:fillColor="?footer_icon_color"
-          android:pathData="M17.963,18L7.414,18L8.414,17L16.5,17C15.73,15.891 14.115,15 12,15C11.339,15 10.726,15.087 10.173,15.241L11.391,14.023C11.592,14.008 11.794,14 12,14C14.613,14 16.835,15.252 17.659,17C17.809,17.318 17.912,17.653 17.963,18Z"/>
-    <path android:fillColor="?footer_icon_color"
-          android:pathData="M12,6C12.872,6 13.657,6.372 14.205,6.966L13.497,7.674C13.131,7.261 12.596,7 12,7C10.896,7 10,7.895 10,9C10,9.596 10.26,10.131 10.674,10.497L9.966,11.205C9.372,10.657 9,9.872 9,9C9,7.343 10.343,6 12,6Z"/>
-    <path android:fillColor="?footer_icon_color"
-          android:pathData="M12,24C18.627,24 24,18.627 24,12C24,5.373 18.627,0 12,0C5.373,0 0,5.373 0,12C0,18.627 5.373,24 12,24ZM23,12C23,8.962 21.769,6.212 19.778,4.222L4.222,19.778C6.212,21.769 8.962,23 12,23C18.075,23 23,18.075 23,12ZM3.547,19.039L19.039,3.547C17.132,1.957 14.677,1 12,1C5.925,1 1,5.925 1,12C1,14.677 1.957,17.132 3.547,19.039Z"
-          android:fillType="evenOdd"/>
+<vector android:height="24.0dip" android:width="24.0dip" android:viewportWidth="24.0" android:viewportHeight="24.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="?footer_icon_color" android:pathData="M17.963,18L7.414,18L8.414,17L16.5,17C15.73,15.891 14.115,15 12,15C11.339,15 10.726,15.087 10.173,15.241L11.391,14.023C11.592,14.008 11.794,14 12,14C14.613,14 16.835,15.252 17.659,17C17.809,17.318 17.912,17.653 17.963,18Z" />
+    <path android:fillColor="?footer_icon_color" android:pathData="M12,6C12.872,6 13.657,6.372 14.205,6.966L13.497,7.674C13.131,7.261 12.596,7 12,7C10.896,7 10,7.895 10,9C10,9.596 10.26,10.131 10.674,10.497L9.966,11.205C9.372,10.657 9,9.872 9,9C9,7.343 10.343,6 12,6Z" />
+    <path android:fillColor="?footer_icon_color" android:pathData="M12,24C18.627,24 24,18.627 24,12C24,5.373 18.627,0 12,0C5.373,0 0,5.373 0,12C0,18.627 5.373,24 12,24ZM23,12C23,8.962 21.769,6.212 19.778,4.222L4.222,19.778C6.212,21.769 8.962,23 12,23C18.075,23 23,18.075 23,12ZM3.547,19.039L19.039,3.547C17.132,1.957 14.677,1 12,1C5.925,1 1,5.925 1,12C1,14.677 1.957,17.132 3.547,19.039Z" android:fillType="evenOdd" />
 </vector>

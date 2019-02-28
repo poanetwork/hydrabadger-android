@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/dark_map_circle_on" />
+    <item android:drawable="@drawable/map_circle_inner" />
+    <item android:drawable="@drawable/ic_map_active_dark" android:left="50.0dip" android:top="45.0dip" android:right="50.0dip" android:bottom="55.0dip" />
+</layer-list>

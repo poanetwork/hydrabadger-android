@@ -9,7 +9,7 @@
     <item
             android:id="@+id/navigation_chats"
             android:icon="@drawable/ic_chats"
-            android:title="@string/title_chats"/>
+            android:title="@string/title_chats" android:enabled="true"/>
 
 
     <item

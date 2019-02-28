@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="9.0dip" android:width="9.0dip" android:viewportWidth="11.0"
-        android:viewportHeight="10.0">
-    <path android:fillColor="#ffd1eded"
-          android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z"/>
-    <path android:fillColor="#ff9dc7c7"
-          android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z"/>
-    <path android:fillColor="#ffe8e8e8"
-          android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z"/>
-    <path android:fillColor="#fff25c5c"
-          android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z"/>
+<vector android:height="9.0dip" android:width="9.0dip" android:viewportWidth="11.0" android:viewportHeight="10.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#ffd1eded" android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z" />
+    <path android:fillColor="#ff9dc7c7" android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z" />
+    <path android:fillColor="#ffe8e8e8" android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z" />
+    <path android:fillColor="#fff25c5c" android:pathData="M1.377,0L0.67,0.707L4.913,4.95L0.67,9.192L1.377,9.899L5.62,5.657L9.862,9.899L10.569,9.192L6.327,4.95L10.569,0.707L9.862,0L5.62,4.243L1.377,0Z" />
 </vector>
