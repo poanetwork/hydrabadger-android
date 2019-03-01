@@ -1,5 +1,6 @@
 package net.korul.hbbft.features
 
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
@@ -47,11 +48,10 @@ class DefaultMessagesFragment :
     DialogInterface.OnClickListener,
     CoreHBBFTListener {
 
-    private var handlerMes = Handler()
-    private var handlerUpd = Handler()
-
     companion object {
         private val CONTENT_TYPE_VOICE: Byte = 1
+
+        private val handler = Handler()
 
         fun newInstance(dialog: Dialog, user: User): DefaultMessagesFragment {
             mCoreHBBFT2X.setRoomName(dialog.dialogName)
@@ -81,8 +81,7 @@ class DefaultMessagesFragment :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        DatabaseApplication.mCoreHBBFT2X.addListener(this)
-
+        super.onCreate(savedInstanceState)
         val bundle = arguments
         if (bundle != null && !bundle.isEmpty) {
             val extraDialog = bundle.getString("dialog")
@@ -93,9 +92,6 @@ class DefaultMessagesFragment :
             val extraUser = bundle.getString("user")
             super.mCurUser = Gson().fromJson(extraUser, User::class.java)
         }
-
-        super.onCreate(savedInstanceState)
-
 
         if(bundle != null && bundle.getBoolean("startHbbft", false))
             startAll()
@@ -125,6 +121,18 @@ class DefaultMessagesFragment :
         mCurDialog = getDialog(mCurDialog!!.id)
 
         return true
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+
+        DatabaseApplication.mCoreHBBFT2X.addListener(this)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        DatabaseApplication.mCoreHBBFT2X.delListener(this)
     }
 
     fun startAll() {
@@ -194,25 +202,25 @@ class DefaultMessagesFragment :
 
     override fun updateStateToOnline() {
         try {
-            handlerUpd.postDelayed({
+            handler.post {
                 progress.dismiss()
-                super.menu!!.findItem(R.id.action_online).icon =
+                menu!!.findItem(R.id.action_online).icon =
                     DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
                 hideMenuHbbft1()
-//                super.invalidateOptionsMenu()
-            }, 0)
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun hideMenuHbbft1() {
-        super.menu!!.findItem(R.id.action_startALL).isVisible = false
+        menu?.findItem(R.id.action_startALL)?.isVisible = false
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
         try {
-            handlerMes.postDelayed({
+            handler.post {
                 if (!you) {
                     var found = false
                     for (user in mCurDialog!!.users) {
@@ -243,7 +251,7 @@ class DefaultMessagesFragment :
                     super.messagesAdapter!!.notifyDataSetChanged()
                     mCurDialog = getDialog(mCurDialog!!.id)
                 }
-            }, 0)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

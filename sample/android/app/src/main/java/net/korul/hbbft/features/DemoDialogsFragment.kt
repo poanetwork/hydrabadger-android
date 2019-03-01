@@ -42,14 +42,13 @@ abstract class DemoDialogsFragment :
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        this.menu = menu
-        inflater!!.inflate(R.menu.chat_actions_menu, menu)
-        menu!!.findItem(R.id.action_delete).isVisible = false
-        menu.findItem(R.id.action_copy).isVisible = false
-        menu.findItem(R.id.action_startALL).isVisible = false
-        menu.findItem(R.id.action_online).isVisible = false
+        menu?.clear()
+        inflater!!.inflate(R.menu.dialogs_actions_menu, menu)
+
+        menu!!.findItem(R.id.action_online).isVisible = false
         menu.findItem(R.id.action_add).isVisible = true
 
+        this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
     }
 

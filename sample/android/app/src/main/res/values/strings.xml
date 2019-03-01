@@ -50,6 +50,7 @@
     <string name="title_lenta">Лента</string>
 
     <string name="tag_chats">TAG_CHAT</string>
+    <string name="tag_chats2">TAG_CHAT2</string>
     <string name="tag_contacts">TAG_CONTACTS</string>
     <string name="tag_settings">TAG_SETTINGS</string>
 

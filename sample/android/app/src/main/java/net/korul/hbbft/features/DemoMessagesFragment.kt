@@ -27,7 +27,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-val handler = Handler()
+//val handler = Handler()
 
 abstract class DemoMessagesFragment : Fragment(),
     MessagesListAdapter.SelectionListener,
@@ -43,6 +43,7 @@ abstract class DemoMessagesFragment : Fragment(),
     var mCurDialog: Dialog? = null
     var mCurUser: User? = null
 
+    private val handler = Handler()
 
     lateinit var progress: ProgressDialog
 
@@ -87,23 +88,22 @@ abstract class DemoMessagesFragment : Fragment(),
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        this.menu = menu
+        menu?.clear()
         inflater!!.inflate(R.menu.chat_actions_menu, menu)
-        onSelectionChanged(0)
-
-        menu!!.findItem(R.id.action_add).isVisible = false
 
         if (isNeedVilibleMenuHbbft()) {
-            menu.findItem(R.id.action_online).icon =
+            menu!!.findItem(R.id.action_online).icon =
                 DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
             hideMenuHbbft()
         }
 
+        this.menu = menu
+        onSelectionChanged(0)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     fun hideMenuHbbft() {
-        menu!!.findItem(R.id.action_startALL).isVisible = false
+        menu?.findItem(R.id.action_startALL)?.isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -124,7 +124,7 @@ abstract class DemoMessagesFragment : Fragment(),
 //                DatabaseApplication.mCoreHBBFT2X.setOfflineModeToDatabase(DatabaseApplication.mCoreHBBFT2X.mRoomName)
             }
             R.id.action_startALL -> {
-                handler.post {
+                Handler().post {
                     progress.show()
                 }
                 DatabaseApplication.mCoreHBBFT2X.subscribeSession()
@@ -148,7 +148,7 @@ abstract class DemoMessagesFragment : Fragment(),
                 DatabaseApplication.mCoreHBBFT2X.startAllNode(mCurDialog!!.dialogName)
             }
         }
-        return true
+        return false
     }
 
 //    override fun onBackPressed() {
@@ -168,9 +168,9 @@ abstract class DemoMessagesFragment : Fragment(),
 
     override fun onSelectionChanged(count: Int) {
         this.selectionCount = count
-        menu!!.findItem(R.id.action_delete).isVisible = count > 0
-        menu!!.findItem(R.id.action_copy).isVisible = count > 0
-        menu!!.findItem(R.id.action_startALL).isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
+        menu?.findItem(R.id.action_delete)?.isVisible = count > 0
+        menu?.findItem(R.id.action_copy)?.isVisible = count > 0
+        menu?.findItem(R.id.action_startALL)?.isVisible = count <= 0 && !isNeedVilibleMenuHbbft()
     }
 
 
@@ -179,7 +179,7 @@ abstract class DemoMessagesFragment : Fragment(),
     }
 
     private fun loadMessages() {
-        Handler().postDelayed({
+        handler.postDelayed({
             try {
                 lastLoadedDate = if (messagesAdapter!!.allMessages.size > 0) {
                     val min = messagesAdapter!!.allMessages.minBy { it.createdAt!!.time }

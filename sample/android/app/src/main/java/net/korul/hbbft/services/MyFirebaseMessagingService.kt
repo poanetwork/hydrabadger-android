@@ -14,6 +14,7 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import net.korul.hbbft.MainActivity
 import net.korul.hbbft.features.DefaultDialogsFragment
 import net.korul.hbbft.R
 
@@ -28,6 +29,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     // is active
     // [START receive_message]
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
+        Log.d(TAG, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages are handled
         // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
@@ -119,7 +121,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * @param messageBody FCM message body received.
      */
     private fun sendNotification(roomname: String) {
-        val intent = Intent(this, DefaultDialogsFragment::class.java).apply {
+        val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         intent.putExtra("Start_App", true)
@@ -146,13 +148,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            val channelId = getString(R.string.default_notification_channel_id)
             val channelName = getString(R.string.default_notification_channel_name)
-            val channel = NotificationChannel(
-                channelId,
-                channelName,
-                NotificationManager.IMPORTANCE_DEFAULT
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(
+                NotificationChannel(
+                    channelId,
+                    channelName, NotificationManager.IMPORTANCE_HIGH
+                )
             )
-            notificationManager.createNotificationChannel(channel)
         }
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())

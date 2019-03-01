@@ -29,8 +29,8 @@ class DatabaseApplication : Application() {
         super.onCreate()
         instance = this
         FlowManager.init(FlowConfig.Builder(this).build())
-//        Fabric.with(this, Crashlytics())
-//        FirebaseApp.initializeApp(this)
+        Fabric.with(this, Crashlytics())
+        FirebaseApp.initializeApp(this)
 
         mCoreHBBFT2X = CoreHBBFT
         mCoreHBBFT2X.Init(applicationContext)

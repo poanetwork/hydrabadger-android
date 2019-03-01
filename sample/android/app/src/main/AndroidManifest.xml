@@ -3,7 +3,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="net.korul.hbbft">
 
-    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <!--<uses-permission android:name="android.permission.READ_LOGS"/>-->
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission
             android:name="android.permission.READ_PHONE_STATE"/> <!-- to be activated service on boot is completed -->
@@ -34,6 +34,7 @@
     <uses-permission android:name="com.example.towntour.permission.MAPS_RECEIVE"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
             android:name=".DatabaseApplication"
@@ -52,8 +53,8 @@
                 android:label="@string/app_name"
                 android:theme="@style/App.Black.Theme">
             <intent-filter>
+                <action android:name=".MainActivity" />
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -67,7 +68,7 @@
                 android:name=".services.ClosingService"
                 android:stopWithTask="false"/>
 
-        <service android:name=".services.MyFirebaseMessagingService" android:permission="true">
+        <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

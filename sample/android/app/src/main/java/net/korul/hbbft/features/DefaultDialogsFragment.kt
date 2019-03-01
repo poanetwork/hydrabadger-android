@@ -1,9 +1,9 @@
 package net.korul.hbbft.features
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.FragmentManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_dialogs.*
-import net.korul.hbbft.CommonFragments.AddDialogFragment
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -28,8 +27,6 @@ import net.korul.hbbft.features.holder.holders.dialogs.CustomDialogViewHolder
 import java.util.*
 
 
-private var handlerMes = Handler(Looper.getMainLooper())
-
 class DefaultDialogsFragment :
     DemoDialogsFragment(),
     DateFormatter.Formatter,
@@ -38,6 +35,8 @@ class DefaultDialogsFragment :
     private var TAG = "HYDRABADGERTAG:DefaultDialogsFragment"
 
     companion object {
+        private val handler = Handler()
+
         fun newInstance(): DefaultDialogsFragment {
             return DefaultDialogsFragment()
         }
@@ -57,8 +56,6 @@ class DefaultDialogsFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DatabaseApplication.mCoreHBBFT2X.addListener(this)
-
         val bundle = arguments
         if (bundle != null && !bundle.isEmpty && bundle.getBoolean("Start_App", false)) {
             Log.d(TAG, "Receive push and start activity")
@@ -73,6 +70,18 @@ class DefaultDialogsFragment :
             }
         }
 
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+
+        DatabaseApplication.mCoreHBBFT2X.addListener(this)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        DatabaseApplication.mCoreHBBFT2X.delListener(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -95,22 +104,28 @@ class DefaultDialogsFragment :
     }
 
     fun startMesFragment(dialog: Dialog, startHbbft: Boolean) {
+        activity!!.supportFragmentManager.popBackStack(getString(R.string.tag_chats), FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
         val transaction = activity!!.supportFragmentManager.beginTransaction()
-        transaction.add(
+        transaction.replace(
             R.id.view,
-            DefaultMessagesFragment.newInstance(dialog, dialog.users[0], startHbbft)
+            DefaultMessagesFragment.newInstance(dialog, dialog.users[0], startHbbft),
+            getString(R.string.tag_chats2)
         )
-        transaction.addToBackStack(getString(R.string.tag_chats))
+        transaction.addToBackStack(getString(R.string.tag_chats2))
         transaction.commit()
     }
 
     override fun onDialogClick(dialog: Dialog) {
+        activity!!.supportFragmentManager.popBackStack(getString(R.string.tag_chats), FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
         val transaction = activity!!.supportFragmentManager.beginTransaction()
-        transaction.add(
+        transaction.replace(
             R.id.view,
-            DefaultMessagesFragment.newInstance(dialog, dialog.users[0])
+            DefaultMessagesFragment.newInstance(dialog, dialog.users[0]),
+            getString(R.string.tag_chats2)
         )
-        transaction.addToBackStack(getString(R.string.tag_chats))
+        transaction.addToBackStack(getString(R.string.tag_chats2))
         transaction.commit()
     }
 
@@ -118,11 +133,14 @@ class DefaultDialogsFragment :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_add -> {
-                val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-                transaction.add(R.id.view, AddDialogFragment.newInstance(), getString(R.string.tag_chats))
-                transaction.addToBackStack(getString(R.string.tag_chats))
-                transaction.commit()
+                CreateNewDialog.open(context!!)
+
+//                val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+//                transaction.add(R.id.view, AddDialogFragment.newInstance(), getString(R.string.tag_chats))
+//                transaction.addToBackStack(getString(R.string.tag_chats))
+//                transaction.commit()
             }
+
         }
 
         return true
@@ -155,12 +173,12 @@ class DefaultDialogsFragment :
     }
 
     override fun updateStateToOnline() {
-//        menu!!.findItem(R.id.action_online).icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+        menu?.findItem(R.id.action_online)?.icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
         try {
-            handlerMes.postDelayed({
+            handler.post {
                 if (!you) {
                     val roomName = DatabaseApplication.mCoreHBBFT2X.mRoomName
                     val dialog = getDialogByRoomName(roomName)
@@ -193,7 +211,7 @@ class DefaultDialogsFragment :
 
                     onNewMessage(dialog.id, mess)
                 }
-            }, 0)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -206,9 +224,16 @@ class DefaultDialogsFragment :
 
     //for example
     fun onNewMessage(dialogId: String, message: Message) {
-        val isUpdated = dialogsAdapter!!.updateDialogWithMessage(dialogId, message)
-        if (!isUpdated) {
-            //Dialog with this ID doesn't exist, so you can create new Dialog or update all dialogs list
+        try {
+            handler.post {
+                val isUpdated = dialogsAdapter!!.updateDialogWithMessage(dialogId, message)
+                if (!isUpdated) {
+                    //Dialog with this ID doesn't exist, so you can create new Dialog or update all dialogs list
+                }
+            }
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

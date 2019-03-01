@@ -15,33 +15,29 @@ import net.korul.hbbft.features.DefaultDialogsFragment
 class MainActivity : AppCompatActivity() {
 
     private var TAG = "MainActivity"
-    private var mCurTAG = "MainActivity"
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_chats -> {
 
-                supportFragmentManager.popBackStackImmediate(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
 
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.view, DefaultDialogsFragment.newInstance(), getString(R.string.tag_chats))
                 transaction.addToBackStack(getString(R.string.tag_chats))
                 transaction.commit()
 
-                mCurTAG = getString(R.string.tag_chats)
-
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_contacts -> {
 
-                supportFragmentManager.popBackStackImmediate(getString(R.string.tag_contacts), POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.popBackStack(getString(R.string.tag_contacts), POP_BACK_STACK_INCLUSIVE)
 
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.view, ContactsFragment.newInstance(), getString(R.string.tag_contacts))
                 transaction.addToBackStack(getString(R.string.tag_contacts))
                 transaction.commit()
-
-                mCurTAG = getString(R.string.tag_contacts)
 
                 return@OnNavigationItemSelectedListener true
             }
@@ -51,14 +47,12 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.navigation_settings -> {
 
-                supportFragmentManager.popBackStackImmediate(getString(R.string.tag_settings), POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.popBackStack(getString(R.string.tag_settings), POP_BACK_STACK_INCLUSIVE)
 
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.view, SettingsFragment.newInstance(), getString(R.string.tag_settings))
                 transaction.addToBackStack(getString(R.string.tag_settings))
                 transaction.commit()
-
-                mCurTAG = getString(R.string.tag_settings)
 
                 return@OnNavigationItemSelectedListener true
             }
@@ -85,19 +79,15 @@ class MainActivity : AppCompatActivity() {
                 if (diag.dialogName == roomName) {
                     Log.d(TAG, "Found dialog and start it $roomName")
 
+                    supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
+                    supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
+
                     val transaction = supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.view, DefaultDialogsFragment.newInstance(true, roomName))
                     transaction.addToBackStack(getString(R.string.tag_chats))
                     transaction.commit()
                 }
             }
-        }
-        else {
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.view, DefaultDialogsFragment.newInstance())
-            transaction.addToBackStack(getString(R.string.tag_chats))
-            transaction.commit()
-            mCurTAG = getString(R.string.tag_chats)
         }
     }
 
