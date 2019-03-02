@@ -1,6 +1,5 @@
 package net.korul.hbbft.CommonFragments
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -76,14 +75,6 @@ class ContactsFragment : Fragment() {
                 transaction.commit()
             })
         contacts_list.addOnItemTouchListener(touch)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
     }
 
     companion object {

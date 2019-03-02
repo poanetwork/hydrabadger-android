@@ -1,6 +1,5 @@
 package net.korul.hbbft.CommonFragments
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -28,10 +27,6 @@ class AddDialogFragment : Fragment() {
         action_back.setOnClickListener {
             (activity as AppCompatActivity).supportFragmentManager.popBackStack()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
     }
 
     override fun onDetach() {

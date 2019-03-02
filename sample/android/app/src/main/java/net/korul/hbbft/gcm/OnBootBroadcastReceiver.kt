@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
@@ -14,7 +14,6 @@ import android.support.v4.app.NotificationCompat
 import android.util.Log
 import net.korul.hbbft.MainActivity
 import net.korul.hbbft.R
-import net.korul.hbbft.services.MyFirebaseMessagingService
 
 
 class OnBootBroadcastReceiver : BroadcastReceiver() {

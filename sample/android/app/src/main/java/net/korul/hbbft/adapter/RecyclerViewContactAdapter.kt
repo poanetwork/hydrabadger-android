@@ -25,7 +25,8 @@ class RecyclerViewContactAdapter(private val mContext: Context, private val mDat
         internal var swipeLayout: SwipeLayout = itemView.findViewById<View>(R.id.swipe) as SwipeLayout
         internal var contact_search_icon: ImageView = itemView.findViewById<View>(R.id.contact_search_icon) as ImageView
         internal var contact_search_name: TextView = itemView.findViewById<View>(R.id.contact_search_name) as TextView
-        internal var contact_search_status: TextView = itemView.findViewById<View>(R.id.contact_search_status) as TextView
+        internal var contact_search_status: TextView =
+            itemView.findViewById<View>(R.id.contact_search_status) as TextView
         internal var contact_block: LinearLayout = itemView.findViewById<View>(R.id.contact_block) as LinearLayout
         internal var contact_remove: LinearLayout = itemView.findViewById<View>(R.id.contact_remove) as LinearLayout
     }

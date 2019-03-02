@@ -1,7 +1,6 @@
 package net.korul.hbbft.CommonFragments
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -25,8 +24,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-interface IAddToContacts
-{
+interface IAddToContacts {
     fun contactAddSuccess(user: User)
 
     fun errorAddContact()
@@ -75,11 +73,10 @@ class AddToContactsFragment : Fragment() {
         }
 
         button_add_contact.setOnClickListener {
-            if(contact_id_or_email.text.toString().isEmpty()) {
+            if (contact_id_or_email.text.toString().isEmpty()) {
                 contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
-            }
-            else
-                CoreHBBFT.AddUser(contact_id_or_email.text.toString(), object: IAddToContacts {
+            } else
+                CoreHBBFT.AddUser(contact_id_or_email.text.toString(), object : IAddToContacts {
                     override fun contactAddSuccess(user: User) {
 
                     }
@@ -100,7 +97,8 @@ class AddToContactsFragment : Fragment() {
 
     fun verifyStoragePermissions(activity: Activity) {
         // Check if we have write permission
-        val permission = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permission =
+            ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
@@ -116,19 +114,18 @@ class AddToContactsFragment : Fragment() {
         if (requestCode == FOLDERPICKER_CODE && resultCode == Activity.RESULT_OK) {
             val folderLocation = data?.extras?.getString("data")
 
-            if(folderLocation != null && folderLocation.isNotEmpty()) {
+            if (folderLocation != null && folderLocation.isNotEmpty()) {
                 val barcodeEncoder = BarcodeEncoder()
                 val bitmap = barcodeEncoder.encodeBitmap(CoreHBBFT.uniqueID1, BarcodeFormat.QR_CODE, 400, 400)
                 try {
                     val filename = folderLocation + File.separator + getString(R.string.qr_code_file_name)
                     val file = File(filename)
-                    if(file.exists())
+                    if (file.exists())
                         file.delete()
                     val create = file.createNewFile()
-                    if(!create){
+                    if (!create) {
                         Toast.makeText(activity, getString(R.string.qr_code_disk_saved_fail), Toast.LENGTH_LONG).show()
-                    }
-                    else {
+                    } else {
                         FileOutputStream(file).use { out ->
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
                         }
@@ -138,15 +135,12 @@ class AddToContactsFragment : Fragment() {
                     e.printStackTrace()
                     Toast.makeText(activity, getString(R.string.qr_code_disk_saved_fail), Toast.LENGTH_LONG).show()
                 }
-            }
-            else {
+            } else {
                 Toast.makeText(activity, getString(R.string.canceled), Toast.LENGTH_LONG).show()
             }
-        }
-        else if(requestCode == REQUEST_EXTERNAL_STORAGE && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == REQUEST_EXTERNAL_STORAGE && resultCode == Activity.RESULT_OK) {
             onSaveQRCode()
-        }
-        else {
+        } else {
             val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
             if (result != null) {
                 if (result.contents == null) {
@@ -154,7 +148,7 @@ class AddToContactsFragment : Fragment() {
                 } else {
                     Toast.makeText(activity, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
 
-                    CoreHBBFT.AddUser(result.contents, object: IAddToContacts {
+                    CoreHBBFT.AddUser(result.contents, object : IAddToContacts {
                         override fun contactAddSuccess(user: User) {
 
                         }
@@ -170,19 +164,14 @@ class AddToContactsFragment : Fragment() {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     companion object {
         fun newInstance() = AddToContactsFragment()
 
         private val REQUEST_EXTERNAL_STORAGE = 1
         private val PERMISSIONS_STORAGE =
-            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
     }
 }

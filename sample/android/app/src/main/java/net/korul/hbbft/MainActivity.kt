@@ -1,7 +1,12 @@
 package net.korul.hbbft
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import android.support.v7.app.AppCompatActivity
@@ -12,14 +17,7 @@ import net.korul.hbbft.CommonFragments.SettingsFragment
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.features.DefaultDialogsFragment
 import net.korul.hbbft.features.DefaultMessagesFragment
-import java.nio.file.Files.size
-import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
-import android.os.PowerManager
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
+
 //import com.judemanutd.autostarter.AutoStartPermissionHelper
 
 
@@ -100,8 +98,7 @@ class MainActivity : AppCompatActivity() {
                     transaction.commit()
                 }
             }
-        }
-        else {
+        } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val intent = Intent()
                 val packageName = packageName
@@ -120,11 +117,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val fragments = supportFragmentManager.fragments
-        if(fragments.size > 0) {
+        if (fragments.size > 0) {
             val lastFragment = fragments[fragments.size - 1]
             if (lastFragment != null && lastFragment.isVisible) {
-                if(lastFragment is DefaultMessagesFragment) {
-                    if(lastFragment.onBackPressed()) {
+                if (lastFragment is DefaultMessagesFragment) {
+                    if (lastFragment.onBackPressed()) {
                         supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
                         supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
 
@@ -136,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        if(supportFragmentManager.fragments.count() > 1)
+        if (supportFragmentManager.fragments.count() > 1)
             super.onBackPressed()
     }
 }

@@ -9,7 +9,6 @@ import net.korul.hbbft.common.data.model.conversation.Conversations.Companion.ge
 import net.korul.hbbft.common.data.model.conversation.Conversations.Companion.getUser
 import net.korul.hbbft.common.data.model.databaseModel.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 object Getters {
@@ -246,7 +245,7 @@ object Getters {
             .queryList()
 
         val dus = dusers.filterNotNull()
-        val duss = dus.distinctBy{ it.id }
+        val duss = dus.distinctBy { it.id }
         for (duser in duss) {
             users.add(getUser(duser))
         }

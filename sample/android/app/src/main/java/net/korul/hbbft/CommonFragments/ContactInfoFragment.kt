@@ -72,14 +72,6 @@ class ContactInfoFragment : Fragment() {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     companion object {
         fun newInstance(user: User): ContactInfoFragment {
             val f = ContactInfoFragment()

@@ -93,7 +93,7 @@ class DefaultMessagesFragment :
             super.mCurUser = Gson().fromJson(extraUser, User::class.java)
         }
 
-        if(bundle != null && bundle.getBoolean("startHbbft", false))
+        if (bundle != null && bundle.getBoolean("startHbbft", false))
             startAll()
     }
 

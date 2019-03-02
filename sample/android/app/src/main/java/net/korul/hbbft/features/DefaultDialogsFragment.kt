@@ -104,7 +104,10 @@ class DefaultDialogsFragment :
     }
 
     fun startMesFragment(dialog: Dialog, startHbbft: Boolean) {
-        activity!!.supportFragmentManager.popBackStack(getString(R.string.tag_chats), FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        activity!!.supportFragmentManager.popBackStack(
+            getString(R.string.tag_chats),
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
 
         val transaction = activity!!.supportFragmentManager.beginTransaction()
         transaction.replace(
@@ -116,7 +119,10 @@ class DefaultDialogsFragment :
     }
 
     override fun onDialogClick(dialog: Dialog) {
-        activity!!.supportFragmentManager.popBackStack(getString(R.string.tag_chats), FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        activity!!.supportFragmentManager.popBackStack(
+            getString(R.string.tag_chats),
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
 
         val transaction = activity!!.supportFragmentManager.beginTransaction()
         transaction.replace(
@@ -171,7 +177,8 @@ class DefaultDialogsFragment :
     }
 
     override fun updateStateToOnline() {
-        menu?.findItem(R.id.action_online)?.icon = DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
+        menu?.findItem(R.id.action_online)?.icon =
+            DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String) {
@@ -229,8 +236,7 @@ class DefaultDialogsFragment :
                     //Dialog with this ID doesn't exist, so you can create new Dialog or update all dialogs list
                 }
             }
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
