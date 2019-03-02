@@ -135,6 +135,15 @@ class DefaultMessagesFragment :
         DatabaseApplication.mCoreHBBFT2X.delListener(this)
     }
 
+    fun onBackPressed(): Boolean {
+        return if (super.selectionCount == 0) {
+            true
+        } else {
+            messagesAdapter!!.unselectAllItems()
+            false
+        }
+    }
+
     fun startAll() {
         handler.post {
             progress.show()

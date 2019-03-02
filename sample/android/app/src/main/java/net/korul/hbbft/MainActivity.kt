@@ -1,5 +1,6 @@
 package net.korul.hbbft
 
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -10,11 +11,21 @@ import net.korul.hbbft.CommonFragments.ContactsFragment
 import net.korul.hbbft.CommonFragments.SettingsFragment
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.features.DefaultDialogsFragment
+import net.korul.hbbft.features.DefaultMessagesFragment
+import java.nio.file.Files.size
+import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
+import android.os.PowerManager
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import com.judemanutd.autostarter.AutoStartPermissionHelper
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var TAG = "MainActivity"
+    private var TAG = "HYDRABADGERTAG:MainActivity"
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -61,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
@@ -89,10 +101,41 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val intent = Intent()
+                val packageName = packageName
+                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                    intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                    intent.data = Uri.parse("package:net.korul.hbbft")
+                    startActivity(intent)
+
+                    AutoStartPermissionHelper.getInstance().getAutoStartPermission(this)
+                }
+            }
+        }
     }
 
 
     override fun onBackPressed() {
+        val fragments = supportFragmentManager.fragments
+        if(fragments.size > 0) {
+            val lastFragment = fragments[fragments.size - 1]
+            if (lastFragment != null && lastFragment.isVisible) {
+                if(lastFragment is DefaultMessagesFragment) {
+                    if(lastFragment.onBackPressed()) {
+                        supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
+                        supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
+
+                        val transaction = supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.view, DefaultDialogsFragment.newInstance())
+                        transaction.addToBackStack(getString(R.string.tag_chats))
+                        transaction.commit()
+                    }
+                }
+            }
+        }
         if(supportFragmentManager.fragments.count() > 1)
             super.onBackPressed()
     }

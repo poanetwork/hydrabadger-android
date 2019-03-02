@@ -37,7 +37,7 @@ abstract class DemoMessagesFragment : Fragment(),
     protected var messagesAdapter: MessagesListAdapter<Message>? = null
 
     var menu: Menu? = null
-    private var selectionCount: Int = 0
+    var selectionCount: Int = 0
     private var lastLoadedDate: Date? = null
 
     var mCurDialog: Dialog? = null
@@ -151,13 +151,6 @@ abstract class DemoMessagesFragment : Fragment(),
         return false
     }
 
-//    override fun onBackPressed() {
-//        if (selectionCount == 0) {
-//            super.onBackPressed()
-//        } else {
-//            messagesAdapter!!.unselectAllItems()
-//        }
-//    }
 
     override fun onLoadMore(page: Int, totalItemsCount: Int) {
         Log.i("TAG", "onLoadMore: $page $totalItemsCount")

@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
+import com.judemanutd.autostarter.AutoStartPermissionHelper
 import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
 import io.fabric.sdk.android.Fabric
@@ -24,16 +25,16 @@ class DatabaseApplication : Application() {
     }
 
     override fun onCreate() {
-        Log.d(TAG, "onCreate DatabaseApplication")
-
         super.onCreate()
+
+        Log.d(TAG, "onCreate DatabaseApplication")
         instance = this
         FlowManager.init(FlowConfig.Builder(this).build())
         Fabric.with(this, Crashlytics())
         FirebaseApp.initializeApp(this)
 
         mCoreHBBFT2X = CoreHBBFT
-        mCoreHBBFT2X.Init(applicationContext)
+        mCoreHBBFT2X.Init(this)
 
 //        FlowManager.getDatabase(AppDatabase::class.java).reset(this)
     }

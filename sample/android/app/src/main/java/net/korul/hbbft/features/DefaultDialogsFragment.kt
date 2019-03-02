@@ -109,8 +109,7 @@ class DefaultDialogsFragment :
         val transaction = activity!!.supportFragmentManager.beginTransaction()
         transaction.replace(
             R.id.view,
-            DefaultMessagesFragment.newInstance(dialog, dialog.users[0], startHbbft),
-            getString(R.string.tag_chats2)
+            DefaultMessagesFragment.newInstance(dialog, dialog.users[0], startHbbft)
         )
         transaction.addToBackStack(getString(R.string.tag_chats2))
         transaction.commit()
@@ -122,8 +121,7 @@ class DefaultDialogsFragment :
         val transaction = activity!!.supportFragmentManager.beginTransaction()
         transaction.replace(
             R.id.view,
-            DefaultMessagesFragment.newInstance(dialog, dialog.users[0]),
-            getString(R.string.tag_chats2)
+            DefaultMessagesFragment.newInstance(dialog, dialog.users[0])
         )
         transaction.addToBackStack(getString(R.string.tag_chats2))
         transaction.commit()

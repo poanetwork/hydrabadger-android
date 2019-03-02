@@ -25,7 +25,7 @@
                   android:paddingRight="32.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:layout_above="@id/save_qr_code" android:layout_below="@id/toolbar">
         <TextView android:id="@+id/contact_id_hint" android:layout_width="wrap_content"
-                  android:layout_height="wrap_content" android:text="@string/contact_request_prompt_email_or_id"
+                  android:layout_height="wrap_content" android:text="@string/contact_request_prompt_id"
                   app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
                   style="@style/TextView.Text"/>
         <android.support.design.widget.TextInputLayout android:id="@+id/contact_id_or_email_layout"

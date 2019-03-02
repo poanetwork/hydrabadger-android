@@ -122,9 +122,6 @@ object CoreHBBFT : IGetData {
         mRoomName = roomname
     }
 
-    fun onDisconnect() {
-
-    }
 
     fun registerForPush(applicationContext: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
