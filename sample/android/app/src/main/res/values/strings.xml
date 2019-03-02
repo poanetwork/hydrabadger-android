@@ -721,6 +721,7 @@
     <string name="prompt_username">Имя пользователя</string>
     <string name="push_notification">Отображать уведомления</string>
     <string name="qr_code_disk_saved">Изображение успешно сохранено!</string>
+    <string name="qr_code_file_name">my_qr_code.png</string>
     <string name="qr_code_disk_saved_fail">Невозможно сохранить изображение в этой папке</string>
     <string name="recover_password_bad_request">Неверная ссылка.</string>
     <string name="recover_password_changed">Пароль был успешно изменен. Попробуйте войти с новым паролем</string>
@@ -1017,6 +1018,11 @@
     </string>
     <string name="zxing_msg_default_status">Чтобы сканировать штрих-код, поместите его в прямоугольник видоискателя.
     </string>
+
+    <string name="canceled">Отменено</string>
+    <string name="select_dir_for_saving">Выберите католог для сохранения</string>
+    <!--<string name="scan_success">Успешно отсканировано</string>-->
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

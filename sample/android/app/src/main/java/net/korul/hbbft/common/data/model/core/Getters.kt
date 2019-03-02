@@ -9,6 +9,7 @@ import net.korul.hbbft.common.data.model.conversation.Conversations.Companion.ge
 import net.korul.hbbft.common.data.model.conversation.Conversations.Companion.getUser
 import net.korul.hbbft.common.data.model.databaseModel.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 object Getters {
@@ -235,6 +236,25 @@ object Getters {
             val ind = list.maxBy { it.id }!!.id
             (ind + 1L)
         }
+    }
+
+    fun getAllUsers(): Array<User> {
+        val users: MutableList<User> = arrayListOf()
+
+        val dusers = Select()
+            .from(DUser::class.java)
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        val duss = dus.distinctBy{ it.id }
+        for (duser in duss) {
+            users.add(getUser(duser))
+        }
+        return users.toTypedArray()
+    }
+
+    fun removeUser(user: User) {
+        //TODO implement
     }
 
     fun getNextUserID(): Long {

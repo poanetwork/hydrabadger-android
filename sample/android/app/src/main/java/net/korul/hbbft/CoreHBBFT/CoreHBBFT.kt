@@ -21,6 +21,7 @@ import com.raizlabs.android.dbflow.kotlinextensions.delete
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import net.korul.hbbft.CommonFragments.IAddToContacts
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.P2P.IGetData
 import net.korul.hbbft.P2P.P2PMesh
@@ -122,6 +123,10 @@ object CoreHBBFT : IGetData {
         mRoomName = roomname
     }
 
+    fun AddUser(uid: String, listener: IAddToContacts) {
+        //TODO implement method
+        listener.errorAddContact()
+    }
 
     fun registerForPush(applicationContext: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

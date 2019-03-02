@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
+                                android:id="@+id/swipe">
+    <LinearLayout android:tag="options" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <include android:id="@+id/contact_block" android:visibility="gone" android:layout_width="74.0dip"
+                 android:layout_height="wrap_content" android:layout_margin="4.0dip" layout="@layout/button_block"/>
+        <include android:id="@+id/contact_remove" android:layout_width="74.0dip" android:layout_height="wrap_content"
+                 android:layout_margin="4.0dip" layout="@layout/button_remove"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:id="@+id/item" android:tag="Hover"
+                  android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <RelativeLayout android:paddingLeft="@dimen/menu_margin_16" android:paddingRight="@dimen/menu_margin_16"
+                        android:paddingBottom="8.0dip" android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+            <ImageView android:id="@+id/contact_search_icon" android:layout_width="@dimen/icon_size_40"
+                       android:layout_height="@dimen/icon_size_40" android:layout_marginRight="20.0dip"
+                       android:layout_centerVertical="true" app:srcCompat="@drawable/ic_contact"/>
+            <TextView android:id="@+id/contact_search_name" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" android:layout_toRightOf="@id/contact_search_icon"
+                      android:layout_alignParentTop="true" style="@style/list_contact_item_username"/>
+            <TextView android:id="@+id/contact_search_status" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" android:layout_toRightOf="@id/contact_search_icon"
+                      android:layout_below="@id/contact_search_name" style="@style/list_contact_item_connect_status"/>
+        </RelativeLayout>
+    </LinearLayout>
+</com.daimajia.swipe.SwipeLayout>

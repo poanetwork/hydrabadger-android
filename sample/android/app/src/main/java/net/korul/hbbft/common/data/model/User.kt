@@ -2,9 +2,7 @@ package net.korul.hbbft.common.data.model
 
 import com.stfalcon.chatkit.commons.models.IUser
 
-/*
- * Created by troy379 on 04.04.17.
- */
+
 class User(
     var id_: Long = 0,
     var uid: String,

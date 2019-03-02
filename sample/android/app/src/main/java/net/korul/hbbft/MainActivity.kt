@@ -20,7 +20,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import com.judemanutd.autostarter.AutoStartPermissionHelper
+//import com.judemanutd.autostarter.AutoStartPermissionHelper
 
 
 class MainActivity : AppCompatActivity() {
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                     intent.data = Uri.parse("package:net.korul.hbbft")
                     startActivity(intent)
 
-                    AutoStartPermissionHelper.getInstance().getAutoStartPermission(this)
+//                    AutoStartPermissionHelper.getInstance().getAutoStartPermission(this)
                 }
             }
         }
