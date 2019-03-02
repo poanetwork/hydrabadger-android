@@ -1,26 +1,25 @@
 package net.korul.hbbft.adapter
 
+
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-
-
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import com.daimajia.swipe.SimpleSwipeListener
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.core.Getters.removeUser
-import java.util.ArrayList
+import java.util.*
 
-class RecyclerViewAdapter(private val mContext: Context, private val mDataset: ArrayList<User>) :
-    RecyclerSwipeAdapter<RecyclerViewAdapter.SimpleViewHolder>() {
+class RecyclerViewContactAdapter(private val mContext: Context, private val mDataset: ArrayList<User>) :
+    RecyclerSwipeAdapter<RecyclerViewContactAdapter.SimpleViewHolder>() {
 
     class SimpleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var swipeLayout: SwipeLayout = itemView.findViewById<View>(R.id.swipe) as SwipeLayout
@@ -70,6 +69,10 @@ class RecyclerViewAdapter(private val mContext: Context, private val mDataset: A
 
     override fun getItemCount(): Int {
         return mDataset.size
+    }
+
+    fun getItemInPos(position: Int): User {
+        return mDataset[position]
     }
 
     override fun getSwipeLayoutResourceId(position: Int): Int {

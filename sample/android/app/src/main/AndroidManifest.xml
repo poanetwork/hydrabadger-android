@@ -81,6 +81,13 @@
                 android:name=".features.CreateNewDialog"
                 android:theme="@style/App.Black.Theme"/>
 
+        <activity
+                android:name=".CommonFragments.ShowBigAvatarActivity"
+                android:theme="@style/App.Black.Theme"/>
+        <activity
+                android:name=".CommonFragments.ShowBigQRActivity"
+                android:theme="@style/App.Black.Theme"/>
+
         <service
                 android:name=".services.ClosingService"
                 android:stopWithTask="false"/>

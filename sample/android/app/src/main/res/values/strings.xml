@@ -1021,6 +1021,7 @@
 
     <string name="canceled">Отменено</string>
     <string name="select_dir_for_saving">Выберите католог для сохранения</string>
+    <string name="uid">uid</string>
     <!--<string name="scan_success">Успешно отсканировано</string>-->
 
 

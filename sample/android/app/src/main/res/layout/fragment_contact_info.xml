@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
     <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
                     android:layout_height="?actionBarSize" app:layout_constraintStart_toStartOf="parent"
                     style="@style/Toolbar">
         <include android:id="@+id/action_back" android:layout_width="wrap_content" android:layout_height="wrap_content"
                  android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
                  android:layout_alignParentBottom="true" layout="@layout/toolbar_button_back"/>
-        <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
                   android:text="@string/account_data_title" android:layout_centerHorizontal="true"
                   android:layout_centerVertical="true" style="@style/toolbar_not_caps_text"/>
         <include android:id="@+id/action_chat" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -23,7 +24,8 @@
                        android:layout_width="@dimen/avatar_icon_size_156"
                        android:layout_height="@dimen/avatar_icon_size_156" app:srcCompat="@drawable/ic_contact"/>
             <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
-                          android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_32">
+                          android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_32"
+                          android:visibility="visible">
                 <RelativeLayout android:orientation="vertical" android:id="@+id/contact_nickname_panel"
                                 android:layout_width="fill_parent" android:layout_height="wrap_content">
                     <TextView android:gravity="center_vertical" android:id="@+id/contact_info_hint"
@@ -37,7 +39,8 @@
                               android:layout_height="wrap_content" android:layout_marginTop="7.0dip"
                               android:maxLines="1" android:maxLength="35" android:layout_toLeftOf="@id/edit_nickname"
                               android:layout_below="@id/contact_info_hint" android:inputType="text"
-                              android:imeOptions="flagNoExtractUi" style="@style/EditText.Fragments"/>
+                              android:imeOptions="flagNoExtractUi" style="@style/EditText.Fragments"
+                              android:layout_toStartOf="@+id/edit_nickname" android:layout_marginEnd="1dp"/>
                 </RelativeLayout>
                 <TextView android:gravity="center_vertical" android:layout_width="wrap_content"
                           android:layout_height="wrap_content" android:text="@string/account_name"
@@ -45,9 +48,16 @@
                 <TextView android:gravity="center_vertical" android:id="@+id/contact_info_name"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
                           style="@style/EditText.Settings"/>
+                <TextView android:gravity="center_vertical" android:layout_width="match_parent"
+                          android:layout_height="wrap_content" android:text="@string/uid"
+                          style="@style/contact_info_hint"/>
+                <TextView android:gravity="center_vertical" android:id="@+id/contact_info_uid"
+                          android:layout_width="match_parent" android:layout_height="wrap_content"
+                          style="@style/EditText.Settings"/>
             </LinearLayout>
             <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/menu_margin_16" android:weightSum="100.0">
+                            android:layout_marginTop="@dimen/menu_margin_16" android:weightSum="100.0"
+                            android:visibility="gone">
                 <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/notifications"
@@ -60,6 +70,17 @@
                                                         android:layout_centerVertical="true"
                                                         style="@style/SwitchCyclops"/>
             </RelativeLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/account_generate_qr"
+                          android:layout_width="match_parent" android:layout_height="match_parent"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_qr_code"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/account_generate_qr_code"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_2_hour"
                           android:visibility="gone" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
@@ -82,7 +103,8 @@
                                                              android:text="@string/notification_mute_6_hours"
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_1_day" android:visibility="gone"
+            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_1_day"
+                          android:visibility="gone"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
                           style="@style/SubTitle.Clicked">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -95,7 +117,8 @@
             </LinearLayout>
             <View android:visibility="gone" style="@style/Divider.Margin"/>
             <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
-                          android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_16">
+                          android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_16"
+                          android:visibility="gone">
                 <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/options" style="@style/TitleText"/>
