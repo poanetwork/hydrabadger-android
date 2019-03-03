@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector android:height="9.0dip" android:width="9.0dip" android:autoMirrored="true" android:viewportWidth="9.0" android:viewportHeight="9.0"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="?footer_icon_color" android:pathData="M4.5,2C4.77614,2 5,2.22386 5,2.5V4H5.5C5.77614,4 6,4.22386 6,4.5C6,4.77614 5.77614,5 5.5,5H4V2.5C4,2.22386 4.22386,2 4.5,2Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M4.5,9C6.98529,9 9,6.98535 9,4.5C9,2.01465 6.98529,0 4.5,0C2.01471,0 0,2.01465 0,4.5C0,6.98535 2.01471,9 4.5,9ZM4.5,8C6.43298,8 8,6.43262 8,4.5C8,2.56738 6.43298,1 4.5,1C2.56702,1 1,2.56738 1,4.5C1,6.43262 2.56702,8 4.5,8Z" android:fillType="evenOdd" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="9.0dip" android:width="9.0dip"
+        android:autoMirrored="true"
+        android:viewportWidth="9.0"
+        android:viewportHeight="9.0">
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M4.5,2C4.77614,2 5,2.22386 5,2.5V4H5.5C5.77614,4 6,4.22386 6,4.5C6,4.77614 5.77614,5 5.5,5H4V2.5C4,2.22386 4.22386,2 4.5,2Z"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M4.5,9C6.98529,9 9,6.98535 9,4.5C9,2.01465 6.98529,0 4.5,0C2.01471,0 0,2.01465 0,4.5C0,6.98535 2.01471,9 4.5,9ZM4.5,8C6.43298,8 8,6.43262 8,4.5C8,2.56738 6.43298,1 4.5,1C2.56702,1 1,2.56738 1,4.5C1,6.43262 2.56702,8 4.5,8Z"
+          android:fillType="evenOdd"/>
 </vector>

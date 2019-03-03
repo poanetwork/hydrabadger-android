@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector android:height="16.0dip" android:width="13.0dip" android:viewportWidth="13.0" android:viewportHeight="16.0"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="?footer_icon_color" android:pathData="M6,6C7.1046,6 8,5.1046 8,4C8,2.8954 7.1046,2 6,2C4.8954,2 4,2.8954 4,4C4,5.1046 4.8954,6 6,6ZM6,5C6.5523,5 7,4.5523 7,4C7,3.4477 6.5523,3 6,3C5.4477,3 5,3.4477 5,4C5,4.5523 5.4477,5 6,5Z" android:fillType="evenOdd" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M10,4C10,6.6096 7.7763,9.7752 6.6449,11.2169C6.2589,11.7088 6,12 6,12C6,12 5.7411,11.7088 5.3551,11.2169C4.2237,9.7752 2,6.6096 2,4C2,1.7909 3.7909,0 6,0C8.2091,0 10,1.7909 10,4ZM9,4C9,5.4398 8.147,7.2277 7.1577,8.7734C6.7476,9.4142 6.3363,9.9798 6,10.417C5.6637,9.9798 5.2524,9.4142 4.8423,8.7734C3.853,7.2277 3,5.4398 3,4C3,2.3431 4.3432,1 6,1C7.6568,1 9,2.3431 9,4Z" android:fillType="evenOdd" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M0,15V14H10V13L13,14.5L10,16V15H0Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="16.0dip" android:width="13.0dip"
+        android:viewportWidth="13.0"
+        android:viewportHeight="16.0">
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M6,6C7.1046,6 8,5.1046 8,4C8,2.8954 7.1046,2 6,2C4.8954,2 4,2.8954 4,4C4,5.1046 4.8954,6 6,6ZM6,5C6.5523,5 7,4.5523 7,4C7,3.4477 6.5523,3 6,3C5.4477,3 5,3.4477 5,4C5,4.5523 5.4477,5 6,5Z"
+          android:fillType="evenOdd"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M10,4C10,6.6096 7.7763,9.7752 6.6449,11.2169C6.2589,11.7088 6,12 6,12C6,12 5.7411,11.7088 5.3551,11.2169C4.2237,9.7752 2,6.6096 2,4C2,1.7909 3.7909,0 6,0C8.2091,0 10,1.7909 10,4ZM9,4C9,5.4398 8.147,7.2277 7.1577,8.7734C6.7476,9.4142 6.3363,9.9798 6,10.417C5.6637,9.9798 5.2524,9.4142 4.8423,8.7734C3.853,7.2277 3,5.4398 3,4C3,2.3431 4.3432,1 6,1C7.6568,1 9,2.3431 9,4Z"
+          android:fillType="evenOdd"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M0,15V14H10V13L13,14.5L10,16V15H0Z"/>
 </vector>

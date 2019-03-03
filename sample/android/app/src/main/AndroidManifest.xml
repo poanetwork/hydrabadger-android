@@ -37,14 +37,14 @@
     <uses-permission android:name="com.example.towntour.permission.MAPS_RECEIVE"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
-    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE"/>
 
     <permission android:name="net.korul.hbbft.permission.C2D_MESSAGE"
-                android:protectionLevel="signature" />
-    <uses-permission android:name="net.korul.hbbft.permission.C2D_MESSAGE" />
+                android:protectionLevel="signature"/>
+    <uses-permission android:name="net.korul.hbbft.permission.C2D_MESSAGE"/>
 
     <application
             android:name=".DatabaseApplication"
@@ -57,6 +57,7 @@
             android:usesCleartextTraffic="true"
             android:screenOrientation="portrait"
             android:hardwareAccelerated="true"
+            tools:replace="android:icon"
             tools:ignore="GoogleAppIndexingWarning">
 
         <activity
@@ -64,9 +65,9 @@
                 android:label="@string/app_name"
                 android:theme="@style/App.Black.Theme">
             <intent-filter>
-                <action android:name=".MainActivity" />
+                <action android:name=".MainActivity"/>
                 <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -74,7 +75,7 @@
         <activity
                 android:name="com.journeyapps.barcodescanner.CaptureActivity"
                 android:screenOrientation="portrait"
-                tools:replace="screenOrientation" />
+                tools:replace="screenOrientation"/>
 
 
         <activity
@@ -118,13 +119,13 @@
 
         <receiver android:name=".gcm.OnBootBroadcastReceiver"
                   android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter >
-                <category android:name="android.intent.category.HOME" />
+            <intent-filter>
+                <category android:name="android.intent.category.HOME"/>
                 <category android:name="net.korul.hbbft"/>
 
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
 
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 

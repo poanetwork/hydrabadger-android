@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector android:height="24.0dip" android:width="21.0dip" android:viewportWidth="21.0" android:viewportHeight="24.0"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="?footer_icon_color" android:pathData="M19,1L6,1C5.448,1 5,1.448 5,2L5,10L4,10L4,2C4,0.896 4.896,0 6,0L19,0C20.104,0 21,0.896 21,2L21,22C21,23.104 20.104,24 19,24L6,24C4.896,24 4,23.104 4,22L4,13L5,13L5,22C5,22.552 5.448,23 6,23L19,23C19.552,23 20,22.552 20,22L20,2C20,1.448 19.552,1 19,1Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M6,20L6,13L7,13L7,19L18,19L18,3L7,3L7,10L6,10L6,2L19,2L19,20L6,20Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M7,21L8,21L8,22L7,22L7,21Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M17,21L18,21L18,22L17,22L17,21Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M12,21L13,21L13,22L12,22L12,21Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M3,12L3,13L0.75,11.5L3,10L3,11L8.75,11L8.75,12L3,12Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24.0dip" android:width="21.0dip"
+        android:viewportWidth="21.0"
+        android:viewportHeight="24.0">
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M19,1L6,1C5.448,1 5,1.448 5,2L5,10L4,10L4,2C4,0.896 4.896,0 6,0L19,0C20.104,0 21,0.896 21,2L21,22C21,23.104 20.104,24 19,24L6,24C4.896,24 4,23.104 4,22L4,13L5,13L5,22C5,22.552 5.448,23 6,23L19,23C19.552,23 20,22.552 20,22L20,2C20,1.448 19.552,1 19,1Z"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M6,20L6,13L7,13L7,19L18,19L18,3L7,3L7,10L6,10L6,2L19,2L19,20L6,20Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M7,21L8,21L8,22L7,22L7,21Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M17,21L18,21L18,22L17,22L17,21Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M12,21L13,21L13,22L12,22L12,21Z"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M3,12L3,13L0.75,11.5L3,10L3,11L8.75,11L8.75,12L3,12Z"/>
 </vector>

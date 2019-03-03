@@ -8,12 +8,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.daimajia.swipe.util.Attributes
 import kotlinx.android.synthetic.main.fragment_contacts.*
 import net.korul.hbbft.R
+import net.korul.hbbft.adapter.ClickListener
 import net.korul.hbbft.adapter.RecyclerViewContactAdapter
 import net.korul.hbbft.adapter.util.DividerItemDecoration
-import net.korul.hbbft.adapter.util.RecyclerItemClickListener
 import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.core.Getters.getAllUsers
 import java.util.*
@@ -58,13 +59,8 @@ class ContactsFragment : Fragment() {
         contacts_list.addItemDecoration(DividerItemDecoration(resources.getDrawable(R.drawable.divider)))
 
         mDataSet = ArrayList(getAllUsers().toList())
-        mAdapter = RecyclerViewContactAdapter(context!!, mDataSet!!)
-        (mAdapter as RecyclerViewContactAdapter).mode = Attributes.Mode.Single
-        contacts_list.adapter = mAdapter
-
-        /* Listeners */
-        val touch = RecyclerItemClickListener(context!!,
-            RecyclerItemClickListener.OnItemClickListener { view, position ->
+        mAdapter = RecyclerViewContactAdapter(context!!, mDataSet!!, object : ClickListener {
+            override fun onItemClick(view: View, position: Int) {
                 val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
                 transaction.add(
                     R.id.view,
@@ -73,8 +69,20 @@ class ContactsFragment : Fragment() {
                 )
                 transaction.addToBackStack(getString(R.string.tag_contacts))
                 transaction.commit()
-            })
-        contacts_list.addOnItemTouchListener(touch)
+            }
+
+            override fun onItemButtonClick(view: View, position: Int) {
+                Toast.makeText(context, "onItemButtonClick $position", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onItemLongClick(view: View, position: Int) {
+                Toast.makeText(context, "LongClick $position", Toast.LENGTH_LONG).show()
+            }
+        })
+
+
+        (mAdapter as RecyclerViewContactAdapter).mode = Attributes.Mode.Single
+        contacts_list.adapter = mAdapter
     }
 
     companion object {

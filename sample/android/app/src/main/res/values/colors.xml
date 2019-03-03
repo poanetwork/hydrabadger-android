@@ -37,7 +37,7 @@
     <color name="bright_foreground_material_dark">@android:color/white</color>
     <color name="bright_foreground_material_light">@android:color/black</color>
     <color name="brown_button">#ffbda878</color>
-    <color name="brown_hint">#ff85816a</color>
+    <color name="brown_hint">#85816A</color>
     <color name="brown_text_color">#ffb5b5b7</color>
     <color name="button_material_dark">#ff5a595b</color>
     <color name="button_material_light">#ffd6d7d7</color>

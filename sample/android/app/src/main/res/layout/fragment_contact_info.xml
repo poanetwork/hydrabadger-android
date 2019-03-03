@@ -36,6 +36,7 @@
                                android:layout_below="@id/contact_info_hint" android:layout_alignParentRight="true"
                                app:srcCompat="@drawable/ic_pencil" style="@style/JustClicked"/>
                     <EditText android:id="@+id/contact_nickname" android:layout_width="fill_parent"
+                              android:textIsSelectable="true"
                               android:layout_height="wrap_content" android:layout_marginTop="7.0dip"
                               android:maxLines="1" android:maxLength="35" android:layout_toLeftOf="@id/edit_nickname"
                               android:layout_below="@id/contact_info_hint" android:inputType="text"
@@ -47,11 +48,13 @@
                           style="@style/contact_info_hint"/>
                 <TextView android:gravity="center_vertical" android:id="@+id/contact_info_name"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
+                          android:textIsSelectable="true"
                           style="@style/EditText.Settings"/>
                 <TextView android:gravity="center_vertical" android:layout_width="match_parent"
                           android:layout_height="wrap_content" android:text="@string/uid"
-                          style="@style/contact_info_hint"/>
+                          style="@style/contact_info_hint" android:layout_marginTop="@dimen/dimen_5dp"/>
                 <TextView android:gravity="center_vertical" android:id="@+id/contact_info_uid"
+                          android:textIsSelectable="true"
                           android:layout_width="match_parent" android:layout_height="wrap_content"
                           style="@style/EditText.Settings"/>
             </LinearLayout>

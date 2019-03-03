@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector android:height="24.0dip" android:width="20.0dip" android:viewportWidth="20.0" android:viewportHeight="24.0"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="?footer_icon_color" android:pathData="M10,24L15,24C16.104,24 17,23.104 17,22L17,2C17,0.896 16.104,0 15,0L10,0L10,1L15,1C15.552,1 16,1.448 16,2L16,22C16,22.552 15.552,23 15,23L10,23L10,24Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M10,20L15,20L15,2L10,2L10,3L14,3L14,19L10,19L10,20Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M13,21L14,21L14,22L13,22L13,21Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M18,24L17.236,24C17.494,23.711 17.697,23.373 17.829,23L18,23C18.552,23 19,22.552 19,22L19,20L18,20L18,19L19,19L19,2C19,1.448 18.552,1 18,1L17.829,1C17.697,0.627 17.494,0.289 17.236,0L18,0C19.104,0 20,0.896 20,2L20,22C20,23.104 19.104,24 18,24Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M0,2L0,22C0,23.104 0.896,24 2,24L10,24L10,23L2,23C1.448,23 1,22.552 1,22L1,2C1,1.448 1.448,1 2,1L10,1L10,0L2,0C0.896,0 0,0.896 0,2Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M10,2L2,2L2,20L10,20L10,19L3,19L3,3L10,3L10,2Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M3,21L4,21L4,22L3,22L3,21Z" />
-    <path android:fillColor="?footer_icon_color" android:pathData="M8,21L9,21L9,22L8,22L8,21Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24.0dip" android:width="20.0dip"
+        android:viewportWidth="20.0"
+        android:viewportHeight="24.0">
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M10,24L15,24C16.104,24 17,23.104 17,22L17,2C17,0.896 16.104,0 15,0L10,0L10,1L15,1C15.552,1 16,1.448 16,2L16,22C16,22.552 15.552,23 15,23L10,23L10,24Z"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M10,20L15,20L15,2L10,2L10,3L14,3L14,19L10,19L10,20Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M13,21L14,21L14,22L13,22L13,21Z"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M18,24L17.236,24C17.494,23.711 17.697,23.373 17.829,23L18,23C18.552,23 19,22.552 19,22L19,20L18,20L18,19L19,19L19,2C19,1.448 18.552,1 18,1L17.829,1C17.697,0.627 17.494,0.289 17.236,0L18,0C19.104,0 20,0.896 20,2L20,22C20,23.104 19.104,24 18,24Z"/>
+    <path android:fillColor="?footer_icon_color"
+          android:pathData="M0,2L0,22C0,23.104 0.896,24 2,24L10,24L10,23L2,23C1.448,23 1,22.552 1,22L1,2C1,1.448 1.448,1 2,1L10,1L10,0L2,0C0.896,0 0,0.896 0,2Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M10,2L2,2L2,20L10,20L10,19L3,19L3,3L10,3L10,2Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M3,21L4,21L4,22L3,22L3,21Z"/>
+    <path android:fillColor="?footer_icon_color" android:pathData="M8,21L9,21L9,22L8,22L8,21Z"/>
 </vector>

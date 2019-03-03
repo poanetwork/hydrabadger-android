@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape android:shape="ring" android:useLevel="false" android:innerRadius="33.0dip" android:thickness="1.0dip"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient android:startColor="#2bffffff" android:endColor="#0f050505" android:angle="90.0" android:type="linear" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="ring" android:useLevel="false"
+       android:innerRadius="33.0dip"
+       android:thickness="1.0dip">
+    <gradient android:startColor="#2bffffff" android:endColor="#0f050505" android:angle="90.0" android:type="linear"/>
 </shape>

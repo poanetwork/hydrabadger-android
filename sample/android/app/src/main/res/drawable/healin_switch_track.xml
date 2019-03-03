@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector
-  xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <shape android:dither="true" android:visible="true" android:shape="rectangle" android:useLevel="false">
-            <solid android:color="@color/healin_primary" />
-            <corners android:radius="15.0dip" />
-            <size android:height="18.0dip" android:width="44.0dip" />
-            <stroke android:width="6.0dip" android:color="@color/healin_primary" />
+            <solid android:color="@color/healin_primary"/>
+            <corners android:radius="15.0dip"/>
+            <size android:height="18.0dip" android:width="44.0dip"/>
+            <stroke android:width="6.0dip" android:color="@color/healin_primary"/>
         </shape>
     </item>
     <item android:state_checked="false">
         <shape android:dither="true" android:visible="true" android:shape="rectangle" android:useLevel="false">
-            <solid android:color="@color/healin_text_color" />
-            <corners android:radius="15.0dip" />
-            <size android:height="18.0dip" android:width="44.0dip" />
+            <solid android:color="@color/healin_text_color"/>
+            <corners android:radius="15.0dip"/>
+            <size android:height="18.0dip" android:width="44.0dip"/>
         </shape>
     </item>
 </selector>

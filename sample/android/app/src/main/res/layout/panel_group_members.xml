@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content">
-    <android.support.v7.widget.AppCompatTextView android:id="@+id/group_member_count" android:layout_width="wrap_content"
+    <android.support.v7.widget.AppCompatTextView android:id="@+id/group_member_count"
+                                                 android:layout_width="wrap_content"
                                                  android:layout_height="wrap_content" style="@style/TitleText"/>
     <LinearLayout android:orientation="horizontal" android:id="@+id/add_admin" android:visibility="gone"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"

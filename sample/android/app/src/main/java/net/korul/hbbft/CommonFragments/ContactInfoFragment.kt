@@ -45,6 +45,7 @@ class ContactInfoFragment : Fragment() {
 //                contact_icon.setImageBitmap(image);
 
         contact_nickname.isEnabled = false
+
         edit_nickname.setOnClickListener {
             contact_nickname.isEnabled = true
             contact_nickname.inputType = InputType.TYPE_CLASS_TEXT

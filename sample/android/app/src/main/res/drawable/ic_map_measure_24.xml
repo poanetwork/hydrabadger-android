@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector android:height="24.0dip" android:width="24.0dip" android:viewportWidth="24.0" android:viewportHeight="24.0"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="?icon_map_active_color" android:pathData="M12,7C13.657,7 15,5.657 15,4C15,2.343 13.657,1 12,1C10.343,1 9,2.343 9,4C9,5.657 10.343,7 12,7ZM12,8C14.209,8 16,6.209 16,4C16,1.791 14.209,0 12,0C9.791,0 8,1.791 8,4C8,6.209 9.791,8 12,8Z" android:fillType="evenOdd" />
-    <path android:fillColor="?icon_map_active_color" android:pathData="M14.056,7.432L20.241,21.007L21.966,21.868L15.163,6.449C15.419,6.119 15.625,5.746 15.768,5.345L24,24L19.478,21.744L13.141,7.835C13.465,7.738 13.772,7.602 14.056,7.432Z" />
-    <path android:fillColor="?icon_map_active_color" android:pathData="M8.835,6.446L2.034,21.859L3.759,20.998L9.941,7.43C10.225,7.6 10.531,7.737 10.856,7.834L4.522,21.735L0,23.991L8.23,5.34C8.373,5.742 8.579,6.115 8.835,6.446Z" />
-    <path android:fillColor="?icon_map_active_color" android:pathData="M7,22L7,23L17,23L17,22L7,22Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24.0dip" android:width="24.0dip"
+        android:viewportWidth="24.0"
+        android:viewportHeight="24.0">
+    <path android:fillColor="?icon_map_active_color"
+          android:pathData="M12,7C13.657,7 15,5.657 15,4C15,2.343 13.657,1 12,1C10.343,1 9,2.343 9,4C9,5.657 10.343,7 12,7ZM12,8C14.209,8 16,6.209 16,4C16,1.791 14.209,0 12,0C9.791,0 8,1.791 8,4C8,6.209 9.791,8 12,8Z"
+          android:fillType="evenOdd"/>
+    <path android:fillColor="?icon_map_active_color"
+          android:pathData="M14.056,7.432L20.241,21.007L21.966,21.868L15.163,6.449C15.419,6.119 15.625,5.746 15.768,5.345L24,24L19.478,21.744L13.141,7.835C13.465,7.738 13.772,7.602 14.056,7.432Z"/>
+    <path android:fillColor="?icon_map_active_color"
+          android:pathData="M8.835,6.446L2.034,21.859L3.759,20.998L9.941,7.43C10.225,7.6 10.531,7.737 10.856,7.834L4.522,21.735L0,23.991L8.23,5.34C8.373,5.742 8.579,6.115 8.835,6.446Z"/>
+    <path android:fillColor="?icon_map_active_color" android:pathData="M7,22L7,23L17,23L17,22L7,22Z"/>
 </vector>

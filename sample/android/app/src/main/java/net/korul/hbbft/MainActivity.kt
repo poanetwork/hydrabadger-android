@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
 import net.korul.hbbft.CommonFragments.ContactsFragment
+import net.korul.hbbft.CommonFragments.ListNewsFragment
 import net.korul.hbbft.CommonFragments.SettingsFragment
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.features.DefaultDialogsFragment
@@ -51,6 +52,13 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_lents -> {
+
+                supportFragmentManager.popBackStack(getString(R.string.tag_lenta), POP_BACK_STACK_INCLUSIVE)
+
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.view, ListNewsFragment.newInstance(), getString(R.string.tag_lenta))
+                transaction.addToBackStack(getString(R.string.tag_lenta))
+                transaction.commit()
 
                 return@OnNavigationItemSelectedListener true
             }

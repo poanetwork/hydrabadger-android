@@ -6,7 +6,8 @@
     <RadioGroup android:id="@+id/app_theme_radio_group" android:layout_width="fill_parent"
                 android:layout_height="wrap_content" android:divider="@drawable/radio_group_divider"
                 android:showDividers="middle" android:dividerPadding="60.0dip">
-        <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start" android:id="@+id/healin_app_theme"
+        <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
+                                                        android:id="@+id/healin_app_theme"
                                                         android:layout_width="fill_parent"
                                                         android:layout_height="58.0dip"
                                                         android:text="@string/settings_app_theme_light"

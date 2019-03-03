@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list
-  xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <size android:height="32.0dip" android:width="32.0dip" />
+            <size android:height="32.0dip" android:width="32.0dip"/>
         </shape>
     </item>
     <item>
         <shape android:shape="ring" android:useLevel="false" android:innerRadius="12.0dip" android:thickness="1.0dip">
-            <solid android:color="#12000000" />
+            <solid android:color="#12000000"/>
         </shape>
     </item>
     <item>
         <shape android:shape="ring" android:useLevel="false" android:innerRadius="12.5dip" android:thickness="1.0dip">
-            <solid android:color="#33000000" />
+            <solid android:color="#33000000"/>
         </shape>
     </item>
     <item android:left="3.5dip" android:top="3.5dip" android:right="3.5dip" android:bottom="3.5dip">
         <shape android:shape="oval">
-            <solid android:color="@color/healin_map_button_color" />
+            <solid android:color="@color/healin_map_button_color"/>
         </shape>
     </item>
 </layer-list>

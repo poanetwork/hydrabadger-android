@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.daimajia.swipe.SimpleSwipeListener
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
@@ -18,7 +17,18 @@ import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.core.Getters.removeUser
 import java.util.*
 
-class RecyclerViewContactAdapter(private val mContext: Context, private val mDataset: ArrayList<User>) :
+
+interface ClickListener {
+    fun onItemClick(view: View, position: Int)
+    fun onItemButtonClick(view: View, position: Int)
+    fun onItemLongClick(view: View, position: Int)
+}
+
+class RecyclerViewContactAdapter(
+    private val mContext: Context,
+    private val mDataset: ArrayList<User>,
+    private val mClickListener: ClickListener
+) :
     RecyclerSwipeAdapter<RecyclerViewContactAdapter.SimpleViewHolder>() {
 
     class SimpleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,8 +37,8 @@ class RecyclerViewContactAdapter(private val mContext: Context, private val mDat
         internal var contact_search_name: TextView = itemView.findViewById<View>(R.id.contact_search_name) as TextView
         internal var contact_search_status: TextView =
             itemView.findViewById<View>(R.id.contact_search_status) as TextView
-        internal var contact_block: LinearLayout = itemView.findViewById<View>(R.id.contact_block) as LinearLayout
         internal var contact_remove: LinearLayout = itemView.findViewById<View>(R.id.contact_remove) as LinearLayout
+        internal var contact_remove2: LinearLayout = itemView.findViewById<View>(R.id.contact_remove2) as LinearLayout
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleViewHolder {
@@ -39,24 +49,31 @@ class RecyclerViewContactAdapter(private val mContext: Context, private val mDat
     override fun onBindViewHolder(viewHolder: SimpleViewHolder, position: Int) {
         val item = mDataset[position]
         viewHolder.swipeLayout.showMode = SwipeLayout.ShowMode.LayDown
+
+
         viewHolder.swipeLayout.addSwipeListener(object : SimpleSwipeListener() {
             override fun onOpen(layout: SwipeLayout?) {
             }
         })
-        viewHolder.swipeLayout.setOnDoubleClickListener { layout, surface ->
-            Toast.makeText(
-                mContext,
-                "DoubleClick",
-                Toast.LENGTH_SHORT
-            ).show()
+        viewHolder.swipeLayout.surfaceView.setOnClickListener { v ->
+            mClickListener.onItemClick(v, position)
+        }
+        viewHolder.swipeLayout.surfaceView.setOnLongClickListener {
+            mClickListener.onItemLongClick(it, position)
+            return@setOnLongClickListener true
         }
         viewHolder.contact_remove.setOnClickListener {
-            removeUser(mDataset[position])
-            mItemManger.removeShownLayouts(viewHolder.swipeLayout)
-            mDataset.removeAt(position)
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, mDataset.size)
-            mItemManger.closeAllItems()
+            mClickListener.onItemButtonClick(it, position)
+            try {
+                removeUser(mDataset[position])
+                mItemManger.removeShownLayouts(viewHolder.swipeLayout)
+                mDataset.removeAt(position)
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, mDataset.size)
+                mItemManger.closeAllItems()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         //TODO content
