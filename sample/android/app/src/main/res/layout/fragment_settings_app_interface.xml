@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
+              android:id="@+id/main_layout" android:fitsSystemWindows="true"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+    <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
+                    android:layout_height="?actionBarSize" style="@style/Toolbar">
+        <include android:id="@+id/action_back" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                 android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
+                 android:layout_alignParentBottom="true" layout="@layout/toolbar_button_back"/>
+        <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/settings_interface_title" android:layout_centerHorizontal="true"
+                  android:layout_centerVertical="true" style="@style/toolbar_not_caps_text"/>
+    </RelativeLayout>
+    <ScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" style="@style/Screen">
+            <android.support.v7.widget.AppCompatTextView android:visibility="gone" android:layout_width="wrap_content"
+                                                         android:layout_height="wrap_content"
+                                                         android:text="@string/settings_chat_background"
+                                                         style="@style/TitleText"/>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/chat_background"
+                          android:visibility="gone"
+                          android:layout_width="fill_parent" android:layout_height="wrap_content"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_chat_background"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/settings_change_chat_background"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
+                                                         android:layout_height="wrap_content"
+                                                         android:layout_marginTop="@dimen/menu_margin_16"
+                                                         android:text="@string/settings_app_theme"
+                                                         style="@style/TitleText"/>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/app_theme"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                <RadioGroup android:id="@id/app_theme_radio_group" android:layout_width="fill_parent"
+                            android:layout_height="wrap_content" android:divider="@drawable/radio_group_divider"
+                            android:showDividers="middle" android:dividerPadding="60.0dip">
+                    <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
+                                                                    android:id="@id/healin_app_theme"
+                                                                    android:layout_width="fill_parent"
+                                                                    android:layout_height="58.0dip"
+                                                                    android:text="@string/settings_app_theme_light"
+                                                                    android:selectAllOnFocus="false"
+                                                                    android:drawableRight="@drawable/radio_button_healin_theme"
+                                                                    android:drawablePadding="20.0dip"
+                                                                    android:drawableEnd="@drawable/radio_button_healin_theme"
+                                                                    style="@style/dialog_list_item"/>
+                    <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
+                                                                    android:id="@id/mib_app_theme"
+                                                                    android:layout_width="fill_parent"
+                                                                    android:layout_height="58.0dip"
+                                                                    android:text="@string/settings_app_theme_dark"
+                                                                    android:drawableRight="@drawable/radio_button_black_theme"
+                                                                    android:drawablePadding="20.0dip"
+                                                                    android:drawableEnd="@drawable/radio_button_black_theme"
+                                                                    style="@style/dialog_list_item"/>
+                </RadioGroup>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:id="@+id/theme_ok" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/action_ok" android:layout_alignParentRight="true" style="@style/Button"/>
+    </RelativeLayout>
+</LinearLayout>

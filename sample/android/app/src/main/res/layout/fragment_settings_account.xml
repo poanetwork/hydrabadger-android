@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
     <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
                     android:layout_height="?actionBarSize" app:layout_constraintStart_toStartOf="parent"
                     style="@style/Toolbar">
@@ -46,17 +46,19 @@
                           android:maxLength="35" android:layout_below="@id/account_name_hint"
                           android:inputType="textPersonName" android:imeOptions="flagNoExtractUi"
                           style="@style/EditText.Settings"/>
-                <TextView android:gravity="center_vertical" android:id="@+id/account_email_hint"
+                <TextView android:gravity="center_vertical" android:id="@+id/account_email_nick"
                           android:layout_width="wrap_content" android:layout_height="wrap_content"
-                          android:text="@string/account_mail" android:layout_below="@id/account_name"
+                          android:text="@string/account_nickname" android:layout_below="@id/account_name"
                           style="@style/TextView.Text"/>
-                <TextView android:id="@+id/account_email" android:background="@drawable/edit_text_border"
+                <EditText android:id="@+id/account_nick" android:background="@drawable/edit_text_border"
                           android:paddingTop="11.0dip" android:paddingBottom="10.0dip"
-                          android:layout_width="fill_parent" android:layout_height="wrap_content"
-                          android:layout_below="@id/account_email_hint" style="@style/EditText.Settings"/>
+                          android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1"
+                          android:maxLength="35" android:layout_below="@id/account_email_nick"
+                          android:inputType="textPersonName" android:imeOptions="flagNoExtractUi"
+                          style="@style/EditText.Settings"/>
                 <TextView android:gravity="center_vertical" android:id="@+id/account_id_hint"
                           android:layout_width="wrap_content" android:layout_height="wrap_content"
-                          android:text="@string/account_id" android:layout_below="@id/account_email"
+                          android:text="@string/uid" android:layout_below="@id/account_nick"
                           style="@style/TextView.Text"/>
                 <TextView android:id="@+id/account_id" android:background="@drawable/edit_text_border"
                           android:paddingTop="11.0dip" android:paddingBottom="10.0dip"
@@ -92,7 +94,7 @@
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/account_invite_list"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
-                          style="@style/SubTitle.Clicked">
+                          style="@style/SubTitle.Clicked" android:visibility="gone">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
                            android:layout_height="wrap_content" app:srcCompat="@drawable/ic_contact_invites"/>
                 <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
@@ -105,10 +107,10 @@
                                                          android:layout_height="wrap_content"
                                                          android:layout_marginTop="@dimen/menu_margin_32"
                                                          android:text="@string/settings_social_network"
-                                                         style="@style/TitleText"/>
+                                                         style="@style/TitleText" android:visibility="gone"/>
             <LinearLayout android:orientation="horizontal" android:id="@+id/security_social_google"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
-                          style="@style/SubTitle.Clicked">
+                          style="@style/SubTitle.Clicked" android:visibility="gone">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="24.0dip"
                            android:layout_height="24.0dip" app:srcCompat="@drawable/ic_social_google"/>
                 <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
@@ -119,7 +121,7 @@
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/security_social_facebook"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
-                          style="@style/SubTitle.Clicked">
+                          style="@style/SubTitle.Clicked" android:visibility="gone">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="24.0dip"
                            android:layout_height="24.0dip" app:srcCompat="@drawable/ic_social_facebook"/>
                 <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
@@ -130,7 +132,7 @@
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/security_social_twitter"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
-                          style="@style/SubTitle.Clicked">
+                          style="@style/SubTitle.Clicked" android:visibility="gone">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="24.0dip"
                            android:layout_height="24.0dip" app:srcCompat="@drawable/ic_social_twitter"/>
                 <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
@@ -140,7 +142,8 @@
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/logout" android:layout_width="fill_parent"
-                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked"
+                          android:visibility="gone">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="24.0dip"
                            android:layout_height="wrap_content" android:scaleType="centerInside"
                            app:srcCompat="@drawable/ic_device_logout"/>

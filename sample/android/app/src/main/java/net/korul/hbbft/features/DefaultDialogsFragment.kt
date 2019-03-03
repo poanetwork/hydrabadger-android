@@ -201,6 +201,7 @@ class DefaultDialogsFragment :
                             id.toString(),
                             dialog.id,
                             "name${dialog.users.size}",
+                            "nick${dialog.users.size}",
                             "http://i.imgur.com/pv1tBmT.png",
                             true
                         )

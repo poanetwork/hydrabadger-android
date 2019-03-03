@@ -252,6 +252,20 @@ object Getters {
         return users.toTypedArray()
     }
 
+    fun updateUserbyUID(uid: String, user: User) {
+        val users = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(uid))
+            .queryList()
+
+        for (duser in users) {
+            duser.avatar = user.avatar
+            duser.name = user.name
+            duser.nick = user.nick
+            duser.update()
+        }
+    }
+
     fun removeUser(user: User) {
         //TODO implement
     }

@@ -21,6 +21,9 @@ class DUser : BaseModel() {
     @Column(name = "name")
     var name: String = ""
 
+    @Column(name = "nick")
+    var nick: String = ""
+
     @Column(name = "avatar")
     var avatar: String = ""
 

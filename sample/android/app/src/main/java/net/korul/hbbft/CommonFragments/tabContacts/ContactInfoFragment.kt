@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments
+package net.korul.hbbft.CommonFragments.tabContacts
 
 import android.content.Context
 import android.os.Bundle
@@ -12,6 +12,9 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_contact_info.*
+import net.korul.hbbft.CommonFragments.ShowBigAvatarActivity
+import net.korul.hbbft.CommonFragments.ShowBigQRActivity
+import net.korul.hbbft.CommonFragments.WarningFragment
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
 
@@ -44,6 +47,7 @@ class ContactInfoFragment : Fragment() {
 //                Bitmap image = BitmapFactory.decodeFile(curUser.getAvatar());
 //                contact_icon.setImageBitmap(image);
 
+        contact_nickname.text = SpannableStringBuilder(curUser.nick)
         contact_nickname.isEnabled = false
 
         edit_nickname.setOnClickListener {
@@ -57,7 +61,13 @@ class ContactInfoFragment : Fragment() {
         }
 
         action_chat.setOnClickListener {
-            //TODO start chat
+            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+            transaction.add(
+                R.id.view,
+                WarningFragment.newInstance(), getString(R.string.tag_contacts)
+            )
+            transaction.addToBackStack(getString(R.string.tag_contacts))
+            transaction.commit()
         }
 
         action_back.setOnClickListener {

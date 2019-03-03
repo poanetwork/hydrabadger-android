@@ -19,8 +19,9 @@
                         android:layout_alignParentTop="true" android:layout_alignParentRight="true"
                         android:layout_alignParentBottom="true">
             <ImageView android:id="@+id/emergency_icon" android:layout_width="wrap_content"
-                       android:layout_height="wrap_content" android:layout_centerInParent="true"
-                       android:contentDescription="@string/settings_delete_data" app:srcCompat="@drawable/ic_warning"/>
+                       android:layout_height="wrap_content"
+                       android:contentDescription="@string/settings_delete_data" app:srcCompat="@drawable/ic_warning"
+                       android:layout_centerHorizontal="true"/>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -41,7 +42,7 @@
                                                          android:text="@string/settings_account"
                                                          style="@style/SettingTitle"/>
             <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
-                            android:layout_below="@id/settings_account">
+                            android:layout_below="@id/settings_account" android:id="@+id/accout_info">
                 <ImageView android:id="@+id/settings_account_icon" android:layout_width="@dimen/icon_size_56"
                            android:layout_height="@dimen/icon_size_56" android:layout_alignParentTop="true"
                            android:layout_alignParentBottom="true" android:layout_centerVertical="true"
@@ -85,8 +86,8 @@
                                                          android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"
                                                          android:text="@string/settings_map_coordinate_title"
-                                                         style="@style/SettingTitle.Ripple"/>
-            <View style="@style/Divider"/>
+                                                         style="@style/SettingTitle.Ripple" android:visibility="gone"/>
+            <View style="@style/Divider" android:visibility="gone"/>
             <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_media_storage"
                                                          android:visibility="visible" android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"

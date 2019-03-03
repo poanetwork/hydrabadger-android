@@ -305,6 +305,7 @@
     <string name="contact_reject">Отклонить</string>
     <string name="contact_remove">Удалить</string>
     <string name="contact_request">Запросы на добавление в контакты:</string>
+    <string name="contact_request_error">Ошибка при запросе на добавление в контакты</string>
     <string name="contact_request_accept">Добавить</string>
     <string name="contact_request_contact_exist">Данный пользователь уже находится в вашем списке контактов!</string>
     <string name="contact_request_error_email_or_id">Введите корректный email или ID пользователя</string>
@@ -843,9 +844,10 @@
     <string name="settings_elevation_add">Добавить карту высот</string>
     <string name="settings_elevation_list">Список высот:</string>
     <string name="settings_elevation_path">Путь к высотам</string>
+    <string name="settings_emergency_delete_data">Удалить все данные</string>
     <string name="settings_emergency_delete_data_accept">Удалить все данные и выйти</string>
     <string name="settings_emergency_delete_data_info">Срочное удаление уничтожит все данные приложения и выйдет с Вашей
-        учетной записи!
+        учетной записи навсегда!
     </string>
     <string name="settings_fexnet_cancel_download">Отменить загрузку</string>
     <string name="settings_help">Помощь:</string>

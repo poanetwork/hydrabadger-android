@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments
+package net.korul.hbbft.CommonFragments.tabChats
 
 import android.os.Bundle
 import android.support.v4.app.Fragment

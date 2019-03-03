@@ -10,8 +10,8 @@
             android:id="@+id/dialogsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:dialogMessageTextColor="@color/white"
-            app:dialogTitleTextColor="@color/white">
+            app:dialogMessageTextColor="?attr/message_text_color"
+            app:dialogTitleTextColor="?attr/message_text_color">
     </com.stfalcon.chatkit.dialogs.DialogsList>
 
     <android.support.design.widget.FloatingActionButton

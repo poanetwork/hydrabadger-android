@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             app:inputHint="@string/hint_enter_a_message"
-            app:inputTextColor="@color/white"
+            app:inputTextColor="?attr/message_text_color"
             app:showAttachmentButton="true"/>
 
 </RelativeLayout>

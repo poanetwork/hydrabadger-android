@@ -244,6 +244,7 @@ class DefaultMessagesFragment :
                             id.toString(),
                             mCurDialog!!.id,
                             "name${mCurDialog!!.users.size}",
+                            "nick${mCurDialog!!.users.size}",
                             "http://i.imgur.com/pv1tBmT.png",
                             true
                         )

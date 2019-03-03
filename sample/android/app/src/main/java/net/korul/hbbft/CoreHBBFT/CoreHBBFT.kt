@@ -1,5 +1,6 @@
 package net.korul.hbbft.CoreHBBFT
 
+import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -17,16 +18,19 @@ import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import net.korul.hbbft.CommonFragments.IAddToContacts
+import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.P2P.IGetData
 import net.korul.hbbft.P2P.P2PMesh
 import net.korul.hbbft.P2P.SocketWrapper
 import net.korul.hbbft.R
 import net.korul.hbbft.Session
+import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.core.Getters.updateUserbyUID
 import net.korul.hbbft.services.ClosingService
 import org.json.JSONObject
 import java.util.*
@@ -116,6 +120,40 @@ object CoreHBBFT : IGetData {
         thread {
             authAnonymously()
         }
+
+        initUser()
+    }
+
+    fun initUser() {
+        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val strUser = prefs!!.getString("CurUser", "")
+        if (strUser == null || strUser.isEmpty()) {
+            val user: User = User(
+                0,
+                DatabaseApplication.mCoreHBBFT2X.uniqueID1,
+                0.toString(),
+                "",
+                "name",
+                "nick",
+                "http://i.imgur.com/pv1tBmT.png",
+                true
+            )
+
+            val editor = prefs.edit()
+            editor.putString("CurUser", Gson().toJson(user))
+            editor.apply()
+
+            DatabaseApplication.mCurUser = user
+        } else
+            DatabaseApplication.mCurUser = Gson().fromJson(strUser, User::class.java)
+    }
+
+    fun saveUser() {
+        updateUserbyUID(uniqueID1, DatabaseApplication.mCurUser)
+        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putString("CurUser", Gson().toJson(DatabaseApplication.mCurUser))
+        editor.apply()
     }
 
     fun setRoomName(roomname: String) {
@@ -222,6 +260,10 @@ object CoreHBBFT : IGetData {
             })
     }
 
+
+    fun unregisterUser(uid: String) {
+        //TODO implement
+    }
 
     fun unregisterInDatabase(RoomName: String) {
         val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("uid").equalTo(uniqueID1)

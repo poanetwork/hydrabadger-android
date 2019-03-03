@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments
+package net.korul.hbbft.CommonFragments.tabLenta
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import net.korul.hbbft.R
 
 
-class SettingsFragment : Fragment() {
+class ListNewsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,10 +17,10 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        return inflater.inflate(R.layout.fragment_warning, container, false)
     }
 
     companion object {
-        fun newInstance() = SettingsFragment()
+        fun newInstance() = ListNewsFragment()
     }
 }

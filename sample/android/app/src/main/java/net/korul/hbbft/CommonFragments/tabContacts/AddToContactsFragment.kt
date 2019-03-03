@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments
+package net.korul.hbbft.CommonFragments.tabContacts
 
 import android.app.Activity
 import android.content.Intent
@@ -76,7 +76,8 @@ class AddToContactsFragment : Fragment() {
             if (contact_id_or_email.text.toString().isEmpty()) {
                 contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
             } else
-                CoreHBBFT.AddUser(contact_id_or_email.text.toString(), object : IAddToContacts {
+                CoreHBBFT.AddUser(contact_id_or_email.text.toString(), object :
+                    IAddToContacts {
                     override fun contactAddSuccess(user: User) {
 
                     }
@@ -148,7 +149,8 @@ class AddToContactsFragment : Fragment() {
                 } else {
                     Toast.makeText(activity, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
 
-                    CoreHBBFT.AddUser(result.contents, object : IAddToContacts {
+                    CoreHBBFT.AddUser(result.contents, object :
+                        IAddToContacts {
                         override fun contactAddSuccess(user: User) {
 
                         }

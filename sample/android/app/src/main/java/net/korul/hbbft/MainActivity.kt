@@ -1,5 +1,6 @@
 package net.korul.hbbft
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,9 +13,10 @@ import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
-import net.korul.hbbft.CommonFragments.ContactsFragment
-import net.korul.hbbft.CommonFragments.ListNewsFragment
-import net.korul.hbbft.CommonFragments.SettingsFragment
+import net.korul.hbbft.CommonFragments.tabContacts.ContactsFragment
+import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
+import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
+import net.korul.hbbft.CommonFragments.tabSettings.SettingsFragment
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.features.DefaultDialogsFragment
 import net.korul.hbbft.features.DefaultMessagesFragment
@@ -88,6 +90,18 @@ class MainActivity : AppCompatActivity() {
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         navView.selectedItemId = R.id.navigation_chats
 
+        val prefs = this.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val theme = prefs!!.getString("Theme", "night")
+        if (theme == "night") {
+            this.setTheme(R.style.App_Black_Theme)
+            this.theme.applyStyle(R.style.App_Black_Theme, true)
+            navView.setBackgroundDrawable(this.resources.getDrawable(R.drawable.footer_bar_dark))
+        } else if (theme == "light") {
+            this.setTheme(R.style.App_Healin_Theme)
+            this.theme.applyStyle(R.style.App_Healin_Theme, true)
+            navView.setBackgroundDrawable(this.resources.getDrawable(R.drawable.footer_bar_healin))
+        }
+
         if (this.intent.getBooleanExtra("Start_App", false)) {
             Log.d(TAG, "Receive push and start activity")
             val roomName = intent.getStringExtra("RoomName")
@@ -119,6 +133,20 @@ class MainActivity : AppCompatActivity() {
 //                    AutoStartPermissionHelper.getInstance().getAutoStartPermission(this)
                 }
             }
+        }
+
+        val themeRestart = prefs.getBoolean("Theme_NeedRestart", false)
+        if (themeRestart) {
+            val editor = prefs.edit()
+            editor.putBoolean("Theme_NeedRestart", false)
+            editor.apply()
+
+            navView.selectedItemId = R.id.navigation_settings
+
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.add(R.id.view, DialogThemeFragment.newInstance(), getString(R.string.tag_settings))
+            transaction.addToBackStack(getString(R.string.tag_settings))
+            transaction.commit()
         }
     }
 

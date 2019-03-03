@@ -37,8 +37,8 @@ class RecyclerViewContactAdapter(
         internal var contact_search_name: TextView = itemView.findViewById<View>(R.id.contact_search_name) as TextView
         internal var contact_search_status: TextView =
             itemView.findViewById<View>(R.id.contact_search_status) as TextView
+        internal var contact_search_uid: TextView = itemView.findViewById<View>(R.id.contact_search_uid) as TextView
         internal var contact_remove: LinearLayout = itemView.findViewById<View>(R.id.contact_remove) as LinearLayout
-        internal var contact_remove2: LinearLayout = itemView.findViewById<View>(R.id.contact_remove2) as LinearLayout
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleViewHolder {
@@ -79,8 +79,11 @@ class RecyclerViewContactAdapter(
         //TODO content
         //        Bitmap image = BitmapFactory.decodeFile(item.getAvatar());
         //        viewHolder.contact_search_icon.setImageBitmap(image);
-        viewHolder.contact_search_name.text = item.name
-        viewHolder.contact_search_status.text = item.uid
+        viewHolder.contact_search_icon.setImageResource(R.drawable.ic_contact)
+
+        viewHolder.contact_search_name.text = item.nick
+        viewHolder.contact_search_status.text = item.name
+        viewHolder.contact_search_uid.text = item.uid
 
         mItemManger.bindView(viewHolder.itemView, position)
     }

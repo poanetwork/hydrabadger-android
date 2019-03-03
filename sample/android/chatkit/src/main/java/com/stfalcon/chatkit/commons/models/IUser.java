@@ -35,6 +35,8 @@ public interface IUser {
      * */
     String getName();
 
+    String getNick();
+
     /**
      * Returns the user's avatar image url
      *

@@ -8,6 +8,7 @@ import com.raizlabs.android.dbflow.config.FlowConfig
 import com.raizlabs.android.dbflow.config.FlowManager
 import io.fabric.sdk.android.Fabric
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.common.data.model.User
 
 
 class DatabaseApplication : Application() {
@@ -21,6 +22,8 @@ class DatabaseApplication : Application() {
         private var TAG = "HYDRABADGERTAG:DatabaseApplication"
 
         var mToken = ""
+
+        lateinit var mCurUser: User
     }
 
     override fun onCreate() {

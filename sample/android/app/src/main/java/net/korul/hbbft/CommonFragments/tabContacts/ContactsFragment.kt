@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments
+package net.korul.hbbft.CommonFragments.tabContacts
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.daimajia.swipe.util.Attributes
 import kotlinx.android.synthetic.main.fragment_contacts.*
+import net.korul.hbbft.CommonFragments.WarningFragment
 import net.korul.hbbft.R
 import net.korul.hbbft.adapter.ClickListener
 import net.korul.hbbft.adapter.RecyclerViewContactAdapter
@@ -43,7 +44,20 @@ class ContactsFragment : Fragment() {
 
         action_add_contact.setOnClickListener {
             val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-            transaction.add(R.id.view, AddToContactsFragment.newInstance(), getString(R.string.tag_contacts))
+            transaction.add(
+                R.id.view,
+                AddToContactsFragment.newInstance(), getString(R.string.tag_contacts)
+            )
+            transaction.addToBackStack(getString(R.string.tag_contacts))
+            transaction.commit()
+        }
+
+        action_search_contact.setOnClickListener {
+            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+            transaction.add(
+                R.id.view,
+                WarningFragment.newInstance(), getString(R.string.tag_contacts)
+            )
             transaction.addToBackStack(getString(R.string.tag_contacts))
             transaction.commit()
         }
@@ -64,7 +78,11 @@ class ContactsFragment : Fragment() {
                 val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
                 transaction.add(
                     R.id.view,
-                    ContactInfoFragment.newInstance((mAdapter as RecyclerViewContactAdapter).getItemInPos(position)),
+                    ContactInfoFragment.newInstance(
+                        (mAdapter as RecyclerViewContactAdapter).getItemInPos(
+                            position
+                        )
+                    ),
                     getString(R.string.tag_contacts)
                 )
                 transaction.addToBackStack(getString(R.string.tag_contacts))

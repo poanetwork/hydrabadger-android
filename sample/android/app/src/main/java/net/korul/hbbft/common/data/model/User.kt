@@ -9,6 +9,7 @@ class User(
     private var id: String,
     var idDialog: String,
     private val name: String,
+    private val nick: String,
     private val avatar: String,
     val isOnline: Boolean
 ) :
@@ -24,6 +25,10 @@ class User(
 
     override fun getName(): String {
         return name
+    }
+
+    override fun getNick(): String {
+        return nick
     }
 
     override fun getAvatar(): String {

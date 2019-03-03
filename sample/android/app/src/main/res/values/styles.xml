@@ -118,7 +118,8 @@
         <item name="toolbar_text">@color/dark_blue</item>
         <item name="yellow_button">@drawable/dark_stroke_yellow</item>
     </style>
-    <style name="App.Healin.Theme" parent="@style/Theme.AppCompat.NoActionBar">
+
+    <style name="App.Healin.Theme" parent="@style/Theme.AppCompat.Light">
         <item name="android:textColorPrimary">@color/grey_color</item>
         <item name="android:textColorHint">@color/green</item>
         <item name="active_text">@color/healin_primary</item>

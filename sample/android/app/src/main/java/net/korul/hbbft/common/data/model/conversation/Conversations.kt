@@ -97,6 +97,7 @@ class Conversations {
                 duser.id.toString(),
                 duser.idDialog,
                 duser.name,
+                duser.nick,
                 duser.avatar,
                 duser.isOnline
             )
@@ -108,6 +109,7 @@ class Conversations {
             duser.uid = user.uid
             duser.idDialog = user.idDialog
             duser.name = user.name
+            duser.nick = user.nick
             duser.avatar = user.avatar
             duser.isOnline = user.isOnline
 
