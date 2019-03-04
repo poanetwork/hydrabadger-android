@@ -735,7 +735,7 @@ impl Session {
         }
     }
 
-    pub fn start_node(&self, ipport_string_source: String, ipports_string_remote: String) {
+    pub fn start_node(&self, ipport_string_source: String, ipports_string_remote: String, uid: String) {
         unsafe {
             warn!("enter to startNode: {:?}", M_NUM_OF_CALLBACK.clone());
         }
@@ -749,13 +749,10 @@ impl Session {
             }
         }
 
-        // let mut m_ipports_remote_ignore: Option<SocketAddr> = None;
-        // if !ipports_remote_ignore.is_empty() {
-        //     m_ipports_remote_ignore = Some(ipports_remote_ignore.parse().expect("Unable to parse socket address remote_addresses"));
-        // }
+        let my_uuid = Uid(Uuid::parse_str(&uid).unwrap());
+        warn!("Parsed - {} UUID.", my_uuid);
 
         let cfg = Config::default();
-         
 
         unsafe {
             let num = M_NUM_OF_CALLBACK.clone();
@@ -764,7 +761,7 @@ impl Session {
                 M_NUM_OF_CALLBACK += 1;
             
                 let callback_ = callback;
-                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
+                let hbft = Some(Hydrabadger::new(bind_address, cfg, my_uuid, callback_, M_NUM_OF_CALLBACK.clone()));
             
                 match hbft {
                     Some(v) => {
@@ -785,7 +782,7 @@ impl Session {
                 M_NUM_OF_CALLBACK += 1;
 
                 let callback_ = callback;
-                let hbft = Some(Hydrabadger::new(bind_address, cfg, Uid::new(), callback_, M_NUM_OF_CALLBACK.clone()));
+                let hbft = Some(Hydrabadger::new(bind_address, cfg, my_uuid, callback_, M_NUM_OF_CALLBACK.clone()));
             
                 match hbft {
                     Some(v) => {

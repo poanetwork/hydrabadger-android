@@ -1,6 +1,7 @@
 package net.korul.hbbft
 
 import android.app.Application
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,16 +11,28 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import net.korul.hbbft.CommonFragments.tabContacts.ContactsFragment
 import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsFragment
+import net.korul.hbbft.CommonFragments.tabSettings.SettingsUserFragment
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.broadcastReceiver
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.getLocalUser
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.saveCurUser
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.uniqueID1
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.updateAvatarInAllUserByUid
+import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.features.DefaultDialogsFragment
 import net.korul.hbbft.features.DefaultMessagesFragment
+import net.korul.hbbft.firebaseStorage.MyDownloadService
+import net.korul.hbbft.firebaseStorage.MyUploadService
+import java.io.File
 
 //import com.judemanutd.autostarter.AutoStartPermissionHelper
 
@@ -148,8 +161,82 @@ class MainActivity : AppCompatActivity() {
             transaction.addToBackStack(getString(R.string.tag_settings))
             transaction.commit()
         }
+
+
+        initSyncSystem()
     }
 
+    public override fun onStart() {
+        super.onStart()
+
+        // Register receiver for uploads and downloads
+        val manager = LocalBroadcastManager.getInstance(this)
+        manager.registerReceiver(broadcastReceiver, MyDownloadService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyUploadService.intentFilter)
+    }
+
+    public override fun onStop() {
+        super.onStop()
+
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
+    }
+
+    private fun initSyncSystem() {
+        broadcastReceiver = object : BroadcastReceiver() {
+
+            override fun onReceive(context: Context, intent: Intent) {
+                Log.d(TAG, "onReceive:$intent")
+
+                when (intent.action) {
+
+                    MyDownloadService.DOWNLOAD_COMPLETED -> {
+                        val filepath = intent.getStringExtra(MyDownloadService.EXTRA_FILE_DOWNLOADED)
+                        val uid = intent.getStringExtra(MyDownloadService.EXTRA_UID_DOWNLOADED)
+
+                        val avatarFile = File(filepath)
+                        Toast.makeText(context, "Download Avatar complete - ${avatarFile.path}", Toast.LENGTH_LONG)
+                            .show()
+
+                        updateAvatarInAllUserByUid(uid, avatarFile)
+                    }
+
+                    MyDownloadService.DOWNLOAD_ERROR -> {
+                        Toast.makeText(context, "Download Avatar Error", Toast.LENGTH_LONG).show()
+                    }
+
+                    MyUploadService.UPLOAD_COMPLETED -> {
+                        val filepath = intent.getStringExtra(MyUploadService.EXTRA_FILE_URI)
+                        if (filepath != null) {
+                            val file = File(filepath)
+                            updateAvatarInAllUserByUid(uniqueID1, file)
+
+                            mCurUser = getLocalUser(uniqueID1)!!
+                            saveCurUser()
+
+                            val myFragment =
+                                supportFragmentManager.findFragmentByTag(getString(R.string.tag_settings)) as SettingsUserFragment?
+                            if (myFragment != null && myFragment.isVisible) {
+                                myFragment.setImageAvatar(file)
+                                myFragment.dismissProgressBar()
+                            }
+                            Toast.makeText(context, "UPLOAD Avatar complete", Toast.LENGTH_LONG).show()
+                        }
+
+                    }
+
+                    MyUploadService.UPLOAD_ERROR -> {
+                        val myFragment =
+                            supportFragmentManager.findFragmentByTag(getString(R.string.tag_settings)) as SettingsUserFragment?
+                        if (myFragment != null && myFragment.isVisible) {
+                            myFragment.dismissProgressBar()
+                        }
+                        Toast.makeText(context, "UPLOAD Avatar Error", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
 
     override fun onBackPressed() {
         val fragments = supportFragmentManager.fragments

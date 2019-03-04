@@ -2,6 +2,7 @@ package net.korul.hbbft.adapter
 
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +15,7 @@ import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.data.model.core.Getters.removeUser
+import net.korul.hbbft.common.data.model.core.Getters.removeUserByUid
 import java.util.*
 
 
@@ -65,7 +66,7 @@ class RecyclerViewContactAdapter(
         viewHolder.contact_remove.setOnClickListener {
             mClickListener.onItemButtonClick(it, position)
             try {
-                removeUser(mDataset[position])
+                removeUserByUid(mDataset[position])
                 mItemManger.removeShownLayouts(viewHolder.swipeLayout)
                 mDataset.removeAt(position)
                 notifyItemRemoved(position)
@@ -76,10 +77,13 @@ class RecyclerViewContactAdapter(
             }
         }
 
-        //TODO content
-        //        Bitmap image = BitmapFactory.decodeFile(item.getAvatar());
-        //        viewHolder.contact_search_icon.setImageBitmap(image);
-        viewHolder.contact_search_icon.setImageResource(R.drawable.ic_contact)
+
+        if (item.avatar != "") {
+            val image = BitmapFactory.decodeFile(item.avatar)
+            viewHolder.contact_search_icon.setImageBitmap(image)
+        } else {
+            viewHolder.contact_search_icon.setImageResource(R.drawable.ic_contact)
+        }
 
         viewHolder.contact_search_name.text = item.nick
         viewHolder.contact_search_status.text = item.name

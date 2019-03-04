@@ -20,7 +20,6 @@ import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -141,10 +140,6 @@ class SettingsQRFragment : Fragment() {
 
                     CoreHBBFT.AddUser(result.contents, object :
                         IAddToContacts {
-                        override fun contactAddSuccess(user: User) {
-
-                        }
-
                         override fun errorAddContact() {
                             Toast.makeText(context, getString(R.string.contact_request_error), Toast.LENGTH_LONG).show()
                         }

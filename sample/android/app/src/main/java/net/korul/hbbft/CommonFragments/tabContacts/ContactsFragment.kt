@@ -17,7 +17,7 @@ import net.korul.hbbft.adapter.ClickListener
 import net.korul.hbbft.adapter.RecyclerViewContactAdapter
 import net.korul.hbbft.adapter.util.DividerItemDecoration
 import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.data.model.core.Getters.getAllUsers
+import net.korul.hbbft.common.data.model.core.Getters.getAllUsersDistinct
 import java.util.*
 
 
@@ -72,7 +72,7 @@ class ContactsFragment : Fragment() {
         // Item Decorator:
         contacts_list.addItemDecoration(DividerItemDecoration(resources.getDrawable(R.drawable.divider)))
 
-        mDataSet = ArrayList(getAllUsers().toList())
+        mDataSet = ArrayList(getAllUsersDistinct().toList())
         mAdapter = RecyclerViewContactAdapter(context!!, mDataSet!!, object : ClickListener {
             override fun onItemClick(view: View, position: Int) {
                 val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_dialogs.*
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.getUserFromLocalOrDownload
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -19,7 +20,6 @@ import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.common.data.fixtures.MessagesFixtures
 import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.Message
-import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.conversation.Conversations
 import net.korul.hbbft.common.data.model.core.Getters
 import net.korul.hbbft.common.data.model.core.Getters.getDialogByRoomName
@@ -194,17 +194,7 @@ class DefaultDialogsFragment :
                             found = true
                     }
                     if (!found) {
-                        val id = Getters.getNextUserID()
-                        val user = User(
-                            id,
-                            uid,
-                            id.toString(),
-                            dialog.id,
-                            "name${dialog.users.size}",
-                            "nick${dialog.users.size}",
-                            "http://i.imgur.com/pv1tBmT.png",
-                            true
-                        )
+                        val user = getUserFromLocalOrDownload(uid, dialog)
                         dialog.users.add(user)
                         Conversations.getDUser(user).insert()
                     }

@@ -3,6 +3,7 @@ package net.korul.hbbft.CoreHBBFT
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -29,10 +30,17 @@ import net.korul.hbbft.P2P.P2PMesh
 import net.korul.hbbft.P2P.SocketWrapper
 import net.korul.hbbft.R
 import net.korul.hbbft.Session
+import net.korul.hbbft.common.data.model.Dialog
 import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.data.model.conversation.Conversations
+import net.korul.hbbft.common.data.model.core.Getters
+import net.korul.hbbft.common.data.model.core.Getters.getAllUsers
+import net.korul.hbbft.common.data.model.core.Getters.getAllUsersDistinct
 import net.korul.hbbft.common.data.model.core.Getters.updateUserbyUID
+import net.korul.hbbft.firebaseStorage.MyDownloadService
 import net.korul.hbbft.services.ClosingService
 import org.json.JSONObject
+import java.io.File
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
@@ -49,6 +57,14 @@ data class Uids(
     var UID: String? = null,
     var isOnline: Boolean? = null
 )
+
+data class Users(
+    var UID: String? = null,
+    var isOnline: Boolean? = null,
+    var name: String? = null,
+    var nick: String? = null
+)
+
 
 object CoreHBBFT : IGetData {
     // p2p
@@ -81,6 +97,8 @@ object CoreHBBFT : IGetData {
 
     private lateinit var mApplicationContext: Context
     private var mDatabase: DatabaseReference
+
+    lateinit var broadcastReceiver: BroadcastReceiver
 
     init {
         System.loadLibrary("hydra_android")
@@ -124,45 +142,8 @@ object CoreHBBFT : IGetData {
         initUser()
     }
 
-    fun initUser() {
-        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
-        val strUser = prefs!!.getString("CurUser", "")
-        if (strUser == null || strUser.isEmpty()) {
-            val user: User = User(
-                0,
-                DatabaseApplication.mCoreHBBFT2X.uniqueID1,
-                0.toString(),
-                "",
-                "name",
-                "nick",
-                "http://i.imgur.com/pv1tBmT.png",
-                true
-            )
-
-            val editor = prefs.edit()
-            editor.putString("CurUser", Gson().toJson(user))
-            editor.apply()
-
-            DatabaseApplication.mCurUser = user
-        } else
-            DatabaseApplication.mCurUser = Gson().fromJson(strUser, User::class.java)
-    }
-
-    fun saveUser() {
-        updateUserbyUID(uniqueID1, DatabaseApplication.mCurUser)
-        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putString("CurUser", Gson().toJson(DatabaseApplication.mCurUser))
-        editor.apply()
-    }
-
     fun setRoomName(roomname: String) {
         mRoomName = roomname
-    }
-
-    fun AddUser(uid: String, listener: IAddToContacts) {
-        //TODO implement method
-        listener.errorAddContact()
     }
 
     fun registerForPush(applicationContext: Context) {
@@ -261,8 +242,223 @@ object CoreHBBFT : IGetData {
     }
 
 
+    fun initUser() {
+        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val strUser = prefs!!.getString("CurUser", "")
+        if (strUser == null || strUser.isEmpty()) {
+            val user = User(
+                0,
+                DatabaseApplication.mCoreHBBFT2X.uniqueID1,
+                0.toString(),
+                "",
+                "name",
+                "nick",
+                "",
+                true
+            )
+
+            val editor = prefs.edit()
+            editor.putString("CurUser", Gson().toJson(user))
+            editor.apply()
+
+            DatabaseApplication.mCurUser = user
+            Conversations.getDUser(user).insert()
+        } else
+            DatabaseApplication.mCurUser = Gson().fromJson(strUser, User::class.java)
+
+        registerUpdateUserInDataBase(DatabaseApplication.mCurUser)
+    }
+
+    fun registerUpdateUserInDataBase(user: User) {
+        val queryRef = mDatabase.child("Users").child(user.uid).orderByChild("uid").equalTo(user.uid)
+        queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userToSave = Users(
+                    user.uid,
+                    user.isOnline,
+                    user.name,
+                    user.nick
+                )
+
+                for (postsnapshot in snapshot.children) {
+                    postsnapshot.key
+                    postsnapshot.ref.removeValue()
+                }
+                snapshot.ref.push().setValue(userToSave)
+                //TODO update all in database
+                Log.d(TAG, "Succes registerUpdateUserInDataBase $uniqueID1")
+            }
+        })
+    }
+
+    fun saveCurUser(user: User) {
+        updateUserbyUID(uniqueID1, user)
+        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putString("CurUser", Gson().toJson(user))
+        editor.apply()
+
+        registerUpdateUserInDataBase(user)
+    }
+
+    fun saveCurUser() {
+        updateUserbyUID(uniqueID1, DatabaseApplication.mCurUser)
+        val prefs = mApplicationContext.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putString("CurUser", Gson().toJson(DatabaseApplication.mCurUser))
+        editor.apply()
+
+        registerUpdateUserInDataBase(DatabaseApplication.mCurUser)
+    }
+
+    fun AddUser(uid: String, listener: IAddToContacts): User? {
+        val ref = mDatabase.child("Users").child(uid)
+
+        val latch = CountDownLatch(1)
+        val listObjectsOfUsers: MutableList<Users> = arrayListOf()
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val objectMap = dataSnapshot.value as HashMap<String, Any>
+                for (obj in objectMap.values) {
+                    val mapObj: Map<String, Any> = obj as Map<String, Any>
+
+                    val user = Users()
+                    user.UID = mapObj["uid"] as String
+                    user.isOnline = mapObj["online"] as Boolean
+                    user.name = mapObj["name"] as String
+                    user.nick = mapObj["nick"] as String
+
+                    listObjectsOfUsers.add(user)
+                }
+                try {
+                    latch.countDown()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        ref.addValueEventListener(postListener)
+        latch.await()
+
+        listObjectsOfUsers.distinctBy { it.UID }
+        if (listObjectsOfUsers.isEmpty())
+            listener.errorAddContact()
+        else {
+            for (user in listObjectsOfUsers) {
+                val id = Getters.getNextUserID()
+                val users = User(
+                    id,
+                    uid,
+                    id.toString(),
+                    (-1).toString(),
+                    user.name!!,
+                    user.nick!!,
+                    "",
+                    user.isOnline!!
+                )
+                Conversations.getDUser(users).insert()
+
+                // Kick off MyDownloadService to download the file
+                val intent = Intent(mApplicationContext, MyDownloadService::class.java)
+                    .putExtra(MyDownloadService.EXTRA_DOWNLOAD_USERID, user.UID)
+                    .setAction(MyDownloadService.ACTION_DOWNLOAD)
+                mApplicationContext.startService(intent)
+            }
+
+            return getLocalUser(uid)
+        }
+
+        return null
+    }
+
+    fun getUserFromLocalOrDownload(uid: String, dialog: Dialog): User {
+        val LocalUser = getLocalUser(uid)
+        if (LocalUser != null) {
+            val id = Getters.getNextUserID()
+            val user = User(
+                id,
+                uid,
+                id.toString(),
+                dialog.id,
+                LocalUser.name,
+                LocalUser.nick,
+                LocalUser.avatar,
+                LocalUser.isOnline
+            )
+
+            return user
+        } else {
+            val User = AddUser(uid, object : IAddToContacts {
+                override fun errorAddContact() {
+                }
+            })
+
+            val id = Getters.getNextUserID()
+            val user = User(
+                id,
+                uid,
+                id.toString(),
+                dialog.id,
+                User!!.name,
+                User.nick,
+                User.avatar,
+                User.isOnline
+            )
+
+            return user
+        }
+    }
+
+    fun updateAvatarInAllUserByUid(uid: String, avatarFile: File) {
+        for (user in getAllUsers(uid)) {
+            if (user.uid == uid) {
+                val us = User(
+                    user.id_,
+                    user.uid,
+                    user.id,
+                    user.idDialog,
+                    user.name,
+                    user.nick,
+                    avatarFile.path,
+                    user.isOnline
+                )
+
+                Conversations.getDUser(us).update()
+            }
+        }
+    }
+
+    fun getLocalUser(uid: String): User? {
+        for (user in getAllUsersDistinct()) {
+            if (user.uid == uid)
+                return user
+        }
+        return null
+    }
+
+
     fun unregisterUser(uid: String) {
-        //TODO implement
+        val queryRef = mDatabase.child("Users").child(uid).orderByChild("uid").equalTo(uid)
+        queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (postsnapshot in snapshot.children) {
+                    postsnapshot.key
+                    postsnapshot.ref.removeValue()
+                }
+                Log.d(TAG, "Succes unregisterUser $uniqueID1")
+            }
+        })
     }
 
     fun unregisterInDatabase(RoomName: String) {
@@ -274,7 +470,7 @@ object CoreHBBFT : IGetData {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     for (postsnapshot in snapshot.children) {
-                        val key = postsnapshot.key
+                        postsnapshot.key
                         postsnapshot.ref.removeValue()
                     }
                     Log.d(TAG, "Succes unregisterInDatabase $uniqueID1")
@@ -286,13 +482,32 @@ object CoreHBBFT : IGetData {
     }
 
     fun registerInDatabase(RoomName: String) {
-        val ref = mDatabase.child("Rooms").child(RoomName)
-        val uid = Uids()
-        uid.UID = uniqueID1
-        uid.isOnline = false
-        ref.push().setValue(uid).addOnSuccessListener { void ->
-            Log.d(TAG, "Succes registerInDatabase $uniqueID1")
-        }
+        val queryRef = mDatabase.child("Rooms").child(RoomName).orderByChild("uid").equalTo(uniqueID1)
+        queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                try {
+                    for (postsnapshot in snapshot.children) {
+                        postsnapshot.key
+                        postsnapshot.ref.removeValue()
+                    }
+                    Log.d(TAG, "Succes unregisterInDatabase $uniqueID1")
+
+                    // Add user
+                    val uid = Uids()
+                    uid.UID = uniqueID1
+                    uid.isOnline = false
+                    val ref = mDatabase.child("Rooms").child(RoomName)
+                    ref.push().setValue(uid).addOnSuccessListener {
+                        Log.d(TAG, "Succes registerInDatabase $uniqueID1")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        })
     }
 
     fun setOfflineModeToDatabase(RoomName: String) {
@@ -306,7 +521,7 @@ object CoreHBBFT : IGetData {
                 uid.UID = uniqueID1
                 uid.isOnline = false
                 for (postsnapshot in snapshot.children) {
-                    val key = postsnapshot.key
+                    postsnapshot.key
                     postsnapshot.ref.removeValue()
                 }
                 snapshot.ref.push().setValue(uid)
@@ -322,13 +537,14 @@ object CoreHBBFT : IGetData {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
+                for (postsnapshot in snapshot.children) {
+                    postsnapshot.key
+                    postsnapshot.ref.removeValue()
+                }
+
                 val uid = Uids()
                 uid.UID = uniqueID1
                 uid.isOnline = true
-                for (postsnapshot in snapshot.children) {
-                    val key = postsnapshot.key
-                    postsnapshot.ref.removeValue()
-                }
                 val ref = snapshot.ref.push()
                 ref.setValue(uid)
 
@@ -342,10 +558,52 @@ object CoreHBBFT : IGetData {
         })
     }
 
+    fun getUIDsFromDataBase(RoomName: String): MutableList<Uids> {
+        val ref = mDatabase.child("Rooms").child(RoomName)
+
+        val latch = CountDownLatch(1)
+        val listObjectsOfUIds: MutableList<Uids> = arrayListOf()
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val objectMap = dataSnapshot.value as HashMap<String, Any>
+                for (obj in objectMap.values) {
+                    val mapObj: Map<String, Any> = obj as Map<String, Any>
+                    val uids = Uids()
+                    uids.UID = mapObj["uid"] as String
+                    uids.isOnline = mapObj["online"] as Boolean
+
+                    listObjectsOfUIds.add(uids)
+                }
+                try {
+                    latch.countDown()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        ref.addValueEventListener(postListener)
+        latch.await()
+
+        listObjectsOfUIds.distinctBy { it.UID }
+        return listObjectsOfUIds
+    }
+
+    fun isSomeBodyOnline(listOfUids: List<Uids>): Boolean {
+        for (uids in listOfUids) {
+            if (uids.isOnline!!)
+                return true
+        }
+        return false
+    }
+
     fun startAllNode(RoomName: String) {
         thread {
             val listObjectsOfUIds = getUIDsFromDataBase(RoomName)
-
             val isSomebodyOnline = isSomeBodyOnline(listObjectsOfUIds)
             val cntUsers = listObjectsOfUIds.count()
 
@@ -405,47 +663,6 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun getUIDsFromDataBase(RoomName: String): MutableList<Uids> {
-        val ref = mDatabase.child("Rooms").child(RoomName)
-
-        val latch = CountDownLatch(1)
-        val listObjectsOfUIds: MutableList<Uids> = arrayListOf()
-        val postListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val objectMap = dataSnapshot.value as HashMap<String, Any>
-                for (obj in objectMap.values) {
-                    val mapObj: Map<String, Any> = obj as Map<String, Any>
-                    val uids = Uids()
-                    uids.UID = mapObj["uid"] as String
-                    uids.isOnline = mapObj["online"] as Boolean
-
-                    listObjectsOfUIds.add(uids)
-                }
-                try {
-                    latch.countDown()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        }
-        ref.addValueEventListener(postListener)
-        latch.await()
-
-        return listObjectsOfUIds
-    }
-
-    fun isSomeBodyOnline(listOfUids: List<Uids>): Boolean {
-        for (uids in listOfUids) {
-            if (uids.isOnline!!)
-                return true
-        }
-        return false
-    }
 
     fun start_node(RoomName: String) {
         setOnlineModeToDatabase(RoomName)
@@ -470,7 +687,8 @@ object CoreHBBFT : IGetData {
 
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
-                strTosend
+                strTosend,
+                uniqueID1
             )
         }
     }
@@ -486,7 +704,7 @@ object CoreHBBFT : IGetData {
         Thread.sleep(100)
         mP2PMesh?.publishAboutMe(RoomName, uniqueID2)
 
-        waitForConnect2()
+        waitForConnectWithoutSelf()
 
         mSocketWrapper!!.initSocketWrapper2X(RoomName, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
@@ -501,7 +719,8 @@ object CoreHBBFT : IGetData {
 
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
-                strTosend
+                strTosend,
+                uniqueID1
             )
 
             strTosend = ""
@@ -515,12 +734,13 @@ object CoreHBBFT : IGetData {
 
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort2}",
-                strTosend
+                strTosend,
+                uniqueID2
             )
         }
     }
 
-    fun waitForConnect2() {
+    fun waitForConnectWithoutSelf() {
         val async = GlobalScope.async {
             var ready = false
             while (!ready) {

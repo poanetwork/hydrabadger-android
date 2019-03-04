@@ -19,14 +19,11 @@ import kotlinx.android.synthetic.main.fragment_add_to_contact.*
 import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
 interface IAddToContacts {
-    fun contactAddSuccess(user: User)
-
     fun errorAddContact()
 }
 
@@ -78,10 +75,6 @@ class AddToContactsFragment : Fragment() {
             } else
                 CoreHBBFT.AddUser(contact_id_or_email.text.toString(), object :
                     IAddToContacts {
-                    override fun contactAddSuccess(user: User) {
-
-                    }
-
                     override fun errorAddContact() {
                         contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
                     }
@@ -151,10 +144,6 @@ class AddToContactsFragment : Fragment() {
 
                     CoreHBBFT.AddUser(result.contents, object :
                         IAddToContacts {
-                        override fun contactAddSuccess(user: User) {
-
-                        }
-
                         override fun errorAddContact() {
                             contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
                         }

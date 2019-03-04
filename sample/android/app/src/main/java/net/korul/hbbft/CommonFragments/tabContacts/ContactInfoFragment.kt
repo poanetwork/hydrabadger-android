@@ -1,6 +1,7 @@
 package net.korul.hbbft.CommonFragments.tabContacts
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -43,9 +44,13 @@ class ContactInfoFragment : Fragment() {
 
         contact_info_name.text = SpannableStringBuilder(curUser.name)
         contact_info_uid.text = SpannableStringBuilder(curUser.uid)
-        //TODO image set
-//                Bitmap image = BitmapFactory.decodeFile(curUser.getAvatar());
-//                contact_icon.setImageBitmap(image);
+
+        if (curUser.avatar != "") {
+            val image = BitmapFactory.decodeFile(curUser.avatar)
+            contact_icon.setImageBitmap(image)
+        } else {
+            contact_icon.setImageResource(R.drawable.ic_contact)
+        }
 
         contact_nickname.text = SpannableStringBuilder(curUser.nick)
         contact_nickname.isEnabled = false

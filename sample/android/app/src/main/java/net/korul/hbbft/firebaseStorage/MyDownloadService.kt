@@ -32,7 +32,7 @@ class MyDownloadService : MyBaseTaskService() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand:$intent:$startId")
 
-        if (ACTION_DOWNLOAD == intent.action && numOftask() == 0) {
+        if (ACTION_DOWNLOAD == intent.action) {
             // Get the path to download from the intent
             val userid = intent.getStringExtra(EXTRA_DOWNLOAD_USERID)
             downloadFromPath(userid)
@@ -48,23 +48,24 @@ class MyDownloadService : MyBaseTaskService() {
         taskStarted()
 //        showProgressNotification(getString(R.string.syncing), 0, 0)
 
-        val outputDir = this.cacheDir
-        val localFile = File.createTempFile("avatar", "jpg", outputDir)
-        storageRef.child("usersAvatars").child(userId).child("avatar.jpg").getFile(localFile).addOnSuccessListener {
+        val outputDir = this.filesDir
+        val localFile = File.createTempFile(userId, "png", outputDir)
+        storageRef.child("usersAvatars").child(userId).child("avatar.png").getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "download:SUCCESS")
 
             // Create file metadata with property to delete
             val metadata = StorageMetadata.Builder()
                 .setContentType(null)
                 .build()
+
             // Delete the metadata property
-            storageRef.child("usersAvatars").child(userId).child("avatar.jpg").updateMetadata(metadata)
+            storageRef.child("usersAvatars").child(userId).child("avatar.png").updateMetadata(metadata)
                 .addOnSuccessListener {
                 }.addOnFailureListener {
                 }
 
             // Send success broadcast with number of bytes downloaded
-            broadcastDownloadFinished(localFile, localFile.length())
+            broadcastDownloadFinished(localFile, localFile.length(), userId)
 //            showDownloadFinishedNotification(localFile.length().toInt())
 
             // Mark task completed
@@ -85,13 +86,14 @@ class MyDownloadService : MyBaseTaskService() {
      * Broadcast finished download (success or failure).
      * @return true if a running receiver received the broadcast.
      */
-    private fun broadcastDownloadFinished(file: File, bytesDownloaded: Long): Boolean {
+    private fun broadcastDownloadFinished(file: File, bytesDownloaded: Long, userId: String): Boolean {
         val success = bytesDownloaded != -1L
         val action = if (success) DOWNLOAD_COMPLETED else DOWNLOAD_ERROR
 
         val broadcast = Intent(action)
             .putExtra(EXTRA_BYTES_DOWNLOADED, bytesDownloaded)
             .putExtra(EXTRA_FILE_DOWNLOADED, file.path)
+            .putExtra(EXTRA_UID_DOWNLOADED, userId)
         return LocalBroadcastManager.getInstance(applicationContext)
             .sendBroadcast(broadcast)
     }
@@ -102,7 +104,7 @@ class MyDownloadService : MyBaseTaskService() {
 
         val broadcast = Intent(action)
             .putExtra(EXTRA_BYTES_DOWNLOADED, bytesDownloaded)
-        return LocalBroadcastManager.getInstance(applicationContext)
+        return LocalBroadcastManager.getInstance(this)
             .sendBroadcast(broadcast)
     }
 
@@ -141,6 +143,7 @@ class MyDownloadService : MyBaseTaskService() {
         const val EXTRA_DOWNLOAD_USERID = "extra_download_usserid"
         const val EXTRA_BYTES_DOWNLOADED = "extra_bytes_downloaded"
         const val EXTRA_FILE_DOWNLOADED = "extra_file_downloaded"
+        const val EXTRA_UID_DOWNLOADED = "extra_uid_downloaded"
 
         val intentFilter: IntentFilter
             get() {

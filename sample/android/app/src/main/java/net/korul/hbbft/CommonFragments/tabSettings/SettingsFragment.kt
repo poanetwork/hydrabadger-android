@@ -2,6 +2,7 @@ package net.korul.hbbft.CommonFragments.tabSettings
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -38,9 +39,12 @@ class SettingsFragment : Fragment() {
         settings_account_email.text = mCurUser.name
         settings_account_id.text = mCurUser.uid
 
-        //TODO image set
-//                Bitmap image = BitmapFactory.decodeFile(curUser.getAvatar());
-//                settings_account_icon.setImageBitmap(image);
+        if (mCurUser.avatar != "") {
+            val image = BitmapFactory.decodeFile(mCurUser.avatar)
+            settings_account_icon.setImageBitmap(image)
+        } else {
+            settings_account_icon.setImageResource(R.drawable.ic_contact)
+        }
 
         accout_info.setOnClickListener {
             val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()

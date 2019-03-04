@@ -237,7 +237,7 @@ object Getters {
         }
     }
 
-    fun getAllUsers(): Array<User> {
+    fun getAllUsersDistinct(): Array<User> {
         val users: MutableList<User> = arrayListOf()
 
         val dusers = Select()
@@ -247,6 +247,35 @@ object Getters {
         val dus = dusers.filterNotNull()
         val duss = dus.distinctBy { it.id }
         for (duser in duss) {
+            users.add(getUser(duser))
+        }
+        return users.toTypedArray()
+    }
+
+    fun getAllUsers(uid: String): Array<User> {
+        val users: MutableList<User> = arrayListOf()
+
+        val dusers = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(uid))
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
+            users.add(getUser(duser))
+        }
+        return users.toTypedArray()
+    }
+
+    fun getAllUsers(): Array<User> {
+        val users: MutableList<User> = arrayListOf()
+
+        val dusers = Select()
+            .from(DUser::class.java)
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
             users.add(getUser(duser))
         }
         return users.toTypedArray()
@@ -262,12 +291,21 @@ object Getters {
             duser.avatar = user.avatar
             duser.name = user.name
             duser.nick = user.nick
+            duser.isOnline = user.isOnline
             duser.update()
         }
     }
 
-    fun removeUser(user: User) {
-        //TODO implement
+    fun removeUserByUid(user: User) {
+        val dusers = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(user.uid))
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
+            duser.delete()
+        }
     }
 
     fun getNextUserID(): Long {

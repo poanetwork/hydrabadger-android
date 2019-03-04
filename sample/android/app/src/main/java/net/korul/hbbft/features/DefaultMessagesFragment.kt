@@ -17,6 +17,7 @@ import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_messages.*
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.DatabaseApplication.Companion.mCoreHBBFT2X
@@ -28,7 +29,6 @@ import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.conversation.Conversations
 import net.korul.hbbft.common.data.model.core.Getters
 import net.korul.hbbft.common.data.model.core.Getters.getDialog
-import net.korul.hbbft.common.data.model.core.Getters.getNextUserID
 import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.features.holder.IncomingVoiceMessageViewHolder
 import net.korul.hbbft.features.holder.OutcomingVoiceMessageViewHolder
@@ -237,24 +237,12 @@ class DefaultMessagesFragment :
                             found = true
                     }
                     if (!found) {
-                        val id = getNextUserID()
-                        val user = User(
-                            id,
-                            uid,
-                            id.toString(),
-                            mCurDialog!!.id,
-                            "name${mCurDialog!!.users.size}",
-                            "nick${mCurDialog!!.users.size}",
-                            "http://i.imgur.com/pv1tBmT.png",
-                            true
-                        )
+                        val user = CoreHBBFT.getUserFromLocalOrDownload(uid, mCurDialog!!)
                         mCurDialog!!.users.add(user)
                         Conversations.getDUser(user).insert()
-                        Conversations.getDDialog(mCurDialog!!).update()
                     }
 
                     val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
-
                     super.messagesAdapter!!.addToStart(
                         MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
                     )
