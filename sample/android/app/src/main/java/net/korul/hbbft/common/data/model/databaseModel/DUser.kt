@@ -29,4 +29,7 @@ class DUser : BaseModel() {
 
     @Column(name = "isOnline")
     var isOnline: Boolean = false
+
+    @Column(name = "isVisible")
+    var isVisible: Boolean = true
 }

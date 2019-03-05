@@ -15,7 +15,7 @@ import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.data.model.core.Getters.removeUserByUid
+import net.korul.hbbft.common.data.model.core.Getters.setInvisUserByUid
 import java.util.*
 
 
@@ -25,7 +25,7 @@ interface ClickListener {
     fun onItemLongClick(view: View, position: Int)
 }
 
-class RecyclerViewContactAdapter(
+class RecyclerViewContactAdapter (
     private val mContext: Context,
     private val mDataset: ArrayList<User>,
     private val mClickListener: ClickListener
@@ -66,7 +66,7 @@ class RecyclerViewContactAdapter(
         viewHolder.contact_remove.setOnClickListener {
             mClickListener.onItemButtonClick(it, position)
             try {
-                removeUserByUid(mDataset[position])
+                setInvisUserByUid(mDataset[position])
                 mItemManger.removeShownLayouts(viewHolder.swipeLayout)
                 mDataset.removeAt(position)
                 notifyItemRemoved(position)

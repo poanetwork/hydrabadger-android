@@ -77,7 +77,7 @@ object Getters {
         return Conversations.getUser(user!!)
     }
 
-    fun getUserbyUID(uid: String, idDialog: String): User? {
+    fun getUserbyUIDFromDialog(uid: String, idDialog: String): User? {
         val user = Select()
             .from(DUser::class.java)
             .where(DUser_Table.uid.eq(uid))
@@ -237,11 +237,12 @@ object Getters {
         }
     }
 
-    fun getAllUsersDistinct(): Array<User> {
+    fun getAllLocalUsersDistinct(): Array<User> {
         val users: MutableList<User> = arrayListOf()
 
         val dusers = Select()
             .from(DUser::class.java)
+            .where(DUser_Table.isVisible.eq(true))
             .queryList()
 
         val dus = dusers.filterNotNull()
@@ -252,7 +253,7 @@ object Getters {
         return users.toTypedArray()
     }
 
-    fun getAllUsers(uid: String): Array<User> {
+    fun getAllLocalUsers(uid: String): Array<User> {
         val users: MutableList<User> = arrayListOf()
 
         val dusers = Select()
@@ -267,7 +268,7 @@ object Getters {
         return users.toTypedArray()
     }
 
-    fun getAllUsers(): Array<User> {
+    fun getAllLocalUsers(): Array<User> {
         val users: MutableList<User> = arrayListOf()
 
         val dusers = Select()
@@ -281,7 +282,7 @@ object Getters {
         return users.toTypedArray()
     }
 
-    fun updateUserbyUID(uid: String, user: User) {
+    fun updateMetaUserbyUID(uid: String, user: User) {
         val users = Select()
             .from(DUser::class.java)
             .where(DUser_Table.uid.eq(uid))
@@ -296,7 +297,7 @@ object Getters {
         }
     }
 
-    fun removeUserByUid(user: User) {
+    fun setInvisUserByUid(user: User) {
         val dusers = Select()
             .from(DUser::class.java)
             .where(DUser_Table.uid.eq(user.uid))
@@ -304,7 +305,8 @@ object Getters {
 
         val dus = dusers.filterNotNull()
         for (duser in dus) {
-            duser.delete()
+            duser.isVisible = false
+            duser.update()
         }
     }
 

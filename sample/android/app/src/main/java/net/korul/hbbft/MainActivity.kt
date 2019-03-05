@@ -21,11 +21,10 @@ import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsUserFragment
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.broadcastReceiver
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.getLocalUser
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.saveCurUser
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT.uniqueID1
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.updateAvatarInAllUserByUid
+import net.korul.hbbft.CoreHBBFT.UserWork.getAnyLocalUserByUid
+import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
+import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
 import net.korul.hbbft.features.DefaultDialogsFragment
@@ -40,6 +39,7 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private var TAG = "HYDRABADGERTAG:MainActivity"
+    lateinit var broadcastReceiver: BroadcastReceiver
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -184,7 +184,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun initSyncSystem() {
         broadcastReceiver = object : BroadcastReceiver() {
-
             override fun onReceive(context: Context, intent: Intent) {
                 Log.d(TAG, "onReceive:$intent")
 
@@ -198,7 +197,7 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(context, "Download Avatar complete - ${avatarFile.path}", Toast.LENGTH_LONG)
                             .show()
 
-                        updateAvatarInAllUserByUid(uid, avatarFile)
+                        updateAvatarInAllLocalUserByUid(uid, avatarFile)
                     }
 
                     MyDownloadService.DOWNLOAD_ERROR -> {
@@ -209,10 +208,10 @@ class MainActivity : AppCompatActivity() {
                         val filepath = intent.getStringExtra(MyUploadService.EXTRA_FILE_URI)
                         if (filepath != null) {
                             val file = File(filepath)
-                            updateAvatarInAllUserByUid(uniqueID1, file)
+                            updateAvatarInAllLocalUserByUid(uniqueID1, file)
 
-                            mCurUser = getLocalUser(uniqueID1)!!
-                            saveCurUser()
+                            mCurUser = getAnyLocalUserByUid(uniqueID1)!!
+                            saveCurUser(mCurUser)
 
                             val myFragment =
                                 supportFragmentManager.findFragmentByTag(getString(R.string.tag_settings)) as SettingsUserFragment?

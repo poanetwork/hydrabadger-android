@@ -12,7 +12,7 @@ import com.raizlabs.android.dbflow.config.FlowManager
 import kotlinx.android.synthetic.main.dialog_emergency_delete.*
 import kotlinx.android.synthetic.main.fragment_settings_storage.*
 import net.korul.hbbft.CommonFragments.WarningFragment
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.RoomWork.unregisterInRoomInFirebase
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.core.Getters
 import net.korul.hbbft.common.data.model.coreDataBase.AppDatabase
@@ -47,7 +47,7 @@ class SettingsStorageFragment : Fragment() {
             dialog.dialog_accept_button.setOnClickListener {
                 val dialogs = Getters.getAllDialog()
                 for (dial in dialogs)
-                    CoreHBBFT.unregisterInDatabase(dial.dialogName)
+                    unregisterInRoomInFirebase(dial.dialogName)
 
                 FlowManager.getDatabase(AppDatabase::class.java).reset(context)
                 dialog.dismiss()

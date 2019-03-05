@@ -1,5 +1,6 @@
 package net.korul.hbbft.CommonFragments.tabSettings
 
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -10,13 +11,17 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.gson.Gson
 import com.raizlabs.android.dbflow.config.FlowManager
 import kotlinx.android.synthetic.main.dialog_emergency_delete.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.RoomWork.unregisterInRoomInFirebase
+import net.korul.hbbft.CoreHBBFT.UserWork.unregisterUserInFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.R
+import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.core.Getters.getAllDialog
 import net.korul.hbbft.common.data.model.coreDataBase.AppDatabase
 
@@ -34,6 +39,10 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         settings_account_name.text = mCurUser.nick
         settings_account_email.text = mCurUser.name
@@ -108,9 +117,14 @@ class SettingsFragment : Fragment() {
             dialog.dialog_accept_button.setOnClickListener {
                 val dialogs = getAllDialog()
                 for (dialog in dialogs)
-                    CoreHBBFT.unregisterInDatabase(dialog.dialogName)
+                    unregisterInRoomInFirebase(dialog.dialogName)
 
-                CoreHBBFT.unregisterUser(CoreHBBFT.uniqueID1)
+                unregisterUserInFirebase(CoreHBBFT.uniqueID1)
+
+                val prefs = CoreHBBFT.mApplicationContext.getSharedPreferences("cur_user", Application.MODE_PRIVATE)
+                prefs.edit().putString("current_user", "").apply()
+
+                DatabaseApplication.mCurUser = User(1L, "", "", "", "", "", "", true, true)
 
                 FlowManager.getDatabase(AppDatabase::class.java).reset(context)
                 val mSettings =

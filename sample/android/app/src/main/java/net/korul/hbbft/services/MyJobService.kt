@@ -11,7 +11,7 @@ class MyJobService : JobService() {
         Log.d(TAG, "Performing long running task in scheduled job")
 
 //        val latch = CountDownLatch(1)
-//        DatabaseApplication.mCoreHBBFT2X.setOfflineModeToDatabase(DatabaseApplication.mCoreHBBFT2X.mRoomName, latch)
+//        DatabaseApplication.mCoreHBBFT2X.setOfflineModeInRoomInFirebase(DatabaseApplication.mCoreHBBFT2X.mRoomName, latch)
 //        latch.await()
 
         return false

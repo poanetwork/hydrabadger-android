@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.InputType
 import android.text.SpannableStringBuilder
@@ -16,6 +17,8 @@ import kotlinx.android.synthetic.main.fragment_contact_info.*
 import net.korul.hbbft.CommonFragments.ShowBigAvatarActivity
 import net.korul.hbbft.CommonFragments.ShowBigQRActivity
 import net.korul.hbbft.CommonFragments.WarningFragment
+import net.korul.hbbft.CoreHBBFT.UserWork
+import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
 
@@ -23,6 +26,9 @@ import net.korul.hbbft.common.data.model.User
 class ContactInfoFragment : Fragment() {
 
     lateinit var curUser: User
+    var edited = false
+    var lastNick = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +69,9 @@ class ContactInfoFragment : Fragment() {
             contact_nickname.requestFocus()
             val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(contact_nickname, InputMethodManager.SHOW_IMPLICIT)
+
+            edited = true
+            lastNick = contact_nickname.text.toString()
         }
 
         action_chat.setOnClickListener {
@@ -76,7 +85,22 @@ class ContactInfoFragment : Fragment() {
         }
 
         action_back.setOnClickListener {
-            (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+
+            if(edited && lastNick != contact_nickname.text.toString()) {
+                val builder = AlertDialog.Builder(activity!!)
+                builder.setMessage(R.string.save_user_settings)
+                    .setPositiveButton(R.string.action_ok) { _, _ ->
+                        saveUser()
+                        (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+                    }
+                    .setNegativeButton(R.string.cancel) { _, _ ->
+                        (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+                    }
+                builder.create()
+                builder.show()
+            }
+            else
+                (activity as AppCompatActivity).supportFragmentManager.popBackStack()
         }
 
         contact_icon.setOnClickListener {
@@ -88,6 +112,20 @@ class ContactInfoFragment : Fragment() {
         }
     }
 
+    fun saveUser() {
+        val user = User(
+            DatabaseApplication.mCurUser.id_,
+            DatabaseApplication.mCurUser.uid,
+            DatabaseApplication.mCurUser.id,
+            DatabaseApplication.mCurUser.idDialog,
+            DatabaseApplication.mCurUser.name,
+            contact_nickname.text.toString(),
+            DatabaseApplication.mCurUser.avatar,
+            DatabaseApplication.mCurUser.isOnline
+        )
+
+        UserWork.saveCurUser(user)
+    }
     companion object {
         fun newInstance(user: User): ContactInfoFragment {
             val f = ContactInfoFragment()

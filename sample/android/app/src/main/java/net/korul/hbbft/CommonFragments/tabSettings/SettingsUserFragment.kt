@@ -21,12 +21,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_settings_account.*
 import lib.folderpicker.FolderPicker
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.saveCurUser
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.updateAvatarInAllUserByUid
+import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
+import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.firebaseStorage.MyUploadService
+import net.korul.hbbft.imageWork.ImageUtil.circleShape
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.concurrent.thread
@@ -65,7 +66,7 @@ class SettingsUserFragment : Fragment() {
         }
 
         action_back.setOnClickListener {
-            val builder = AlertDialog.Builder(context!!)
+            val builder = AlertDialog.Builder(activity!!)
             builder.setMessage(R.string.save_user_settings)
                 .setPositiveButton(R.string.action_ok) { _, _ ->
                     saveUser()
@@ -75,6 +76,7 @@ class SettingsUserFragment : Fragment() {
                     (activity as AppCompatActivity).supportFragmentManager.popBackStack()
                 }
             builder.create()
+            builder.show()
         }
 
         action_confirm.setOnClickListener {
@@ -87,8 +89,7 @@ class SettingsUserFragment : Fragment() {
         account_id.text = SpannableStringBuilder(mCurUser.uid)
 
         account_icon.setOnClickListener {
-            verifyStoragePermissions(activity!!)
-            pickFile()
+            verifyStoragePermissionsAndPickFile(activity!!)
         }
 
 
@@ -139,12 +140,14 @@ class SettingsUserFragment : Fragment() {
                         val localFile = File.createTempFile(mCurUser.uid, "png", outputDir)
 
                         val bitmap = BitmapFactory.decodeFile(fileLocation)
-                        val resized = Bitmap.createScaledBitmap(bitmap, 150, 150, true)
+                        val resized = Bitmap.createScaledBitmap(bitmap, 250, 250, true)
+                        val uImage = circleShape(resized)
+
                         val out = FileOutputStream(localFile)
-                        resized.compress(Bitmap.CompressFormat.PNG, 80, out) //100-best quality
+                        uImage.compress(Bitmap.CompressFormat.PNG, 90, out) //100-best quality
                         out.close()
 
-                        updateAvatarInAllUserByUid(mCurUser.uid, localFile)
+                        updateAvatarInAllLocalUserByUid(mCurUser.uid, localFile)
 
                         val uploadUri = Uri.fromFile(localFile)
                         context!!.startService(
@@ -164,6 +167,8 @@ class SettingsUserFragment : Fragment() {
             pickFile()
         }
     }
+
+
 
     fun dismissProgressBar() {
         handle.post {
@@ -186,18 +191,20 @@ class SettingsUserFragment : Fragment() {
         saveCurUser(user)
     }
 
-    fun verifyStoragePermissions(activity: Activity) {
+    fun verifyStoragePermissionsAndPickFile(activity: Activity) {
         // Check if we have write permission
         val permission =
             ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                activity,
+            requestPermissions(
                 PERMISSIONS_STORAGE,
                 REQUEST_EXTERNAL_STORAGE
             )
+        }
+        else {
+            pickFile()
         }
     }
 

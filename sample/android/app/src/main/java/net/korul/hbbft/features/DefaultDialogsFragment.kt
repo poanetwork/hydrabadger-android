@@ -12,8 +12,8 @@ import android.view.ViewGroup
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_dialogs.*
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.getUserFromLocalOrDownload
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
@@ -194,12 +194,12 @@ class DefaultDialogsFragment :
                             found = true
                     }
                     if (!found) {
-                        val user = getUserFromLocalOrDownload(uid, dialog)
+                        val user = getUserFromLocalOrDownloadFromFirebase(uid, dialog.id)
                         dialog.users.add(user)
                         Conversations.getDUser(user).insert()
                     }
 
-                    val user = Getters.getUserbyUID(uid, dialog.id)
+                    val user = Getters.getUserbyUIDFromDialog(uid, dialog.id)
                     val mess = MessagesFixtures.setNewMessage(mes, dialog, user!!)
 
                     dialog.unreadCount++

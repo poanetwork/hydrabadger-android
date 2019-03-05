@@ -121,7 +121,7 @@ abstract class DemoMessagesFragment : Fragment(),
                 AppUtils.showToast(context!!, R.string.copied_message, true)
             }
             R.id.action_online -> {
-//                DatabaseApplication.mCoreHBBFT2X.setOfflineModeToDatabase(DatabaseApplication.mCoreHBBFT2X.mRoomName)
+//                DatabaseApplication.mCoreHBBFT2X.setOfflineModeInRoomInFirebase(DatabaseApplication.mCoreHBBFT2X.mRoomName)
             }
             R.id.action_startALL -> {
                 Handler().post {

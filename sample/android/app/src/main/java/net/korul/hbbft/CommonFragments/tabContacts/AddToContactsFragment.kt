@@ -18,6 +18,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.android.synthetic.main.fragment_add_to_contact.*
 import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.R
 import java.io.File
 import java.io.FileOutputStream
@@ -65,15 +66,14 @@ class AddToContactsFragment : Fragment() {
         }
 
         save_qr_code.setOnClickListener {
-            verifyStoragePermissions(activity!!)
-            onSaveQRCode()
+            verifyStoragePermissionsAndSaveQRCode(activity!!)
         }
 
         button_add_contact.setOnClickListener {
             if (contact_id_or_email.text.toString().isEmpty()) {
                 contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
             } else
-                CoreHBBFT.AddUser(contact_id_or_email.text.toString(), object :
+                getUserFromLocalOrDownloadFromFirebase(contact_id_or_email.text.toString(), object :
                     IAddToContacts {
                     override fun errorAddContact() {
                         contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
@@ -89,18 +89,20 @@ class AddToContactsFragment : Fragment() {
     }
 
 
-    fun verifyStoragePermissions(activity: Activity) {
+    fun verifyStoragePermissionsAndSaveQRCode(activity: Activity) {
         // Check if we have write permission
         val permission =
             ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                activity,
+            requestPermissions(
                 PERMISSIONS_STORAGE,
                 REQUEST_EXTERNAL_STORAGE
             )
+        }
+        else {
+            onSaveQRCode()
         }
     }
 
@@ -142,7 +144,7 @@ class AddToContactsFragment : Fragment() {
                 } else {
                     Toast.makeText(activity, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
 
-                    CoreHBBFT.AddUser(result.contents, object :
+                    getUserFromLocalOrDownloadFromFirebase(result.contents, object :
                         IAddToContacts {
                         override fun errorAddContact() {
                             contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)

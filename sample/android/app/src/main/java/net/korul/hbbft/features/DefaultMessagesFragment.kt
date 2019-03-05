@@ -17,8 +17,8 @@ import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_messages.*
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.DatabaseApplication.Companion.mCoreHBBFT2X
 import net.korul.hbbft.R
@@ -237,12 +237,12 @@ class DefaultMessagesFragment :
                             found = true
                     }
                     if (!found) {
-                        val user = CoreHBBFT.getUserFromLocalOrDownload(uid, mCurDialog!!)
+                        val user = getUserFromLocalOrDownloadFromFirebase(uid, mCurDialog!!.id)
                         mCurDialog!!.users.add(user)
                         Conversations.getDUser(user).insert()
                     }
 
-                    val user = Getters.getUserbyUID(uid, mCurDialog!!.id)
+                    val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
                     super.messagesAdapter!!.addToStart(
                         MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
                     )
@@ -309,7 +309,7 @@ class DefaultMessagesFragment :
         super.messagesAdapter!!.setDateHeadersFormatter(this)
         super.messagesAdapter!!.registerViewClickListener(
             R.id.messageUserAvatar
-        ) { view, message ->
+        ) { _, message ->
             AppUtils.showToast(
                 context!!,
                 message.user.name + " avatar click",

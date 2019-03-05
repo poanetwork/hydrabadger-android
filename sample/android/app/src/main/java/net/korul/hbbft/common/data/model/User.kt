@@ -11,7 +11,8 @@ class User(
     private val name: String,
     private val nick: String,
     private val avatar: String,
-    val isOnline: Boolean
+    val isOnline: Boolean,
+    val isVisible: Boolean = true
 ) :
     IUser {
 

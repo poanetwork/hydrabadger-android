@@ -99,7 +99,8 @@ class Conversations {
                 duser.name,
                 duser.nick,
                 duser.avatar,
-                duser.isOnline
+                duser.isOnline,
+                duser.isVisible
             )
         }
 
@@ -112,6 +113,7 @@ class Conversations {
             duser.nick = user.nick
             duser.avatar = user.avatar
             duser.isOnline = user.isOnline
+            duser.isVisible = user.isVisible
 
             return duser
         }
