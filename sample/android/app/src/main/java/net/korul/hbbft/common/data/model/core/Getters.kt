@@ -53,6 +53,25 @@ object Getters {
         return dialogs
     }
 
+    fun getAllDialogsName(): MutableList<String> {
+        val ddialogs = Select()
+            .from(DDialog::class.java)
+            .queryList()
+
+        val dialogs: MutableList<Dialog> = arrayListOf()
+        for (ddialog in ddialogs)
+            dialogs.add(getDialog(ddialog))
+
+        val distDialogs = dialogs.distinctBy { it.dialogName }
+        val listDiagNames: MutableList<String> = mutableListOf()
+
+        for (diag in distDialogs) {
+            listDiagNames.add(diag.dialogName)
+        }
+
+        return listDiagNames
+    }
+
     fun getUsers(id: String): MutableList<User?> {
         val users: MutableList<User?> = arrayListOf()
 
@@ -77,7 +96,7 @@ object Getters {
         return Conversations.getUser(user!!)
     }
 
-    fun getUserbyUID(uid: String, idDialog: String): User? {
+    fun getUserbyUIDFromDialog(uid: String, idDialog: String): User? {
         val user = Select()
             .from(DUser::class.java)
             .where(DUser_Table.uid.eq(uid))
@@ -234,6 +253,79 @@ object Getters {
         else {
             val ind = list.maxBy { it.id }!!.id
             (ind + 1L)
+        }
+    }
+
+    fun getAllLocalUsersDistinct(): Array<User> {
+        val users: MutableList<User> = arrayListOf()
+
+        val dusers = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.isVisible.eq(true))
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        val duss = dus.distinctBy { it.uid }
+        for (duser in duss) {
+            users.add(getUser(duser))
+        }
+        return users.toTypedArray()
+    }
+
+    fun getAllLocalUsers(uid: String): Array<User> {
+        val users: MutableList<User> = arrayListOf()
+
+        val dusers = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(uid))
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
+            users.add(getUser(duser))
+        }
+        return users.toTypedArray()
+    }
+
+    fun getAllLocalUsers(): Array<User> {
+        val users: MutableList<User> = arrayListOf()
+
+        val dusers = Select()
+            .from(DUser::class.java)
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
+            users.add(getUser(duser))
+        }
+        return users.toTypedArray()
+    }
+
+    fun updateMetaUserbyUID(uid: String, user: User) {
+        val users = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(uid))
+            .queryList()
+
+        for (duser in users) {
+            duser.avatar = user.avatar
+            duser.name = user.name
+            duser.nick = user.nick
+            duser.isOnline = user.isOnline
+            duser.update()
+        }
+    }
+
+    fun setInvisUserByUid(user: User) {
+        val dusers = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(user.uid))
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
+            duser.isVisible = false
+            duser.update()
         }
     }
 

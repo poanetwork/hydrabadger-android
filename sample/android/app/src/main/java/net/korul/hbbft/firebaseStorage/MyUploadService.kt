@@ -8,11 +8,11 @@ import android.os.Build
 import android.os.IBinder
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
-import net.korul.hbbft.firebaseStorage.MyBaseTaskService
 import java.io.File
 
 /**
@@ -38,7 +38,7 @@ class MyUploadService : MyBaseTaskService() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand:$intent:$startId")
-        if (ACTION_UPLOAD == intent.action && numOftask() == 0) {
+        if (ACTION_UPLOAD == intent.action) {
             val fileUri = intent.getParcelableExtra<Uri>(EXTRA_FILE_URI)
             val userId = intent.getStringExtra(EXTRA_USER_ID)
 
@@ -70,9 +70,9 @@ class MyUploadService : MyBaseTaskService() {
         // [END_EXCLUDE]
 
         // [START get_child_ref]
-        // Get a reference to store file at photos/<FILENAME>.jpg
+        // Get a reference to store file at photos/<FILENAME>.png
         val photoRef = storageRef.child("usersAvatars").child(userId)
-            .child("avatar.jpg")
+            .child("avatar.png")
         // [END get_child_ref]
 
         // Upload file to Firebase Storage
@@ -94,7 +94,7 @@ class MyUploadService : MyBaseTaskService() {
             Log.d(TAG, "uploadFromUri: getDownloadUri success")
 
             // update lastmoficate to local file
-            storageRef.child("usersAvatars").child(userId).child("avatar.jpg").metadata.addOnSuccessListener {
+            storageRef.child("usersAvatars").child(userId).child("avatar.png").metadata.addOnSuccessListener {
                 try {
                     val lastUpadte = it.updatedTimeMillis
                     val juri = java.net.URI(fileUri.toString())
@@ -107,7 +107,9 @@ class MyUploadService : MyBaseTaskService() {
             }
 
             // [START_EXCLUDE]
-            broadcastUploadFinished(downloadUri, fileUri)
+            val juri = java.net.URI(fileUri.toString())
+            val file = File(juri)
+            broadcastUploadFinished(downloadUri, file.path)
 //            showUploadFinishedNotification(downloadUri, fileUri)
             taskCompleted()
             // [END_EXCLUDE]
@@ -116,7 +118,7 @@ class MyUploadService : MyBaseTaskService() {
             Log.w(TAG, "uploadFromUri:onFailure", exception)
 
             // [START_EXCLUDE]
-            broadcastUploadFinished(null, fileUri)
+            broadcastUploadFinished(null, null)
 //            showUploadFinishedNotification(null, fileUri)
             taskCompleted()
             // [END_EXCLUDE]
@@ -128,7 +130,7 @@ class MyUploadService : MyBaseTaskService() {
      * Broadcast finished upload (success or failure).
      * @return true if a running receiver received the broadcast.
      */
-    private fun broadcastUploadFinished(downloadUrl: Uri?, fileUri: Uri?): Boolean {
+    private fun broadcastUploadFinished(downloadUrl: Uri?, fileUri: String?): Boolean {
         val success = downloadUrl != null
 
         val action = if (success) UPLOAD_COMPLETED else UPLOAD_ERROR
@@ -136,7 +138,7 @@ class MyUploadService : MyBaseTaskService() {
         val broadcast = Intent(action)
             .putExtra(EXTRA_DOWNLOAD_URL, downloadUrl)
             .putExtra(EXTRA_FILE_URI, fileUri)
-        return LocalBroadcastManager.getInstance(applicationContext)
+        return LocalBroadcastManager.getInstance(this)
             .sendBroadcast(broadcast)
     }
 

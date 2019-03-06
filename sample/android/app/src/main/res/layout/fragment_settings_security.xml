@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
+              android:id="@+id/main_layout" android:fitsSystemWindows="true"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+    <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
+                    android:layout_height="?actionBarSize" style="@style/Toolbar">
+        <include android:id="@+id/action_back" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                 android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
+                 android:layout_alignParentBottom="true" layout="@layout/toolbar_button_back"/>
+        <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/settings_security_options" android:layout_centerHorizontal="true"
+                  android:layout_centerVertical="true" style="@style/toolbar_not_caps_text"/>
+    </RelativeLayout>
+    <ScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" style="@style/Screen">
+            <LinearLayout android:orientation="horizontal" android:id="@+id/security_lock_code"
+                          android:visibility="visible" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_pincode"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/settings_screen_lock_code"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/settings_black_list"
+                          android:visibility="gone" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_black_list"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/settings_edit_black_list"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/security_password"
+                          android:layout_width="fill_parent" android:layout_height="wrap_content"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_key_password"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/settings_change_your_password"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/devices" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="24.0dip"
+                           android:layout_height="wrap_content" android:scaleType="centerInside"
+                           app:srcCompat="@drawable/ic_devices"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/settings_devices"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/online_status" android:visibility="gone"
+                          android:layout_width="fill_parent" android:layout_height="wrap_content"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="24.0dip"
+                           android:layout_height="wrap_content" android:scaleType="centerInside"
+                           app:srcCompat="@drawable/ic_online_status"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/settings_security_online_status"
+                                                             style="@style/SubTitleText.BigMargin"/>
+                <android.support.v7.widget.SwitchCompat android:id="@+id/switch_contact_notification"
+                                                        android:layout_width="fill_parent"
+                                                        android:layout_height="wrap_content" android:checked="true"
+                                                        style="@style/SwitchCyclops"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

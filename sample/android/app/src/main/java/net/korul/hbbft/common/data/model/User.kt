@@ -2,17 +2,17 @@ package net.korul.hbbft.common.data.model
 
 import com.stfalcon.chatkit.commons.models.IUser
 
-/*
- * Created by troy379 on 04.04.17.
- */
+
 class User(
     var id_: Long = 0,
     var uid: String,
     private var id: String,
     var idDialog: String,
     private val name: String,
+    private val nick: String,
     private val avatar: String,
-    val isOnline: Boolean
+    val isOnline: Boolean,
+    val isVisible: Boolean = true
 ) :
     IUser {
 
@@ -26,6 +26,10 @@ class User(
 
     override fun getName(): String {
         return name
+    }
+
+    override fun getNick(): String {
+        return nick
     }
 
     override fun getAvatar(): String {

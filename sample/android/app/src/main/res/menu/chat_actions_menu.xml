@@ -7,36 +7,12 @@
             app:showAsAction="always"
             android:title="@string/status"/>
 
-    <!--<item-->
-            <!--android:id="@+id/clear"-->
-            <!--android:icon="@drawable/clear"-->
-            <!--app:showAsAction="always"-->
-            <!--android:title="@string/clear"/>-->
-
     <item
             android:id="@+id/action_startALL"
             android:icon="@mipmap/start"
             app:showAsAction="always"
             android:title="@string/start"/>
 
-
-    <!--<item-->
-            <!--android:id="@+id/action_1x"-->
-            <!--android:icon="@mipmap/ic_1x"-->
-            <!--app:showAsAction="always"-->
-            <!--android:title="@string/start_1x"/>-->
-
-    <!--<item-->
-            <!--android:id="@+id/action_2x"-->
-            <!--android:icon="@mipmap/ic_2x"-->
-            <!--app:showAsAction="always"-->
-            <!--android:title="@string/start_2x"/>-->
-
-    <!--<item-->
-            <!--android:id="@+id/action_3x"-->
-            <!--android:icon="@mipmap/ic_3x"-->
-            <!--app:showAsAction="always"-->
-            <!--android:title="@string/start_3x"/>-->
 
     <item
             android:id="@+id/action_delete"

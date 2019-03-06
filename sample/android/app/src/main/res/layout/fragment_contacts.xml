@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+    <android.support.constraint.ConstraintLayout android:layout_gravity="fill" android:id="@+id/toolbar"
+                                                 android:layout_width="fill_parent"
+                                                 android:layout_height="?actionBarSize"
+                                                 app:layout_constraintStart_toStartOf="parent" style="@style/Toolbar">
+        <RelativeLayout android:id="@+id/contacts_manager" android:layout_width="fill_parent"
+                        android:layout_height="fill_parent" app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <include android:id="@+id/action_add_contact" android:layout_width="wrap_content"
+                     android:layout_height="wrap_content" android:layout_alignParentLeft="true"
+                     android:layout_alignParentTop="true" android:layout_alignParentBottom="true"
+                     layout="@layout/toolbar_button_add_to_contact"/>
+            <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:text="@string/contact_title"
+                      android:layout_centerHorizontal="true" android:layout_centerVertical="true"
+                      style="@style/toolbar_not_caps_text"/>
+            <include android:id="@+id/action_search_contact" android:layout_width="wrap_content"
+                     android:layout_height="wrap_content" android:layout_alignParentTop="true"
+                     android:layout_alignParentRight="true" android:layout_alignParentBottom="true"
+                     layout="@layout/toolbar_button_search"/>
+        </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
+    <android.support.constraint.ConstraintLayout android:id="@+id/constraint_contacts"
+                                                 android:layout_width="fill_parent"
+                                                 android:layout_height="fill_parent" android:layout_below="@id/toolbar">
+        <LinearLayout android:orientation="vertical" android:id="@+id/contacts_frame" android:layout_width="fill_parent"
+                      android:layout_height="fill_parent" app:layout_constraintEnd_toEndOf="parent"
+                      app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <RelativeLayout android:id="@+id/contact_request_panel" android:paddingLeft="@dimen/menu_margin_16"
+                            android:paddingRight="@dimen/menu_margin_16" android:visibility="gone"
+                            android:layout_width="fill_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="16.0dip" android:weightSum="100.0" style="@style/Clicked">
+                <android.support.v7.widget.AppCompatTextView android:id="@+id/contact_request"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/contact_request"
+                                                             android:layout_centerVertical="true"
+                                                             style="@style/TitleText"/>
+                <ImageView android:id="@+id/contact_request_icon" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" android:layout_alignParentRight="true"
+                           android:layout_centerVertical="true" app:srcCompat="@drawable/ic_check_down"/>
+            </RelativeLayout>
+            <ListView android:id="@+id/contact_request_list" android:visibility="gone"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" android:divider="@null"/>
+            <View android:id="@+id/contact_request_divider" android:visibility="gone"
+                  android:layout_marginTop="@dimen/menu_margin_16" style="@style/Divider"/>
+            <android.support.v7.widget.RecyclerView android:id="@+id/contacts_list" android:layout_width="fill_parent"
+                                                    android:layout_height="fill_parent" android:divider="@null"
+                                                    style="@style/ScrollBar"/>
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+</RelativeLayout>

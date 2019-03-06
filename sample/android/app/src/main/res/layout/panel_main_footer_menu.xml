@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+    <RelativeLayout android:background="?theme_background" android:layout_width="fill_parent"
+                    android:layout_height="56.0dip">
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent"
+                      android:layout_height="56.0dip" android:weightSum="5.0" style="@style/Footer">
+            <LinearLayout android:orientation="vertical" android:id="@+id/item_contacts" android:paddingTop="4.0dip"
+                          android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center" android:id="@+id/item_contacts_image"
+                           android:paddingLeft="10.0dip" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_contacts"/>
+                <TextView android:gravity="center" android:layout_gravity="center" android:id="@+id/item_contacts_text"
+                          android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:text="@string/item_contacts" style="@style/tab_text_unactive"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:id="@+id/item_chats" android:paddingTop="4.0dip"
+                          android:focusable="true" android:clickable="true" android:layout_width="0.0dip"
+                          android:layout_height="fill_parent" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center" android:id="@+id/item_chats_image"
+                           android:paddingLeft="10.0dip" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_chats"/>
+                <TextView android:layout_gravity="center" android:id="@+id/item_chats_text"
+                          android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:text="@string/item_chats" style="@style/tab_text_unactive"/>
+            </LinearLayout>
+            <ImageView android:layout_gravity="center" android:layout_width="0.0dip"
+                       android:layout_height="wrap_content" android:layout_weight="1.0"/>
+            <LinearLayout android:orientation="vertical" android:id="@+id/item_report" android:paddingTop="4.0dip"
+                          android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center"
+                           android:id="@+id/item_report_image"
+                           android:paddingLeft="10.0dip"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           app:srcCompat="@drawable/ic_strichka"/>
+                <TextView android:layout_gravity="center" android:id="@+id/item_report_text"
+                          android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:text="@string/item_feed" style="@style/tab_text_unactive"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:id="@+id/item_settings" android:paddingTop="8.0dip"
+                          android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center" android:id="@+id/item_settings_image"
+                           android:layout_width="wrap_content" android:layout_height="wrap_content"
+                           app:srcCompat="@drawable/ic_settings"/>
+                <TextView android:layout_gravity="center" android:id="@+id/item_settings_text"
+                          android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:text="@string/settings_mini" style="@style/tab_text_unactive"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

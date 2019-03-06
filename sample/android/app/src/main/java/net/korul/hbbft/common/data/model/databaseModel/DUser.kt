@@ -21,9 +21,15 @@ class DUser : BaseModel() {
     @Column(name = "name")
     var name: String = ""
 
+    @Column(name = "nick")
+    var nick: String = ""
+
     @Column(name = "avatar")
     var avatar: String = ""
 
     @Column(name = "isOnline")
     var isOnline: Boolean = false
+
+    @Column(name = "isVisible")
+    var isVisible: Boolean = true
 }

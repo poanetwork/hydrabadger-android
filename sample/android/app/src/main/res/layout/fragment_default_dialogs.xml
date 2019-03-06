@@ -1,0 +1,34 @@
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/windowBackground"
+        android:theme="?attr/actionBarTheme"
+        android:minHeight="?attr/actionBarSize">
+
+    <com.stfalcon.chatkit.dialogs.DialogsList
+            android:id="@+id/dialogsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:dialogMessageTextColor="?attr/message_text_color"
+            app:dialogTitleTextColor="?attr/message_text_color">
+    </com.stfalcon.chatkit.dialogs.DialogsList>
+
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:tint="@android:color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            app:backgroundTint="@color/colorPrimary"
+            app:fabSize="normal"
+            android:scaleType="fitCenter"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginStart="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:foreground="@android:drawable/ic_input_add" android:visibility="gone"/>
+
+</RelativeLayout>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="?dialog_background"
+                  android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <TextView android:id="@+id/dialog_invite_contact_title"
+                  android:paddingLeft="@dimen/dialog_item_padding_horizontal" android:paddingTop="12.0dip"
+                  android:paddingRight="@dimen/dialog_item_padding_horizontal" android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" android:text="@string/contact_add_title"
+                  style="@style/TextView.TitleText"/>
+        <View style="@style/Divider.Title"/>
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent"
+                      android:layout_height="fill_parent" android:weightSum="100.0">
+            <android.support.v7.widget.CardView android:id="@+id/dialog_invite_contact_by_email"
+                                                android:layout_width="128.0dip" android:layout_height="128.0dip"
+                                                android:layout_weight="50.0" style="@style/CardButton">
+                <ImageView android:layout_gravity="center" android:id="@+id/imageView2"
+                           android:layout_width="wrap_content" android:layout_height="wrap_content"
+                           app:srcCompat="@drawable/ic_add_by_email_v2"/>
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView android:id="@+id/dialog_invite_contact_by_id"
+                                                android:layout_width="128.0dip" android:layout_height="128.0dip"
+                                                android:layout_weight="50.0" style="@style/CardButton">
+                <ImageView android:layout_gravity="center" android:id="@+id/imageView3"
+                           android:layout_width="wrap_content" android:layout_height="wrap_content"
+                           app:srcCompat="@drawable/ic_add_by_id_v2"/>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent"
+                      android:layout_height="fill_parent" android:weightSum="100.0">
+            <android.support.v7.widget.CardView android:id="@+id/dialog_invite_contact_by_qr"
+                                                android:layout_width="128.0dip" android:layout_height="128.0dip"
+                                                android:layout_weight="50.0" style="@style/CardButton">
+                <ImageView android:layout_gravity="center" android:id="@+id/imageView4"
+                           android:layout_width="wrap_content" android:layout_height="wrap_content"
+                           app:srcCompat="@drawable/ic_add_by_qr_v2"/>
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView android:id="@+id/dialog_invite_contact_by_nearby"
+                                                android:layout_width="128.0dip" android:layout_height="128.0dip"
+                                                android:layout_weight="50.0" style="@style/CardButton">
+                <ImageView android:layout_gravity="center" android:id="@+id/imageView5"
+                           android:layout_width="wrap_content" android:layout_height="wrap_content"
+                           app:srcCompat="@drawable/ic_add_by_nearby_v2"/>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+        <View style="@style/Divider"/>
+        <TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+                  android:layout_marginLeft="16.0dip" android:layout_marginTop="8.0dip"
+                  android:layout_marginRight="24.0dip" android:layout_marginBottom="8.0dip"
+                  android:text="@string/contact_add_hint" style="@style/TextView.Text"/>
+    </LinearLayout>
+</ScrollView>

@@ -15,7 +15,7 @@ foreigner_class!(class Session {
 
     method Session::send_message(&self, str1: String);
 
-    method Session::start_node(&self, ipport_string_source: String, ipports_string_remote: String);
+    method Session::start_node(&self, ipport_string_source: String, ipports_string_remote: String, uid: String);
 
     method Session::subscribe(&mut self, _: Box<OnEvent>);
     method Session::after_subscribe(&'static mut self);

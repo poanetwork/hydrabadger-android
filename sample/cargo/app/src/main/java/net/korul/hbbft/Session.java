@@ -16,11 +16,11 @@ public final class Session {
     }
     private static native void do_send_message(long me, String a0) ;
 
-    public final void start_node(@NonNull String a0, @NonNull String a1)  {
+    public final void start_node(@NonNull String a0, @NonNull String a1, @NonNull String a2)  {
 
-        do_start_node(mNativeObj, a0, a1);
+        do_start_node(mNativeObj, a0, a1, a2);
     }
-    private static native void do_start_node(long me, String a0, String a1) ;
+    private static native void do_start_node(long me, String a0, String a1, String a2) ;
 
     public final void subscribe(@NonNull MyObserver a0)  {
 

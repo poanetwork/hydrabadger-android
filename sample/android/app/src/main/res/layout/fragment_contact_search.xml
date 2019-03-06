@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+    <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
+                    android:layout_height="?actionBarSize" app:layout_constraintStart_toStartOf="parent"
+                    style="@style/Toolbar">
+        <RelativeLayout android:id="@+id/search_manager" android:background="?search_background"
+                        android:layout_width="fill_parent" android:layout_height="fill_parent"
+                        android:layout_margin="4.0dip" android:animateLayoutChanges="true">
+            <ImageView android:id="@+id/action_search_contact" android:layout_width="wrap_content"
+                       android:layout_height="wrap_content" android:layout_marginLeft="11.0dip"
+                       android:layout_marginRight="11.0dip" android:layout_centerVertical="true"
+                       app:srcCompat="@drawable/ic_search"/>
+            <include android:id="@+id/action_search_close" android:layout_width="wrap_content"
+                     android:layout_height="wrap_content" android:layout_alignParentTop="true"
+                     android:layout_alignParentRight="true" android:layout_alignParentBottom="true"
+                     layout="@layout/button_close"/>
+            <EditText android:id="@+id/search_query" android:background="@android:color/transparent"
+                      android:focusable="true" android:layout_width="fill_parent" android:layout_height="fill_parent"
+                      android:maxLines="1" android:layout_toLeftOf="@id/action_search_close"
+                      android:layout_toRightOf="@id/action_search_contact" android:inputType="text"
+                      android:imeOptions="actionSearch|flagNoExtractUi"/>
+        </RelativeLayout>
+    </RelativeLayout>
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+                  android:layout_below="@id/toolbar">
+        <android.support.v7.widget.AppCompatTextView android:id="@+id/contacts_search_result_total"
+                                                     android:layout_width="wrap_content"
+                                                     android:layout_height="wrap_content"
+                                                     android:layout_marginLeft="@dimen/menu_margin_16"
+                                                     android:layout_marginTop="@dimen/menu_margin_16"
+                                                     style="@style/TitleText"/>
+        <ListView android:id="@+id/contacts_search_result_list" android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" android:divider="@null"/>
+    </LinearLayout>
+</RelativeLayout>

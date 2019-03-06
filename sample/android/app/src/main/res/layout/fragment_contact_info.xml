@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+    <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
+                    android:layout_height="?actionBarSize" app:layout_constraintStart_toStartOf="parent"
+                    style="@style/Toolbar">
+        <include android:id="@+id/action_back" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                 android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
+                 android:layout_alignParentBottom="true" layout="@layout/toolbar_button_back"/>
+        <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/account_data_title" android:layout_centerHorizontal="true"
+                  android:layout_centerVertical="true" style="@style/toolbar_not_caps_text"/>
+        <include android:id="@+id/action_chat" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                 android:layout_alignParentTop="true" android:layout_alignParentRight="true"
+                 android:layout_alignParentBottom="true" layout="@layout/toolbar_button_chat"/>
+    </RelativeLayout>
+    <ScrollView android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" style="@style/Screen">
+            <ImageView android:layout_gravity="center_horizontal" android:id="@+id/contact_icon"
+                       android:layout_width="@dimen/avatar_icon_size_156"
+                       android:layout_height="@dimen/avatar_icon_size_156" app:srcCompat="@drawable/ic_contact"/>
+            <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_32"
+                          android:visibility="visible">
+                <RelativeLayout android:orientation="vertical" android:id="@+id/contact_nickname_panel"
+                                android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <TextView android:gravity="center_vertical" android:id="@+id/contact_info_hint"
+                              android:layout_width="wrap_content" android:layout_height="wrap_content"
+                              android:text="@string/account_nickname" style="@style/contact_info_hint"/>
+                    <ImageView android:id="@+id/edit_nickname" android:layout_width="56.0dip"
+                               android:layout_height="56.0dip" android:scaleType="center"
+                               android:layout_below="@id/contact_info_hint" android:layout_alignParentRight="true"
+                               app:srcCompat="@drawable/ic_pencil" style="@style/JustClicked"/>
+                    <EditText android:id="@+id/contact_nickname" android:layout_width="fill_parent"
+                              android:textIsSelectable="true"
+                              android:layout_height="wrap_content" android:layout_marginTop="7.0dip"
+                              android:maxLines="1" android:maxLength="35" android:layout_toLeftOf="@id/edit_nickname"
+                              android:layout_below="@id/contact_info_hint" android:inputType="text"
+                              android:imeOptions="flagNoExtractUi" style="@style/EditText.Fragments"
+                              android:layout_toStartOf="@+id/edit_nickname" android:layout_marginEnd="1dp"/>
+                </RelativeLayout>
+                <TextView android:gravity="center_vertical" android:layout_width="wrap_content"
+                          android:layout_height="wrap_content" android:text="@string/account_name"
+                          style="@style/contact_info_hint"/>
+                <TextView android:gravity="center_vertical" android:id="@+id/contact_info_name"
+                          android:layout_width="fill_parent" android:layout_height="wrap_content"
+                          android:textIsSelectable="true"
+                          style="@style/EditText.Settings"/>
+                <TextView android:gravity="center_vertical" android:layout_width="match_parent"
+                          android:layout_height="wrap_content" android:text="@string/uid"
+                          style="@style/contact_info_hint" android:layout_marginTop="@dimen/dimen_5dp"/>
+                <TextView android:gravity="center_vertical" android:id="@+id/contact_info_uid"
+                          android:textIsSelectable="true"
+                          android:layout_width="match_parent" android:layout_height="wrap_content"
+                          style="@style/EditText.Settings"/>
+            </LinearLayout>
+            <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/menu_margin_16" android:weightSum="100.0"
+                            android:visibility="gone">
+                <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/notifications"
+                                                             android:layout_centerVertical="true"
+                                                             style="@style/TitleText"/>
+                <android.support.v7.widget.SwitchCompat android:id="@+id/switch_contact_notification"
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content" android:checked="true"
+                                                        android:layout_alignParentRight="true"
+                                                        android:layout_centerVertical="true"
+                                                        style="@style/SwitchCyclops"/>
+            </RelativeLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/account_generate_qr"
+                          android:layout_width="match_parent" android:layout_height="match_parent"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_qr_code"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/account_generate_qr_code"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_2_hour"
+                          android:visibility="gone" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_clock_2_hours"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/notification_mute_2_hours"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_6_hour"
+                          android:visibility="gone" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_clock_6_hours"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/notification_mute_6_hours"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_1_day"
+                          android:visibility="gone"
+                          android:layout_width="fill_parent" android:layout_height="wrap_content"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_clock_1_day"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/notification_mute_1_day"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <View android:visibility="gone" style="@style/Divider.Margin"/>
+            <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_16"
+                          android:visibility="gone">
+                <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/options" style="@style/TitleText"/>
+                <LinearLayout android:orientation="horizontal" android:id="@+id/contact_info_share"
+                              android:visibility="gone" android:layout_width="fill_parent"
+                              android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                    <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                               android:layout_height="wrap_content" app:srcCompat="@drawable/ic_share"/>
+                    <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                                 android:layout_width="wrap_content"
+                                                                 android:layout_height="wrap_content"
+                                                                 android:text="@string/contact_share"
+                                                                 style="@style/SubTitleText.BigMargin"/>
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@+id/contact_info_clear_chat_history"
+                              android:layout_width="fill_parent" android:layout_height="wrap_content"
+                              style="@style/SubTitle.Clicked">
+                    <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                               android:layout_height="wrap_content" app:srcCompat="@drawable/ic_broom"/>
+                    <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                                 android:layout_width="wrap_content"
+                                                                 android:layout_height="wrap_content"
+                                                                 android:text="@string/contact_clear_chat_history"
+                                                                 style="@style/SubTitleText.BigMargin"/>
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@+id/contact_info_block"
+                              android:visibility="gone" android:layout_width="fill_parent"
+                              android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
+                    <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
+                               android:layout_height="wrap_content" app:srcCompat="@drawable/ic_block"/>
+                    <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                                 android:layout_width="wrap_content"
+                                                                 android:layout_height="wrap_content"
+                                                                 android:text="@string/contact_options_block"
+                                                                 style="@style/SubTitleText.BigMargin"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
