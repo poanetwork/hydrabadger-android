@@ -18,7 +18,6 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_settings_account.*
 import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
@@ -26,6 +25,7 @@ import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.firebaseStorage.MyUploadService
 import net.korul.hbbft.imageWork.ImageUtil.circleShape
 import java.io.File
@@ -92,7 +92,6 @@ class SettingsUserFragment : Fragment() {
             verifyStoragePermissionsAndPickFile(activity!!)
         }
 
-
         val pathAvatar = mCurUser.avatar
         if (pathAvatar != "") {
             val image = BitmapFactory.decodeFile(pathAvatar)
@@ -158,10 +157,16 @@ class SettingsUserFragment : Fragment() {
                         )
                     }
                 } else if (resultCode == Activity.RESULT_CANCELED) {
-                    Toast.makeText(context!!, getString(R.string.file_error), Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        activity!!,
+                        getString(R.string.file_error), true
+                    )
                 }
             } else {
-                Toast.makeText(activity, getString(R.string.canceled), Toast.LENGTH_LONG).show()
+                AppUtils.showToast(
+                    activity!!,
+                    getString(R.string.canceled), true
+                )
             }
         } else if (requestCode == REQUEST_EXTERNAL_STORAGE && resultCode == Activity.RESULT_OK) {
             pickFile()

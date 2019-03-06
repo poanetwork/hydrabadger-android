@@ -1,13 +1,13 @@
 package net.korul.hbbft.features
 
 import android.content.DialogInterface
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
-import com.squareup.picasso.Picasso
 import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import net.korul.hbbft.R
@@ -35,9 +35,20 @@ abstract class DemoDialogsFragment :
 
         imageLoader = ImageLoader { imageView, url, payload ->
             try {
-                Picasso.with(context).load(url).into(imageView)
-            } catch (e: IllegalArgumentException) {
+                val pathAvatar = url
+                if (pathAvatar != "") {
+                    val image = BitmapFactory.decodeFile(pathAvatar)
+                    imageView.setImageBitmap(image)
+                } else {
+                    imageView.setImageResource(R.drawable.ic_contact)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+//            try {
+//                Picasso.with(context).load(url).into(imageView)
+//            } catch (e: IllegalArgumentException) {
+//            }
         }
     }
 

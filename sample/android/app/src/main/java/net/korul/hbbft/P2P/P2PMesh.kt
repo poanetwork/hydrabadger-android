@@ -3,7 +3,6 @@ package net.korul.hbbft.P2P
 import android.content.Context
 import android.os.Handler
 import android.util.Log
-import android.widget.Toast
 import io.nats.client.Connection
 import io.nats.client.ConnectionFactory
 import io.nats.client.Message
@@ -11,6 +10,7 @@ import io.nats.client.Subscription
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import net.korul.hbbft.common.utils.AppUtils
 import org.json.JSONObject
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
@@ -39,7 +39,10 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         when (msg.what) {
             DISPLAY_UI_TOAST -> run {
                 try {
-                    Toast.makeText(applicationContext, msg.obj as String, Toast.LENGTH_SHORT).show()
+                    AppUtils.showToast(
+                        applicationContext,
+                        msg.obj as String, true
+                    )
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

@@ -8,16 +8,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.daimajia.swipe.util.Attributes
 import kotlinx.android.synthetic.main.fragment_contacts.*
 import net.korul.hbbft.CommonFragments.WarningFragment
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.R
 import net.korul.hbbft.adapter.ClickListener
 import net.korul.hbbft.adapter.RecyclerViewContactAdapter
 import net.korul.hbbft.adapter.util.DividerItemDecoration
 import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.core.Getters.getAllLocalUsersDistinct
+import net.korul.hbbft.common.utils.AppUtils
 import java.util.*
 
 
@@ -37,10 +38,6 @@ class ContactsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_contacts, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onResume() {
@@ -76,7 +73,7 @@ class ContactsFragment : Fragment() {
         // Item Decorator:
         contacts_list.addItemDecoration(DividerItemDecoration(resources.getDrawable(R.drawable.divider)))
 
-        mDataSet = ArrayList(getAllLocalUsersDistinct().toList())
+        mDataSet = ArrayList(getAllLocalUsersDistinct().filter { it.uid != CoreHBBFT.uniqueID1 }.toList())
         mAdapter = RecyclerViewContactAdapter(context!!, mDataSet!!, object : ClickListener {
             override fun onItemClick(view: View, position: Int) {
                 val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
@@ -94,11 +91,17 @@ class ContactsFragment : Fragment() {
             }
 
             override fun onItemButtonClick(view: View, position: Int) {
-                Toast.makeText(context, "onItemButtonClick $position", Toast.LENGTH_LONG).show()
+                AppUtils.showToast(
+                    activity!!,
+                    "onItemButtonClick $position", true
+                )
             }
 
             override fun onItemLongClick(view: View, position: Int) {
-                Toast.makeText(context, "LongClick $position", Toast.LENGTH_LONG).show()
+                AppUtils.showToast(
+                    activity!!,
+                    "LongClick $position", true
+                )
             }
         })
 

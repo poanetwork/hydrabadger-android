@@ -53,6 +53,25 @@ object Getters {
         return dialogs
     }
 
+    fun getAllDialogsName(): MutableList<String> {
+        val ddialogs = Select()
+            .from(DDialog::class.java)
+            .queryList()
+
+        val dialogs: MutableList<Dialog> = arrayListOf()
+        for (ddialog in ddialogs)
+            dialogs.add(getDialog(ddialog))
+
+        val distDialogs = dialogs.distinctBy { it.dialogName }
+        val listDiagNames: MutableList<String> = mutableListOf()
+
+        for (diag in distDialogs) {
+            listDiagNames.add(diag.dialogName)
+        }
+
+        return listDiagNames
+    }
+
     fun getUsers(id: String): MutableList<User?> {
         val users: MutableList<User?> = arrayListOf()
 
@@ -246,7 +265,7 @@ object Getters {
             .queryList()
 
         val dus = dusers.filterNotNull()
-        val duss = dus.distinctBy { it.id }
+        val duss = dus.distinctBy { it.uid }
         for (duser in duss) {
             users.add(getUser(duser))
         }

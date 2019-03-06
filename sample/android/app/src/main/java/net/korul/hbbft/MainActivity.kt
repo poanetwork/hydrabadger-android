@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import net.korul.hbbft.CommonFragments.tabContacts.ContactsFragment
 import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
@@ -27,6 +26,7 @@ import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
 import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.common.data.fixtures.DialogsFixtures
+import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.features.DefaultDialogsFragment
 import net.korul.hbbft.features.DefaultMessagesFragment
 import net.korul.hbbft.firebaseStorage.MyDownloadService
@@ -194,14 +194,20 @@ class MainActivity : AppCompatActivity() {
                         val uid = intent.getStringExtra(MyDownloadService.EXTRA_UID_DOWNLOADED)
 
                         val avatarFile = File(filepath)
-                        Toast.makeText(context, "Download Avatar complete - ${avatarFile.path}", Toast.LENGTH_LONG)
-                            .show()
+
+                        AppUtils.showToast(
+                            context,
+                            "Download Avatar complete - ${avatarFile.path}", true
+                        )
 
                         updateAvatarInAllLocalUserByUid(uid, avatarFile)
                     }
 
                     MyDownloadService.DOWNLOAD_ERROR -> {
-                        Toast.makeText(context, "Download Avatar Error", Toast.LENGTH_LONG).show()
+                        AppUtils.showToast(
+                            context,
+                            "Download Avatar Error", true
+                        )
                     }
 
                     MyUploadService.UPLOAD_COMPLETED -> {
@@ -219,7 +225,11 @@ class MainActivity : AppCompatActivity() {
                                 myFragment.setImageAvatar(file)
                                 myFragment.dismissProgressBar()
                             }
-                            Toast.makeText(context, "UPLOAD Avatar complete", Toast.LENGTH_LONG).show()
+
+                            AppUtils.showToast(
+                                context,
+                                "UPLOAD Avatar Error", true
+                            )
                         }
 
                     }
@@ -230,7 +240,10 @@ class MainActivity : AppCompatActivity() {
                         if (myFragment != null && myFragment.isVisible) {
                             myFragment.dismissProgressBar()
                         }
-                        Toast.makeText(context, "UPLOAD Avatar Error", Toast.LENGTH_LONG).show()
+                        AppUtils.showToast(
+                            context,
+                            "UPLOAD Avatar Error", true
+                        )
                     }
                 }
             }

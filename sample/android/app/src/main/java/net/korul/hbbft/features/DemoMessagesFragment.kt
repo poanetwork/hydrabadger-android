@@ -10,8 +10,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import com.squareup.picasso.Picasso
-import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -29,11 +27,11 @@ import java.util.*
 
 //val handler = Handler()
 
-abstract class DemoMessagesFragment : Fragment(),
+abstract class DemoMessagesFragment :
+    Fragment(),
     MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
 
-    protected lateinit var imageLoader: ImageLoader
     protected var messagesAdapter: MessagesListAdapter<Message>? = null
 
     var menu: Menu? = null
@@ -65,13 +63,6 @@ abstract class DemoMessagesFragment : Fragment(),
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        imageLoader = ImageLoader { imageView, url, payload ->
-            try {
-                Picasso.with(context).load(url).into(imageView)
-            } catch (e: IllegalArgumentException) {
-            }
-        }
-
         progress = ProgressDialog(context!!)
         progress.setTitle("Connecting")
         progress.setMessage("Wait while connecting...")
@@ -80,7 +71,7 @@ abstract class DemoMessagesFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
-        if (mCurDialog!!.lastMessage != null) {
+        if (mCurDialog!!.lastMessage != null && (messagesAdapter!!.allMessages.size == 0 || messagesAdapter!!.allMessages[0] != mCurDialog!!.lastMessage)) {
             messagesAdapter!!.addToStart(mCurDialog!!.lastMessage, true)
         } else {
             loadMessages()

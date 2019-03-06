@@ -5,13 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -20,6 +20,8 @@ import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.R
+import net.korul.hbbft.common.data.model.User
+import net.korul.hbbft.common.utils.AppUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -28,10 +30,15 @@ interface IAddToContacts {
     fun errorAddContact()
 }
 
+interface IAddToContacts2 {
+    fun errorAddContact()
+    fun user(user: User)
+}
 
 class AddToContactsFragment : Fragment() {
 
     private val FOLDERPICKER_CODE = 111
+    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +81,11 @@ class AddToContactsFragment : Fragment() {
                 contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
             } else
                 getUserFromLocalOrDownloadFromFirebase(contact_id_or_email.text.toString(), object :
-                    IAddToContacts {
+                    IAddToContacts2 {
+                    override fun user(user: User) {
+
+                    }
+
                     override fun errorAddContact() {
                         contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
                     }
@@ -120,19 +131,31 @@ class AddToContactsFragment : Fragment() {
                         file.delete()
                     val create = file.createNewFile()
                     if (!create) {
-                        Toast.makeText(activity, getString(R.string.qr_code_disk_saved_fail), Toast.LENGTH_LONG).show()
+                        AppUtils.showToast(
+                            activity!!,
+                            getString(R.string.qr_code_disk_saved_fail), true
+                        )
                     } else {
                         FileOutputStream(file).use { out ->
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
                         }
                     }
-                    Toast.makeText(activity, getString(R.string.qr_code_disk_saved), Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        activity!!,
+                        getString(R.string.qr_code_disk_saved), true
+                    )
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    Toast.makeText(activity, getString(R.string.qr_code_disk_saved_fail), Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        activity!!,
+                        getString(R.string.qr_code_disk_saved_fail), true
+                    )
                 }
             } else {
-                Toast.makeText(activity, getString(R.string.canceled), Toast.LENGTH_LONG).show()
+                AppUtils.showToast(
+                    activity!!,
+                    getString(R.string.canceled), true
+                )
             }
         } else if (requestCode == REQUEST_EXTERNAL_STORAGE && resultCode == Activity.RESULT_OK) {
             onSaveQRCode()
@@ -140,14 +163,26 @@ class AddToContactsFragment : Fragment() {
             val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
             if (result != null) {
                 if (result.contents == null) {
-                    Toast.makeText(activity, getString(R.string.canceled), Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        activity!!,
+                        getString(R.string.canceled), true
+                    )
                 } else {
-                    Toast.makeText(activity, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        activity!!,
+                        "Scanned: " + result.contents, false
+                    )
 
                     getUserFromLocalOrDownloadFromFirebase(result.contents, object :
-                        IAddToContacts {
+                        IAddToContacts2 {
+                        override fun user(user: User) {
+
+                        }
+
                         override fun errorAddContact() {
-                            contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
+                            handler.post {
+                                contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
+                            }
                         }
                     })
                 }

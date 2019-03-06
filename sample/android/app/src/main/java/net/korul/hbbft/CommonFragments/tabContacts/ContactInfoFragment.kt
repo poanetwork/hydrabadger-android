@@ -18,7 +18,7 @@ import net.korul.hbbft.CommonFragments.ShowBigAvatarActivity
 import net.korul.hbbft.CommonFragments.ShowBigQRActivity
 import net.korul.hbbft.CommonFragments.WarningFragment
 import net.korul.hbbft.CoreHBBFT.UserWork
-import net.korul.hbbft.DatabaseApplication
+import net.korul.hbbft.CoreHBBFT.Users
 import net.korul.hbbft.R
 import net.korul.hbbft.common.data.model.User
 
@@ -113,18 +113,13 @@ class ContactInfoFragment : Fragment() {
     }
 
     fun saveUser() {
-        val user = User(
-            DatabaseApplication.mCurUser.id_,
-            DatabaseApplication.mCurUser.uid,
-            DatabaseApplication.mCurUser.id,
-            DatabaseApplication.mCurUser.idDialog,
-            DatabaseApplication.mCurUser.name,
-            contact_nickname.text.toString(),
-            DatabaseApplication.mCurUser.avatar,
-            DatabaseApplication.mCurUser.isOnline
-        )
+        val user = Users()
+        user.UID = curUser.uid
+        user.name = curUser.name
+        user.nick = contact_nickname.text.toString()
+        user.isOnline = curUser.isOnline
 
-        UserWork.saveCurUser(user)
+        UserWork.updateMetaInAllLocalUserByUid(user)
     }
     companion object {
         fun newInstance(user: User): ContactInfoFragment {

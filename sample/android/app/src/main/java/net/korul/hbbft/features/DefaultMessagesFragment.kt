@@ -2,6 +2,7 @@ package net.korul.hbbft.features
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -10,13 +11,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.google.gson.Gson
+import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessageHolders
 import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_messages.*
+import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts2
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
@@ -52,6 +54,7 @@ class DefaultMessagesFragment :
         private val CONTENT_TYPE_VOICE: Byte = 1
 
         private val handler = Handler()
+        private val handlerMes = Handler()
 
         fun newInstance(dialog: Dialog, user: User): DefaultMessagesFragment {
             mCoreHBBFT2X.setRoomName(dialog.dialogName)
@@ -237,17 +240,33 @@ class DefaultMessagesFragment :
                             found = true
                     }
                     if (!found) {
-                        val user = getUserFromLocalOrDownloadFromFirebase(uid, mCurDialog!!.id)
-                        mCurDialog!!.users.add(user)
-                        Conversations.getDUser(user).insert()
-                    }
+                        getUserFromLocalOrDownloadFromFirebase(uid, mCurDialog!!.id, object : IAddToContacts2 {
+                            override fun errorAddContact() {
 
-                    val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                    super.messagesAdapter!!.addToStart(
-                        MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
-                    )
-                    super.messagesAdapter!!.notifyDataSetChanged()
-                    mCurDialog = getDialog(mCurDialog!!.id)
+                            }
+
+                            override fun user(user: User) {
+                                mCurDialog!!.users.add(user)
+                                Conversations.getDUser(user).insert()
+
+                                val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
+                                handlerMes.post {
+                                    messagesAdapter!!.addToStart(
+                                        MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
+                                    )
+                                    messagesAdapter!!.notifyDataSetChanged()
+                                    mCurDialog = getDialog(mCurDialog!!.id)
+                                }
+                            }
+                        })
+                    } else {
+                        val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
+                        super.messagesAdapter!!.addToStart(
+                            MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
+                        )
+                        super.messagesAdapter!!.notifyDataSetChanged()
+                        mCurDialog = getDialog(mCurDialog!!.id)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -261,10 +280,10 @@ class DefaultMessagesFragment :
         //For example click listener
         payload.avatarClickListener = object : CustomIncomingTextMessageViewHolder.OnAvatarClickListener {
             override fun onAvatarClick() {
-                Toast.makeText(
+                AppUtils.showToast(
                     context!!,
-                    "Text message avatar clicked", Toast.LENGTH_SHORT
-                ).show()
+                    "Text message avatar clicked", true
+                )
             }
         }
 
@@ -303,7 +322,19 @@ class DefaultMessagesFragment :
             .setOutcomingImageLayout(R.layout.item_custom_outcoming_image_message)
 
 
-        super.messagesAdapter = MessagesListAdapter(mCurUser?.id, holders, super.imageLoader)
+        super.messagesAdapter = MessagesListAdapter(mCurUser?.id, holders, ImageLoader { imageView, url, payload ->
+            try {
+                val pathAvatar = url
+                if (pathAvatar != "") {
+                    val image = BitmapFactory.decodeFile(pathAvatar)
+                    imageView.setImageBitmap(image)
+                } else {
+                    imageView.setImageResource(R.drawable.ic_contact)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
         super.messagesAdapter!!.enableSelectionMode(this)
         super.messagesAdapter!!.setLoadMoreListener(this)
         super.messagesAdapter!!.setDateHeadersFormatter(this)

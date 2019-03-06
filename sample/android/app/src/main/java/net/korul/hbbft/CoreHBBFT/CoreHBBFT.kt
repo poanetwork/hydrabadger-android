@@ -2,21 +2,23 @@ package net.korul.hbbft.CoreHBBFT
 
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
 import android.text.SpannableStringBuilder
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
+import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.CoreHBBFT.PushWork.preSendPushToStart
 import net.korul.hbbft.CoreHBBFT.PushWork.registerForPush
 import net.korul.hbbft.CoreHBBFT.RoomWork.getUIDsInRoomFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.isSomeBodyOnlineInList
+import net.korul.hbbft.CoreHBBFT.RoomWork.reregisterInFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.setOfflineModeInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.setOnlineModeInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.UserWork.initCurUser
@@ -28,12 +30,13 @@ import net.korul.hbbft.P2P.P2PMesh
 import net.korul.hbbft.P2P.SocketWrapper
 import net.korul.hbbft.R
 import net.korul.hbbft.Session
+import net.korul.hbbft.common.data.model.core.Getters.getAllDialogsName
+import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.services.ClosingService
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 import kotlin.math.abs
-
 
 
 object CoreHBBFT : IGetData {
@@ -68,14 +71,10 @@ object CoreHBBFT : IGetData {
     lateinit var mApplicationContext: Context
     var mDatabase: DatabaseReference
 
-    lateinit var handler: Handler
-
     init {
         System.loadLibrary("hydra_android")
 
         session = net.korul.hbbft.Session()
-
-        generateOrGetUID()
 
         mFunctions = FirebaseFunctions.getInstance()
         mAuth = FirebaseAuth.getInstance()
@@ -86,13 +85,15 @@ object CoreHBBFT : IGetData {
     }
 
     fun Init(applicationContext: Context) {
+        mApplicationContext = applicationContext
+
+        generateOrGetUID()
+
         val serviceIntent = Intent(applicationContext, ClosingService::class.java)
         applicationContext.startService(serviceIntent)
 
         mP2PMesh = P2PMesh(applicationContext, this)
         mSocketWrapper = SocketWrapper(mP2PMesh!!)
-
-        mApplicationContext = applicationContext
 
         registerForPush(applicationContext)
 
@@ -105,14 +106,13 @@ object CoreHBBFT : IGetData {
                 Log.d(TAG, msg)
             }
 
-        handler = Handler()
-
         initCurUser()
         thread {
             val latch = authAnonymouslyInFirebase()
             latch.await()
             saveCurUserSync(DatabaseApplication.mCurUser)
             updateAllUsersFromFirebase()
+            reregisterInFirebase(getAllDialogsName(), uniqueID1)
         }
     }
 
@@ -131,25 +131,26 @@ object CoreHBBFT : IGetData {
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInAnonymously:failure", task.exception)
-                    Toast.makeText(
-                        mApplicationContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
+                    AppUtils.showToast(
+                        mApplicationContext,
+                        "Authentication failed", true
+                    )
                 }
 
                 latch.countDown()
             }
             .addOnCanceledListener {
-                Toast.makeText(
-                    mApplicationContext, "Authentication canceled.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                AppUtils.showToast(
+                    mApplicationContext,
+                    "Authentication canceled", true
+                )
             }
             .addOnFailureListener {
-                Toast.makeText(
-                    mApplicationContext, "Authentication Failure.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                AppUtils.showToast(
+                    mApplicationContext,
+                    "Authentication Failure", true
+                )
             }
 
         return latch
@@ -163,7 +164,10 @@ object CoreHBBFT : IGetData {
 
             // if 1 user
             if (cntUsers < 2) {
-                Toast.makeText(mApplicationContext, "Room is empty", Toast.LENGTH_LONG).show()
+                AppUtils.showToast(
+                    mApplicationContext,
+                    "Room is empty", true
+                )
                 Log.d(TAG, "Room is empty $RoomName")
 
             }
@@ -183,7 +187,10 @@ object CoreHBBFT : IGetData {
                     preSendPushToStart(listOf(uid), RoomName, uniqueID1)
                 } else {
                     Log.d(TAG, "Room uid is empty $RoomName")
-                    Toast.makeText(mApplicationContext, "Room uid is empty", Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        mApplicationContext,
+                        "Room is empty", true
+                    )
                 }
             }
             // if 2 users and second start
@@ -206,7 +213,10 @@ object CoreHBBFT : IGetData {
                     preSendPushToStart(uids, RoomName, uniqueID1)
                 } else {
                     Log.d(TAG, "Room uid is empty $RoomName")
-                    Toast.makeText(mApplicationContext, "Room uids is empty", Toast.LENGTH_LONG).show()
+                    AppUtils.showToast(
+                        mApplicationContext,
+                        "Room uids is empty", true
+                    )
                 }
             }
             // if many users and i am not first
@@ -409,25 +419,20 @@ object CoreHBBFT : IGetData {
     }
 
     fun generateOrGetUID() {
-        val mSettings = DatabaseApplication.instance.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
-        val uiid = mSettings.getString(APP_PREFERENCES_NAME1, "")
-        val uiid1 = mSettings.getString(APP_PREFERENCES_NAME2, "")
+        val uiid = ReadObjectFromFile(APP_PREFERENCES_NAME1)
+        val uiid1 = ReadObjectFromFile(APP_PREFERENCES_NAME2)
 
         if (uiid == null || uiid == "") {
             uniqueID1 = UUID.randomUUID().toString()
 
-            val editor = mSettings.edit()
-            editor.putString(APP_PREFERENCES_NAME1, uniqueID1)
-            editor.apply()
+            WriteObjectToFile(uniqueID1, APP_PREFERENCES_NAME1)
         } else
             uniqueID1 = uiid
 
         if (uiid1 == null || uiid1 == "") {
             uniqueID2 = UUID.randomUUID().toString()
 
-            val editor = mSettings.edit()
-            editor.putString(APP_PREFERENCES_NAME2, uniqueID2)
-            editor.apply()
+            WriteObjectToFile(uniqueID2, APP_PREFERENCES_NAME2)
         } else
             uniqueID2 = uiid1
     }

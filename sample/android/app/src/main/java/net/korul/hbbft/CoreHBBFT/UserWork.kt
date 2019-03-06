@@ -1,6 +1,5 @@
 package net.korul.hbbft.CoreHBBFT
 
-import android.app.Application
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -8,22 +7,23 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
-import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts
+import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts2
+import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
+import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.common.data.model.User
 import net.korul.hbbft.common.data.model.conversation.Conversations
 import net.korul.hbbft.common.data.model.core.Getters
 import net.korul.hbbft.firebaseStorage.MyDownloadService
 import java.io.File
-import java.util.HashMap
-import java.util.concurrent.CountDownLatch
+import java.util.*
+import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
 
 object UserWork {
 
     fun initCurUser() {
-        val prefs = CoreHBBFT.mApplicationContext.getSharedPreferences("cur_user", Application.MODE_PRIVATE)
-        val strUser = prefs!!.getString("current_user","")
+        val strUser = ReadObjectFromFile("cur_user.out")
         if (strUser == null || strUser.isEmpty()) {
             val user = User (
                 0,
@@ -43,9 +43,8 @@ object UserWork {
     }
 
     fun saveCurUser(user: User) {
-        val prefs = CoreHBBFT.mApplicationContext.getSharedPreferences("cur_user", Application.MODE_PRIVATE)
         val saveuser = Gson().toJson(user).toString()
-        prefs.edit().putString("current_user", saveuser).apply()
+        WriteObjectToFile(saveuser, "cur_user.out")
 
         DatabaseApplication.mCurUser = user
 
@@ -54,23 +53,22 @@ object UserWork {
     }
 
     fun saveCurUserSync(user: User) {
-        val prefs = CoreHBBFT.mApplicationContext.getSharedPreferences("cur_user", Application.MODE_PRIVATE)
         val saveuser = Gson().toJson(user).toString()
-        prefs.edit().putString("current_user", saveuser).apply()
+        WriteObjectToFile(saveuser, "cur_user.out")
 
         DatabaseApplication.mCurUser = user
 
         Getters.updateMetaUserbyUID(CoreHBBFT.uniqueID1, user)
-        val latch = insertOrUpdateUserInFirebase(user)
-        latch.await()
+        val semaphore = insertOrUpdateUserInFirebase(user)
+        semaphore.acquire()
     }
 
-    fun insertOrUpdateUserInFirebase(user: User): CountDownLatch {
-        val latch = CountDownLatch(1)
+    fun insertOrUpdateUserInFirebase(user: User): Semaphore {
+        val semaphore = Semaphore(1)
         val queryRef = CoreHBBFT.mDatabase.child("Users").child(user.uid).orderByChild("uid").equalTo(user.uid)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
-                latch.countDown()
+                semaphore.release()
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -87,16 +85,16 @@ object UserWork {
                 }
                 snapshot.ref.push().setValue(userToSave)
                 Log.d(CoreHBBFT.TAG, "Succes insertOrUpdateUserInFirebase ${CoreHBBFT.uniqueID1}")
-                latch.countDown()
+                semaphore.release()
             }
         })
-        return latch
+        return semaphore
     }
 
     private fun getUsersFromFirebase(uid: String): MutableList<Users> {
         val ref = CoreHBBFT.mDatabase.child("Users").child(uid)
 
-        val latch = CountDownLatch(1)
+        val semaphore = Semaphore(0)
         val listObjectsOfUsers: MutableList<Users> = arrayListOf()
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -113,85 +111,82 @@ object UserWork {
 
                         listObjectsOfUsers.add(user)
                     }
-                    try {
-                        latch.countDown()
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
+                    semaphore.release()
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+                semaphore.release()
                 // Getting Post failed, log a message
                 Log.w(CoreHBBFT.TAG, "loadPost:onCancelled", databaseError.toException())
             }
         }
-        ref.addValueEventListener(postListener)
-        latch.await()
+        ref.addListenerForSingleValueEvent(postListener)
+        semaphore.acquire()
 
         listObjectsOfUsers.distinctBy { it.UID }
         return listObjectsOfUsers
     }
 
-    fun AddUserToLocalFromFirebaseWithAvatar(uid: String, listener: IAddToContacts) {
-        val latch = CountDownLatch(1)
-        thread {
-            val listObjectsOfUsers: MutableList<Users> = getUsersFromFirebase(uid)
-            if (listObjectsOfUsers.isEmpty()) {
-                listener.errorAddContact()
-            }
-            else {
-                for (user in listObjectsOfUsers) {
-                    val id = Getters.getNextUserID()
-                    val users = User(
-                        id,
-                        uid,
-                        id.toString(),
-                        "",
-                        user.name!!,
-                        user.nick!!,
-                        "",
-                        user.isOnline!!
-                    )
-                    Conversations.getDUser(users).insert()
+    fun AddUserToLocalFromFirebaseWithAvatar(
+        uid: String,
+        dialogId: String,
+        listObjectsOfUsers: MutableList<Users>,
+        listener: IAddToContacts2
+    ) {
+        if (listObjectsOfUsers.isEmpty()) {
+            listener.errorAddContact()
+        } else {
+            for (user in listObjectsOfUsers) {
+                val id = Getters.getNextUserID()
+                val users = User(
+                    id,
+                    uid,
+                    id.toString(),
+                    "",
+                    user.name!!,
+                    user.nick!!,
+                    "",
+                    user.isOnline!!
+                )
+                Conversations.getDUser(users).insert()
 
-                    // Kick off MyDownloadService to download the file
-                    val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadService::class.java)
-                        .putExtra(MyDownloadService.EXTRA_DOWNLOAD_USERID, user.UID)
-                        .setAction(MyDownloadService.ACTION_DOWNLOAD)
-                    CoreHBBFT.mApplicationContext.startService(intent)
-                }
+                // Kick off MyDownloadService to download the file
+                val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadService::class.java)
+                    .putExtra(MyDownloadService.EXTRA_DOWNLOAD_USERID, user.UID)
+                    .setAction(MyDownloadService.ACTION_DOWNLOAD)
+                CoreHBBFT.mApplicationContext.startService(intent)
             }
-            latch.countDown()
         }
-        latch.await()
+
+        val User = getAnyLocalUserByUid(uid)
+        val id = Getters.getNextUserID()
+        val user = User(
+            id,
+            uid,
+            id.toString(),
+            dialogId,
+            User!!.name,
+            User.nick,
+            User.avatar,
+            User.isOnline
+        )
+        listener.user(user)
     }
 
-    fun getUserFromLocalOrDownloadFromFirebase(uid: String): User {
-        return getUserFromLocalOrDownloadFromFirebase(uid, "", object : IAddToContacts {
+    fun getUserFromLocalOrDownloadFromFirebase(uid: String, listener: IAddToContacts2) {
+        getUserFromLocalOrDownloadFromFirebase(uid, "", object : IAddToContacts2 {
+            override fun user(user: User) {
+                listener.user(user)
+            }
+
             override fun errorAddContact() {
                 Toast.makeText(CoreHBBFT.mApplicationContext, "ERROR Adding Contact", Toast.LENGTH_LONG).show()
             }
         })
     }
 
-    fun getUserFromLocalOrDownloadFromFirebase(uid: String, listener: IAddToContacts): User {
-        return getUserFromLocalOrDownloadFromFirebase(uid, "", object : IAddToContacts {
-            override fun errorAddContact() {
-                listener.errorAddContact()
-            }
-        })
-    }
-
-    fun getUserFromLocalOrDownloadFromFirebase(uid: String, idDialog: String): User {
-        return getUserFromLocalOrDownloadFromFirebase(uid, idDialog, object : IAddToContacts {
-            override fun errorAddContact() {
-                Toast.makeText(CoreHBBFT.mApplicationContext, "ERROR Adding Contact", Toast.LENGTH_LONG).show()
-            }
-        })
-    }
-
-    fun getUserFromLocalOrDownloadFromFirebase(uid: String, dialogId: String, listener: IAddToContacts): User {
+    fun getUserFromLocalOrDownloadFromFirebase(uid: String, dialogId: String, listener: IAddToContacts2) {
         val LocalUser = getAnyLocalUserByUid(uid)
         if (LocalUser != null) {
             val id = Getters.getNextUserID()
@@ -206,27 +201,20 @@ object UserWork {
                 LocalUser.isOnline
             )
 
-            return user
+            listener.user(user)
         } else {
-            AddUserToLocalFromFirebaseWithAvatar(uid, object : IAddToContacts {
-                override fun errorAddContact() {
-                    listener.errorAddContact()
-                }
-            })
-            val User = getAnyLocalUserByUid(uid)
-            val id = Getters.getNextUserID()
-            val user = User(
-                id,
-                uid,
-                id.toString(),
-                dialogId,
-                User!!.name,
-                User.nick,
-                User.avatar,
-                User.isOnline
-            )
+            thread {
+                val listOfUSer = getUsersFromFirebase(uid)
+                AddUserToLocalFromFirebaseWithAvatar(uid, dialogId, listOfUSer, object : IAddToContacts2 {
+                    override fun user(user: User) {
+                        listener.user(user)
+                    }
 
-            return user
+                    override fun errorAddContact() {
+                        listener.errorAddContact()
+                    }
+                })
+            }
         }
     }
 
@@ -268,6 +256,25 @@ object UserWork {
         }
     }
 
+    fun updateMetaInAllLocalUserByUidWithoutNick(userMeta: Users) {
+        for (user in Getters.getAllLocalUsers(userMeta.UID!!)) {
+            if (user.uid == userMeta.UID) {
+                val us = User(
+                    user.id_,
+                    user.uid,
+                    user.id,
+                    user.idDialog,
+                    userMeta.name!!,
+                    user.nick,
+                    user.avatar,
+                    userMeta.isOnline!!
+                )
+
+                Conversations.getDUser(us).update()
+            }
+        }
+    }
+
     fun getAnyLocalUserByUid(uid: String): User? {
         for (user in Getters.getAllLocalUsersDistinct()) {
             if (user.uid == uid)
@@ -284,7 +291,7 @@ object UserWork {
             else {
                 for (us in listObjectsOfUsers) {
 
-                    updateMetaInAllLocalUserByUid(us)
+                    updateMetaInAllLocalUserByUidWithoutNick(us)
 
                     // Kick off MyDownloadService to download the file
                     val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadService::class.java)

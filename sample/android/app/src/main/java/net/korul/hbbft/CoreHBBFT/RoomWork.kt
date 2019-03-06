@@ -4,10 +4,36 @@ import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import java.util.HashMap
+import java.util.*
 import java.util.concurrent.CountDownLatch
 
 object RoomWork {
+
+    fun reregisterInFirebase(ListDialogsName: List<String>, uid: String) {
+        for (dialogName in ListDialogsName) {
+            val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(dialogName).orderByChild("uid").equalTo(uid)
+            queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (postsnapshot in snapshot.children) {
+                        postsnapshot.key
+                        postsnapshot.ref.removeValue()
+                    }
+
+                    val uid = Uids()
+                    uid.UID = CoreHBBFT.uniqueID1
+                    uid.isOnline = false
+                    val ref = snapshot.ref.push()
+                    ref.setValue(uid)
+
+                    Log.d(CoreHBBFT.TAG, "Succes reregisterInFirebase ${CoreHBBFT.uniqueID1}")
+                }
+            })
+        }
+    }
+
 
     fun unregisterInRoomInFirebase(RoomName: String) {
         val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(RoomName).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
