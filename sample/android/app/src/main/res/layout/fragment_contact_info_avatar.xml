@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
+              android:clickable="true"
+              android:focusable="true">
     <ImageView android:layout_gravity="center_horizontal" android:id="@+id/contact_icon"
                android:layout_width="match_parent"
                android:layout_height="match_parent" app:srcCompat="@drawable/ic_contact" android:layout_margin="25dp"/>

@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+                android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
+                android:clickable="true"
+                android:focusable="true">
     <android.support.constraint.ConstraintLayout android:layout_gravity="fill" android:id="@+id/toolbar"
                                                  android:layout_width="fill_parent"
                                                  android:layout_height="?actionBarSize"
@@ -46,7 +48,15 @@
                           android:maxLength="@integer/description_max_length" android:inputType="textMultiLine"
                           android:imeOptions="flagNoExtractUi" style="@style/EditText.Fragments"/>
                 <include android:layout_width="fill_parent" android:layout_height="wrap_content"
-                         android:layout_marginTop="16.0dip" layout="@layout/panel_group_members"/>
+                         android:layout_marginTop="16.0dip" layout="@layout/panel_group_members"
+                         android:visibility="gone"/>
+                <Button android:layout_gravity="center" android:id="@+id/button_add_create_group"
+                        android:paddingLeft="10.0dip"
+                        android:paddingRight="10.0dip" android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16.0dip" android:text="@string/contact_add"
+                        android:drawablePadding="-16.0dip"
+                        style="@style/button.green"/>
             </LinearLayout>
         </ScrollView>
     </android.support.constraint.ConstraintLayout>

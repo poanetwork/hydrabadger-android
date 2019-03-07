@@ -14,13 +14,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_contact_info.*
+import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonFragments.ShowBigAvatarActivity
 import net.korul.hbbft.CommonFragments.ShowBigQRActivity
 import net.korul.hbbft.CommonFragments.WarningFragment
 import net.korul.hbbft.CoreHBBFT.UserWork
 import net.korul.hbbft.CoreHBBFT.Users
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
 
 
 class ContactInfoFragment : Fragment() {
@@ -85,13 +85,20 @@ class ContactInfoFragment : Fragment() {
         }
 
         action_back.setOnClickListener {
-
-            if(edited && lastNick != contact_nickname.text.toString()) {
+            if (edited && lastNick != contact_nickname.text.toString()) {
                 val builder = AlertDialog.Builder(activity!!)
                 builder.setMessage(R.string.save_user_settings)
                     .setPositiveButton(R.string.action_ok) { _, _ ->
                         saveUser()
                         (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+                        val currentFragment =
+                            activity!!.supportFragmentManager.findFragmentByTag(getString(R.string.tag_contacts))
+                        if (currentFragment is ContactsFragment) {
+                            val fragTransaction = activity!!.supportFragmentManager.beginTransaction()
+                            fragTransaction.detach(currentFragment)
+                            fragTransaction.attach(currentFragment)
+                            fragTransaction.commit()
+                        }
                     }
                     .setNegativeButton(R.string.cancel) { _, _ ->
                         (activity as AppCompatActivity).supportFragmentManager.popBackStack()
@@ -121,6 +128,7 @@ class ContactInfoFragment : Fragment() {
 
         UserWork.updateMetaInAllLocalUserByUid(user)
     }
+
     companion object {
         fun newInstance(user: User): ContactInfoFragment {
             val f = ContactInfoFragment()

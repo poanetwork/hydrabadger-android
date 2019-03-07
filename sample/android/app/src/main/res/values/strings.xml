@@ -1,12 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Hydrabadger</string>
-
-
-    <string name="hint_enter_a_message">Type a message…</string>
-    <string name="copied_message">Message copied!</string>
-
-    <string name="date_header_today">Today</string>
-    <string name="date_header_yesterday">Yesterday</string>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 
     <string-array name="view_types_dialog">
         <item name="image">Image (default)</item>
@@ -18,1019 +11,990 @@
         <item name="voice">Cancel</item>
     </string-array>
 
-    <string name="start_typing_status">Start typing</string>
-    <string name="stop_typing_status">Stop typing</string>
-
-    <string name="clear">clear</string>
-    <string name="status">status</string>
-    <string name="start">Start</string>
-    <string name="start_1x">start_1x</string>
-    <string name="start_2x">start_2x</string>
-    <string name="start_3x">start_3x</string>
-
-    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
-    <string name="default_notification_channel_name" translatable="true">fcm_default</string>
-    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
-    <string name="fcm_message">FCM Message</string>
-
-    <string name="msg_subscribed">FCM subscribe</string>
-    <string name="msg_subscribe_failed">FCM unsubscribe</string>
+    <string name="avatar_file_not_found">User without avatar</string>
+    <string name="room_file_not_found" translatable="false">Room without avatar</string>
 
 
-    <string name="sync">Загрузка</string>
-    <string name="syncing" tools:ignore="TypographyEllipsis">Загрузка...</string>
-    <string name="syncing_completed_well">Загрузка выполнена</string>
-    <string name="syncing_error">Ошибка при загрузке</string>
-    <string name="syncing_error_sign">Для загрузки необходимо в настройках привязать аккаунт</string>
-    <string name="syncing_completed_well_">Загрузка выполнена успешно</string>
-
-    <string name="title_chats">Чаты</string>
-    <string name="title_contacts">Контакты</string>
-    <string name="title_settings">Настройки</string>
-    <string name="title_lenta">Лента</string>
-
-    <string name="tag_chats">TAG_CHAT</string>
-    <string name="tag_chats2">TAG_CHAT2</string>
-    <string name="tag_contacts">TAG_CONTACTS</string>
-    <string name="tag_settings">TAG_SETTINGS</string>
-    <string name="tag_lenta">TAG_LENTA</string>
-
+    <string name="SelectFolder">Select Folder</string>
+    <string name="abc_action_bar_home_description">Navigate home</string>
+    <string name="abc_action_bar_up_description">Navigate up</string>
+    <string name="abc_action_menu_overflow_description">More options</string>
+    <string name="abc_action_mode_done">Done</string>
+    <string name="abc_activity_chooser_view_see_all">See all</string>
+    <string name="abc_activitychooserview_choose_application">Choose an app</string>
+    <string name="abc_capital_off">OFF</string>
+    <string name="abc_capital_on">ON</string>
+    <string name="abc_search_hint">Search…</string>
+    <string name="abc_searchview_description_clear">Clear query</string>
+    <string name="abc_searchview_description_query">Search query</string>
+    <string name="abc_searchview_description_search">Search</string>
+    <string name="abc_searchview_description_submit">Submit query</string>
+    <string name="abc_searchview_description_voice">Voice search</string>
+    <string name="abc_shareactionprovider_share_with">Share with</string>
+    <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
+    <string name="abc_toolbar_collapse_description">Collapse</string>
+    <string name="account_black_list">Blacklist</string>
+    <string name="account_black_list_size">Blocked %d contacts</string>
+    <string name="account_black_list_unblock">Unblock</string>
+    <string name="account_data_title">Account details</string>
+    <string name="account_edit_black_list">Edit blacklist</string>
+    <string name="account_generate_qr_code">Generate QR-code</string>
     <string name="account_id">ID</string>
-
-
-    <string name="SelectFolder">Выбрать папку</string>
-    <string name="abc_action_bar_home_description">Перейти на главный экран</string>
-    <string name="abc_action_bar_up_description">Перейти вверх</string>
-    <string name="abc_action_menu_overflow_description">Другие параметры</string>
-    <string name="abc_action_mode_done">Готово</string>
-    <string name="abc_activity_chooser_view_see_all">Показать все</string>
-    <string name="abc_activitychooserview_choose_application">Выбрать приложение</string>
-    <string name="abc_capital_off">ОТКЛ.</string>
-    <string name="abc_capital_on">ВКЛ.</string>
-    <string name="abc_search_hint">Поиск</string>
-    <string name="abc_searchview_description_clear">Удалить запрос</string>
-    <string name="abc_searchview_description_query">Поисковый запрос</string>
-    <string name="abc_searchview_description_search">Поиск</string>
-    <string name="abc_searchview_description_submit">Отправить запрос</string>
-    <string name="abc_searchview_description_voice">Голосовой поиск</string>
-    <string name="abc_shareactionprovider_share_with">Открыть доступ</string>
-    <string name="abc_shareactionprovider_share_with_application">Открыть доступ приложению \"%s\"</string>
-    <string name="abc_toolbar_collapse_description">Свернуть</string>
-    <string name="account_black_list">Черный список</string>
-    <string name="account_black_list_size">Заблокированно %d контактов</string>
-    <string name="account_black_list_unblock">Разблок.</string>
-    <string name="account_data_title">Контактные данные</string>
-    <string name="account_edit_black_list">Редактировать черный список</string>
-    <string name="account_generate_qr_code">Сгенерировать QR-код</string>
-    <string name="account_invite_action_cancel">Отмена</string>
-    <string name="account_invite_ask_cancel">Отменить запрос?</string>
-    <string name="account_invite_list">Исходящие запросы в контакты</string>
-    <string name="account_invite_list_count">Исходящие запросы (%d):</string>
-    <string name="account_invite_list_edit">Отправленные вами запросы в друзья</string>
-    <string name="account_invite_list_title">Запросы</string>
-    <string name="account_ip_blocked">Вход с этого устройства заблокирован. Попробуйте ввести другой пароль через 10
-        минут.
+    <string name="account_invite_action_cancel">Cancel</string>
+    <string name="account_invite_ask_cancel">Are you sure?</string>
+    <string name="account_invite_list">Outgoing requests to contacts</string>
+    <string name="account_invite_list_count">Outgoing requests (%d):</string>
+    <string name="account_invite_list_edit">Outgoing requests to contacts</string>
+    <string name="account_invite_list_title">Invites</string>
+    <string name="account_ip_blocked">Log in to account from this device is blocked. Try to login with other password
+        after 10 minutes.
     </string>
-    <string name="account_locked">Ваш аккаунт не активирован. Пожалуйста проверьте электронную почту!</string>
-    <string name="account_mail">Почта</string>
-    <string name="account_name">Имя</string>
-    <string name="account_nickname">Никнейм</string>
-    <string name="account_qr_code_scan">Сканировать</string>
-    <string name="account_qr_info">Другой пользователь может просканировать этот QR-код для автоматического добавления
-        вас в контакты
+    <string name="account_locked">You account is locked. Check your email!</string>
+    <string name="account_mail">Email</string>
+    <string name="account_name">Name</string>
+    <string name="account_nickname">Nickname</string>
+    <string name="account_qr_code_scan">Scan</string>
+    <string name="account_qr_info">Other user can scan this QR-code and add you to contact automatically</string>
+    <string name="account_qr_options">Options</string>
+    <string name="account_qr_save">Save QR-code like picture</string>
+    <string name="account_qr_share">Share QR-code</string>
+    <string name="account_qr_title">Your QR-code</string>
+    <string name="account_send">Send</string>
+    <string name="account_share_contact">Contacts settings</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_clear_message_history">Clear history of message</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_delete_timer">Timer</string>
+    <string name="action_forgot_password">Forgot password?</string>
+    <string name="action_forward">Forward</string>
+    <string name="action_forward_select_to">Select who to forward</string>
+    <string name="action_ok">OK</string>
+    <string name="action_pin_top">Pin to top</string>
+    <string name="action_refresh_password">Send</string>
+    <string name="action_reply">Reply</string>
+    <string name="action_send_current_geolocation">Send geolocation</string>
+    <string name="action_short_pin_top">Pin</string>
+    <string name="action_short_unpin_top">Unpin</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_up">Sign up</string>
+    <string name="action_sign_up_end">End</string>
+    <string name="action_sign_up_final_sign_in">Sign in Hydrabadger</string>
+    <string name="action_sign_up_next">Next</string>
+    <string name="action_sign_up_previous">Back</string>
+    <string name="action_start_broadcasting_geolocation">Broadcast geolocation</string>
+    <string name="all_broadcasts">All current broadcast geo-location</string>
+    <string name="all_group_broadcasts">Geo-location broadcast in the current group</string>
+    <string name="app_name">Hydrabadger</string>
+    <string name="applicationIsUpToDate">You have last version of Hydrabadger</string>
+    <string name="archive_chat_yes_no">Are you sure you want to archive chat?</string>
+    <string name="ask_delete_messages">Delete %d messages?</string>
+    <string name="attachment_alert_send_object_to_send">Select object to send</string>
+    <string name="attachment_camera">Camera</string>
+    <string name="attachment_contact">Contact</string>
+    <string name="attachment_file">File</string>
+    <string name="attachment_image">Image</string>
+    <string name="attachment_location">Object</string>
+    <string name="attachment_location_point">Point: %s</string>
+    <string name="attachment_location_point_receiver">"Choose to whom to send position: "</string>
+    <string name="attachment_object">Object</string>
+    <string name="attachment_picture">Picture</string>
+    <string name="attachment_translate_geopos">Geopos.</string>
+    <string name="avatar_change">Change avatar</string>
+    <string name="avatar_delete">Delete avatar</string>
+    <string name="bad_credentials">Incorrect email or username!</string>
+    <string name="broadcast_is_over">Broadcast is over</string>
+    <string name="broadcasting_geolocation">Broadcast geolocation</string>
+    <string name="broadcasting_geolocation_count">Geolocation broadcasts: %d</string>
+    <string name="broadcasting_geolocation_time_end">Active until %s</string>
+    <string name="broadcasting_stopped">Broadcast over</string>
+    <string name="button_refresh_password">Send</string>
+    <string name="by_locality">By locality</string>
+    <string name="callName">Call Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="change_log_layer_create">Create layer</string>
+    <string name="change_log_layer_delete">Deleted layer</string>
+    <string name="change_log_layer_edit">Edited layer info</string>
+    <string name="change_log_layer_object_changed_to">To:</string>
+    <string name="change_log_layer_target_create">Created an object</string>
+    <string name="change_log_layer_target_delete">Deleted an object</string>
+    <string name="change_log_layer_target_edit">Changed the object</string>
+    <string name="change_log_layer_target_sync">Synchronized object</string>
+    <string name="change_log_layer_user_added">Added new member</string>
+    <string name="change_log_layer_user_back_you">Returned you to the layer</string>
+    <string name="change_log_layer_user_deleted">Removed member</string>
+    <string name="change_log_layer_user_leave">Member left the layer</string>
+    <string name="change_log_layer_user_permissions_changed">Changed the permissions for the member</string>
+    <string name="change_password">Change password</string>
+    <string name="channel_action_subscribe">Subscribe</string>
+    <string name="channel_add_subscriber">Add</string>
+    <string name="channel_create_add_avatar">Add avatar of channel</string>
+    <string name="channel_create_description_hint">Enter the description of channel</string>
+    <string name="channel_create_select_admins">Select channel administrators:</string>
+    <string name="channel_create_select_member">Select channel members:</string>
+    <string name="channel_create_select_moderators">Select channel moderators:</string>
+    <string name="channel_create_title_hint">Enter the name of channel</string>
+    <string name="channel_delete">Delete channel</string>
+    <string name="channel_description">Description of channel</string>
+    <string name="channel_leave">Leave</string>
+    <string name="channel_mute_notification">Mute notifications</string>
+    <string name="channel_title">Name of channel</string>
+    <string name="channel_title_total_subscribers">%d subscribers</string>
+    <string name="channel_total_subscribers">Subscribers (%d):</string>
+    <string name="chat_add_object_to_map">Add an object on the map?</string>
+    <string name="chat_archive">Archive</string>
+    <string name="chat_delete_item">Delete chat</string>
+    <string name="chat_msg">Message</string>
+    <string name="chat_msg_copy">Copy</string>
+    <string name="chat_msg_delete">Delete</string>
+    <string name="chat_msg_forward">Forward</string>
+    <string name="chat_new_messages">New messages</string>
+    <string name="chat_pin">Pin to top</string>
+    <string name="chat_unpin">Unpin from top</string>
+    <string name="chats_create_channel">Create channel</string>
+    <string name="chats_create_group">Create group</string>
+    <string name="chats_delete">Delete chat</string>
+    <string name="chats_result_not_found">Not found chat</string>
+    <string name="chats_result_search">Found %d chats</string>
+    <string name="chats_storage_permission_info">Hydrabadger needs access to your storage so that you can send and save
+        photos and files
     </string>
-    <string name="account_qr_options">Действия</string>
-    <string name="account_qr_save">Сохранить QR-код как изображение</string>
-    <string name="account_qr_share">Поделиться QR-кодом</string>
-    <string name="account_qr_title">Ваш QR-код</string>
-    <string name="account_send">Отправить</string>
-    <string name="account_share_contact">Настройки контактов</string>
-    <string name="action_cancel">Отмена</string>
-    <string name="action_clear_message_history">Очистить историю сообщений</string>
-    <string name="action_copy">Копир.</string>
-    <string name="action_add">Добавить</string>
-    <string name="action_delete">Удалить</string>
-    <string name="action_delete_timer">Таймер</string>
-    <string name="action_forgot_password">Забыли пароль?</string>
-    <string name="action_forward">Пересл.</string>
-    <string name="action_forward_select_to">Выберите кому переслать</string>
-    <string name="action_ok">Хорошо</string>
-    <string name="action_pin_top">Закрепить вверху списка</string>
-    <string name="action_refresh_password">Отправить</string>
-    <string name="action_reply">Ответ.</string>
-    <string name="action_send_current_geolocation">Отправить геопозицию</string>
-    <string name="action_short_pin_top">Закреп.</string>
-    <string name="action_short_unpin_top">Открепи.</string>
-    <string name="action_sign_in">Войти</string>
-    <string name="action_sign_up">Регистрация</string>
-    <string name="action_sign_up_end">Завершить</string>
-    <string name="action_sign_up_final_sign_in">Зайти в Hydrabadger</string>
-    <string name="action_sign_up_next">Далее</string>
-    <string name="action_sign_up_previous">Назад</string>
-    <string name="action_start_broadcasting_geolocation">Транслировать геопозицию</string>
-    <string name="all_broadcasts">Все текущие трансляции геопозиции</string>
-    <string name="all_group_broadcasts">Трансляции геопозиции в текущей группе</string>
-    <string name="applicationIsUpToDate">У Вас уже установлена последняя версия программы.</string>
-    <string name="archive_chat_yes_no">Вы действительно хотите архивировать чат?</string>
-    <string name="ask_delete_messages">Удалить %d сообщений?</string>
-    <string name="attachment_alert_send_object_to_send">Выберите объект для отправки</string>
-    <string name="attachment_camera">Камера</string>
-    <string name="attachment_contact">Контакт</string>
-    <string name="attachment_file">Файл</string>
-    <string name="attachment_image">Изображение</string>
-    <string name="attachment_location">Объект</string>
-    <string name="attachment_location_point">Точка: %s</string>
-    <string name="attachment_location_point_receiver">"Выберите кому отправить позицию: "</string>
-    <string name="attachment_object">Объект</string>
-    <string name="attachment_picture">Изобр.</string>
-    <string name="attachment_translate_geopos">Геопоз.</string>
-    <string name="avatar_change">Изменить аватар</string>
-    <string name="avatar_delete">Удалить</string>
-    <string name="bad_credentials">Неверно введен пароль или почта!</string>
-    <string name="broadcast_is_over">Трансляция окончена</string>
-    <string name="broadcasting_geolocation">Трансляция геопозиции</string>
-    <string name="broadcasting_geolocation_count">Трансляций геопозиций: %d</string>
-    <string name="broadcasting_geolocation_time_end">Активна до %s</string>
-    <string name="broadcasting_stopped">Трансляция завершена</string>
-    <string name="button_refresh_password">Отправить</string>
-    <string name="by_locality">По названию</string>
-    <string name="callName">Имя</string>
-    <string name="cancel">Отмена</string>
-    <string name="change_log_layer_create">Создал слой</string>
-    <string name="change_log_layer_delete">Удалил слой</string>
-    <string name="change_log_layer_edit">Отредактировал информацию слоя</string>
-    <string name="change_log_layer_object_changed_to">На:</string>
-    <string name="change_log_layer_target_create">Создал объект</string>
-    <string name="change_log_layer_target_delete">Удалил объект</string>
-    <string name="change_log_layer_target_edit">Изменил объект</string>
-    <string name="change_log_layer_target_sync">Синхронизировал объект</string>
-    <string name="change_log_layer_user_added">Добавил нового участника</string>
-    <string name="change_log_layer_user_back_you">Вернул Вас в слой</string>
-    <string name="change_log_layer_user_deleted">Удалил участника</string>
-    <string name="change_log_layer_user_leave">Участник покинул слой</string>
-    <string name="change_log_layer_user_permissions_changed">Изменил полномочия для участника</string>
-    <string name="change_password">Изменить пароль</string>
-    <string name="channel_action_subscribe">Подписаться</string>
-    <string name="channel_add_subscriber">Добавить</string>
-    <string name="channel_create_add_avatar">Добавить аватар канала</string>
-    <string name="channel_create_description_hint">Введите описание канала</string>
-    <string name="channel_create_select_admins">Выберите администраторов канала:</string>
-    <string name="channel_create_select_member">Выберите участников канала:</string>
-    <string name="channel_create_select_moderators">Выберите модераторов канала:</string>
-    <string name="channel_create_title_hint">Введите название канала</string>
-    <string name="channel_delete">Удалить канал</string>
-    <string name="channel_description">Описание канала</string>
-    <string name="channel_leave">Выйти</string>
-    <string name="channel_mute_notification">Выключить оповещения</string>
-    <string name="channel_title">Название канала</string>
-    <string name="channel_title_total_subscribers">%d подписчиков</string>
-    <string name="channel_total_subscribers">Подписчики (%d):</string>
-    <string name="chat_add_object_to_map">Добавить объект на карту?</string>
-    <string name="chat_archive">Архивировать</string>
-    <string name="chat_delete_item">Удалить чат</string>
-    <string name="chat_msg">Сообщение</string>
-    <string name="chat_msg_copy">Скопировать</string>
-    <string name="chat_msg_delete">Удалить</string>
-    <string name="chat_msg_forward">Переслать</string>
-    <string name="chat_new_messages">Новые сообщения</string>
-    <string name="chat_pin">Закрепить</string>
-    <string name="chat_unpin">Открепить</string>
-    <string name="chats_create_channel">Создать канал</string>
-    <string name="chats_create_group">Создать групу</string>
-    <string name="chats_delete">Удалить чат</string>
-    <string name="chats_result_not_found">Не найдено чатов</string>
-    <string name="chats_result_search">Найдено %d чатов</string>
-    <string name="chats_storage_permission_info">Hydrabadger требуется доступ к хранилищу, что бы Вы могли отправлять и
-        сохранять фото и файлы
+    <string name="chats_title">Chats</string>
+    <string name="check_update_button">Check updates</string>
+    <string name="clear_history">Clear history</string>
+    <string name="clear_history_yes_no">Are you sure you want to clear history?</string>
+    <string name="com_facebook_device_auth_instructions">Visit &lt;b>facebook.com/device&lt;/b> and enter the code shown
+        above.
     </string>
-    <string name="chats_title">Чаты</string>
-    <string name="check_update_button">Проверить наличие обновлений</string>
-    <string name="clear_history">Очистить чат</string>
-    <string name="clear_history_yes_no">Вы действительно хотите удалить историю сообщений?</string>
-    <string name="com_facebook_device_auth_instructions">Откройте &lt;b>facebook.com/device&lt;/b> и введите код,
-        показанный выше.
+    <string name="com_facebook_image_download_unknown_error">Unexpected error while downloading an image.</string>
+    <string name="com_facebook_internet_permission_error_message">WebView login requires INTERNET permission</string>
+    <string name="com_facebook_internet_permission_error_title">AndroidManifest Error</string>
+    <string name="com_facebook_like_button_liked">Liked</string>
+    <string name="com_facebook_like_button_not_liked">Like</string>
+    <string name="com_facebook_loading">Loading…</string>
+    <string name="com_facebook_loginview_cancel_action">Cancel</string>
+    <string name="com_facebook_loginview_log_in_button">Log in</string>
+    <string name="com_facebook_loginview_log_in_button_continue">Continue with Facebook</string>
+    <string name="com_facebook_loginview_log_in_button_long">Log in with Facebook</string>
+    <string name="com_facebook_loginview_log_out_action">Log out</string>
+    <string name="com_facebook_loginview_log_out_button">Log out</string>
+    <string name="com_facebook_loginview_logged_in_as">Logged in as: %1$s</string>
+    <string name="com_facebook_loginview_logged_in_using_facebook">Logged in using Facebook</string>
+    <string name="com_facebook_send_button_text">Send</string>
+    <string name="com_facebook_share_button_text">Share</string>
+    <string name="com_facebook_smart_device_instructions">To connect your account, open the Facebook app on your mobile
+        device and check for notifications.
     </string>
-    <string name="com_facebook_image_download_unknown_error">Неожиданная ошибка при скачивании изображения.</string>
-    <string name="com_facebook_internet_permission_error_message">Для входа через WebView необходимо разрешение
-        INTERNET
+    <string name="com_facebook_smart_device_instructions_or">- OR -</string>
+    <string name="com_facebook_smart_login_confirmation_cancel">Not you?</string>
+    <string name="com_facebook_smart_login_confirmation_continue_as">Continue as %1$s</string>
+    <string name="com_facebook_smart_login_confirmation_title">Confirm Login</string>
+    <string name="com_facebook_tooltip_default">"You're in control - choose what info you want to share with apps."
     </string>
-    <string name="com_facebook_internet_permission_error_title">Ошибка AndroidManifest</string>
-    <string name="com_facebook_like_button_liked">Нравится</string>
-    <string name="com_facebook_like_button_not_liked">Нравится</string>
-    <string name="com_facebook_loading">Загрузка...</string>
-    <string name="com_facebook_loginview_cancel_action">Отмена</string>
-    <string name="com_facebook_loginview_log_in_button">Войти</string>
-    <string name="com_facebook_loginview_log_in_button_continue">Продолжить с Facebook</string>
-    <string name="com_facebook_loginview_log_in_button_long">Вход через Facebook</string>
-    <string name="com_facebook_loginview_log_out_action">Выйти</string>
-    <string name="com_facebook_loginview_log_out_button">Выйти</string>
-    <string name="com_facebook_loginview_logged_in_as">Вы вошли как %1$s</string>
-    <string name="com_facebook_loginview_logged_in_using_facebook">Выполнен вход через Facebook</string>
-    <string name="com_facebook_send_button_text">Отправить</string>
-    <string name="com_facebook_share_button_text">Поделиться</string>
-    <string name="com_facebook_smart_device_instructions">Чтобы привязать ваш аккаунт, откройте приложение Facebook на
-        своем мобильном устройстве и проверьте уведомления.
+    <string name="common_google_play_services_enable_button">Enable</string>
+    <string name="common_google_play_services_enable_text">"%1$s won't work unless you enable Google Play services."
     </string>
-    <string name="com_facebook_smart_device_instructions_or">- ИЛИ -</string>
-    <string name="com_facebook_smart_login_confirmation_cancel">Не Вы?</string>
-    <string name="com_facebook_smart_login_confirmation_continue_as">Продолжить как %1$s</string>
-    <string name="com_facebook_smart_login_confirmation_title">Подтвердите вход</string>
-    <string name="com_facebook_tooltip_default">Контроль над данными — выберите, какой информацией вы хотите делиться с
-        приложениями.
+    <string name="common_google_play_services_enable_title">Enable Google Play services</string>
+    <string name="common_google_play_services_install_button">Install</string>
+    <string name="common_google_play_services_install_text">"%1$s won't run without Google Play services, which are
+        missing from your device."
     </string>
-    <string name="common_google_play_services_enable_button">Включить</string>
-    <string name="common_google_play_services_enable_text">Для работы приложения \"%1$s\" требуется включить сервисы
-        Google Play.
+    <string name="common_google_play_services_install_title">Get Google Play services</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play services availability</string>
+    <string name="common_google_play_services_notification_ticker">Google Play services error</string>
+    <string name="common_google_play_services_unknown_issue">%1$s is having trouble with Google Play services. Please
+        try again.
     </string>
-    <string name="common_google_play_services_enable_title">Включите сервисы Google Play</string>
-    <string name="common_google_play_services_install_button">Установить</string>
-    <string name="common_google_play_services_install_text">Для работы приложения \"%1$s\" требуется установить сервисы
-        Google Play.
+    <string name="common_google_play_services_unsupported_text">"%1$s won't run without Google Play services, which are
+        not supported by your device."
     </string>
-    <string name="common_google_play_services_install_title">Установите сервисы Google Play</string>
-    <string name="common_google_play_services_notification_channel_name">Доступность сервисов Google Play</string>
-    <string name="common_google_play_services_notification_ticker">Ошибка сервисов Google Play</string>
-    <string name="common_google_play_services_unknown_issue">Приложению \"%1$s\" не удается подключиться к сервисам
-        Google Play. Повторите попытку.
+    <string name="common_google_play_services_update_button">Update</string>
+    <string name="common_google_play_services_update_text">"%1$s won't run unless you update Google Play services."
     </string>
-    <string name="common_google_play_services_unsupported_text">Для работы с приложением \"%1$s\" требуются сервисы
-        Google Play. Они не поддерживаются на вашем устройстве.
+    <string name="common_google_play_services_update_title">Update Google Play services</string>
+    <string name="common_google_play_services_updating_text">"%1$s won't run without Google Play services, which are
+        currently updating."
     </string>
-    <string name="common_google_play_services_update_button">Обновить</string>
-    <string name="common_google_play_services_update_text">Чтобы запустить приложение \"%1$s\", обновите сервисы
-        Google Play.
+    <string name="common_google_play_services_wear_update_text">New version of Google Play services needed. It will
+        update itself shortly.
     </string>
-    <string name="common_google_play_services_update_title">Обновите сервисы Google Play</string>
-    <string name="common_google_play_services_updating_text">Сервисы Google Play, необходимые для работы приложения
-        \"%1$s\", в настоящий момент обновляются.
+    <string name="common_open_on_phone">Open on phone</string>
+    <string name="common_signin_button_text">Sign in</string>
+    <string name="common_signin_button_text_long">Sign in with Google</string>
+    <string name="comp_broadcast_ask">Complete all input and output broadcasts</string>
+    <string name="comp_broadcasts">Completion of broadcasts</string>
+    <string name="comp_your_broadcasting">Finish broadcasting your geo-location?</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="confirm_refresh_password">To refresh your password, check your email</string>
+    <string name="connection_status_lost">Connection lost</string>
+    <string name="connection_status_stopped">Server under maintenance</string>
+    <string name="connection_status_update">Synchronization</string>
+    <string name="contact_accept">Accept</string>
+    <string name="contact_add">Add</string>
+    <string name="contact_add_by_id">Add by ID</string>
+    <string name="contact_add_by_mail">Add by email</string>
+    <string name="contact_add_by_nearby">Add nearby users</string>
+    <string name="contact_add_by_qr_code">Scan QR-code</string>
+    <string name="contact_add_hint">*Choose how to add to contacts</string>
+    <string name="contact_add_new_contact">Send request for adding to contact</string>
+    <string name="contact_add_request">Add to contact list</string>
+    <string name="contact_add_title">Add to contact</string>
+    <string name="contact_clear_chat_history">Clear chat history</string>
+    <string name="contact_email_invite_send">Request for adding to contact is send</string>
+    <string name="contact_email_not_exist">User with this email does not exist</string>
+    <string name="contact_generate_qr_code">Generate my QR-code</string>
+    <string name="contact_id_not_exist">User with this identificator does not exist</string>
+    <string name="contact_nickname_changed">Nickname is successfully changed</string>
+    <string name="contact_options_block">Block</string>
+    <string name="contact_options_delete">Delete</string>
+    <string name="contact_options_pin">Pin</string>
+    <string name="contact_options_unpin">Unpin</string>
+    <string name="contact_pinned">Pinned</string>
+    <string name="contact_placeholder">Contact</string>
+    <string name="contact_qr_scan">Scan QR-code</string>
+    <string name="contact_qr_scan_help">Set QR-code in square</string>
+    <string name="contact_reject">Reject</string>
+    <string name="contact_remove">Remove</string>
+    <string name="contact_request">Request for adding you to contact:</string>
+    <string name="contact_request_accept">Accept</string>
+    <string name="contact_request_contact_exist">This user was added to your contact list!</string>
+    <string name="contact_request_error_email_or_id">Enter correct user email or id</string>
+    <string name="contact_request_prompt_email">Enter user email</string>
+    <string name="contact_request_prompt_email_or_id">Enter user email or ID</string>
+    <string name="contact_request_prompt_id">Enter user ID</string>
+    <string name="contact_request_reject">Reject</string>
+    <string name="contact_request_request_exist">Request to contact was send!</string>
+    <string name="contact_request_to_contact">Requests for adding to contact</string>
+    <string name="contact_request_to_me">You cannot send request for adding to contact to yourself!</string>
+    <string name="contact_requests">Requests to contact:</string>
+    <string name="contact_result_not_found">Not found contact</string>
+    <string name="contact_result_search">Found %d contacts</string>
+    <string name="contact_send_invite">Request for adding to contact is send!</string>
+    <string name="contact_share">Share contact</string>
+    <string name="contact_title">Contacts</string>
+    <string name="contact_total_count" formatted="false">Total contacts %d online %d</string>
+    <string name="copied">Copied to clipboard</string>
+    <string name="create_add_admin">Add administrators</string>
+    <string name="create_add_member">Add members</string>
+    <string name="create_add_moderator">Add moderators</string>
+    <string name="create_total_admins">Administrators (%d)</string>
+    <string name="create_total_members">Members (%d)</string>
+    <string name="create_total_moderators">Moderators (%d)</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="date_at_time" formatted="false">%s at %s</string>
+    <string name="delete_chat_yes_no">Are you sure you want to delete chat?</string>
+    <string name="delete_contact_yes_no">Are you sure you want to delete contact?</string>
+    <string name="delete_image">Delete photo</string>
+    <string name="delete_target_yes_no">Are you sure you want to delete object?</string>
+    <string name="delete_timer_title">Timer of delete messages</string>
+    <string name="dialog_blocked">This user is not consist in your contact list. You cannot send him message</string>
+    <string name="dialog_go_to_geolocation">Move to the received location?</string>
+    <string name="dialog_search_by_coordinates_title">Search location</string>
+    <string name="do_after_sign_up">At the Email sent confirmation of registration. Please check your email (spam)!
     </string>
-    <string name="common_google_play_services_wear_update_text">Версия сервисов Google Play устарела. Они автоматически
-        обновятся в ближайшее время.
+    <string name="done">Done</string>
+    <string name="download_compmleated">Download comleated</string>
+    <string name="downloads">Downloads</string>
+    <string name="edit_devices">Edit devices</string>
+    <string name="ef_camera">CAMERA</string>
+    <string name="ef_done">DONE</string>
+    <string name="ef_error_create_image_file">Failed to create image file</string>
+    <string name="ef_error_no_camera">No camera found</string>
+    <string name="ef_error_null_cursor">Oops, something went wrong!</string>
+    <string name="ef_ltitle_permission_denied">Permission denied</string>
+    <string name="ef_msg_empty_images">No images found</string>
+    <string name="ef_msg_limit_images">Image selection limit</string>
+    <string name="ef_msg_no_camera_permission">Please grant camera permission to capture image</string>
+    <string name="ef_msg_no_write_external_permission">Please grant storage permission to select images</string>
+    <string name="ef_ok">OK</string>
+    <string name="ef_permission_write_external_rationale">Allow access external storage to select images</string>
+    <string name="ef_selected">%d selected</string>
+    <string name="ef_selected_with_limit">%1$d/%2$d selected</string>
+    <string name="ef_title_folder">Folder</string>
+    <string name="ef_title_select_image">Tap to select images</string>
+    <string name="email">Email</string>
+    <string name="empty_contact_list">Your contact list is empty</string>
+    <string name="errorTitle">Error!</string>
+    <string name="error_confirm_password">Confirm password does not match the password</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_file_is_too_large">File is too large!</string>
+    <string name="error_incorrect_password">This password is too short (min 6 character)</string>
+    <string name="error_insufficient_space">There is not enough memory to download the map</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_id">The user ID should consist of numbers and Latin characters of 8 characters</string>
+    <string name="error_invalid_user_id">This user id is not found</string>
+    <string name="error_invalid_username">Username must contains at least 2 symbols</string>
+    <string name="error_no_network_connection">No network connection</string>
+    <string name="error_unknown">Failed to download</string>
+    <string name="error_wrong_search_range">Wrong coordinates range</string>
+    <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
+    <string name="feed_card_info_full_button">More</string>
+    <string name="feed_card_info_min_button">Short</string>
+    <string name="feed_download_update">Download</string>
+    <string name="feed_new_device_login_info">Login from a new device</string>
+    <string name="feed_new_device_login_log_app_version">Application Version: %s</string>
+    <string name="feed_new_device_login_log_device">Device: %s</string>
+    <string name="feed_new_device_login_log_instruction">"If it's not you, click on the "<b>"\"No, it's not me\""</b>",
+        and we will delete this device and account from this device.
+        If it's is you, click on the "<b>"\"Yes, it's me\""</b>, and the device will continue to work with your account.
     </string>
-    <string name="common_open_on_phone">Открыть на телефоне</string>
-    <string name="common_signin_button_text">Войти</string>
-    <string name="common_signin_button_text_long">Войти через аккаунт Google</string>
-    <string name="comp_broadcast_ask">Завершить все входные и выходные трансяции?</string>
-    <string name="comp_broadcasts">Завершение трансляций</string>
-    <string name="comp_your_broadcasting">Завершить трансляцию своей геопозиции?</string>
-    <string name="confirm_password">Подтвердите Пароль</string>
-    <string name="confirm_refresh_password">Для изменения пароля проверьте Вашу почту</string>
-    <string name="connection_status_lost">Соединение потеряно</string>
-    <string name="connection_status_stopped">На сервере проводятся технические работы</string>
-    <string name="connection_status_update">Синхронизация</string>
-    <string name="contact_accept">Добавить</string>
-    <string name="contact_add">Добавить</string>
-    <string name="contact_add_by_id">Добавить с помощью ID</string>
-    <string name="contact_add_by_mail">Добавить с помощью email</string>
-    <string name="contact_add_by_nearby">Добавить пользователей рядом</string>
-    <string name="contact_add_by_qr_code">Сканировать QR-код</string>
-    <string name="contact_add_hint">*Выберите способ добавления в контакты</string>
-    <string name="contact_add_new_contact">Отправить запрос на добавление нового контакта</string>
-    <string name="contact_add_request">Добавить в список контактов</string>
-    <string name="contact_add_title">Добавление в контакты</string>
-    <string name="contact_clear_chat_history">Очистить историю сообщений</string>
-    <string name="contact_email_invite_send">Запрос на добавление в контакты отправлен</string>
-    <string name="contact_email_not_exist">Пользователь с данной почтой не существует</string>
-    <string name="contact_generate_qr_code">Сгенерировать собственный QR-код</string>
-    <string name="contact_id_not_exist">Пользователь с данным идентификатором не существует</string>
-    <string name="contact_nickname_changed">Никнейм успешно изменен</string>
-    <string name="contact_options_block">Блок</string>
-    <string name="contact_options_delete">Удалить</string>
-    <string name="contact_options_pin">Закрепить</string>
-    <string name="contact_options_unpin">Открепить</string>
-    <string name="contact_pinned">Закреплены</string>
-    <string name="contact_placeholder">Контакт</string>
-    <string name="contact_qr_scan">Сканировать QR-код</string>
-    <string name="contact_qr_scan_help">Наведите квадрат на QR-код</string>
-    <string name="contact_reject">Отклонить</string>
-    <string name="contact_remove">Удалить</string>
-    <string name="contact_request">Запросы на добавление в контакты:</string>
-    <string name="contact_request_error">Ошибка при запросе на добавление в контакты</string>
-    <string name="contact_request_accept">Добавить</string>
-    <string name="contact_request_contact_exist">Данный пользователь уже находится в вашем списке контактов!</string>
-    <string name="contact_request_error_email_or_id">Введите корректный email или ID пользователя</string>
-    <string name="contact_request_prompt_email">Введите email пользователя</string>
-    <string name="contact_request_prompt_email_or_id">Введите email или ID пользователя</string>
-    <string name="contact_request_prompt_id">Введите ID пользователя</string>
-    <string name="contact_request_reject">Отклонить</string>
-    <string name="contact_request_request_exist">Запрос на добавление уже был отправлен!</string>
-    <string name="contact_request_to_contact">Запросы в контакты</string>
-    <string name="contact_request_to_me">Вы не можете отправить запрос на добавление в контакты используя Вашу почту или
-        идентификатор!
+    <string name="feed_new_device_login_log_ip">IP address: %s</string>
+    <string name="feed_new_device_login_log_title">We detected a login to your account from a new device.</string>
+    <string name="feed_new_device_login_no">"No, it's not me"</string>
+    <string name="feed_new_device_login_title">Account login detected</string>
+    <string name="feed_new_device_login_yes">"Yes, it's me"</string>
+    <string name="feed_server_update_end">End:</string>
+    <string name="feed_server_update_start">Start:</string>
+    <string name="feed_tutorial_open">Open</string>
+    <string name="fex_net_files">Not sorted</string>
+    <string name="fex_net_folders">From folder</string>
+    <string name="fexnet_base_map">Map</string>
+    <string name="file_invalid">File invalid</string>
+    <string name="file_placeholder">File</string>
+    <string name="fill_required_fields">Required fields is empty</string>
+    <string name="for_you">You</string>
+    <string name="from_you">You</string>
+    <string name="geolocation_placeholder">Geolocation</string>
+    <string name="group_action_delete">Delete group</string>
+    <string name="group_action_leave">Leave group</string>
+    <string name="group_add_admin_authority">Upgrade</string>
+    <string name="group_add_member">Add member</string>
+    <string name="group_admin_hint">Admins:</string>
+    <string name="group_admins_title">Group admins</string>
+    <string name="group_authority_admin">Admin</string>
+    <string name="group_authority_change">Change authority</string>
+    <string name="group_authority_chose">Chose authority</string>
+    <string name="group_authority_member">Member</string>
+    <string name="group_authority_owner">Owner</string>
+    <string name="group_blocked">You are removed from this group</string>
+    <string name="group_change_avatar">Change the group avatar</string>
+    <string name="group_create_add_avatar">Add avatar of group</string>
+    <string name="group_create_description_hint">Enter the description of group</string>
+    <string name="group_create_select_admins">Select group administrators:</string>
+    <string name="group_create_select_member">Select group members:</string>
+    <string name="group_create_select_moderators">Select group moderators:</string>
+    <string name="group_create_title_hint">Enter the name of group</string>
+    <string name="group_delete">Delete group</string>
+    <string name="group_delete_admin_authority">Downgrade</string>
+    <string name="group_delete_leave">Delete and leave group</string>
+    <string name="group_delete_member">Delete</string>
+    <string name="group_delete_member_question">Are you sure you want to remove this user?</string>
+    <string name="group_description">Description of group</string>
+    <string name="group_description_changed">Group description changed</string>
+    <string name="group_edit_name">Edit name</string>
+    <string name="group_event_added_member" formatted="false">%s added %s</string>
+    <string name="group_event_authority_changed" formatted="false">%s changed authority for %s</string>
+    <string name="group_event_avatar_changed">%s changed the group avatar</string>
+    <string name="group_event_avatar_removed">%s deleted the group avatar</string>
+    <string name="group_event_deleted_member" formatted="false">%s removed %s</string>
+    <string name="group_event_description_changed">%s changed the description of group</string>
+    <string name="group_event_leaved">%s left group</string>
+    <string name="group_event_name_changed" formatted="false">%s changed the group name to %s</string>
+    <string name="group_invalid_description">Description of group must contains at max 126 symbols</string>
+    <string name="group_invalid_name">Group name must contains at least 2 symbols</string>
+    <string name="group_is_deleted">Group deleted</string>
+    <string name="group_leave_group_question">Are you sure you want to leave group and clear group history?</string>
+    <string name="group_member_list">Member list</string>
+    <string name="group_members">Members:</string>
+    <string name="group_members_limit_exceed">Limit for size of users in the group is exceeded (50 members)</string>
+    <string name="group_members_title">Group members</string>
+    <string name="group_owner_hint">Owner:</string>
+    <string name="group_prompt_name">Enter group name</string>
+    <string name="group_removed">%s removed group</string>
+    <string name="group_request_forbidden">You havenʼt permission for this request</string>
+    <string name="group_select_user">Select user</string>
+    <string name="group_title">Name of group</string>
+    <string name="group_title_changed">Group name changed</string>
+    <string name="group_title_total_members">%d members</string>
+    <string name="group_welcome_msg">You are added to group</string>
+    <string name="group_you_create">You create this group</string>
+    <string name="has_broadcasting">"Turn on GPS.
+        To determine the coordinates of the application Hydrabadger, you must enable the transfer of location data"
     </string>
-    <string name="contact_requests">Запросы в контакты:</string>
-    <string name="contact_result_not_found">Ничего не найдено</string>
-    <string name="contact_result_search">Найдено %d контактов</string>
-    <string name="contact_send_invite">Запрос на добавление в контакты отправлен!</string>
-    <string name="contact_share">Отправить контакт</string>
-    <string name="contact_title">Контакты</string>
-    <string name="contact_total_count" formatted="false">Всего контактов %d в сети %d</string>
-    <string name="copied">Скопировано в буффер обмена</string>
-    <string name="create_add_admin">Добавить администраторов</string>
-    <string name="create_add_member">Добавить участника</string>
-    <string name="create_add_moderator">Добавить модераторов</string>
-    <string name="create_total_admins">Администраторы (%d)</string>
-    <string name="create_total_members">Участники (%d)</string>
-    <string name="create_total_moderators">Модераторы (%d)</string>
-    <string name="dark_theme">Темная тема</string>
-    <string name="date_at_time" formatted="false">%s в %s</string>
-    <string name="delete_chat_yes_no">Вы действительно хотите удалить чат?</string>
-    <string name="delete_contact_yes_no">Вы действительно хотите удалить контакт?</string>
-    <string name="delete_image">Удалить фото</string>
-    <string name="delete_target_yes_no">Вы действительно хотите удалить объект?</string>
-    <string name="delete_timer_title">Таймер удаления сообщений</string>
-    <string name="dialog_blocked">Данный пользователь не находиться в вашем списке контактов. Поэтому вы не можете
-        отправить ему сообщение
-    </string>
-    <string name="dialog_go_to_geolocation">Перейти на полученную позицию?</string>
-    <string name="dialog_search_by_coordinates_title">Поиск местности</string>
-    <string name="do_after_sign_up">На указанный Email отправлено подтверждение регистрации. Пожалуйста проверьте
-        электронную почту (папку спам)!
-    </string>
-    <string name="done">Готово</string>
-    <string name="download_compmleated">Загрузка завершена</string>
-    <string name="downloads">Загрузки</string>
-    <string name="edit_devices">Редактировать устройства</string>
-    <string name="ef_camera">КАМЕРА</string>
-    <string name="ef_done">ГОТОВО</string>
-    <string name="ef_error_create_image_file">Не удалось создать файл</string>
-    <string name="ef_error_no_camera">Камера недоступна</string>
-    <string name="ef_error_null_cursor">Ой! Что-то пошло не так!</string>
-    <string name="ef_ltitle_permission_denied">Доступ запрещён</string>
-    <string name="ef_msg_empty_images">Изображений не найдено</string>
-    <string name="ef_msg_limit_images">Лимит выбора изображений</string>
-    <string name="ef_msg_no_camera_permission">Пожалуйста, разрешите доступ к камере, чтобы сделать снимок</string>
-    <string name="ef_msg_no_write_external_permission">Пожалуйста, разрешите доступ к хранилищу, чтобы выбрать
-        изображения
-    </string>
-    <string name="ef_ok">ОК</string>
-    <string name="ef_permission_write_external_rationale">Разрешите доступ к хранилищу, чтобы выбрать изображения
-    </string>
-    <string name="ef_selected">%d выбрано</string>
-    <string name="ef_selected_with_limit">%1$d/%2$d выбрано</string>
-    <string name="ef_title_folder">Папка</string>
-    <string name="ef_title_select_image">Коснитесь, чтобы выбрать</string>
-    <string name="email">Почта</string>
-    <string name="empty_contact_list">Ваш список контактов пуст</string>
-    <string name="errorTitle">Ошибка!</string>
-    <string name="error_confirm_password">Пароль подтверждения не соответствует паролю</string>
-    <string name="error_field_required">Это поле обязательно к заполнению</string>
-    <string name="error_file_is_too_large">Файл слишком большой!</string>
-    <string name="error_incorrect_password">Пароль должен содержать не меньше 6 символов</string>
-    <string name="error_insufficient_space">Недостаточно памяти для загрузки карты</string>
-    <string name="error_invalid_email">Этот адрес электронной почты не похож на почту</string>
-    <string name="error_invalid_id">ID пользователя должен состоять из цифр и латиницы длинной 8 символов</string>
-    <string name="error_invalid_user_id">Пользователя с такой почтой не существует</string>
-    <string name="error_invalid_username">Имя пользователя должно состоять не менее чем из 2 символов</string>
-    <string name="error_no_network_connection">Отсутсвует интернет соединение</string>
-    <string name="error_unknown">Не удалось загрузить!</string>
-    <string name="error_wrong_search_range">Неверный диапазон координат</string>
-    <string name="fcm_fallback_notification_channel_label">Другое</string>
-    <string name="feed_card_info_full_button">Подробнее</string>
-    <string name="feed_card_info_min_button">Короче</string>
-    <string name="feed_download_update">Загрузить</string>
-    <string name="feed_new_device_login_info">Вход с нового устройства</string>
-    <string name="feed_new_device_login_log_app_version">Версия приложения: %s</string>
-    <string name="feed_new_device_login_log_device">Устройство: %s</string>
-    <string name="feed_new_device_login_log_instruction">Если это не вы, нажмите на кнопку <b>\"Нет, это не я\"</b>", и
-        мы удалим это устройство и учетную запись с этого устройства.
-        Если это вы, нажмите на кнопку "<b>\"Да, это я\"</b> и устройство продолжит работу с вашей учетной записью.
-    </string>
-    <string name="feed_new_device_login_log_ip">IP адрес: %s</string>
-    <string name="feed_new_device_login_log_title">Мы обнаружили вход в вашу учетную запись с нового устройства.
-    </string>
-    <string name="feed_new_device_login_no">Нет, это не я</string>
-    <string name="feed_new_device_login_title">Обнаружен вход в учетную запись</string>
-    <string name="feed_new_device_login_yes">Да, это я</string>
-    <string name="feed_server_update_end">Конец:</string>
-    <string name="feed_server_update_start">Начало:</string>
-    <string name="feed_tutorial_open">Открыть</string>
-    <string name="fex_net_files">Файлы</string>
-    <string name="fex_net_folders">Папки</string>
-    <string name="fexnet_base_map">Карты</string>
-    <string name="file_invalid">Файл поврежден</string>
-    <string name="file_error">Ошибка выбора файла</string>
-    <string name="file_placeholder">Файл</string>
-    <string name="fill_required_fields">Заполните обязательные поля</string>
-    <string name="for_you">Вас</string>
-    <string name="from_you">Вы</string>
-    <string name="geolocation_placeholder">Геопозиция</string>
-    <string name="group_action_delete">Удалить группу</string>
-    <string name="group_action_leave">Выйти из группы</string>
-    <string name="group_add_admin_authority">Повысить</string>
-    <string name="group_add_member">Добавить участника</string>
-    <string name="group_admin_hint">Администраторы:</string>
-    <string name="group_admins_title">Администраторы группы</string>
-    <string name="group_authority_admin">Администратор</string>
-    <string name="group_authority_change">Изменить права пользователя</string>
-    <string name="group_authority_chose">Выберите категорию</string>
-    <string name="group_authority_member">Пользователь</string>
-    <string name="group_authority_owner">Владелец</string>
-    <string name="group_blocked">Вас удалили из этой группы</string>
-    <string name="group_change_avatar">Сменить аватар группы</string>
-    <string name="group_create_add_avatar">Добавить аватар группы</string>
-    <string name="group_create_description_hint">Введите описание группы</string>
-    <string name="group_create_select_admins">Выберите администраторов группы:</string>
-    <string name="group_create_select_member">Выберите участников группы:</string>
-    <string name="group_create_select_moderators">Выберите модераторов группы:</string>
-    <string name="group_create_title_hint">Введите название группы</string>
-    <string name="group_delete">Удалить группу</string>
-    <string name="group_delete_admin_authority">Понизить</string>
-    <string name="group_delete_leave">Удалить и покинуть группу</string>
-    <string name="group_delete_member">Удалить</string>
-    <string name="group_delete_member_question">Вы действительно хотите удалить этого участника?</string>
-    <string name="group_description">Описание группы</string>
-    <string name="group_description_changed">Описание группы изменено</string>
-    <string name="group_edit_name">Сменить название группы</string>
-    <string name="group_event_added_member" formatted="false">%s добавил(а) %s</string>
-    <string name="group_event_authority_changed" formatted="false">%s изменил(а) права для %s</string>
-    <string name="group_event_avatar_changed">%s изменил аватар группы</string>
-    <string name="group_event_avatar_removed">%s удалил аватар группы</string>
-    <string name="group_event_deleted_member" formatted="false">%s удалил(а) %s</string>
-    <string name="group_event_description_changed">%s изменил(а) описание группы</string>
-    <string name="group_event_leaved">%s вышел(ла) из группы</string>
-    <string name="group_event_name_changed" formatted="false">%s изменил(а) название группы на %s</string>
-    <string name="group_invalid_description">Описание группы должно содержать не более 126 символов</string>
-    <string name="group_invalid_name">Название группы должно содержать не менее 2 символов</string>
-    <string name="group_is_deleted">Группа удалена</string>
-    <string name="group_leave_group_question">Вы действительно хотите покинуть группу и удалить историю сообщений?
-    </string>
-    <string name="group_member_list">Список участников</string>
-    <string name="group_members">Участников:</string>
-    <string name="group_members_limit_exceed">Превышен лимит на количество пользователей в группе (50 участников)
-    </string>
-    <string name="group_members_title">Участники группы</string>
-    <string name="group_owner_hint">Владелец:</string>
-    <string name="group_prompt_name">Введите название группы</string>
-    <string name="group_removed">%s удалил группу</string>
-    <string name="group_request_forbidden">Вы не имеете прав на это действие</string>
-    <string name="group_select_user">Выберите пользователя</string>
-    <string name="group_title">Название группы</string>
-    <string name="group_title_changed">Название группы изменено</string>
-    <string name="group_title_total_members">%d участников</string>
-    <string name="group_welcome_msg">Вас добавили в группу</string>
-    <string name="group_you_create">Вы создали группу</string>
-    <string name="has_broadcasting">"Включите GPS.
-        Для опредиления координат, приложению Hydrabadger, необходимо включить передачу данных о местоположении"
-    </string>
-    <string name="have_broadcasting">Вы уже транслируете геолокацию в этом чате</string>
-    <string name="have_not_key_for_cipher">У Вас нет ключей для шифрования сообщения. Подождите, до тех пор, пока
-        оппонент не появится онлайн.
-    </string>
-    <string name="hint_ck42_range">От 5 до 7 символов</string>
-    <string name="image_placeholder">Изображение</string>
-    <string name="image_select">Выберите изображение</string>
-    <string name="image_selection_title">Папка</string>
-    <string name="information_title">Информация</string>
-    <string name="invalid_old_password">Введенный пароль не соответствует вашему старому паролю</string>
-    <string name="item_blocked">Заблокированные</string>
-    <string name="item_chats">Чаты</string>
-    <string name="item_contacts">Контакты</string>
-    <string name="item_devices">Устройства</string>
-    <string name="item_elevation">База высот</string>
-    <string name="item_feed">Лента</string>
-    <string name="item_groups">Новая группа</string>
-    <string name="item_help">Помощь</string>
-    <string name="item_map">Карта</string>
-    <string name="item_report">Рапорт</string>
-    <string name="item_reviews">Отзывы</string>
+    <string name="have_broadcasting">You are already broadcasting geolocation in this chat</string>
+    <string name="have_not_key_for_cipher">You haven`t key for cipher. Wait when your opponent is login</string>
+    <string name="hint_ck42_range">From 5 to 7 symbols</string>
+    <string name="image_placeholder">Image</string>
+    <string name="image_select">Tap to select</string>
+    <string name="image_selection_title">Folder</string>
+    <string name="information_title">Information</string>
+    <string name="invalid_old_password">This password is not equivalent old password</string>
+    <string name="item_blocked">Blocked</string>
+    <string name="item_chats">Chats</string>
+    <string name="item_contacts">Contacts</string>
+    <string name="item_devices">Devices</string>
+    <string name="item_elevation">Elevation path</string>
+    <string name="item_feed">Feed</string>
+    <string name="item_groups">New group</string>
+    <string name="item_help">Help</string>
+    <string name="item_map">Map</string>
+    <string name="item_report">Report</string>
+    <string name="item_reviews">Reviews</string>
     <string name="item_salute">S.A.L.U.T.E.</string>
-    <string name="item_search">Поиск</string>
-    <string name="item_settings">Настройки</string>
-    <string name="last_online_date">Был(а) в сети %s</string>
-    <string name="latitude">Широта</string>
-    <string name="layer_add_observers">Добавить</string>
-    <string name="layer_admins_title">Администраторы слоя</string>
-    <string name="layer_change_history">История изменений</string>
-    <string name="layer_change_log_title">События слоя %s</string>
-    <string name="layer_convert_to_private">Сделать шар приватным</string>
-    <string name="layer_convert_to_private_info">"Сделав слой приватным все участники будут удалены из слоя.
-        Вы также можете создать приватную копию слоя для личной работы."
+    <string name="item_search">Search</string>
+    <string name="item_settings">Settings</string>
+    <string name="last_online_date">Was online %s</string>
+    <string name="latitude">Latitude</string>
+    <string name="layer_add_observers">Add</string>
+    <string name="layer_admins_title">Admins of layer</string>
+    <string name="layer_change_history">History of changes</string>
+    <string name="layer_change_log_title">Event of layer %s</string>
+    <string name="layer_convert_to_private">Convert to private</string>
+    <string name="layer_convert_to_private_info">"Making the layer private, all participants will be removed from the
+        layer.
+        You can also create a private copy of the layer for personal work."
     </string>
-    <string name="layer_convert_to_public">Сделать шар публичным</string>
-    <string name="layer_convert_to_public_info">"Сделав слой публичным все объекты этого слоя станут доступными для всех
-        участников слоя.
-        Вы также можете создать публичную копию слоя для совместной работы."
+    <string name="layer_convert_to_public">Convert to public</string>
+    <string name="layer_convert_to_public_info">"Making the layer public, all the objects in this layer will be
+        available to all members of the layer.
+        You can also create a public copy for the collaboration work on layer."
     </string>
-    <string name="layer_create_name_desc_hint">Название слоя и опис:</string>
-    <string name="layer_create_name_hint">Название слоя:</string>
-    <string name="layer_create_notes">Описание:</string>
-    <string name="layer_create_owner_name_hint">Владелец слоя:</string>
-    <string name="layer_create_select_admins">Выберите администраторов слоя:</string>
-    <string name="layer_create_select_editors">Выберите редакторов слоя:</string>
-    <string name="layer_create_select_member">Выберите наблюдателей слоя:</string>
-    <string name="layer_create_title">Создание слоя</string>
-    <string name="layer_delete">Удалить слой</string>
-    <string name="layer_delete_forbidden">У Вас нет полномочий для удаления слоя</string>
-    <string name="layer_delete_yes_no">Вы действительно хотите удалить слой?</string>
-    <string name="layer_duplicate_to_private">Создать приватную копию</string>
-    <string name="layer_duplicate_to_public">Создать публичную копию</string>
-    <string name="layer_editors_title">Редакторы слоя</string>
-    <string name="layer_export">Экспортировать</string>
-    <string name="layer_import">Импортировать</string>
-    <string name="layer_leave">Выйти</string>
-    <string name="layer_leave_question">Вы действительно хотите выйти из слоя?</string>
-    <string name="layer_list_empty">"Вы еще не создали ни одного слоя!
-        Создайте слой и используйте его для операций над объектами"
+    <string name="layer_create_name_desc_hint">Layer name and description:</string>
+    <string name="layer_create_name_hint">Layer name:</string>
+    <string name="layer_create_notes">Description:</string>
+    <string name="layer_create_owner_name_hint">Layer owner:</string>
+    <string name="layer_create_select_admins">Select layer administrators:</string>
+    <string name="layer_create_select_editors">Select layer editors:</string>
+    <string name="layer_create_select_member">Select layer observers:</string>
+    <string name="layer_create_title">Creating layer</string>
+    <string name="layer_delete">Delete layer</string>
+    <string name="layer_delete_forbidden">You do not have permissions to delete the layer</string>
+    <string name="layer_delete_yes_no">Are you sure you want to delete layer?</string>
+    <string name="layer_duplicate_to_private">Create private copy</string>
+    <string name="layer_duplicate_to_public">Create public copy</string>
+    <string name="layer_editors_title">Editors of layer</string>
+    <string name="layer_export">Export layer</string>
+    <string name="layer_import">Import layer</string>
+    <string name="layer_leave">Leave</string>
+    <string name="layer_leave_question">Are you sure you want to leave layer?</string>
+    <string name="layer_list_empty">"Your layer list is empty!
+        Create layer and use it for operations on objects"
     </string>
-    <string name="layer_member_count">Всего пользователей: %d</string>
-    <string name="layer_member_delete_yes_no">Вы действительно хотите удалить пользователя со слоя?</string>
-    <string name="layer_member_menu_remove">Удалить со слоя</string>
-    <string name="layer_member_menu_set_admin">Сделать администратором</string>
-    <string name="layer_member_menu_set_editor">Сделать редактором</string>
-    <string name="layer_member_menu_set_observer">Сделать наблюдателем</string>
-    <string name="layer_member_options_block">Блок.</string>
-    <string name="layer_member_options_delete">Удал.</string>
-    <string name="layer_member_set_admin">Админ.</string>
-    <string name="layer_member_set_editor">Редакт.</string>
-    <string name="layer_member_set_observer">Наблюд.</string>
-    <string name="layer_members_title">Наблюдатели слоя</string>
-    <string name="layer_need_synchronization_info">&lt;Название и описание слоя станет видимым, когда владелец этого
-        слоя появится в сети.>
+    <string name="layer_member_count">Total members: %d</string>
+    <string name="layer_member_delete_yes_no">Are you sure you want to delete user from layer?</string>
+    <string name="layer_member_menu_remove">Delete from layer</string>
+    <string name="layer_member_menu_set_admin">Set admin</string>
+    <string name="layer_member_menu_set_editor">Set editor</string>
+    <string name="layer_member_menu_set_observer">Set observer</string>
+    <string name="layer_member_options_block">Block</string>
+    <string name="layer_member_options_delete">Delete</string>
+    <string name="layer_member_set_admin">Admin</string>
+    <string name="layer_member_set_editor">Editor</string>
+    <string name="layer_member_set_observer">Observer</string>
+    <string name="layer_members_title">Observers of layer</string>
+    <string name="layer_need_synchronization_info">&lt;The name and description of the layer will become visible when
+        the owner of this layer appears on the network.>
     </string>
-    <string name="layer_need_synchronization_info_owner">&lt;Название и описание слоя станет видимым, когда устройство с
-        которого был создан этот слой появится в сети.>
+    <string name="layer_need_synchronization_info_owner">&lt;The name and description of the layer will become visible
+        when the device from which this layer was created appears on the network.>
     </string>
-    <string name="layer_need_synchronization_title">&lt;Нет данных для этого устройства></string>
-    <string name="layer_new">Новый слой</string>
-    <string name="layer_not_found">Слой не найден</string>
-    <string name="layer_object_show">Посмотреть все объекты</string>
-    <string name="layer_object_total">Объекты на этом шаре (%d):</string>
-    <string name="layer_objects_total">Объекты на слое (%d):</string>
-    <string name="layer_option_leave">Покин.</string>
-    <string name="layer_options_edit">Редакт.</string>
-    <string name="layer_options_help">Помощь</string>
-    <string name="layer_options_help_info">"Пользователи делятся на следующие категории:
-        1. Владелец
-        - имеет все права
-        2. Администратор
-        - добавить цель
-        - удалить свои цели
-        - добавлять пользователей (Редактор, Наблюдатель)
-        - изменять права всех пользователей
-        - удалить пользователей
-        3. Редактор
-        - может добавлять цели
-        - может удалять свои цели
-        4. Наблюдатель
-        - может только видеть цели"
+    <string name="layer_need_synchronization_title">&lt;Not found data for this device></string>
+    <string name="layer_new">New layer</string>
+    <string name="layer_not_found">Layer not found</string>
+    <string name="layer_object_show">Show all objects</string>
+    <string name="layer_object_total">Objects in this layer (%d):</string>
+    <string name="layer_objects_total">Objects on layer (%d):</string>
+    <string name="layer_option_leave">Leave</string>
+    <string name="layer_options_edit">Edit</string>
+    <string name="layer_options_help">Help</string>
+    <string name="layer_options_help_info">"Users are divided into the following categories:
+        1. Owner
+        - has all rights
+        2. Administrator
+        - add target
+        - delete your goals
+        - add users (Editor, Observer)
+        - change the rights of all users
+        - delete users
+        3. Editor
+        - can add goals
+        - can delete its goals
+        4. Observer
+        - can only see goals"
     </string>
-    <string name="layer_options_hide_off">Видим.</string>
-    <string name="layer_options_hide_on">Скрыть</string>
-    <string name="layer_options_remove">Удал.</string>
-    <string name="layer_parameters_title">Параметры слоя</string>
-    <string name="layer_remote_blocked">Вас удалили с этого слоя</string>
-    <string name="layer_search_result">Найдено %d слоев:</string>
-    <string name="layer_select_admins">Выберите администраторов слоя:</string>
-    <string name="layer_select_export_layers">Выберите слои для экспорта:</string>
-    <string name="layer_select_member">Выберите наблюдателей слоя:</string>
-    <string name="layer_select_moderators">Выберите модераторов слоя:</string>
-    <string name="layer_select_prompt">Выберите слой</string>
-    <string name="layer_target_add_forbidden">У Вас нет полномочий для добавления объектов на слой</string>
-    <string name="layer_target_cannot_change_visible">Для изменения видимости объекта сделайте шар видимым</string>
-    <string name="layer_title">Слои</string>
-    <string name="layer_title_not_valid">Название слоя должно состоять не менее чем из 2 символов</string>
-    <string name="layer_total">Всего слоев (%d):</string>
-    <string name="layer_total_observers">Наблюдатели (%d):</string>
-    <string name="layer_type_hint">Тип слоя:</string>
-    <string name="layer_type_private">Приватный</string>
-    <string name="layer_type_private_info">"Все объекты на приватном слое храняться только на Вашем устройстве и
-        доступны только Вам.
-        Вы не сможете добавлять участников к этому слою."
+    <string name="layer_options_hide_off">Visible</string>
+    <string name="layer_options_hide_on">Hide</string>
+    <string name="layer_options_remove">Remove</string>
+    <string name="layer_parameters_title">Parameters of layer</string>
+    <string name="layer_remote_blocked">You have been removed from this layer</string>
+    <string name="layer_search_result">Found %d layers:</string>
+    <string name="layer_select_admins">Select layer administrators:</string>
+    <string name="layer_select_export_layers">Select layers for export:</string>
+    <string name="layer_select_member">Select layer observers:</string>
+    <string name="layer_select_moderators">Select layer moderators:</string>
+    <string name="layer_select_prompt">Select layer</string>
+    <string name="layer_target_add_forbidden">You do not have the authority to add objects to the layer</string>
+    <string name="layer_target_cannot_change_visible">To change the visibility of the object, make the layer is
+        visible
     </string>
-    <string name="layer_type_public">Публичный</string>
-    <string name="layer_type_public_info">"Все объекты на публичном слое храняться не только на Вашем устройстве, но и
-        на устройствах участников слоя.
-        Вы сможете добавлять участников к этому слою."
+    <string name="layer_title">Layers</string>
+    <string name="layer_title_not_valid">Layer title must have at least 2 symbol</string>
+    <string name="layer_total">Total layers (%d):</string>
+    <string name="layer_total_observers">Observers (%d):</string>
+    <string name="layer_type_hint">Layer type:</string>
+    <string name="layer_type_private">Private</string>
+    <string name="layer_type_private_info">"All objects on a private layer are stored only on your device and are only
+        available to you.
+        You can not add participants to this layer."
     </string>
-    <string name="layer_unknown_owner">Неизвестный</string>
-    <string name="layer_user_add_forbidden">У Вас нет полномочий для добавления пользователей в слой</string>
-    <string name="layer_user_change_permission_forbidden">У Вас нет полномочий для изменения прав пользователей</string>
-    <string name="layer_user_remove_forbidden">У Вас нет полномочий для удаления пользователей со слоя</string>
-    <string name="loading">Загрузка......</string>
-    <string name="log_out">Выйти</string>
-    <string name="longitude">Долгота</string>
-    <string name="map_GPS_off">Для определения координат включите GPS в настройках устройства</string>
-    <string name="map_add">Добавить</string>
-    <string name="map_add_point">Добавить точку</string>
-    <string name="map_cannot_download_without_internet">Соединение с Интернетом отсутствует, поэтому онлайн карта не
-        отобразится.
+    <string name="layer_type_public">Public</string>
+    <string name="layer_type_public_info">"All objects on the public layer are stored not only on your device, but also
+        on the devices of the layer members.
+        You can add participants to this layer."
     </string>
-    <string name="map_clear_points">Удалить точки</string>
+    <string name="layer_unknown_owner">Unknown</string>
+    <string name="layer_user_add_forbidden">You do not have permissions to add users to the layer</string>
+    <string name="layer_user_change_permission_forbidden">You do not have permissions to modify user rights</string>
+    <string name="layer_user_remove_forbidden">You do not have permissions to remove users from the layer</string>
+    <string name="loading">Loading......</string>
+    <string name="log_out">Log Out</string>
+    <string name="longitude">Longitude</string>
+    <string name="map_GPS_off">For correct work of GPS you need it on</string>
+    <string name="map_add">Add</string>
+    <string name="map_add_point">Add point</string>
+    <string name="map_cannot_download_without_internet">There is no Internet connection, so the online map will not be
+        displayed.
+    </string>
+    <string name="map_clear_points">Clear points</string>
     <string name="map_coordinate_mgrs">MGRS</string>
-    <string name="map_coordinate_sk42">СК-42</string>
+    <string name="map_coordinate_sk42">SK-42</string>
     <string name="map_coordinate_utm">UTM</string>
     <string name="map_coordinate_wgs84">WGS-84</string>
-    <string name="map_coordinate_x">X:</string>
     <string name="map_coordinate_y">Y:</string>
-    <string name="map_coordinates">Координаты %s</string>
-    <string name="map_copy_to_clipboard" formatted="false">Позиция: %s. %s</string>
-    <string name="map_copy_to_clipboard_dk_ak" formatted="false">Позиция: %s. %s. %s, %s</string>
-    <string name="map_file_not_found">Файл с картами не найден. Перейдите в настройки у кажите файл с картами</string>
-    <string name="map_go_to_settings">Перейти к настройкам?</string>
-    <string name="map_object_list_empty">Вы еще не создали ни одного объекта!</string>
-    <string name="map_points">Список</string>
-    <string name="map_selected">Выбрано карту: %s</string>
+    <string name="map_coordinates">Coordinates %s</string>
+    <string name="map_copy_to_clipboard" formatted="false">Position: %s. %s.</string>
+    <string name="map_copy_to_clipboard_dk_ak" formatted="false">Position: %s. %s. %s, %s</string>
+    <string name="map_file_not_found">Map file not found. Open settings and set file with map</string>
+    <string name="map_go_to_settings">Go to settings?</string>
+    <string name="map_object_list_empty">Your object list is empty!</string>
+    <string name="map_points">List</string>
+    <string name="map_selected">Map selected: %s</string>
     <string name="map_settings_coordinate_mgrs">MGRS</string>
-    <string name="map_settings_coordinate_sk42">СК-42</string>
-    <string name="map_settings_coordinate_system">Система координат:</string>
+    <string name="map_settings_coordinate_sk42">SK-42</string>
+    <string name="map_settings_coordinate_system">Coordinate system:</string>
     <string name="map_settings_coordinate_utm">UTM</string>
     <string name="map_settings_coordinate_wgs84">WGS-84</string>
-    <string name="map_status_offline">оффлайн</string>
-    <string name="map_status_online">онлайн</string>
-    <string name="map_title">Карта</string>
-    <string name="member_add_editor">Добавить редакторов</string>
-    <string name="member_add_observer">Добавить наблюдателей</string>
-    <string name="member_total_editor">Редакторы (%d)</string>
-    <string name="member_total_observer">Наблюдатели (%d)</string>
-    <string name="message">Сообщение</string>
-    <string name="message_encrypted_info">Это сообщение зашифровано старыми ключами, его содержание станет видимым когда
-        отправитель сообщения появится в сети.
+    <string name="map_status_offline">offline</string>
+    <string name="map_status_online">online</string>
+    <string name="map_title">Map</string>
+    <string name="member_add_editor">Add editors</string>
+    <string name="member_add_observer">Add observers</string>
+    <string name="member_total_editor">Editors (%d)</string>
+    <string name="member_total_observer">Observers (%d)</string>
+    <string name="message">Message</string>
+    <string name="message_encrypted_info">This message is encrypted with old keys, its contents will be visible when the
+        sender of the message appears on the network.
     </string>
-    <string name="mgrs_search_wrong_format">Неверный формат координат</string>
-    <string name="milstd_dimension_air">Воздушный</string>
-    <string name="milstd_dimension_ground">Наземный</string>
-    <string name="milstd_dimension_other">Другой</string>
-    <string name="milstd_dimension_sea_sub_surface">Подводный</string>
-    <string name="milstd_dimension_sea_surface">Наводний</string>
-    <string name="milstd_dimension_sof">Силы специальных операций</string>
-    <string name="milstd_dimension_space">Космический</string>
-    <string name="milstd_dimension_unknown">Неизвестный</string>
-    <string name="msg_not_sent">Сообщение не отправлено</string>
-    <string name="name_of_locality_hint">Введите название населенного пункта</string>
-    <string name="nearby_error_bluetooth">Проверте ваше Bluetooth соединение</string>
-    <string name="nearby_error_body">Что то пошло не так. %s</string>
-    <string name="nearby_error_gps">Проверте ваши GPS настройки</string>
-    <string name="nearby_error_other">Попробуйте снова</string>
-    <string name="nearby_error_wifi">Проверте ваше Wi-Fi соединение</string>
-    <string name="nearby_permission_error">"Что то пошло не так.
-        Возможно вы не предоставили нужные разрешения"
+    <string name="mgrs_search_wrong_format">Wrong coordinate format</string>
+    <string name="milstd_dimension_air">Air</string>
+    <string name="milstd_dimension_ground">Ground</string>
+    <string name="milstd_dimension_other">Other</string>
+    <string name="milstd_dimension_sea_sub_surface">Sea Sub Surface</string>
+    <string name="milstd_dimension_sea_surface">Sea Surface</string>
+    <string name="milstd_dimension_sof">SOF</string>
+    <string name="milstd_dimension_space">Space</string>
+    <string name="milstd_dimension_unknown">Unknown</string>
+    <string name="msg_not_sent">Message Not sent</string>
+    <string name="name_of_locality_hint">Enter name of locality</string>
+    <string name="nearby_error_bluetooth">Check your Bluetooth connection</string>
+    <string name="nearby_error_body">Something went wrong. %s</string>
+    <string name="nearby_error_gps">Check your GPS settings</string>
+    <string name="nearby_error_other">Try again</string>
+    <string name="nearby_error_wifi">Check your Wi-Fi connection</string>
+    <string name="nearby_permission_error">"Something went wrong.
+        You may not have granted permissions."
     </string>
-    <string name="nearby_request_permisson_hint">Для поиска соседних устройств необходимо предоставить доступ к вашим
-        GPS координатам и микрофону
+    <string name="nearby_request_permisson_hint">To search for neighboring devices, you must provide access to your GPS
+        coordinates and microphone
     </string>
-    <string name="nearby_search_text">Поиск соседних пользователей</string>
-    <string name="nearby_shake_hint">"Потрясите другим телефоном
-        с установленным Hydrabadger"
+    <string name="nearby_search_text">Search nearby users</string>
+    <string name="nearby_shake_hint">"Shake another phone
+        with installed Hydrabadger"
     </string>
-    <string name="newVersionAvailable">Доступна новая версия %s. Скачать?</string>
-    <string name="new_password">Новый пароль</string>
-    <string name="no">Нет</string>
-    <string name="no_app_for_opening_file">Не найдено приложения для открытия файла</string>
-    <string name="no_sound">Без звука</string>
-    <string name="north_text">Север</string>
-    <string name="nothing_found">По вашему запросу ничего не найдено</string>
-    <string name="notification_contact_request_name">Запросы в контакты</string>
-    <string name="notification_dialog_message_name">Сообщения из диалогов</string>
-    <string name="notification_file_loading">Загружаемые фалы</string>
-    <string name="notification_group_message_name">Сообщения из групп</string>
-    <string name="notification_message_locked">Для Вас есть новые сообщения</string>
-    <string name="notification_mute_1_day">Заблокировать на 1 день</string>
-    <string name="notification_mute_2_hours">Заблокировать на 2 часа</string>
-    <string name="notification_mute_6_hours">Заблокировать на 6 часов</string>
-    <string name="notification_server_message_name">Новостные сообщения</string>
-    <string name="notifications">Оповещения</string>
-    <string name="object_placeholder">Объект</string>
-    <string name="object_preview_label_affiliation">Принадлежность:</string>
-    <string name="object_preview_label_dimension">Пространство:</string>
-    <string name="object_preview_label_function">Функция:</string>
-    <string name="off_line">Был в сети</string>
-    <string name="ok">Хорошо</string>
-    <string name="old_password">Текущий пароль</string>
-    <string name="on_line">В сети</string>
-    <string name="open_mail">Открыть почту</string>
-    <string name="options">Действия</string>
-    <string name="or">или</string>
-    <string name="orientation_left">Слева</string>
-    <string name="orientation_right">Справа</string>
-    <string name="password">Пароль</string>
-    <string name="password_changed">Пароль изменен</string>
-    <string name="pin_code_changed">Код изменен</string>
-    <string name="pin_code_deleted">PIN-код выключен</string>
-    <string name="pin_code_match_error">Неправильный PIN-код!</string>
-    <string name="pin_code_set">Код задан</string>
-    <string name="pin_put_code">Введите PIN-код</string>
-    <string name="pin_put_confirm_code">Подтвердите код</string>
-    <string name="pin_put_confirm_error">Код подтверждения не совпадает!</string>
-    <string name="pin_put_new_code">Введите ваш новый 4-значный код</string>
-    <string name="preview_object_action_deails">Детали</string>
-    <string name="preview_object_action_send">Отправить</string>
-    <string name="preview_object_layer">Слой</string>
-    <string name="preview_object_owner">Созд.</string>
-    <string name="prompt_email">Почта</string>
-    <string name="prompt_password">Пароль (не менее 6 символов)</string>
-    <string name="prompt_print_email">Введите ваш email</string>
-    <string name="prompt_select_contact">Выберите контакт</string>
-    <string name="prompt_username">Имя пользователя</string>
-    <string name="push_notification">Отображать уведомления</string>
-    <string name="qr_code_disk_saved">Изображение успешно сохранено!</string>
-    <string name="qr_code_file_name">my_qr_code.png</string>
-    <string name="qr_code_disk_saved_fail">Невозможно сохранить изображение в этой папке</string>
-    <string name="recover_password_bad_request">Неверная ссылка.</string>
-    <string name="recover_password_changed">Пароль был успешно изменен. Попробуйте войти с новым паролем</string>
-    <string name="recover_password_confirm_password">Подтвердите новый пароль</string>
-    <string name="recover_password_forbidden">"Время на смену пароля закончилось!
-        Ссылка на сброс пароля действительна в течение 2 часов после отправки сообщения на электронную почту."
+    <string name="newVersionAvailable">Available new version %s. Download?</string>
+    <string name="new_password">New password</string>
+    <string name="no">No</string>
+    <string name="no_app_for_opening_file">No app for opening this file</string>
+    <string name="no_sound">No sound</string>
+    <string name="north_text">North</string>
+    <string name="nothing_found">Nothing found on your request</string>
+    <string name="notification_contact_request_name">Request to contact</string>
+    <string name="notification_dialog_message_name">Dialog message</string>
+    <string name="notification_file_loading">File loading</string>
+    <string name="notification_group_message_name">Group message</string>
+    <string name="notification_message_locked">You have a new messages</string>
+    <string name="notification_mute_1_day">Mute on 1 day</string>
+    <string name="notification_mute_2_hours">Mute on 2 hours</string>
+    <string name="notification_mute_6_hours">Mute on 6 hours</string>
+    <string name="notification_server_message_name">News message</string>
+    <string name="notifications">Notifications</string>
+    <string name="object_placeholder">Object</string>
+    <string name="object_preview_label_affiliation">Affiliation:</string>
+    <string name="object_preview_label_dimension">Dimension:</string>
+    <string name="object_preview_label_function">Function:</string>
+    <string name="off_line">offline</string>
+    <string name="ok">OK</string>
+    <string name="old_password">Old password</string>
+    <string name="on_line">online</string>
+    <string name="open_mail">Open email app</string>
+    <string name="options">Options</string>
+    <string name="or">or</string>
+    <string name="orientation_left">Left</string>
+    <string name="orientation_right">Right</string>
+    <string name="password">Password</string>
+    <string name="password_changed">Password is successfully changed</string>
+    <string name="pin_code_changed">Pin changed</string>
+    <string name="pin_code_deleted">PIN-code disabled</string>
+    <string name="pin_code_match_error">Wrong PIN-code!</string>
+    <string name="pin_code_set">Pin set</string>
+    <string name="pin_put_code">Put your PIN-code</string>
+    <string name="pin_put_confirm_code">Confirm your code</string>
+    <string name="pin_put_confirm_error">Confirm code error!</string>
+    <string name="pin_put_new_code">Enter your new 4-digit code</string>
+    <string name="preview_object_action_deails">Details</string>
+    <string name="preview_object_action_send">Send</string>
+    <string name="preview_object_layer">Layer</string>
+    <string name="preview_object_owner">Owner</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (not less 6 character)</string>
+    <string name="prompt_print_email">Print your email</string>
+    <string name="prompt_select_contact">Select contact</string>
+    <string name="prompt_username">Username</string>
+    <string name="push_notification">Push notification</string>
+    <string name="qr_code_disk_saved">QR code saved successfully!</string>
+    <string name="qr_code_disk_saved_fail">"Can't save qr code in this dir"</string>
+    <string name="recover_password_bad_request">Invalid link.</string>
+    <string name="recover_password_changed">Password is successfully changed. Try to login with it</string>
+    <string name="recover_password_confirm_password">Confirm password</string>
+    <string name="recover_password_forbidden">"Time for change password is end!
+        The password reset link is valid for one hour after the email is sent."
     </string>
-    <string name="recover_password_new_password">Новый пароль</string>
-    <string name="recover_password_set_password">Изменить пароль</string>
-    <string name="recover_password_title">Сброс пароля</string>
-    <string name="refresh_password_info">Система отправит инструкцию для сброса пароля, которая прийдет на Ваш email
+    <string name="recover_password_new_password">New password</string>
+    <string name="recover_password_set_password">Set new password</string>
+    <string name="recover_password_title">Reset password</string>
+    <string name="refresh_password_info">The system will send a instruction for refresh your password that will come to
+        your email
     </string>
-    <string name="region_and_district">%1$s обл. %2$s рн.</string>
-    <string name="region_without_district">%1$s обл. %2$s</string>
-    <string name="repeated_new_password">Новый пароль, еще раз</string>
-    <string name="report_details_title">Рапорт за %s</string>
-    <string name="report_filter_apply">Применить</string>
-    <string name="report_filter_clear">Сбросить</string>
-    <string name="report_filter_parameters">Параметры фильтров:</string>
-    <string name="report_filter_title">Фильтр рапортов</string>
-    <string name="report_for">Для</string>
-    <string name="report_from">От</string>
-    <string name="report_hostility_friendly">Дружественный</string>
-    <string name="report_hostility_hostile">Враждебный</string>
-    <string name="report_hostility_involved">Задействованный</string>
-    <string name="report_hostility_probably_friend">Вероятно дружественный</string>
-    <string name="report_hostility_probably_hostile">Вероятно враждебный</string>
-    <string name="report_hostility_probably_involved">Вероятно задействованный</string>
-    <string name="report_hostility_probably_neutral">Вероятно нейтральний</string>
-    <string name="report_hostility_unknown">Неизвестно</string>
-    <string name="report_info_coordinates">Координаты:</string>
-    <string name="report_info_end_observe">Конец наблюдения:</string>
-    <string name="report_info_equipment">Вооружение:</string>
-    <string name="report_info_hostility">Враждебность:</string>
-    <string name="report_info_staff_count">Количество персонала:</string>
-    <string name="report_info_start_observe">Начало наблюдения:</string>
-    <string name="report_info_type">Тип:</string>
-    <string name="report_is_send">Рапорт отправлен!</string>
-    <string name="report_name">Название рапорта</string>
-    <string name="report_new_activity">Активность:</string>
-    <string name="report_new_date_range_from">С</string>
-    <string name="report_new_date_range_to">По</string>
-    <string name="report_new_description_actions">Описание действий объекта</string>
-    <string name="report_new_destination">Адресат:</string>
-    <string name="report_new_equipment">Оборудование:</string>
-    <string name="report_new_equipment_count">Количество оборудования (тенты, вооружение, електроника)</string>
-    <string name="report_new_equipment_hint">Тип и название вооружения (через запятую)</string>
-    <string name="report_new_location">Местонахождение:</string>
-    <string name="report_new_location_ground">Местонахождение на местности</string>
-    <string name="report_new_machines_count">Количество техники</string>
-    <string name="report_new_name_hint">Введите название рапорта</string>
-    <string name="report_new_object_scale">Масштаб объекта:</string>
-    <string name="report_new_observer_time">Время наблюдения:</string>
-    <string name="report_new_send">Отправить</string>
-    <string name="report_new_staff_count">Количество персонала</string>
-    <string name="report_new_title">Новый рапорт</string>
-    <string name="report_options_details">Детали</string>
-    <string name="report_options_remove">Удалить</string>
-    <string name="report_received_title">Получ.</string>
-    <string name="report_search_result">Найдено %d рапортов:</string>
-    <string name="report_select_receiver_hint">Виберите получателя рапорта:</string>
-    <string name="report_select_receiver_title">Получатель рапорта</string>
-    <string name="report_send_title">Отправ.</string>
-    <string name="report_type_battalion">Батальон</string>
-    <string name="report_type_company">Рота</string>
-    <string name="report_type_division">Дивизион</string>
-    <string name="report_type_subdivision">Подразделение</string>
-    <string name="required_field">Поле является обязательным для заполнения</string>
-    <string name="search_menu_title">Поиск</string>
-    <string name="search_not_found">Ничего не найдено</string>
-    <string name="select">Выбрать</string>
-    <string name="server_bad_gateway">Проблема с сервером. Попробуйте чуть позже</string>
-    <string name="server_too_many_requests">"Вы совершили слишком много запросов на сервер!
-        Попробуйте через час"
+    <string name="region_and_district">%1$s reg. %2$s dis.</string>
+    <string name="region_without_district">%1$s reg. %2$s</string>
+    <string name="repeated_new_password">Confirm new password</string>
+    <string name="report_details_title">Report from %s</string>
+    <string name="report_filter_apply">Apply</string>
+    <string name="report_filter_clear">Clear</string>
+    <string name="report_filter_parameters">Filter parameters:</string>
+    <string name="report_filter_title">Report filter</string>
+    <string name="report_for">For</string>
+    <string name="report_from">From</string>
+    <string name="report_hostility_friendly">Friendly</string>
+    <string name="report_hostility_hostile">Hostile</string>
+    <string name="report_hostility_involved">Involved</string>
+    <string name="report_hostility_probably_friend">Probably friendly</string>
+    <string name="report_hostility_probably_hostile">Probably hostile</string>
+    <string name="report_hostility_probably_involved">Probably involved</string>
+    <string name="report_hostility_probably_neutral">Probably neutral</string>
+    <string name="report_hostility_unknown">Unknown</string>
+    <string name="report_info_coordinates">Coordinates:</string>
+    <string name="report_info_end_observe">End of observation:</string>
+    <string name="report_info_equipment">Equipment:</string>
+    <string name="report_info_hostility">Hostility type:</string>
+    <string name="report_info_staff_count">Staff count:</string>
+    <string name="report_info_start_observe">Started observation:</string>
+    <string name="report_info_type">Type:</string>
+    <string name="report_is_send">Report was sent!</string>
+    <string name="report_name">Name of report</string>
+    <string name="report_new_activity">Activity:</string>
+    <string name="report_new_date_range_from">From</string>
+    <string name="report_new_date_range_to">To</string>
+    <string name="report_new_description_actions">Description of objects actions</string>
+    <string name="report_new_destination">Destination:</string>
+    <string name="report_new_equipment">Equipment:</string>
+    <string name="report_new_equipment_count">Amount of equipment</string>
+    <string name="report_new_equipment_hint">Type and name of weapons (separate via comma)</string>
+    <string name="report_new_location">Location:</string>
+    <string name="report_new_location_ground">Location on the ground</string>
+    <string name="report_new_machines_count">Amount of machines</string>
+    <string name="report_new_name_hint">Enter the name of report</string>
+    <string name="report_new_object_scale">Scale of the object:</string>
+    <string name="report_new_observer_time">Observation time:</string>
+    <string name="report_new_send">Send</string>
+    <string name="report_new_staff_count">Staff count</string>
+    <string name="report_new_title">New report</string>
+    <string name="report_options_details">Details</string>
+    <string name="report_options_remove">Remove</string>
+    <string name="report_received_title">Received</string>
+    <string name="report_search_result">Found %d reports:</string>
+    <string name="report_select_receiver_hint">Select recipient:</string>
+    <string name="report_select_receiver_title">Recipient of report</string>
+    <string name="report_send_title">Sent</string>
+    <string name="report_type_battalion">Battalion</string>
+    <string name="report_type_company">Company</string>
+    <string name="report_type_division">Division</string>
+    <string name="report_type_subdivision">Subdivision</string>
+    <string name="required_field">Required field</string>
+    <string name="search_menu_title">Search</string>
+    <string name="search_not_found">Not results</string>
+    <string name="select">Select</string>
+    <string name="server_bad_gateway">Server problem. Try it later</string>
+    <string name="server_too_many_requests">"You've made too many server requests!
+        Try it in an hour"
     </string>
-    <string name="settings">Настройки</string>
-    <string name="settings_account">Моя учетная запись</string>
-    <string name="settings_angle_azimuth">Азимут</string>
-    <string name="settings_angle_directional">Дирекционный</string>
-    <string name="settings_angle_display">Отображение угла:</string>
-    <string name="settings_app_theme">Тема интерфейса</string>
-    <string name="settings_app_theme_dark">Темная</string>
-    <string name="settings_app_theme_light">Светлая</string>
-    <string name="settings_ask_logout">Вы действительно хотите выйти из учетной записи?</string>
-    <string name="settings_ask_offline_logout">"При выходе из аккаунта без подключения к интернету, Вы рискуете потерять
-        доступ к аккаунту, так как некоторые данные все еще будут доступны для этого устройства.
-        Вы действительно хотите выйти из учетной записи?"
+    <string name="settings">Settings</string>
+    <string name="settings_account">My account</string>
+    <string name="settings_angle_azimuth">Azimuth</string>
+    <string name="settings_angle_directional">Directional</string>
+    <string name="settings_angle_display">Angle display:</string>
+    <string name="settings_app_theme">Theme interface:</string>
+    <string name="settings_app_theme_dark">Dark</string>
+    <string name="settings_app_theme_light">Light</string>
+    <string name="settings_ask_logout">Are you sure you want to quit from account?</string>
+    <string name="settings_ask_offline_logout">"When you exit an account without connecting to the Internet, you
+        increase the risk of losing your account, as some data will still be available for this device.
+        Are you sure you want to quit from account?"
     </string>
-    <string name="settings_auto_download_2g">Автоматически загружать через мобильные сети:</string>
-    <string name="settings_auto_download_wifi">Автоматически загружать через WiFi:</string>
-    <string name="settings_avatar">Аватар</string>
-    <string name="settings_avatar_add">Добавить фото</string>
-    <string name="settings_avatar_change">Изменить фото</string>
-    <string name="settings_avatar_remove">Удалить фото</string>
-    <string name="settings_button_orientation">Ориентация кнопок на карте</string>
-    <string name="settings_change">Сменить</string>
-    <string name="settings_change_chat_background">Изменить фон окна чата</string>
-    <string name="settings_change_username">Сменить имя</string>
-    <string name="settings_change_your_password">Изменить пароль</string>
-    <string name="settings_chat_background">Фон окна чата:</string>
-    <string name="settings_clear_media">Очистка хранилища</string>
-    <string name="settings_contacts_data">Мои контактные данные:</string>
+    <string name="settings_auto_download_2g">Automatically download via mobile networks:</string>
+    <string name="settings_auto_download_wifi">Automatically download via WiFi:</string>
+    <string name="settings_avatar">Avatar</string>
+    <string name="settings_avatar_add">Upload photo</string>
+    <string name="settings_avatar_change">Change photo</string>
+    <string name="settings_avatar_remove">Remove photo</string>
+    <string name="settings_button_orientation">Button orientation</string>
+    <string name="settings_change">Change</string>
+    <string name="settings_change_chat_background">Change the background of the chat window</string>
+    <string name="settings_change_username">Change callName</string>
+    <string name="settings_change_your_password">Change password</string>
+    <string name="settings_chat_background">Background of the chat window:</string>
+    <string name="settings_clear_media">Clear storage</string>
+    <string name="settings_contacts_data">My contact details:</string>
     <string name="settings_coordinate_mgrs">MGRS</string>
-    <string name="settings_coordinate_sk42">СК-42</string>
-    <string name="settings_coordinate_system">Система координат:</string>
+    <string name="settings_coordinate_sk42">SK-42</string>
+    <string name="settings_coordinate_system">Coordinate system:</string>
     <string name="settings_coordinate_utm">UTM</string>
     <string name="settings_coordinate_wgs84">WGS-84</string>
-    <string name="settings_delete_data">Удалить данные с устройства</string>
-    <string name="settings_devices">Активные устройства</string>
-    <string name="settings_devices_local">Текущее устройство:</string>
-    <string name="settings_devices_other">Другие устройства (%d):</string>
-    <string name="settings_download_files">Файлы</string>
-    <string name="settings_download_photo">Фото</string>
-    <string name="settings_download_video">Видео</string>
-    <string name="settings_edit_black_list">Редактировать черный список</string>
-    <string name="settings_edit_media_storage">Управлять хранилищем</string>
-    <string name="settings_elevation">База высот:</string>
-    <string name="settings_elevation_add">Добавить карту высот</string>
-    <string name="settings_elevation_list">Список высот:</string>
-    <string name="settings_elevation_path">Путь к высотам</string>
-    <string name="settings_emergency_delete_data">Удалить все данные</string>
-    <string name="settings_emergency_delete_data_accept">Удалить все данные и выйти</string>
-    <string name="settings_emergency_delete_data_info">Срочное удаление уничтожит все данные приложения и выйдет с Вашей
-        учетной записи навсегда!
+    <string name="settings_delete_data">Delete data from device</string>
+    <string name="settings_devices">Active devices</string>
+    <string name="settings_devices_local">Local device:</string>
+    <string name="settings_devices_other">Other devices (%d):</string>
+    <string name="settings_download_files">Files</string>
+    <string name="settings_download_photo">Photo</string>
+    <string name="settings_download_video">Video</string>
+    <string name="settings_edit_black_list">Edit blacklist</string>
+    <string name="settings_edit_media_storage">Manage repository</string>
+    <string name="settings_elevation">Elevation:</string>
+    <string name="settings_elevation_add">Add elevation</string>
+    <string name="settings_elevation_list">Elevation list:</string>
+    <string name="settings_elevation_path">Elevation path</string>
+    <string name="settings_emergency_delete_data_accept">Delete all data and log out</string>
+    <string name="settings_emergency_delete_data_info">Urgent removal will destroy all data from the application and
+        will be logout from your account!
     </string>
-    <string name="settings_fexnet_cancel_download">Отменить загрузку</string>
-    <string name="settings_help">Помощь:</string>
-    <string name="settings_help_Hydrabadger">Справка Hydrabadger</string>
-    <string name="settings_help_title">Помощь</string>
-    <string name="settings_interface_title">Интерфейс</string>
-    <string name="settings_logout">Выйти</string>
-    <string name="settings_logout_on_other_devices">Выйти из учетной записи на других устройствах</string>
-    <string name="settings_map">Карта:</string>
-    <string name="settings_map_add">Добавить карту</string>
-    <string name="settings_map_coordinate_title">Карты и координаты</string>
-    <string name="settings_map_download">Загрузить карту</string>
-    <string name="settings_map_list">Список карт:</string>
-    <string name="settings_media_storage">Мое медиа хранилище:</string>
-    <string name="settings_media_storage_full_clear">Полностью очистить хранилище</string>
-    <string name="settings_media_storage_info" formatted="false">%d файл, %.1f MB доступно из %.1f MB</string>
-    <string name="settings_media_storage_not_received_users">Пользователи (%d) которые не получили файл:</string>
-    <string name="settings_media_storage_title">Список файлов не полученных пользователелями</string>
-    <string name="settings_media_storage_your">Ваши файлы:</string>
-    <string name="settings_military_functional">Функционал военного</string>
-    <string name="settings_mini">Настройки</string>
-    <string name="settings_notification">Оповещения на экране:</string>
-    <string name="settings_notifications_title">Оповещения</string>
-    <string name="settings_options">Опции:</string>
-    <string name="settings_screen_lock_automate">Автоматически блокировать:</string>
-    <string name="settings_screen_lock_code">Код блокировки экрана</string>
-    <string name="settings_screen_lock_set_code">Задать код</string>
-    <string name="settings_screen_lock_time_15_minute">Через 15 минут</string>
-    <string name="settings_screen_lock_time_1_minute">Через 1 минуту</string>
-    <string name="settings_screen_lock_time_30_minute">Через 30 минут</string>
-    <string name="settings_screen_lock_time_60_minute">Через 1 час</string>
-    <string name="settings_screen_lock_time_now">Немедленно</string>
-    <string name="settings_screen_lock_via_code">Блокировать экран с помощью кода:</string>
-    <string name="settings_security_online_status">Мой онлайн статус</string>
-    <string name="settings_security_options">Опции безопасности</string>
-    <string name="settings_social_ask_disconnect">Вы действительно желаете отсоединить %s от аккаунта?</string>
-    <string name="settings_social_connect">Присоединить</string>
-    <string name="settings_social_connected">Присоединен</string>
-    <string name="settings_social_network">Настройки учетной записи</string>
-    <string name="settings_software_version">Версия: %s</string>
-    <string name="settings_sound_invite_to_contact">Приглашение в контакты</string>
-    <string name="settings_sound_invite_to_group">Приглашения в группы</string>
-    <string name="settings_sound_message">Сообщения</string>
-    <string name="settings_sound_notification">Звуковые сигналы:</string>
-    <string name="settings_sound_volume">Громкость</string>
-    <string name="settings_successfully_save">Настройки успешно сохраненны</string>
-    <string name="settings_transfer_and_media_title">Передача и медиа хранилище</string>
-    <string name="settings_username_changed">Имя успешно изменено</string>
-    <string name="sign_in_exception_social_is_unused">Эта социальная сеть не привязана ни к одному аккаунту. Попробуйте
-        привязать ее в настройках аккаунта или зарегистрироваться
+    <string name="settings_fexnet_cancel_download">Cancel download</string>
+    <string name="settings_help">Help:</string>
+    <string name="settings_help_title">Help</string>
+    <string name="settings_interface_title">Interface</string>
+    <string name="settings_logout">Log out</string>
+    <string name="settings_logout_on_other_devices">Log out of account on other devices</string>
+    <string name="settings_map">Map:</string>
+    <string name="settings_map_add">Add map</string>
+    <string name="settings_map_coordinate_title">Maps and coordinates</string>
+    <string name="settings_map_download">Download map</string>
+    <string name="settings_map_list">Map list:</string>
+    <string name="settings_media_storage">My media repository:</string>
+    <string name="settings_media_storage_full_clear">Clear completely storage</string>
+    <string name="settings_media_storage_info" formatted="false">%d file, %.1f MB available from %.1f MB</string>
+    <string name="settings_media_storage_not_received_users">Users (%d) who did not receive the file:</string>
+    <string name="settings_media_storage_title">List of files not received by users</string>
+    <string name="settings_media_storage_your">Your storage:</string>
+    <string name="settings_military_functional">Functional military</string>
+    <string name="settings_mini">Settings</string>
+    <string name="settings_notification">Notification on the screen:</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_options">Options:</string>
+    <string name="settings_screen_lock_automate">Automatically lock:</string>
+    <string name="settings_screen_lock_code">Screen lock code</string>
+    <string name="settings_screen_lock_set_code">Set code</string>
+    <string name="settings_screen_lock_time_15_minute">After 15 minutes</string>
+    <string name="settings_screen_lock_time_1_minute">After 1 minute</string>
+    <string name="settings_screen_lock_time_30_minute">After 30 minutes</string>
+    <string name="settings_screen_lock_time_60_minute">After 1 hour</string>
+    <string name="settings_screen_lock_time_now">Immediately</string>
+    <string name="settings_screen_lock_via_code">Lock the screen using code:</string>
+    <string name="settings_security_online_status">My online status</string>
+    <string name="settings_security_options">Security options</string>
+    <string name="settings_social_ask_disconnect">Are you sure you want to disconnect %s from your account?</string>
+    <string name="settings_social_connect">Connect</string>
+    <string name="settings_social_connected">Connected</string>
+    <string name="settings_social_network">Account settings</string>
+    <string name="settings_software_version">Version: %s</string>
+    <string name="settings_sound_invite_to_contact">Invite to the contacts</string>
+    <string name="settings_sound_invite_to_group">Invite to groups</string>
+    <string name="settings_sound_message">Message</string>
+    <string name="settings_sound_notification">Sound signals:</string>
+    <string name="settings_sound_volume">Loudness</string>
+    <string name="settings_successfully_save">Settings saved successfully</string>
+    <string name="settings_transfer_and_media_title">Data transfer and media repository</string>
+    <string name="settings_username_changed">CallName is successfully changed</string>
+    <string name="sign_in_exception_social_is_unused">"This social network isn't connected to account. Try to connect it
+        in account settings or sign up"
     </string>
-    <string name="sign_in_via_social">Войти с помощью</string>
-    <string name="sign_up_exception_email_is_used">Данный email уже используется. Выберите другую почту или попробуйте
-        войти.
+    <string name="sign_in_via_social">Sign in via</string>
+    <string name="sign_up_exception_email_is_used">This email is used. Try other email or login</string>
+    <string name="sign_up_exception_social_email_is_used">Social network response us email that was registered. Try
+        other email or login
     </string>
-    <string name="sign_up_exception_social_email_is_used">Социальная сеть вернула нам email который уже используется.
-        Выберите другую почту или попробуйте войти.
+    <string name="sign_up_exception_social_is_used">This social network was connected to account. Try to login</string>
+    <string name="sign_up_final_message">"Thank you!
+        Your invite link has been sent to your email address.
+        Log in to your mailbox and follow the link to confirm your registration."
     </string>
-    <string name="sign_up_exception_social_is_used">Эта социальная сеть уже привязана к аккаунту. Попробуйте войти
-    </string>
-    <string name="sign_up_final_message">"Спасибо!
-        На ваш электронный адрес отправлена ссылка.
-        Зайдите на ваш почтовый ящик и перейдите по ссылке для подтверждения регистрации."
-    </string>
-    <string name="sign_up_required_fields">* - обязательные поля для заполнения</string>
-    <string name="sign_up_social_email_hint">"Для окончания регистрации нам нужна Ваша почта.
+    <string name="sign_up_required_fields">* - required fields</string>
+    <string name="sign_up_social_email_hint">"We need your mail to complete the registration.
 
-        Она будет использоваться только в следующих случаях:
-        1. Когда необходимо выполнить вход в приложение с помощью почты с паролем
-        2. Когда нужно восстановить пароль
-        3. Когда есть необходимость подтвердить, что это Ваш аккаунт"
+        It will only be used in the following cases:
+        1. When you need to log in to the application using mail with password
+        2. When you need to recover password
+        3. When it is necessary to confirm that this is your account"
     </string>
-    <string name="sign_up_social_final_message">"Спасибо!
-        Вы успешно зарегистрировались!
-        На Вашу почту было отправлено письмо для подтверждения регистрации.
-        После подтверждения Вы сможете войти используя одну из социальных сетей."
+    <string name="sign_up_social_final_message">"Thank you!
+        You have successfully registered!
+        An email has been sent to your email to confirm registration.
+        After confirmation you can log in using one of the social networks."
     </string>
-    <string name="sign_up_via_social">Зарегистрироваться с помощью</string>
-    <string name="sound_notification">Звук уведомления</string>
-    <string name="start_watching">Начать просмотр</string>
-    <string name="status_bar_notification_info_overflow">>999</string>
-    <string name="stop_broadcasting">Остановить трансляцию</string>
-    <string name="stop_receive_geolocation">Вы действительно хотите прекратить просмотр геопозиции?</string>
-    <string name="stop_receive_geolocation_from">Вы действительно хотите прекратить просмотр геопозиции от %s</string>
-    <string name="storage">Память</string>
-    <string name="storage_clear_ask">Удалить медиафайлы?</string>
-    <string name="storage_clear_done">Все медиафайлы удалены!</string>
-    <string name="storage_limit_reached">Превышен лимит отправки медиа-файлов</string>
-    <string name="storage_title">Хранилище</string>
-    <string name="target_actuate">Время актуальности</string>
-    <string name="target_actuate_date">Время актуальности</string>
-    <string name="target_coordinates_empty">Цель должна иметь корректные координаты</string>
-    <string name="target_coordinates_less_5">Координаты должны содержать минимум 5 цифр</string>
-    <string name="target_create_layer_hint">Создать в слое:</string>
-    <string name="target_create_title">Создание объекта</string>
-    <string name="target_edit">Редактировать объект</string>
-    <string name="target_encrypted_info">Этот объект зашифрован невалидным ключем, его содержание станет видимым когда
-        отправитель сообщения появится в сети.
+    <string name="sign_up_via_social">Sign up via</string>
+    <string name="sound_notification">Sound notification</string>
+    <string name="start_watching">Start watching</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+    <string name="stop_broadcasting">Stop broadcasting</string>
+    <string name="stop_receive_geolocation">Do you really want to stop viewing geolocation?</string>
+    <string name="stop_receive_geolocation_from">Do you really want to stop viewing geolocation from %s</string>
+    <string name="storage">Storage</string>
+    <string name="storage_clear_ask">Clear files?</string>
+    <string name="storage_clear_done">All files is deleted!</string>
+    <string name="storage_limit_reached">Storage limit reached</string>
+    <string name="storage_title">Storage</string>
+    <string name="target_actuate">Actuate date</string>
+    <string name="target_actuate_date">Actuate date</string>
+    <string name="target_coordinates_empty">Target must have correct coordinates</string>
+    <string name="target_coordinates_less_5">Coordinates must have min 5 numeric</string>
+    <string name="target_create_layer_hint">Create in layer:</string>
+    <string name="target_create_title">Creating object</string>
+    <string name="target_edit">Edit object</string>
+    <string name="target_encrypted_info">This object is encrypted with old keys, its contents will be created when the
+        sender of the message appears on the network.
     </string>
-    <string name="target_exist_in_layer">"Объект уже присутствует на данном слое.
-        Вы действительно хотите его добавить?"
+    <string name="target_exist_in_layer">"The object already present on this layer.
+        Do you really want to add if?"
     </string>
-    <string name="target_failed_filter">Объект, который Вы создали, не попадает в параметры фильтра, поэтому он не будет
-        отображаться на карте.
+    <string name="target_failed_filter">"Object you are create don't match any filter settings, therefore would not be
+        shown on the map."
     </string>
-    <string name="target_filter_date_range" formatted="false">с %s по %s</string>
-    <string name="target_filter_date_range_from">С</string>
-    <string name="target_filter_date_range_hint">Общее время:</string>
-    <string name="target_filter_date_range_to">По</string>
-    <string name="target_filter_is_empty">Вы не задали параметры для фильтра!</string>
-    <string name="target_filter_layer">Слой %s</string>
-    <string name="target_filter_object_param">Параметры объекта:</string>
-    <string name="target_filter_parameters">Параметры фильтра:</string>
-    <string name="target_filter_title">Фильтр объектов</string>
+    <string name="target_filter_date_range" formatted="false">from %s to %s</string>
+    <string name="target_filter_date_range_from">From</string>
+    <string name="target_filter_date_range_hint">Date range:</string>
+    <string name="target_filter_date_range_to">To</string>
+    <string name="target_filter_is_empty">You are not set params for filter!</string>
+    <string name="target_filter_layer">Layer %s</string>
+    <string name="target_filter_object_param">Object parameters:</string>
+    <string name="target_filter_parameters">Filter parameters:</string>
+    <string name="target_filter_title">Object filter</string>
     <string name="target_h">H:</string>
     <string name="target_h_hint">H</string>
-    <string name="target_hostility_friend">Дружественный</string>
-    <string name="target_hostility_hostile">Враждебный</string>
-    <string name="target_hostility_neutral">Нейтральный</string>
-    <string name="target_hostility_type">Враждебность</string>
-    <string name="target_hostility_unknown">Неопознанный</string>
-    <string name="target_info_actuate_date">Время актуальности:</string>
-    <string name="target_info_coordinates">Координаты:</string>
-    <string name="target_info_layer">Слой:</string>
-    <string name="target_info_owner">Владелец:</string>
-    <string name="target_info_report_date">Время обнаружения:</string>
-    <string name="target_layer_hint">Создан в шаре:</string>
-    <string name="target_list">Объекты (всего %d)</string>
-    <string name="target_name">Название</string>
-    <string name="target_name_hint">Название объекта</string>
-    <string name="target_notes">Заметки</string>
-    <string name="target_of_layer">Объекты слоя</string>
-    <string name="target_options_edit">Редакт.</string>
-    <string name="target_options_hide_off">Видим.</string>
-    <string name="target_options_hide_on">Скрыть</string>
-    <string name="target_options_remove">Удал.</string>
-    <string name="target_report">Время обнаружения</string>
-    <string name="target_report_date">Время обнаружения</string>
-    <string name="target_search_result">Найдено %d объектов:</string>
-    <string name="target_title">Объекты</string>
-    <string name="target_title_empty">Название цели должно состоять не менее чем из 1 символа</string>
-    <string name="target_type">Тип:</string>
-    <string name="target_type_control_points">Пункты управления</string>
-    <string name="target_type_weapons">Вооружения</string>
+    <string name="target_hostility_friend">Friend</string>
+    <string name="target_hostility_hostile">Hostile</string>
+    <string name="target_hostility_neutral">Neutral</string>
+    <string name="target_hostility_type">Hostility type:</string>
+    <string name="target_hostility_unknown">Unknown</string>
+    <string name="target_info_actuate_date">Actuate date:</string>
+    <string name="target_info_coordinates">Coordinates:</string>
+    <string name="target_info_layer">Layer:</string>
+    <string name="target_info_owner">Owner:</string>
+    <string name="target_info_report_date">Report date:</string>
+    <string name="target_layer_hint">Created in layer:</string>
+    <string name="target_list">Objects (total %d)</string>
+    <string name="target_name">Name</string>
+    <string name="target_name_hint">Object name</string>
+    <string name="target_notes">Notes</string>
+    <string name="target_of_layer">Objects of layer</string>
+    <string name="target_options_edit">Edit</string>
+    <string name="target_options_hide_off">Visible</string>
+    <string name="target_options_hide_on">Hide</string>
+    <string name="target_options_remove">Remove</string>
+    <string name="target_report">Reporting date</string>
+    <string name="target_report_date">Reporting date</string>
+    <string name="target_search_result">Found %d objects:</string>
+    <string name="target_title">Objects</string>
+    <string name="target_title_empty">Title must have at least 1 symbol</string>
+    <string name="target_type">Type:</string>
+    <string name="target_type_control_points">Control points</string>
+    <string name="target_type_weapons">Weapons</string>
     <string name="target_x">X:</string>
     <string name="target_x_hint">X</string>
     <string name="target_y">Y:</string>
     <string name="target_y_hint">Y</string>
-    <string name="title_choose_map">Выберите карту</string>
-    <string name="to_map">На карту</string>
-    <string name="to_you">Вам</string>
-    <string name="total_members">Всего учасников: %d</string>
-    <string name="tw__login_btn_txt">Войти с учётной записью Твиттера</string>
-    <string name="unavailable_internet_connection">Проверьте подключение к Интернету!</string>
-    <string name="upload_image">Загрузить фото</string>
-    <string name="user_is_typing">%1$s пишет</string>
-    <string name="users_are_typing">%1$s пишут</string>
-    <string name="users_for_add">Вы можете добавить пользователей:</string>
-    <string name="vibration">Вибрация</string>
-    <string name="warning">Внимание</string>
-    <string name="warning_back">Назад</string>
-    <string name="warning_message">"Данная функция появится в следующих версиях Hydrabadger.
+    <string name="title_choose_map">Select Map</string>
+    <string name="to_map">To map</string>
+    <string name="to_you">To you</string>
+    <string name="total_members">Total members: %d</string>
+    <string name="tw__login_btn_txt">Log in with Twitter</string>
+    <string name="unavailable_internet_connection">Check your internet connection!</string>
+    <string name="upload_image">Upload photo</string>
+    <string name="user_is_typing">%1$s is typing</string>
+    <string name="users_are_typing">%1$s are typing</string>
+    <string name="users_for_add">You can add this users:</string>
+    <string name="vibration">Vibration</string>
+    <string name="warning">Warning</string>
+    <string name="warning_back">Back</string>
+    <string name="warning_message">"This function will appear in the next versions of Hydrabadger.
 
-        Спасибо за проявленный интерес!"
+        Thank you for your interest!"
     </string>
-    <string name="yes">Да</string>
-    <string name="zxing_app_name">Сканер штрих-кодов</string>
+    <string name="yes">Yes</string>
+    <string name="zxing_app_name">Barcode Scanner</string>
     <string name="zxing_button_ok">OK</string>
-    <string name="zxing_msg_camera_framework_bug">К сожалению, возникла ошибка камеры. Может потребоваться перезагрузить
-        устройство.
+    <string name="zxing_msg_camera_framework_bug">Sorry, the Android camera encountered a problem. You may need to
+        restart the device.
     </string>
-    <string name="zxing_msg_default_status">Чтобы сканировать штрих-код, поместите его в прямоугольник видоискателя.
-    </string>
-
-    <string name="canceled">Отменено</string>
-    <string name="select_dir_for_saving">Выберите католог для сохранения</string>
+    <string name="zxing_msg_default_status">Place a barcode inside the viewfinder rectangle to scan it.</string>
+    <string name="action_add">Add</string>
+    <string name="canceled">Canceled</string>
+    <string name="clear">clear</string>
+    <string name="contact_request_error">Error when requesting to add to contacts</string>
+    <string name="copied_message">Message copied!</string>
+    <string name="date_header_today">Today</string>
+    <string name="date_header_yesterday">Yesterday</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="default_notification_channel_name">fcm_default</string>
+    <string name="fcm_message">FCM Message</string>
+    <string name="file_error">File selection error</string>
+    <string name="hint_enter_a_message">Type a message…</string>
+    <string name="msg_subscribe_failed">FCM unsubscribe</string>
+    <string name="msg_subscribed">FCM subscribe</string>
+    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+    <string name="qr_code_file_name">my_qr_code.png</string>
+    <string name="save_user_settings">Save changes?</string>
+    <string name="select_dir_for_saving">Select a directory to save</string>
+    <string name="settings_emergency_delete_data">Delete all data</string>
+    <string name="settings_help_Hydrabadger">Help Hydrabadger</string>
+    <string name="start">Start</string>
+    <string name="start_1x">start_1x</string>
+    <string name="start_2x">start_2x</string>
+    <string name="start_3x">start_3x</string>
+    <string name="start_typing_status">Start typing</string>
+    <string name="status">status</string>
+    <string name="stop_typing_status">Stop typing</string>
+    <string name="sync">Loading</string>
+    <string name="syncing">Loading...</string>
+    <string name="syncing_completed_well">Download complete</string>
+    <string name="syncing_completed_well_">Download successful</string>
+    <string name="syncing_error">Loading error</string>
+    <string name="syncing_error_sign">To download, you need to attach an account in the settings</string>
+    <string name="tag_chats">TAG_CHAT</string>
+    <string name="tag_chats2">TAG_CHAT2</string>
+    <string name="tag_contacts">TAG_CONTACTS</string>
+    <string name="tag_lenta">TAG_LENTA</string>
+    <string name="tag_settings">TAG_SETTINGS</string>
+    <string name="title_chats">Chats</string>
+    <string name="title_contacts">Contacts</string>
+    <string name="title_lenta">Tape</string>
+    <string name="title_settings">Settings</string>
     <string name="uid">uid</string>
-    <!--<string name="scan_success">Успешно отсканировано</string>-->
-
-    <string name="save_user_settings">Сохранить изменения?</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

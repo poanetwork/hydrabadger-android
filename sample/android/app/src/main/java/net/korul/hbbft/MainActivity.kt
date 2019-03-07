@@ -4,17 +4,16 @@ import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
-import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
+import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures
+import net.korul.hbbft.CommonData.utils.AppUtils
+import net.korul.hbbft.CommonFragments.tabChats.AddDialogFragment
 import net.korul.hbbft.CommonFragments.tabContacts.ContactsFragment
 import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
@@ -25,16 +24,15 @@ import net.korul.hbbft.CoreHBBFT.UserWork.getAnyLocalUserByUid
 import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
 import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
-import net.korul.hbbft.common.data.fixtures.DialogsFixtures
-import net.korul.hbbft.common.utils.AppUtils
-import net.korul.hbbft.features.DefaultDialogsFragment
-import net.korul.hbbft.features.DefaultMessagesFragment
-import net.korul.hbbft.firebaseStorage.MyDownloadService
-import net.korul.hbbft.firebaseStorage.MyUploadService
+import net.korul.hbbft.Dialogs.DialogsFragment
+import net.korul.hbbft.Dialogs.MessagesFragment
+import net.korul.hbbft.FirebaseStorageDU.MyDownloadRoomService
+import net.korul.hbbft.FirebaseStorageDU.MyDownloadUserService
+import net.korul.hbbft.FirebaseStorageDU.MyUploadRoomService
+import net.korul.hbbft.FirebaseStorageDU.MyUploadUserService
 import java.io.File
 
 //import com.judemanutd.autostarter.AutoStartPermissionHelper
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
 
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.view, DefaultDialogsFragment.newInstance(), getString(R.string.tag_chats))
+                transaction.replace(R.id.view, DialogsFragment.newInstance(), getString(R.string.tag_chats))
                 transaction.addToBackStack(getString(R.string.tag_chats))
                 transaction.commit()
 
@@ -117,36 +115,37 @@ class MainActivity : AppCompatActivity() {
 
         if (this.intent.getBooleanExtra("Start_App", false)) {
             Log.d(TAG, "Receive push and start activity")
-            val roomName = intent.getStringExtra("RoomName")
+            val RoomId = intent.getStringExtra("RoomId")
 
             val dialogs = DialogsFixtures.dialogs
             for (diag in dialogs) {
-                if (diag.dialogName == roomName) {
-                    Log.d(TAG, "Found dialog and start it $roomName")
+                if (diag.id == RoomId) {
+                    Log.d(TAG, "Found dialog and start it $RoomId")
 
                     supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
                     supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
 
                     val transaction = supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.view, DefaultDialogsFragment.newInstance(true, roomName))
+                    transaction.replace(R.id.view, DialogsFragment.newInstance(true, RoomId))
                     transaction.addToBackStack(getString(R.string.tag_chats))
                     transaction.commit()
                 }
             }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val intent = Intent()
-                val packageName = packageName
-                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                    intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                    intent.data = Uri.parse("package:net.korul.hbbft")
-                    startActivity(intent)
+        }
+//        else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                val intent = Intent()
+//                val packageName = packageName
+//                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+//                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+//                    intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+//                    intent.data = Uri.parse("package:net.korul.hbbft")
+//                    startActivity(intent)
 
 //                    AutoStartPermissionHelper.getInstance().getAutoStartPermission(this)
-                }
-            }
-        }
+//                }
+//            }
+//        }
 
         val themeRestart = prefs.getBoolean("Theme_NeedRestart", false)
         if (themeRestart) {
@@ -171,13 +170,12 @@ class MainActivity : AppCompatActivity() {
 
         // Register receiver for uploads and downloads
         val manager = LocalBroadcastManager.getInstance(this)
-        manager.registerReceiver(broadcastReceiver, MyDownloadService.intentFilter)
-        manager.registerReceiver(broadcastReceiver, MyUploadService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyDownloadUserService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyUploadUserService.intentFilter)
     }
 
     public override fun onStop() {
         super.onStop()
-
         // Unregister download receiver
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
     }
@@ -188,10 +186,10 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "onReceive:$intent")
 
                 when (intent.action) {
-
-                    MyDownloadService.DOWNLOAD_COMPLETED -> {
-                        val filepath = intent.getStringExtra(MyDownloadService.EXTRA_FILE_DOWNLOADED)
-                        val uid = intent.getStringExtra(MyDownloadService.EXTRA_UID_DOWNLOADED)
+                    // User
+                    MyDownloadUserService.DOWNLOAD_COMPLETED -> {
+                        val filepath = intent.getStringExtra(MyDownloadUserService.EXTRA_FILE_DOWNLOADED)
+                        val uid = intent.getStringExtra(MyDownloadUserService.EXTRA_UID_DOWNLOADED)
 
                         val avatarFile = File(filepath)
 
@@ -203,15 +201,19 @@ class MainActivity : AppCompatActivity() {
                         updateAvatarInAllLocalUserByUid(uid, avatarFile)
                     }
 
-                    MyDownloadService.DOWNLOAD_ERROR -> {
+                    MyDownloadUserService.DOWNLOAD_ERROR -> {
                         AppUtils.showToast(
                             context,
                             "Download Avatar Error", true
                         )
                     }
 
-                    MyUploadService.UPLOAD_COMPLETED -> {
-                        val filepath = intent.getStringExtra(MyUploadService.EXTRA_FILE_URI)
+                    MyDownloadUserService.DOWNLOAD_FILE_NOT_FOUND -> {
+                        Log.d(TAG, getString(R.string.avatar_file_not_found))
+                    }
+
+                    MyUploadUserService.UPLOAD_COMPLETED -> {
+                        val filepath = intent.getStringExtra(MyUploadUserService.EXTRA_FILE_URI)
                         if (filepath != null) {
                             val file = File(filepath)
                             updateAvatarInAllLocalUserByUid(uniqueID1, file)
@@ -228,13 +230,12 @@ class MainActivity : AppCompatActivity() {
 
                             AppUtils.showToast(
                                 context,
-                                "UPLOAD Avatar Error", true
+                                "UPLOAD Avatar COMPLETED", true
                             )
                         }
-
                     }
 
-                    MyUploadService.UPLOAD_ERROR -> {
+                    MyUploadUserService.UPLOAD_ERROR -> {
                         val myFragment =
                             supportFragmentManager.findFragmentByTag(getString(R.string.tag_settings)) as SettingsUserFragment?
                         if (myFragment != null && myFragment.isVisible) {
@@ -243,6 +244,59 @@ class MainActivity : AppCompatActivity() {
                         AppUtils.showToast(
                             context,
                             "UPLOAD Avatar Error", true
+                        )
+                    }
+
+
+                    // Room
+                    MyDownloadRoomService.DOWNLOAD_COMPLETED -> {
+                        val uid = intent.getStringExtra(MyDownloadRoomService.EXTRA_UID_DOWNLOADED)
+
+                        AppUtils.showToast(
+                            context,
+                            "ADDED DIALOG complete - $uid", true
+                        )
+                    }
+
+                    MyDownloadRoomService.DOWNLOAD_ERROR -> {
+                        AppUtils.showToast(
+                            context,
+                            "ADDED DIALOGError", true
+                        )
+                    }
+
+                    MyDownloadRoomService.DOWNLOAD_FILE_NOT_FOUND -> {
+                        Log.d(TAG, getString(R.string.room_file_not_found))
+                    }
+
+                    MyUploadRoomService.UPLOAD_ROOM_COMPLETED -> {
+                        val filepath = intent.getStringExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI)
+                        val roomID = intent.getStringExtra(MyUploadRoomService.EXTRA_ROOM_ID)
+                        if (filepath != null && roomID != null) {
+                            File(filepath)
+
+                            val myFragment =
+                                supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AddDialogFragment?
+                            if (myFragment != null && myFragment.isVisible) {
+                                myFragment.dismissProgressBar()
+                            }
+
+                            AppUtils.showToast(
+                                context,
+                                "ADDED DIALOG COMPLETED", true
+                            )
+                        }
+                    }
+
+                    MyUploadRoomService.UPLOAD_ROOM_ERROR -> {
+                        val myFragment =
+                            supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AddDialogFragment?
+                        if (myFragment != null && myFragment.isVisible) {
+                            myFragment.dismissProgressBar()
+                        }
+                        AppUtils.showToast(
+                            context,
+                            "ADDED DIALOG Error", true
                         )
                     }
                 }
@@ -255,13 +309,13 @@ class MainActivity : AppCompatActivity() {
         if (fragments.size > 0) {
             val lastFragment = fragments[fragments.size - 1]
             if (lastFragment != null && lastFragment.isVisible) {
-                if (lastFragment is DefaultMessagesFragment) {
+                if (lastFragment is MessagesFragment) {
                     if (lastFragment.onBackPressed()) {
                         supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
                         supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
 
                         val transaction = supportFragmentManager.beginTransaction()
-                        transaction.replace(R.id.view, DefaultDialogsFragment.newInstance())
+                        transaction.replace(R.id.view, DialogsFragment.newInstance())
                         transaction.addToBackStack(getString(R.string.tag_chats))
                         transaction.commit()
                     }

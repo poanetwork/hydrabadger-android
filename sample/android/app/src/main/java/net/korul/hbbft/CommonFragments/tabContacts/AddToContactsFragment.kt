@@ -17,23 +17,17 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.android.synthetic.main.fragment_add_to_contact.*
 import lib.folderpicker.FolderPicker
+import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.IAddToContacts
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.utils.AppUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-interface IAddToContacts {
-    fun errorAddContact()
-}
 
-interface IAddToContacts2 {
-    fun errorAddContact()
-    fun user(user: User)
-}
 
 class AddToContactsFragment : Fragment() {
 
@@ -77,17 +71,17 @@ class AddToContactsFragment : Fragment() {
         }
 
         button_add_contact.setOnClickListener {
-            if (contact_id_or_email.text.toString().isEmpty()) {
-                contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
+            if (contact_id.text.toString().isEmpty()) {
+                contact_id.error = getString(R.string.contact_request_error_email_or_id)
             } else
-                getUserFromLocalOrDownloadFromFirebase(contact_id_or_email.text.toString(), object :
-                    IAddToContacts2 {
+                getUserFromLocalOrDownloadFromFirebase(contact_id.text.toString(), object :
+                    IAddToContacts {
                     override fun user(user: User) {
 
                     }
 
                     override fun errorAddContact() {
-                        contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
+                        contact_id.error = getString(R.string.contact_request_error_email_or_id)
                     }
                 })
         }
@@ -111,8 +105,7 @@ class AddToContactsFragment : Fragment() {
                 PERMISSIONS_STORAGE,
                 REQUEST_EXTERNAL_STORAGE
             )
-        }
-        else {
+        } else {
             onSaveQRCode()
         }
     }
@@ -174,14 +167,14 @@ class AddToContactsFragment : Fragment() {
                     )
 
                     getUserFromLocalOrDownloadFromFirebase(result.contents, object :
-                        IAddToContacts2 {
+                        IAddToContacts {
                         override fun user(user: User) {
 
                         }
 
                         override fun errorAddContact() {
                             handler.post {
-                                contact_id_or_email.error = getString(R.string.contact_request_error_email_or_id)
+                                contact_id.error = getString(R.string.contact_request_error_email_or_id)
                             }
                         }
                     })

@@ -20,14 +20,14 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_settings_account.*
 import lib.folderpicker.FolderPicker
+import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
 import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
+import net.korul.hbbft.FirebaseStorageDU.MyUploadUserService
+import net.korul.hbbft.ImageWork.ImageUtil.circleShape
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.utils.AppUtils
-import net.korul.hbbft.firebaseStorage.MyUploadService
-import net.korul.hbbft.imageWork.ImageUtil.circleShape
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.concurrent.thread
@@ -37,6 +37,7 @@ class SettingsUserFragment : Fragment() {
 
     lateinit var progress: ProgressDialog
     val handle = Handler()
+    var clickOnAvatar: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,22 +67,41 @@ class SettingsUserFragment : Fragment() {
         }
 
         action_back.setOnClickListener {
-            val builder = AlertDialog.Builder(activity!!)
-            builder.setMessage(R.string.save_user_settings)
-                .setPositiveButton(R.string.action_ok) { _, _ ->
-                    saveUser()
-                    (activity as AppCompatActivity).supportFragmentManager.popBackStack()
-                }
-                .setNegativeButton(R.string.cancel) { _, _ ->
-                    (activity as AppCompatActivity).supportFragmentManager.popBackStack()
-                }
-            builder.create()
-            builder.show()
+            if (somethingChanged()) {
+                val builder = AlertDialog.Builder(activity!!)
+                builder.setMessage(R.string.save_user_settings)
+                    .setPositiveButton(R.string.action_ok) { _, _ ->
+                        saveUser()
+                        (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+                        val currentFragment =
+                            activity!!.supportFragmentManager.findFragmentByTag(getString(R.string.tag_settings))
+                        if (currentFragment is SettingsFragment) {
+                            val fragTransaction = activity!!.supportFragmentManager.beginTransaction()
+                            fragTransaction.detach(currentFragment)
+                            fragTransaction.attach(currentFragment)
+                            fragTransaction.commit()
+                        }
+                    }
+                    .setNegativeButton(R.string.cancel) { _, _ ->
+                        (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+                    }
+                builder.create()
+                builder.show()
+            } else {
+                (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+            }
         }
 
         action_confirm.setOnClickListener {
             saveUser()
             (activity as AppCompatActivity).supportFragmentManager.popBackStack()
+            val currentFragment = activity!!.supportFragmentManager.findFragmentByTag(getString(R.string.tag_settings))
+            if (currentFragment is SettingsFragment) {
+                val fragTransaction = activity!!.supportFragmentManager.beginTransaction()
+                fragTransaction.detach(currentFragment)
+                fragTransaction.attach(currentFragment)
+                fragTransaction.commit()
+            }
         }
 
         account_name.text = SpannableStringBuilder(mCurUser.name)
@@ -89,6 +109,7 @@ class SettingsUserFragment : Fragment() {
         account_id.text = SpannableStringBuilder(mCurUser.uid)
 
         account_icon.setOnClickListener {
+            clickOnAvatar = true
             verifyStoragePermissionsAndPickFile(activity!!)
         }
 
@@ -99,6 +120,17 @@ class SettingsUserFragment : Fragment() {
         } else {
             account_icon.setImageResource(R.drawable.ic_contact)
         }
+    }
+
+    fun somethingChanged(): Boolean {
+        if (clickOnAvatar)
+            return true
+        if (account_name.text.toString() != mCurUser.name)
+            return true
+        if (account_nick.text.toString() != mCurUser.nick)
+            return true
+
+        return false
     }
 
     fun setImageAvatar(file: File) {
@@ -150,10 +182,10 @@ class SettingsUserFragment : Fragment() {
 
                         val uploadUri = Uri.fromFile(localFile)
                         context!!.startService(
-                            Intent(context, MyUploadService::class.java)
-                                .putExtra(MyUploadService.EXTRA_FILE_URI, uploadUri)
-                                .putExtra(MyUploadService.EXTRA_USER_ID, mCurUser.uid)
-                                .setAction(MyUploadService.ACTION_UPLOAD)
+                            Intent(context, MyUploadUserService::class.java)
+                                .putExtra(MyUploadUserService.EXTRA_FILE_URI, uploadUri)
+                                .putExtra(MyUploadUserService.EXTRA_USER_ID, mCurUser.uid)
+                                .setAction(MyUploadUserService.ACTION_UPLOAD)
                         )
                     }
                 } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -172,7 +204,6 @@ class SettingsUserFragment : Fragment() {
             pickFile()
         }
     }
-
 
 
     fun dismissProgressBar() {
@@ -207,8 +238,7 @@ class SettingsUserFragment : Fragment() {
                 PERMISSIONS_STORAGE,
                 REQUEST_EXTERNAL_STORAGE
             )
-        }
-        else {
+        } else {
             pickFile()
         }
     }

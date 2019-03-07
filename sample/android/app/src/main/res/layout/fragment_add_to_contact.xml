@@ -2,7 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+                android:layout_height="fill_parent"
+                android:background="?android:attr/windowBackground"
+                android:clickable="true"
+                android:focusable="true">
     <android.support.constraint.ConstraintLayout android:layout_gravity="fill" android:id="@+id/toolbar"
                                                  android:layout_width="fill_parent"
                                                  android:layout_height="?actionBarSize"
@@ -34,7 +37,7 @@
                                                        android:layout_marginTop="2.0dip"
                                                        app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
                                                        style="@style/TextInputLayout.Fragments">
-            <AutoCompleteTextView android:id="@+id/contact_id_or_email" android:focusable="true"
+            <AutoCompleteTextView android:id="@+id/contact_id" android:focusable="true"
                                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                                   android:maxLines="1" android:inputType="text"
                                   android:imeOptions="actionNext|flagNoExtractUi" style="@style/EditText.Fragments"/>

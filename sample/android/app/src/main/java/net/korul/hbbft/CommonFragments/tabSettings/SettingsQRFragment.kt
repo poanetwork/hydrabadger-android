@@ -17,11 +17,10 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.android.synthetic.main.fragment_settings_account_qr_code.*
 import lib.folderpicker.FolderPicker
-import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts2
+import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -141,7 +140,7 @@ class SettingsQRFragment : Fragment() {
                     Toast.makeText(activity, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
 
                     getUserFromLocalOrDownloadFromFirebase(result.contents, object :
-                        IAddToContacts2 {
+                        IAddToContacts {
                         override fun user(user: User) {
 
                         }

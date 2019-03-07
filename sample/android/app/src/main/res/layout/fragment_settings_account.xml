@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
+              android:clickable="true"
+              android:focusable="true">
     <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
                     android:layout_height="?actionBarSize" app:layout_constraintStart_toStartOf="parent"
                     style="@style/Toolbar">

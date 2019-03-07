@@ -3,7 +3,9 @@
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:id="@+id/main_layout" android:fitsSystemWindows="true"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
+              android:clickable="true"
+              android:focusable="true">
     <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
                     android:layout_height="?actionBarSize" style="@style/Toolbar">
         <include android:id="@+id/action_back" android:layout_width="wrap_content" android:layout_height="wrap_content"
