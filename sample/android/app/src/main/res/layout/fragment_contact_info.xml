@@ -169,9 +169,9 @@
                        android:layout_marginBottom="25dp" android:foregroundGravity="center_horizontal"
                        android:layout_gravity="center_horizontal"/>
             <LinearLayout android:orientation="horizontal" android:id="@+id/save_qr_code" android:paddingLeft="32.0dip"
-                          android:paddingRight="32.0dip" android:paddingBottom="16.0dip"
+                          android:paddingRight="32.0dip"
                           android:layout_width="match_parent"
-                          android:layout_height="match_parent" android:layout_marginBottom="8.0dip"
+                          android:layout_height="match_parent"
                           android:layout_alignParentLeft="true" android:layout_alignParentBottom="true"
                           style="@style/SubTitle.Clicked">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -184,7 +184,7 @@
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/export_qr_code"
                           android:paddingLeft="32.0dip"
-                          android:paddingRight="32.0dip" android:paddingBottom="16.0dip"
+                          android:paddingRight="32.0dip" android:paddingBottom="@dimen/dimen_20dp"
                           android:layout_width="match_parent"
                           android:layout_height="match_parent" android:layout_marginBottom="@dimen/dimen_20dp"
                           android:layout_alignParentLeft="true" android:layout_alignParentBottom="true"
