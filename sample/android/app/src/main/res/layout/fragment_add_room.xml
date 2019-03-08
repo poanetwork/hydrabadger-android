@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="?android:attr/windowBackground"
+                android:clickable="true"
+                android:focusable="true">
+    <android.support.constraint.ConstraintLayout android:layout_gravity="fill" android:id="@+id/toolbar"
+                                                 android:layout_width="fill_parent"
+                                                 android:layout_height="?actionBarSize"
+                                                 app:layout_constraintStart_toStartOf="parent" style="@style/Toolbar">
+        <RelativeLayout android:layout_width="fill_parent"
+                        android:layout_height="fill_parent" app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent">
+            <include android:id="@+id/action_back" android:layout_width="wrap_content"
+                     android:layout_height="wrap_content" android:layout_alignParentLeft="true"
+                     android:layout_alignParentTop="true" android:layout_alignParentBottom="true"
+                     layout="@layout/toolbar_button_back"/>
+            <TextView android:id="@+id/toolbar_text" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:text="@string/room_add_title"
+                      style="@style/toolbar_not_caps_text" android:layout_centerInParent="true"/>
+        </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
+
+
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+                android:layout_below="@id/toolbar">
+        <LinearLayout android:orientation="vertical" android:paddingLeft="8.0dip" android:paddingTop="16.0dip"
+                      android:paddingRight="8.0dip" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_above="@id/save_qr_code" android:layout_below="@id/toolbar">
+
+
+            <RelativeLayout android:orientation="horizontal" android:paddingTop="8.0dip"
+                            android:paddingRight="8.0dip" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:paddingLeft="8.0dip">
+
+
+                <Button android:layout_gravity="center" android:id="@+id/button_open_qr_scanner"
+                        android:paddingLeft="10.0dip"
+                        android:paddingRight="10.0dip" android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16.0dip" android:text="@string/contact_qr_scan"
+                        android:drawablePadding="-16.0dip" style="@style/button.green"
+                        android:layout_alignParentLeft="true"/>
+
+                <Button android:layout_gravity="center" android:id="@+id/button_open_qr_gallary"
+                        android:paddingLeft="10.0dip"
+                        android:paddingRight="10.0dip" android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16.0dip" android:text="@string/contact_qr_gallary"
+                        android:drawablePadding="-16.0dip" style="@style/button.green"
+                        android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+
+
+            <ImageView android:layout_gravity="center_horizontal" android:id="@+id/my_qr_code_view"
+                       android:layout_width="300dp" android:layout_height="300dp"
+                       android:layout_marginTop="16.0dip" android:layout_marginBottom="8.0dip"/>
+            <Button android:layout_gravity="center" android:id="@+id/button_add_dialog_qr"
+                    android:paddingLeft="10.0dip"
+                    android:paddingRight="10.0dip" android:layout_width="250.0dip" android:layout_height="wrap_content"
+                    android:layout_marginTop="16.0dip" android:text="@string/contact_add"
+                    android:drawablePadding="-16.0dip"
+                    style="@style/button.green" android:visibility="gone"/>
+            <TextView android:textSize="16.0sp" android:textStyle="bold" android:layout_gravity="center"
+                      android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:layout_marginTop="16.0dip" android:text="@string/or" style="@style/TextView.Text"/>
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:text="@string/room_request_prompt_id"
+                      app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                      style="@style/TextView.Text"/>
+            <android.support.design.widget.TextInputLayout android:id="@+id/dialog_id_layout"
+                                                           android:orientation="horizontal"
+                                                           android:layout_width="fill_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:layout_marginTop="2.0dip"
+                                                           app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
+                                                           style="@style/TextInputLayout.Fragments">
+
+
+                <RelativeLayout android:orientation="horizontal" android:paddingTop="8.0dip"
+                                android:paddingRight="8.0dip" android:layout_width="match_parent"
+                                android:layout_height="wrap_content" android:paddingLeft="8.0dip">
+
+                    <AutoCompleteTextView android:id="@+id/dialog_id" android:focusable="true"
+                                          android:layout_width="fill_parent" android:layout_height="wrap_content"
+                                          android:maxLines="1" android:inputType="text"
+                                          android:imeOptions="actionNext|flagNoExtractUi"
+                                          style="@style/EditText.Fragments"
+                                          android:layout_centerVertical="true"
+                                          android:layout_toLeftOf="@id/button_add_dialog"
+                                          android:layout_marginRight="10dp"
+                                          android:textColorHint="@color/new_text_attachment_primary_color_light"/>
+
+                    <Button android:layout_gravity="center" android:id="@+id/button_add_dialog"
+                            android:paddingLeft="10.0dip"
+                            android:paddingRight="10.0dip" android:layout_width="86dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16.0dip" android:text="@string/contact_add"
+                            android:drawablePadding="-16.0dip"
+                            style="@style/button.green" android:layout_weight="1" android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true" android:visibility="gone"/>
+                </RelativeLayout>
+
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

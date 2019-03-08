@@ -19,9 +19,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 class ShowBigQRActivity : AppCompatActivity() {
-
-    private val FOLDERPICKER_CODE = 111
-
     lateinit var qr: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,10 +34,12 @@ class ShowBigQRActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
+        action_back.setOnClickListener {
+            finish()
+        }
 
         save_qr_code.setOnClickListener {
-            verifyStoragePermissions(this)
-            onSaveQRCode()
+            verifyStoragePermissionsAndSace(this)
         }
     }
 
@@ -51,18 +50,20 @@ class ShowBigQRActivity : AppCompatActivity() {
     }
 
 
-    fun verifyStoragePermissions(activity: Activity) {
+    fun verifyStoragePermissionsAndSace(activity: Activity) {
         // Check if we have write permission
         val permission =
             ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
+            // We don't have permission so prompt the dialog
             ActivityCompat.requestPermissions(
                 activity,
                 PERMISSIONS_STORAGE,
                 REQUEST_EXTERNAL_STORAGE
             )
+        } else {
+            onSaveQRCode()
         }
     }
 
@@ -100,6 +101,7 @@ class ShowBigQRActivity : AppCompatActivity() {
     }
 
     companion object {
+        private val FOLDERPICKER_CODE = 111
         private val REQUEST_EXTERNAL_STORAGE = 1
         private val PERMISSIONS_STORAGE =
             arrayOf(

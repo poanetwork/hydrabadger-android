@@ -3,7 +3,9 @@
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:id="@+id/main_layout" android:fitsSystemWindows="true"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+              android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
+              android:clickable="true"
+              android:focusable="true">
     <RelativeLayout android:layout_gravity="fill" android:id="@+id/toolbar" android:layout_width="fill_parent"
                     android:layout_height="?actionBarSize" style="@style/Toolbar">
         <include android:id="@+id/action_back" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -48,7 +50,7 @@
                                                              android:layout_marginTop="16.0dip"
                                                              android:text="@string/settings_screen_lock_automate"
                                                              style="@style/TitleText"/>
-                <RadioGroup android:id="@+id/lock_time_radio_group" android:layout_width="fill_parent"
+                <RadioGroup android:layout_width="fill_parent"
                             android:layout_height="wrap_content" android:checkedButton="@id/lock_immediately_button">
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
                                                                     android:id="@+id/lock_immediately_button"
@@ -58,28 +60,24 @@
                                                                     android:layout_weight="1.0"
                                                                     style="@style/SubTitle.RadioButton"/>
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
-                                                                    android:id="@+id/lock_1_minute_button"
                                                                     android:layout_width="fill_parent"
                                                                     android:layout_height="wrap_content"
                                                                     android:text="@string/settings_screen_lock_time_1_minute"
                                                                     android:layout_weight="1.0"
                                                                     style="@style/SubTitle.RadioButton"/>
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
-                                                                    android:id="@+id/lock_15_minute_button"
                                                                     android:layout_width="fill_parent"
                                                                     android:layout_height="wrap_content"
                                                                     android:text="@string/settings_screen_lock_time_15_minute"
                                                                     android:layout_weight="1.0"
                                                                     style="@style/SubTitle.RadioButton"/>
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
-                                                                    android:id="@+id/lock_30_minute_button"
                                                                     android:layout_width="fill_parent"
                                                                     android:layout_height="wrap_content"
                                                                     android:text="@string/settings_screen_lock_time_30_minute"
                                                                     android:layout_weight="1.0"
                                                                     style="@style/SubTitle.RadioButton"/>
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
-                                                                    android:id="@+id/lock_60_minute_button"
                                                                     android:layout_width="fill_parent"
                                                                     android:layout_height="wrap_content"
                                                                     android:text="@string/settings_screen_lock_time_60_minute"

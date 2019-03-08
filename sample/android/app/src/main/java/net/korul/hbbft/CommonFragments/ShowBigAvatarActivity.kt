@@ -21,6 +21,10 @@ class ShowBigAvatarActivity : AppCompatActivity() {
         } else {
             contact_icon.setImageResource(R.drawable.ic_contact)
         }
+
+        action_back.setOnClickListener {
+            finish()
+        }
     }
 
     companion object {

@@ -11,19 +11,18 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.gson.Gson
 import com.raizlabs.android.dbflow.config.FlowManager
 import kotlinx.android.synthetic.main.dialog_emergency_delete.*
 import kotlinx.android.synthetic.main.fragment_settings.*
+import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.data.model.core.Getters.getAllDialog
+import net.korul.hbbft.CommonData.data.model.coreDataBase.AppDatabase
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.RoomWork.unregisterInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.UserWork.unregisterUserInFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.R
-import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.data.model.core.Getters.getAllDialog
-import net.korul.hbbft.common.data.model.coreDataBase.AppDatabase
 
 
 class SettingsFragment : Fragment() {
@@ -35,10 +34,6 @@ class SettingsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_settings, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onResume() {
@@ -105,7 +100,7 @@ class SettingsFragment : Fragment() {
             transaction.commit()
         }
 
-        action_emergency_delete.setOnClickListener {
+        settings_emergency_delete.setOnClickListener {
             val dialog = Dialog(context!!)
             dialog.setContentView(R.layout.dialog_emergency_delete)
             dialog.setTitle("")
@@ -117,7 +112,7 @@ class SettingsFragment : Fragment() {
             dialog.dialog_accept_button.setOnClickListener {
                 val dialogs = getAllDialog()
                 for (dialog in dialogs)
-                    unregisterInRoomInFirebase(dialog.dialogName)
+                    unregisterInRoomInFirebase(dialog.id)
 
                 unregisterUserInFirebase(CoreHBBFT.uniqueID1)
 

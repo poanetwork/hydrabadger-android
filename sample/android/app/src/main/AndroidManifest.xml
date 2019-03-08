@@ -58,7 +58,7 @@
             android:screenOrientation="portrait"
             android:hardwareAccelerated="true"
             tools:replace="android:icon"
-            tools:ignore="GoogleAppIndexingWarning">
+            tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
         <activity
                 android:name=".MainActivity"
@@ -79,15 +79,15 @@
 
 
         <activity
-                android:name=".features.CreateNewDialog"
-                android:theme="@style/App.Black.Theme"/>
+                android:name=".Dialogs.CreateNewDialog"
+                android:theme="@style/App.Black.Theme" tools:ignore="InnerclassSeparator"/>
 
         <activity
                 android:name=".CommonFragments.ShowBigAvatarActivity"
-                android:theme="@style/App.Black.Theme"/>
+                android:theme="@style/App.Black.Theme" tools:ignore="InnerclassSeparator"/>
         <activity
                 android:name=".CommonFragments.ShowBigQRActivity"
-                android:theme="@style/App.Black.Theme"/>
+                android:theme="@style/App.Black.Theme" tools:ignore="InnerclassSeparator"/>
 
         <service
                 android:name=".services.ClosingService"
@@ -110,12 +110,20 @@
         </service>
 
         <service
-                android:name=".firebaseStorage.MyDownloadService"
-                android:exported="false"/>
+                android:name=".FirebaseStorageDU.MyDownloadUserService"
+                android:exported="false" tools:ignore="InnerclassSeparator"/>
 
         <service
-                android:name=".firebaseStorage.MyUploadService"
-                android:exported="false"/>
+                android:name=".FirebaseStorageDU.MyUploadUserService"
+                android:exported="false" tools:ignore="InnerclassSeparator"/>
+
+        <service
+                android:name=".FirebaseStorageDU.MyDownloadRoomService"
+                android:exported="false" tools:ignore="InnerclassSeparator"/>
+
+        <service
+                android:name=".FirebaseStorageDU.MyUploadRoomService"
+                android:exported="false" tools:ignore="InnerclassSeparator"/>
 
         <receiver android:name=".gcm.OnBootBroadcastReceiver"
                   android:permission="com.google.android.c2dm.permission.SEND">

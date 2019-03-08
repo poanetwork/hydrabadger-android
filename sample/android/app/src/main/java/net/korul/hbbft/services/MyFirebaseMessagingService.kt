@@ -18,63 +18,21 @@ import net.korul.hbbft.MainActivity
 import net.korul.hbbft.R
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-
-    /**
-     * Called when message is received.
-     *
-     * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
-     */
-
-    // is active
     // [START receive_message]
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
         Log.d(TAG, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        // [START_EXCLUDE]
-        // There are two types of messages data messages and notification messages. Data messages are handled
-        // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
-        // traditionally used with GCM. Notification messages are only received here in onMessageReceived when the app
-        // is in the foreground. When the app is in the background an automatically generated notification is displayed.
-        // When the user taps on the notification they are returned to the app. Messages containing both notification
-        // and data payloads are treated as notification messages. The Firebase console always sends notification
-        // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
-        // [END_EXCLUDE]
         Log.d(TAG, "onMessageReceived: ${remoteMessage?.from}")
 
         try {
-            val roomname = remoteMessage?.data!!["body"]!!
+            val roomid = remoteMessage?.data!!["body"]!!
             val uidsFrom = remoteMessage.data!!["title"]!!
 
-            Log.d(TAG, "onMessageReceived from uid: $uidsFrom and roomname $roomname")
+            Log.d(TAG, "onMessageReceived from uid: $uidsFrom and roomid $roomid")
 
-            sendNotification(roomname)
+            sendNotification(roomid)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-//        Log.d(TAG, "From: ${remoteMessage?.from}")
-
-        // Check if message contains a data payload.
-//        remoteMessage?.data?.isNotEmpty()?.let {
-//            Log.d(TAG, "Message data payload: " + remoteMessage.data)
-//
-//            if (/* Check if data needs to be processed by long running job */ true) {
-//                // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
-//                scheduleJob()
-//            } else {
-//                // Handle message within 10 seconds
-//                handleNow()
-//            }
-//        }
-
-        // Check if message contains a notification payload.
-//        remoteMessage?.notification?.let {
-//            Log.d(TAG, "Message Notification Body: ${it.body}")
-//        }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
     // [END receive_message]
 
@@ -87,9 +45,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String?) {
         Log.d(TAG, "Refreshed token: $token")
 
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // Instance ID token to your app server.
         sendRegistrationToServer(token)
     }
     // [END on_new_token]
@@ -104,7 +59,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     /**
      * Persist token to third-party servers.
      *
-     * Modify this method to associate the user's FCM InstanceID token with any server-side account
+     * Modify this method to associate the dialog's FCM InstanceID token with any server-side account
      * maintained by your application.
      *
      * @param token The new token.
@@ -119,12 +74,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      *
      * @param messageBody FCM message body received.
      */
-    private fun sendNotification(roomname: String) {
+    private fun sendNotification(roomid: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         intent.putExtra("Start_App", true)
-        intent.putExtra("RoomName", roomname)
+        intent.putExtra("RoomId", roomid)
         val pendingIntent = PendingIntent.getActivity(
             this, 0 /* Request code */, intent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -136,7 +91,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.mipmap.ic_launcher))
             .setContentTitle("Start connect?")
-            .setContentText("User want start messaging in Room - $roomname")
+            .setContentText("User want start messaging in Room - $roomid")
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
@@ -165,7 +120,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     companion object {
 
         private const val TAG = "HYDRABADGERTAG:PushServ"
-
 
         /**
          * Schedule a job using FirebaseJobDispatcher.

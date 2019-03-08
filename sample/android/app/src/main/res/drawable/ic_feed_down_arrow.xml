@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="36.0dip" android:width="36.0dip"
-        android:viewportWidth="36.0"
-        android:viewportHeight="36.0">
-    <path android:fillColor="?sign_button"
-          android:pathData="M24.4403,15.8536L19.001,21.2929C18.6105,21.6834 17.9773,21.6834 17.5868,21.2929L12.1474,15.8536C11.8325,15.5386 12.0555,15 12.501,15L24.0868,15C24.5322,15 24.7553,15.5386 24.4403,15.8536Z"/>
-</vector>

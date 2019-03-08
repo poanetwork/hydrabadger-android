@@ -1,0 +1,243 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Hydrabadger</string>
+
+
+    <string name="avatar_file_not_found">Польователь без аватарки</string>
+
+    <string name="hint_enter_a_message">Type a message…</string>
+    <string name="copied_message">Сообщене скопировано!</string>
+
+    <string name="date_header_today">Today</string>
+    <string name="date_header_yesterday">Yesterday</string>
+
+    <string-array name="view_types_dialog">
+        <item name="image">Image (default)</item>
+        <item name="voice">Voice message (custom)</item>
+    </string-array>
+
+    <string-array name="view_do_dialog">
+        <item name="Export">О Диалоге</item>
+        <item name="Delete">Удалить</item>
+        <item name="Cancel">Отменить</item>
+    </string-array>
+
+
+    <string-array name="view_do_new_dialog">
+        <item name="add_exist">Добавить существующий диалог</item>
+        <item name="create_new">Создать новый диалог</item>
+    </string-array>
+
+    <string name="start_typing_status">Start typing</string>
+    <string name="stop_typing_status">Stop typing</string>
+
+    <string name="status">статус</string>
+    <string name="start">Start</string>
+
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="default_notification_channel_name" translatable="true">fcm_default</string>
+    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+
+    <string name="msg_subscribed">FCM подписано</string>
+    <string name="msg_subscribe_failed">FCM отписано</string>
+
+
+    <string name="syncing_completed_well">Загрузка выполнена</string>
+    <string name="syncing_error">Ошибка при загрузке</string>
+
+    <string name="title_chats">Чаты</string>
+    <string name="title_contacts">Контакты</string>
+    <string name="title_settings">Настройки</string>
+    <string name="title_lenta">Лента</string>
+
+    <string name="tag_chats">TAG_CHAT</string>
+    <string name="tag_chats2">TAG_CHAT2</string>
+    <string name="tag_contacts">TAG_CONTACTS</string>
+    <string name="tag_settings">TAG_SETTINGS</string>
+    <string name="tag_lenta">TAG_LENTA</string>
+
+
+    <string name="canceled">Отменено</string>
+    <string name="select_dir_for_saving">Выберите католог для сохранения</string>
+    <string name="select_qr_image">Выберите изображение с QR</string>
+    <string name="uid">uid</string>
+    <!--<string name="scan_success">Успешно отсканировано</string>-->
+    <string name="save_user_settings">Сохранить изменения?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="action_add">Добавить</string>
+    <string name="contact_request_error">Ошибка при запросе на добавление в контакты</string>
+    <string name="file_error">Ошибка выбора файла</string>
+    <string name="qr_code_file_name">my_qr_code.png</string>
+    <string name="settings_emergency_delete_data">Удалить все данные</string>
+
+
+    <string name="name_dialog_isempty">Введите название диалога</string>
+    <string name="room_add_title">Добавение диалога</string>
+    <string name="room_request_prompt_id">Введите ID диалога</string>
+
+
+    <!--NOT MINE-->
+    <string name="export_qr">Экспорт QR..</string>
+    <string name="export_chooser_title" tools:ignore="TypographyEllipsis">"Экспорт...</string>
+
+    <string name="abc_action_bar_home_description">Перейти на главный экран</string>
+    <string name="abc_action_bar_up_description">Перейти вверх</string>
+    <string name="abc_action_menu_overflow_description">Другие параметры</string>
+    <string name="abc_action_mode_done">Готово</string>
+    <string name="abc_activity_chooser_view_see_all">Показать все</string>
+    <string name="abc_activitychooserview_choose_application">Выбрать приложение</string>
+    <string name="abc_capital_off">ОТКЛ.</string>
+    <string name="abc_capital_on">ВКЛ.</string>
+    <string name="abc_search_hint">Поиск</string>
+    <string name="abc_searchview_description_clear">Удалить запрос</string>
+    <string name="abc_searchview_description_query">Поисковый запрос</string>
+    <string name="abc_searchview_description_search">Поиск</string>
+    <string name="abc_searchview_description_submit">Отправить запрос</string>
+    <string name="abc_searchview_description_voice">Голосовой поиск</string>
+    <string name="abc_shareactionprovider_share_with">Открыть доступ</string>
+    <string name="abc_shareactionprovider_share_with_application">Открыть доступ приложению \"%s\"</string>
+    <string name="abc_toolbar_collapse_description">Свернуть</string>
+    <string name="account_data_title">Контактные данные</string>
+    <string name="account_generate_qr_code">Сгенерировать QR-код</string>
+    <string name="account_invite_list">Исходящие запросы в контакты</string>
+    <string name="account_name">Имя</string>
+    <string name="account_nickname">Никнейм</string>
+    <string name="account_qr_code_scan">Сканировать</string>
+    <string name="account_qr_info">Другой пользователь может просканировать этот QR-код для автоматического добавления
+        вас в контакты
+    </string>
+    <string name="account_qr_options">Действия</string>
+    <string name="account_qr_save">Сохранить QR-код как изображение</string>
+    <string name="account_qr_title">Ваш QR-код</string>
+    <string name="account_send">Отправить</string>
+    <string name="account_share_contact">Настройки контактов</string>
+    <string name="action_copy">Копир.</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_ok">Хорошо</string>
+    <string name="cancel">Отмена</string>
+    <string name="common_google_play_services_enable_button">Включить</string>
+    <string name="common_google_play_services_enable_text">Для работы приложения \"%1$s\" требуется включить сервисы
+        Google Play.
+    </string>
+    <string name="common_google_play_services_enable_title">Включите сервисы Google Play</string>
+    <string name="common_google_play_services_install_button">Установить</string>
+    <string name="common_google_play_services_install_text">Для работы приложения \"%1$s\" требуется установить сервисы
+        Google Play.
+    </string>
+    <string name="common_google_play_services_install_title">Установите сервисы Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Доступность сервисов Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Ошибка сервисов Google Play</string>
+    <string name="common_google_play_services_unknown_issue">Приложению \"%1$s\" не удается подключиться к сервисам
+        Google Play. Повторите попытку.
+    </string>
+    <string name="common_google_play_services_unsupported_text">Для работы с приложением \"%1$s\" требуются сервисы
+        Google Play. Они не поддерживаются на вашем устройстве.
+    </string>
+    <string name="common_google_play_services_update_button">Обновить</string>
+    <string name="common_google_play_services_update_text">Чтобы запустить приложение \"%1$s\", обновите сервисы
+        Google Play.
+    </string>
+    <string name="common_google_play_services_update_title">Обновите сервисы Google Play</string>
+    <string name="common_google_play_services_updating_text">Сервисы Google Play, необходимые для работы приложения
+        \"%1$s\", в настоящий момент обновляются.
+    </string>
+    <string name="common_google_play_services_wear_update_text">Версия сервисов Google Play устарела. Они автоматически
+        обновятся в ближайшее время.
+    </string>
+    <string name="common_open_on_phone">Открыть на телефоне</string>
+    <string name="common_signin_button_text">Войти</string>
+    <string name="common_signin_button_text_long">Войти через аккаунт Google</string>
+    <string name="contact_add">Добавить</string>
+    <string name="contact_add_title">Добавление в контакты</string>
+    <string name="contact_clear_chat_history">Очистить историю сообщений</string>
+    <string name="contact_options_block">Блок</string>
+    <string name="contact_options_delete">Удалить</string>
+    <string name="contact_qr_scan">Сканировать QR-код</string>
+    <string name="contact_qr_gallary">Выбрать QR-code из галереи</string>
+    <string name="contact_request">Запросы на добавление в контакты:</string>
+    <string name="contact_request_error_id">Введите корректный ID пользователя</string>
+    <string name="contact_request_prompt_id">Введите ID пользователя</string>
+    <string name="contact_share">Отправить контакт</string>
+    <string name="contact_title">Контакты</string>
+    <string name="create_add_admin">Добавить администраторов</string>
+    <string name="create_add_member">Добавить участника</string>
+    <string name="create_total_admins">Администраторы (%d)</string>
+    <string name="create_total_members">Участники (%d)</string>
+    <string name="fcm_fallback_notification_channel_label">Другое</string>
+    <string name="group_create_description_hint">Введите описание группы</string>
+    <string name="group_export_description_hint">Описание группы</string>
+    <string name="group_create_title_hint">Введите название группы</string>
+    <string name="group_export_title_hint">Название группы</string>
+    <string name="no_sound">Без звука</string>
+    <string name="notification_mute_1_day">Заблокировать на 1 день</string>
+    <string name="notification_mute_2_hours">Заблокировать на 2 часа</string>
+    <string name="notification_mute_6_hours">Заблокировать на 6 часов</string>
+    <string name="notifications">Оповещения</string>
+    <string name="old_password">Текущий пароль</string>
+    <string name="options">Действия</string>
+    <string name="or">или</string>
+    <string name="qr_code_file_selected">QR изображение выбрано!</string>
+    <string name="avatar">Аватар</string>
+    <string name="qr">QR</string>
+    <string name="qr_code_disk_saved">Изображение успешно сохранено!</string>
+    <string name="qr_code_disk_saved_fail" tools:ignore="ExtraTranslation">Невозможно сохранить изображение в этой
+        папке
+    </string>
+    <string name="search_menu_title">Поиск</string>
+    <string name="select">Выбрать</string>
+    <string name="settings">Настройки</string>
+    <string name="settings_account">Моя учетная запись</string>
+    <string name="settings_app_theme">Тема интерфейса</string>
+    <string name="settings_app_theme_dark">Темная</string>
+    <string name="settings_app_theme_light">Светлая</string>
+    <string name="settings_change">Сменить</string>
+    <string name="settings_change_chat_background">Изменить фон окна чата</string>
+    <string name="settings_change_your_password">Изменить пароль</string>
+    <string name="settings_chat_background">Фон окна чата:</string>
+    <string name="settings_clear_media">Очистка хранилища</string>
+    <string name="settings_devices">Активные устройства</string>
+    <string name="settings_edit_black_list">Редактировать черный список</string>
+    <string name="settings_emergency_delete_data_accept">Удалить все данные и выйти</string>
+    <string name="settings_emergency_delete_data_info">Срочное удаление уничтожит все данные приложения и выйдет с Вашей
+        учетной записи навсегда!
+    </string>
+    <string name="settings_help_title">Помощь</string>
+    <string name="settings_interface_title">Интерфейс</string>
+    <string name="settings_logout">Выйти</string>
+    <string name="settings_map_coordinate_title">Карты и координаты</string>
+    <string name="settings_media_storage_title">Список файлов не полученных пользователелями</string>
+    <string name="settings_notifications_title">Оповещения</string>
+    <string name="settings_screen_lock_automate">Автоматически блокировать:</string>
+    <string name="settings_screen_lock_code">Код блокировки экрана</string>
+    <string name="settings_screen_lock_set_code">Задать код</string>
+    <string name="settings_screen_lock_time_15_minute">Через 15 минут</string>
+    <string name="settings_screen_lock_time_1_minute">Через 1 минуту</string>
+    <string name="settings_screen_lock_time_30_minute">Через 30 минут</string>
+    <string name="settings_screen_lock_time_60_minute">Через 1 час</string>
+    <string name="settings_screen_lock_time_now">Немедленно</string>
+    <string name="settings_screen_lock_via_code">Блокировать экран с помощью кода:</string>
+    <string name="settings_security_online_status">Мой онлайн статус</string>
+    <string name="settings_security_options">Опции безопасности</string>
+    <string name="settings_social_network">Настройки учетной записи</string>
+    <string name="settings_sound_invite_to_contact">Приглашение в контакты</string>
+    <string name="settings_sound_invite_to_group">Приглашения в группы</string>
+    <string name="settings_sound_message">Сообщения</string>
+    <string name="settings_sound_notification">Звуковые сигналы:</string>
+    <string name="settings_sound_volume">Громкость</string>
+    <string name="sound_notification">Звук уведомления</string>
+    <string name="status_bar_notification_info_overflow">>999</string>
+    <string name="storage_title">Хранилище</string>
+    <string name="warning">Внимание</string>
+    <string name="warning_back">Назад</string>
+    <string name="warning_message">"Данная функция появится в следующих версиях Hydrabadger.
+
+        Спасибо за проявленный интерес!"
+    </string>
+    <string name="zxing_app_name">Сканер штрих-кодов</string>
+    <string name="zxing_button_ok">OK</string>
+    <string name="zxing_msg_camera_framework_bug">К сожалению, возникла ошибка камеры. Может потребоваться перезагрузить
+        устройство.
+    </string>
+    <string name="zxing_msg_default_status">Чтобы сканировать штрих-код, поместите его в прямоугольник видоискателя.
+    </string>
+
+</resources>

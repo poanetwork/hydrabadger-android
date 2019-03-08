@@ -10,7 +10,7 @@ import io.nats.client.Subscription
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import net.korul.hbbft.common.utils.AppUtils
+import net.korul.hbbft.CommonData.utils.AppUtils
 import org.json.JSONObject
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
@@ -25,7 +25,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     var mConnections: HashMap<Pair<String, String>, Connections> = hashMapOf()
 
     var userName: MutableList<String?> = arrayListOf()
-    var roomNameList: MutableList<String?> = arrayListOf()
+    var roomIdList: MutableList<String?> = arrayListOf()
 
     var usersCon: MutableList<String> = arrayListOf()
 
@@ -54,28 +54,28 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     })
 
 
-    fun initOneMesh(roomName: String, UID: String) {
+    fun initOneMesh(roomId: String, UID: String) {
         try {
-            Log.d(TAG, "P2PMesh initOneMesh $roomName - roomName, $UID - UID")
+            Log.d(TAG, "P2PMesh initOneMesh $roomId - roomId, $UID - UID")
 
-            roomNameList.add(roomName)
+            roomIdList.add(roomId)
             userName.add(UID)
             consNats[UID] = initNatsSignalling(UID)
-            initNatsMeshInitiator(consNats[UID], UID, "users:Room:$roomName")
+            initNatsMeshInitiator(consNats[UID], UID, "users:Room:$roomId")
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
 
-    fun publishAboutMe(roomName: String, UID: String) {
+    fun publishAboutMe(roomId: String, UID: String) {
         val json = JSONObject()
         json.put("type", "addUser")
-        json.put("user", UID)
+        json.put("dialog", UID)
 
         val message = json.toString()
 
-        consNats[UID]?.publish("users:Room:$roomName", message.toByteArray(StandardCharsets.UTF_8))
+        consNats[UID]?.publish("users:Room:$roomId", message.toByteArray(StandardCharsets.UTF_8))
     }
 
     fun FreeConnect() {
@@ -99,8 +99,8 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             }
         }
 
-        for (roomName in roomNameList) {
-            if (roomName.isNullOrEmpty())
+        for (roomId in roomIdList) {
+            if (roomId.isNullOrEmpty())
                 continue
 
             for (user in userName) {
@@ -108,17 +108,17 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 val message: String
 
                 json.put("type", "deleteUser")
-                json.put("user", user)
+                json.put("dialog", user)
 
                 message = json.toString()
 
-                consNats[user]?.publish("users:Room:$roomName", message.toByteArray(StandardCharsets.UTF_8))
+                consNats[user]?.publish("users:Room:$roomId", message.toByteArray(StandardCharsets.UTF_8))
             }
         }
     }
 
-    fun initNatsMeshInitiator(nats: Connection?, UID: String, roomName: String) {
-        val sub = nats!!.subscribe(roomName) { msg: Message? ->
+    fun initNatsMeshInitiator(nats: Connection?, UID: String, roomId: String) {
+        val sub = nats!!.subscribe(roomId) { msg: Message? ->
             if (msg == null)
                 return@subscribe
 
@@ -126,7 +126,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val json2 = JSONObject(message)
 
             if (json2.getString("type") == "addUser") {
-                val user = json2.getString("user")
+                val user = json2.getString("dialog")
                 val myUid = UID
                 val pair: Pair<String, String> = Pair(user, myUid)
                 val pair2: Pair<String, String> = Pair(myUid, user)
@@ -142,7 +142,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 }
             } else if (json2.getString("type") == "deleteUser") {
                 try {
-                    val user = json2.getString("user")
+                    val user = json2.getString("dialog")
                     val myUid = UID
 
                     val pair: Pair<String, String> = Pair(user, myUid)

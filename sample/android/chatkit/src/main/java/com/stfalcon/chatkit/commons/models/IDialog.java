@@ -30,6 +30,8 @@ public interface IDialog<MESSAGE extends IMessage> {
 
     String getDialogName();
 
+    String getDialogDescr();
+
     List<? extends IUser> getUsers();
 
     MESSAGE getLastMessage();

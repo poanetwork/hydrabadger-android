@@ -2,13 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/main_layout"
                 android:fitsSystemWindows="true"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" android:background="?android:attr/windowBackground">
+                android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
+                android:clickable="true"
+                android:focusable="true">
     <android.support.v7.widget.AppCompatTextView android:gravity="center" android:id="@+id/warning_message"
                                                  android:layout_width="wrap_content"
                                                  android:layout_height="wrap_content" android:layout_margin="64.0dip"
                                                  android:text="@string/warning_message"
                                                  android:layout_centerInParent="true" style="@style/medium_text"/>
-    <Button android:id="@+id/warning_back_button" android:visibility="gone" android:layout_width="wrap_content"
+    <Button android:visibility="gone" android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:text="@string/warning_back"
             android:layout_below="@id/warning_message" android:layout_centerInParent="true" style="@style/Button"/>
 </RelativeLayout>

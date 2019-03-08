@@ -10,15 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import com.daimajia.swipe.util.Attributes
 import kotlinx.android.synthetic.main.fragment_contacts.*
+import net.korul.hbbft.AdapterRecycler.ClickListener
+import net.korul.hbbft.AdapterRecycler.RecyclerViewContactAdapter
+import net.korul.hbbft.AdapterRecycler.util.DividerItemDecoration
+import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.data.model.core.Getters.getAllLocalUsersDistinct
+import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CommonFragments.WarningFragment
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.R
-import net.korul.hbbft.adapter.ClickListener
-import net.korul.hbbft.adapter.RecyclerViewContactAdapter
-import net.korul.hbbft.adapter.util.DividerItemDecoration
-import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.data.model.core.Getters.getAllLocalUsersDistinct
-import net.korul.hbbft.common.utils.AppUtils
 import java.util.*
 
 

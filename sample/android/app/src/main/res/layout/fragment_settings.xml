@@ -5,7 +5,9 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity" android:background="?android:attr/windowBackground">
+        tools:context=".MainActivity" android:background="?android:attr/windowBackground"
+        android:clickable="true"
+        android:focusable="true">
 
     <RelativeLayout android:id="@+id/toolbar"
                     android:layout_width="fill_parent"
@@ -14,15 +16,6 @@
                   android:layout_height="wrap_content"
                   android:text="@string/settings" android:layout_centerHorizontal="true"
                   android:layout_centerVertical="true" style="@style/toolbar_not_caps_text"/>
-        <RelativeLayout android:id="@+id/action_emergency_delete" android:padding="@dimen/padding_16"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true" android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true">
-            <ImageView android:id="@+id/emergency_icon" android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:contentDescription="@string/settings_delete_data" app:srcCompat="@drawable/ic_warning"
-                       android:layout_centerHorizontal="true"/>
-        </RelativeLayout>
     </RelativeLayout>
 
 
@@ -30,11 +23,11 @@
                 android:layout_below="@id/toolbar">
         <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                       android:layout_height="wrap_content" style="@style/Screen">
-            <RelativeLayout android:id="@+id/account_data"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="@dimen/menu_margin_5"
-                            style="@style/Clicked"/>
+            <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/menu_margin_5"
+                    style="@style/Clicked"/>
             <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_account"
                                                          android:background="@null" android:paddingTop="0.0dip"
                                                          android:layout_width="fill_parent"
@@ -55,7 +48,7 @@
                               android:layout_height="wrap_content" style="@style/username_text"/>
                     <TextView android:gravity="center_vertical" android:id="@+id/settings_account_email"
                               android:layout_width="wrap_content" android:layout_height="wrap_content"
-                              android:layout_marginTop="8.0dip" style="@style/email_text"/>
+                              android:layout_marginTop="8.0dip" style="@style/email_text" android:visibility="gone"/>
                     <TextView android:gravity="center_vertical" android:id="@+id/settings_account_id"
                               android:layout_width="wrap_content" android:layout_height="wrap_content"
                               android:layout_marginTop="8.0dip" style="@style/email_text"/>
@@ -82,11 +75,11 @@
                                                          android:text="@string/settings_security_options"
                                                          style="@style/SettingTitle.Ripple"/>
             <View style="@style/Divider"/>
-            <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_maps"
-                                                         android:layout_width="fill_parent"
-                                                         android:layout_height="wrap_content"
-                                                         android:text="@string/settings_map_coordinate_title"
-                                                         style="@style/SettingTitle.Ripple" android:visibility="gone"/>
+            <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_map_coordinate_title"
+                    style="@style/SettingTitle.Ripple" android:visibility="gone"/>
             <View style="@style/Divider" android:visibility="gone"/>
             <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_media_storage"
                                                          android:visibility="visible" android:layout_width="fill_parent"
@@ -94,13 +87,24 @@
                                                          android:text="@string/settings_clear_media"
                                                          style="@style/SettingTitle.Ripple"/>
             <View android:visibility="gone" style="@style/Divider"/>
-            <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_help" android:visibility="gone"
+            <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_emergency_delete"
+                                                         android:visibility="visible"
+                                                         android:layout_width="match_parent"
+                                                         android:layout_height="wrap_content"
+                                                         android:text="@string/settings_emergency_delete_data_accept"
+                                                         android:drawablePadding="10dp"
+                                                         style="@style/SettingTitle.Ripple"
+                                                         android:drawableStart="@drawable/ic_warning"
+            />
+            <View android:visibility="gone" style="@style/Divider" android:layout_width="match_parent"
+                  android:layout_height="wrap_content"/>
+            <android.support.v7.widget.AppCompatTextView android:visibility="gone"
                                                          android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"
                                                          android:text="@string/settings_help_title"
                                                          style="@style/SettingTitle.Ripple"/>
             <View android:visibility="gone" style="@style/Divider"/>
-            <TextView android:id="@+id/software_version" android:paddingTop="@dimen/menu_margin_10"
+            <TextView android:paddingTop="@dimen/menu_margin_10"
                       android:layout_width="fill_parent" android:layout_height="wrap_content"
                       style="@style/settings_software_version"/>
         </LinearLayout>

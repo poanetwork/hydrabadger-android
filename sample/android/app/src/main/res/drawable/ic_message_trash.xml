@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="9.0dip" android:width="9.0dip"
-        android:autoMirrored="true"
-        android:viewportWidth="9.0"
-        android:viewportHeight="9.0">
-    <path android:fillColor="?footer_icon_color"
-          android:pathData="M4,0C3.44769,0 3,0.44727 3,1H0.5C0.22388,1 0,1.22363 0,1.5C0,1.77637 0.22388,2 0.5,2H1L1.87732,8.1416C1.90417,8.3291 1.98218,8.49902 2.09601,8.63672C2.28058,8.85938 2.55945,9 2.86731,9H6.13269C6.63037,9 7.05225,8.63379 7.12268,8.1416L8,2H8.5C8.63275,2 8.75348,1.94824 8.84302,1.86328C8.9397,1.77246 9,1.64355 9,1.5C9,1.22363 8.77612,1 8.5,1H6C6,0.44727 5.55231,0 5,0H4Z"/>
-</vector>

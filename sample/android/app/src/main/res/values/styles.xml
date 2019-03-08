@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="ActionText">
-        <item name="android:textSize">@dimen/font_large</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?active_text</item>
-        <item name="android:paddingLeft">8.0dip</item>
-        <item name="android:layout_margin">8.0dip</item>
-    </style>
     <style name="AlertDialog.AppCompat" parent="@style/Base.AlertDialog.AppCompat"/>
     <style name="AlertDialog.AppCompat.Light" parent="@style/Base.AlertDialog.AppCompat.Light"/>
     <style name="Animation.AppCompat.Dialog" parent="@style/Base.Animation.AppCompat.Dialog"/>
@@ -220,75 +213,6 @@
         <item name="toolbar_tab_selected">@drawable/healin_sign_tab_selected</item>
         <item name="toolbar_text">@color/healin_toolbar_text</item>
         <item name="yellow_button">@drawable/healin_stroke_yellow</item>
-    </style>
-    <style name="App.Ubuntu.Theme" parent="@style/Theme.AppCompat.NoActionBar">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorHint">@color/healin_white_text_color</item>
-        <item name="active_text">@color/orange</item>
-        <item name="background_fab">@color/aubergine_mid</item>
-        <item name="background_message_selected">@color/aubergine_mid</item>
-        <item name="background_pin_code">@color/aubergine_mid</item>
-        <item name="big_map_button_off">@drawable/ubuntu_big_map_off</item>
-        <item name="big_map_button_on">@drawable/ubuntu_big_map_on</item>
-        <item name="blue_button">@drawable/ubuntu_stroke_blue</item>
-        <item name="checkbox_off">@color/orange</item>
-        <item name="checkbox_on">@color/orange</item>
-        <item name="colorAccent">@color/brown_hint</item>
-        <item name="colorControlActivated">@color/brown_hint</item>
-        <item name="colorControlHighlight">@color/brown_hint</item>
-        <item name="colorControlNormal">@color/control_normal</item>
-        <item name="colorPrimary">@color/aubergine_mid</item>
-        <item name="colorPrimaryDark">@color/aubergine_dark</item>
-        <item name="contact_options">@color/healin_white_text_color</item>
-        <item name="dialog_background">@drawable/ubuntu_dialog_background</item>
-        <item name="divider_color">@color/aubergine_light</item>
-        <item name="footer_bar">@drawable/footer_bar_ubuntu</item>
-        <item name="green_button">@drawable/ubuntu_stroke_green</item>
-        <item name="icon_background">@color/aubergine_mid</item>
-        <item name="icon_foreground">@color/orange</item>
-        <item name="indicator_read">@color/aubergine_light</item>
-        <item name="input_panel_color">@color/orange</item>
-        <item name="input_search_dialog">@drawable/ubuntu_input_search_dialog</item>
-        <item name="left_bubble">@color/aubergine_light</item>
-        <item name="map_background">@color/aubergine_mid</item>
-        <item name="medium_text_color">@color/white</item>
-        <item name="message_background">@drawable/ubuntu_message_background</item>
-        <item name="object_info_hint">@color/healin_object_info_hint</item>
-        <item name="object_preview_background">@color/dark_object_preview_bg</item>
-        <item name="object_selected_background">@drawable/dark_selected_object_bg</item>
-        <item name="red_button">@drawable/ubuntu_stroke_red</item>
-        <item name="right_bubble">@color/orange</item>
-        <item name="ripple_color">@color/orange</item>
-        <item name="ripple_effect">@drawable/ubuntu_ripple_effect</item>
-        <item name="seek_bar_color">@color/orange</item>
-        <item name="sign_button">@color/orange</item>
-        <item name="sign_indicator">@color/orange</item>
-        <item name="sing_hint">@color/white</item>
-        <item name="spinner_color">@color/aubergine_mid</item>
-        <item name="switch_selector">@drawable/ubuntu_switch_selector</item>
-        <item name="switch_track">@drawable/ubuntu_switch_track</item>
-        <item name="tab_background">@drawable/ubuntu_tab_background</item>
-        <item name="text_color">@color/healin_white_text_color</item>
-        <item name="theme_background">@color/aubergine_dark</item>
-        <item name="toolbar">@drawable/toolbar_ubuntu</item>
-        <item name="toolbar_color">@color/healin_toolbar</item>
-        <item name="toolbar_tab_selected">@drawable/ubuntu_sign_tab_selected</item>
-        <item name="toolbar_text">@color/healin_white_text_color</item>
-        <item name="yellow_button">@drawable/ubuntu_stroke_yellow</item>
-    </style>
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorTextInput">@color/black</item>
-    </style>
-    <style name="AppTheme.AppBarOverlay" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="AppTheme.PopupOverlay" parent="@style/ThemeOverlay.AppCompat.Light"/>
-    <style name="AppThemeDark" parent="@style/Theme.AppCompat.NoActionBar">
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorTextInput">@color/white</item>
     </style>
     <style name="Base.AlertDialog.AppCompat" parent="@android:style/Widget">
         <item name="android:layout">@layout/abc_alert_dialog_material</item>
@@ -616,9 +540,6 @@
         <item name="colorControlNormal">?android:textColorSecondary</item>
         <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
         <item name="isLightTheme">true</item>
-    </style>
-    <style name="Base.V14.Widget.Design.AppBarLayout" parent="@android:style/Widget">
-        <item name="android:background">?colorPrimary</item>
     </style>
     <style name="Base.V7.Theme.AppCompat" parent="@style/Platform.AppCompat">
         <item name="android:panelBackground">@android:color/transparent</item>
@@ -1241,7 +1162,6 @@
         <item name="android:scaleType">center</item>
         <item name="android:minWidth">56.0dip</item>
     </style>
-    <style name="Base.Widget.Design.AppBarLayout" parent="@style/Base.V14.Widget.Design.AppBarLayout"/>
     <style name="Base.Widget.Design.TabLayout" parent="@android:style/Widget">
         <item name="tabBackground">?selectableItemBackground</item>
         <item name="tabIndicatorColor">?colorAccent</item>
@@ -1252,27 +1172,11 @@
         <item name="tabSelectedTextColor">?android:textColorPrimary</item>
         <item name="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
     </style>
-    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
-        <item name="android:windowIsFloating">true</item>
-        <item name="bottomSheetStyle">@style/BottomSheet</item>
-    </style>
-    <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
-        <item name="android:background">?dialog_bottom_background</item>
-        <item name="behavior_peekHeight">200.0dip</item>
-    </style>
     <style name="Button">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?sign_button</item>
         <item name="android:background">@null</item>
         <item name="android:padding">@dimen/padding_mini</item>
-    </style>
-    <style name="Button.Clicked" parent="@style/Button">
-        <item name="android:background">?ripple_effect</item>
-    </style>
-    <style name="CardButton" parent="@style/CardView">
-        <item name="android:layout_margin">8.0dip</item>
-        <item name="cardBackgroundColor">?card_button_color</item>
-        <item name="cardCornerRadius">16.0dip</item>
     </style>
     <style name="CardView" parent="@style/Base.CardView"/>
     <style name="CardView.Dark" parent="@style/CardView">
@@ -1281,78 +1185,18 @@
     <style name="CardView.Light" parent="@style/CardView">
         <item name="cardBackgroundColor">@color/cardview_light_background</item>
     </style>
-    <style name="CheckBox">
-        <item name="android:layout_margin">@dimen/menu_margin_5</item>
-    </style>
-    <style name="CheckBox.Square" parent="@style/CheckBox">
-        <item name="android:button">@drawable/super_checkbox</item>
-    </style>
     <style name="Clicked">
         <item name="android:background">?ripple_effect</item>
         <item name="android:padding">@dimen/menu_margin_5</item>
-    </style>
-    <style name="ConnectionText">
-        <item name="android:textSize">@dimen/font_smallest</item>
-        <item name="android:textColor">@color/healin_background</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@color/connection_lost</item>
-    </style>
-    <style name="CoordinateTableText">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?coordinate_table_text</item>
-        <item name="android:background">?map_coordinate_data_background</item>
-    </style>
-    <style name="Dialog">
-        <item name="android:background">?dialog_background</item>
-    </style>
-    <style name="Dialog.Bottom" parent="@style/BaseBottomSheetDialog"/>
-    <style name="Dialog.Item" parent="@style/Dialog">
-        <item name="android:background">@color/transparent</item>
-        <item name="android:paddingLeft">24.0dip</item>
-        <item name="android:paddingTop">9.0dip</item>
-        <item name="android:paddingRight">10.0dip</item>
-        <item name="android:paddingBottom">9.0dip</item>
-    </style>
-    <style name="Dialog.Text" parent="@style/Dialog">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?message_text_color</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:background">@color/transparent</item>
-        <item name="android:layout_marginLeft">32.0dip</item>
-    </style>
-    <style name="Dialog.Title" parent="@style/Dialog">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?dialog_tittle_color</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:background">@color/transparent</item>
-        <item name="android:layout_marginLeft">16.0dip</item>
-        <item name="android:layout_marginTop">11.0dip</item>
-        <item name="android:layout_marginRight">16.0dip</item>
-        <item name="android:layout_marginBottom">11.0dip</item>
     </style>
     <style name="Divider">
         <item name="android:background">?divider_color</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">0.5dip</item>
     </style>
-    <style name="Divider.DialogItem" parent="@style/Divider">
-        <item name="android:background">?divider_item_color</item>
-    </style>
     <style name="Divider.Margin" parent="@style/Divider">
         <item name="android:layout_marginTop">8.0dip</item>
         <item name="android:layout_marginBottom">8.0dip</item>
-    </style>
-    <style name="Divider.Margin.account" parent="@style/Divider.Margin">
-        <item name="android:background">?sing_hint</item>
-        <item name="android:layout_marginTop">1.0dip</item>
-    </style>
-    <style name="Divider.Title" parent="@style/Divider">
-        <item name="android:background">?divider_title_color</item>
-    </style>
-    <style name="Divider.Vertical" parent="@style/Divider">
-        <item name="android:background">?divider_color</item>
-        <item name="android:layout_width">0.5dip</item>
-        <item name="android:layout_height">fill_parent</item>
     </style>
     <style name="EditText">
         <item name="android:background">?edit_text_border</item>
@@ -1361,11 +1205,6 @@
         <item name="android:paddingRight">@dimen/edit_text_horizontal_padding</item>
         <item name="android:paddingBottom">@dimen/edit_text_vertical_padding</item>
     </style>
-    <style name="EditText.Dialog" parent="@style/EditText">
-        <item name="android:textSize">@dimen/font_large</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:textColorHint">?edit_text_hint_color</item>
-    </style>
     <style name="EditText.Fragments" parent="@style/EditText">
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:textColor">?title_text</item>
@@ -1373,218 +1212,16 @@
         <item name="android:layout_marginLeft">2.0dip</item>
         <item name="android:layout_marginRight">2.0dip</item>
     </style>
-    <style name="EditText.SearchByCoordinates" parent="@style/EditText">
-        <item name="android:textSize">@dimen/font_large</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:textColorHint">?edit_text_hint_color</item>
-    </style>
     <style name="EditText.Settings" parent="@style/EditText">
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:textColor">?title_text</item>
         <item name="android:textColorHint">?edit_text_hint_color</item>
-    </style>
-    <style name="Feed"/>
-    <style name="Feed.BottomDivider" parent="@style/Feed">
-        <item name="android:background">#ffe8e8e8</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">1.0dip</item>
-    </style>
-    <style name="Feed.Divider" parent="@style/Feed">
-        <item name="android:background">?card_date_color</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">0.5dip</item>
-    </style>
-    <style name="FeedTextBody">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-    </style>
-    <style name="FeedTextBody.Info" parent="@style/FeedTextBody">
-        <item name="android:gravity">center</item>
-    </style>
-    <style name="FeedTextBody.Short" parent="@style/FeedTextBody">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:maxLines">5</item>
-    </style>
-    <style name="FeedTextButton">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?theme_background</item>
-        <item name="android:background">?card_button</item>
-    </style>
-    <style name="FeedTextDate">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?card_date_color</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="FeedTextFullButton">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?active_text</item>
-    </style>
-    <style name="FeedTextInfo">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?card_date_color</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="FeedTextTime">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="FeedTextTitle">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="FilePickerAlertDialogTheme" parent="@style/Theme.AppCompat.Dialog.Alert">
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/emergency_red</item>
-        <item name="colorPrimaryDark">@color/icon_color_white</item>
-    </style>
-    <style name="FilePickerTheme" parent="@style/NNF_BaseTheme.Light">
-        <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/emergency_red</item>
-        <item name="colorPrimaryDark">@color/icon_color_white</item>
-        <item name="nnf_list_item_divider">?android:listDivider</item>
     </style>
     <style name="Footer">
         <item name="android:background">?footer_bar</item>
     </style>
     <style name="JustClicked">
         <item name="android:background">?ripple_effect</item>
-    </style>
-    <style name="LinearLayout">
-        <item name="android:paddingLeft">@dimen/dialog_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/dialog_item_padding_vertical</item>
-        <item name="android:paddingRight">@dimen/dialog_item_padding_horizontal</item>
-        <item name="android:paddingBottom">@dimen/dialog_item_padding_vertical</item>
-    </style>
-    <style name="LinearLayout.Dialog" parent="@style/LinearLayout"/>
-    <style name="LinearLayout.Dialog.Item" parent="@style/LinearLayout.Dialog">
-        <item name="android:gravity">center</item>
-        <item name="android:paddingLeft">@dimen/dialog_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/dialog_item_padding_vertical</item>
-        <item name="android:paddingRight">@dimen/dialog_item_padding_horizontal</item>
-        <item name="android:paddingBottom">@dimen/dialog_item_padding_vertical</item>
-        <item name="android:layout_marginTop">1.0dip</item>
-    </style>
-    <style name="MapButton">
-        <item name="android:scaleType">centerInside</item>
-    </style>
-    <style name="MapButton.Big" parent="@style/MapButton">
-        <item name="android:background">?map_button_circle_60</item>
-    </style>
-    <style name="MapButton.Medium" parent="@style/MapButton">
-        <item name="android:background">?map_button_circle_42</item>
-    </style>
-    <style name="MapButton.Small" parent="@style/MapButton">
-        <item name="android:background">?map_button_circle_32</item>
-    </style>
-    <style name="MessengerButton">
-        <item name="android:clickable">true</item>
-    </style>
-    <style name="MessengerButton.Blue" parent="@style/MessengerButton">
-        <item name="android:background">@drawable/messenger_button_blue_bg_selector</item>
-    </style>
-    <style name="MessengerButton.Blue.Large" parent="@style/MessengerButton.Blue">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">44.0dip</item>
-        <item name="android:layout_marginLeft">16.0dip</item>
-        <item name="android:layout_marginRight">16.0dip</item>
-    </style>
-    <style name="MessengerButton.Blue.Small" parent="@style/MessengerButton.Blue">
-        <item name="android:layout_width">158.0dip</item>
-        <item name="android:layout_height">36.0dip</item>
-    </style>
-    <style name="MessengerButton.White" parent="@style/MessengerButton">
-        <item name="android:background">@drawable/messenger_button_white_bg_selector</item>
-    </style>
-    <style name="MessengerButton.White.Large" parent="@style/MessengerButton.White">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">44.0dip</item>
-        <item name="android:layout_marginLeft">16.0dip</item>
-        <item name="android:layout_marginRight">16.0dip</item>
-    </style>
-    <style name="MessengerButton.White.Small" parent="@style/MessengerButton.White">
-        <item name="android:layout_width">158.0dip</item>
-        <item name="android:layout_height">36.0dip</item>
-    </style>
-    <style name="MessengerButtonText">
-        <item name="android:textSize">14.0sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:drawablePadding">4.0dip</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-    <style name="MessengerButtonText.Blue" parent="@style/MessengerButtonText">
-        <item name="android:textColor">#ffffffff</item>
-    </style>
-    <style name="MessengerButtonText.Blue.Large" parent="@style/MessengerButtonText.Blue">
-        <item name="android:drawableLeft">@drawable/messenger_bubble_large_white</item>
-    </style>
-    <style name="MessengerButtonText.Blue.Small" parent="@style/MessengerButtonText.Blue">
-        <item name="android:drawableLeft">@drawable/messenger_bubble_small_white</item>
-    </style>
-    <style name="MessengerButtonText.White" parent="@style/MessengerButtonText">
-        <item name="android:textColor">#ff0084ff</item>
-    </style>
-    <style name="MessengerButtonText.White.Large" parent="@style/MessengerButtonText.White">
-        <item name="android:drawableLeft">@drawable/messenger_bubble_large_blue</item>
-    </style>
-    <style name="MessengerButtonText.White.Small" parent="@style/MessengerButtonText.White">
-        <item name="android:drawableLeft">@drawable/messenger_bubble_small_blue</item>
-    </style>
-    <style name="MilCard" parent="@style/CardView">
-        <item name="android:layout_gravity">center</item>
-        <item name="android:layout_marginLeft">11.0dip</item>
-        <item name="android:layout_marginTop">3.0dip</item>
-        <item name="android:layout_marginRight">11.0dip</item>
-        <item name="android:layout_marginBottom">3.0dip</item>
-        <item name="cardBackgroundColor">?background_card_color</item>
-        <item name="cardCornerRadius">5.0dip</item>
-        <item name="cardElevation">5.0dip</item>
-        <item name="cardUseCompatPadding">true</item>
-    </style>
-    <style name="NNF_BaseTheme" parent="@style/Theme.AppCompat.DialogWhenLarge">
-        <item name="nnf_dir_icon_color">?colorAccent</item>
-        <item name="nnf_save_icon_color">?colorAccent</item>
-        <item name="nnf_separator_color">@color/nnf_dark_separator_color</item>
-        <item name="nnf_toolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-    <style name="NNF_BaseTheme.Light" parent="@style/Theme.AppCompat.Light.DialogWhenLarge">
-        <item name="nnf_dir_icon_color">?colorAccent</item>
-        <item name="nnf_save_icon_color">?colorAccent</item>
-        <item name="nnf_separator_color">@color/nnf_light_separator_color</item>
-        <item name="nnf_toolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-    <style name="NormalText">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?message_text_color</item>
-    </style>
-    <style name="ObjectFilterParam">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?message_text_color</item>
-    </style>
-    <style name="ObjectInfo">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?sing_hint</item>
-    </style>
-    <style name="ObjectTitle">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?title_text</item>
-    </style>
-    <style name="Padding">
-        <item name="android:padding">@dimen/menu_margin_5</item>
     </style>
     <style name="Platform.AppCompat" parent="@android:style/Theme.Holo">
         <item name="android:colorForeground">@color/foreground_material_dark</item>
@@ -1752,14 +1389,6 @@
         <item name="android:scrollbars">vertical</item>
         <item name="android:fadeScrollbars">true</item>
     </style>
-    <style name="SearchLocationButton">
-        <item name="android:textColor">@null</item>
-        <item name="android:background">@null</item>
-    </style>
-    <style name="SearchLocationLabel">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?search_location_text</item>
-    </style>
     <style name="SettingTitle">
         <item name="android:textSize">@dimen/font_normal</item>
         <item name="android:textStyle">bold</item>
@@ -1770,15 +1399,6 @@
     <style name="SettingTitle.Ripple" parent="@style/SettingTitle">
         <item name="android:background">?ripple_effect</item>
         <item name="android:paddingLeft">@dimen/menu_margin_5</item>
-    </style>
-    <style name="SpinnerText">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:padding">8.0dip</item>
-    </style>
-    <style name="SplashTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="colorPrimaryDark">@color/healin_status_bar</item>
     </style>
     <style name="SubTitle">
         <item name="android:padding">@dimen/menu_margin_5</item>
@@ -1801,46 +1421,10 @@
         <item name="android:layout_marginLeft">32.0dip</item>
         <item name="android:layout_marginRight">32.0dip</item>
     </style>
-    <style name="SubTitleText.MediumMargin" parent="@style/SubTitleText">
-        <item name="android:layout_marginLeft">24.0dip</item>
-        <item name="android:layout_marginRight">24.0dip</item>
-    </style>
-    <style name="SubTitleText.SmallMargin" parent="@style/SubTitleText">
-        <item name="android:layout_marginLeft">@dimen/menu_margin_10</item>
-        <item name="android:layout_marginRight">@dimen/menu_margin_10</item>
-    </style>
-    <style name="SwipeButton">
-        <item name="android:layout_width">74.0dip</item>
-        <item name="android:layout_height">58.0dip</item>
-        <item name="android:layout_margin">4.0dip</item>
-    </style>
     <style name="SwitchCyclops">
         <item name="android:layout_margin">@dimen/menu_margin_5</item>
         <item name="android:thumb">?switch_selector</item>
         <item name="track">?switch_track</item>
-    </style>
-    <style name="Text">
-        <item name="android:textColor">?new_text_color</item>
-    </style>
-    <style name="Text.AttachmentPrimary" parent="@style/Text">
-        <item name="android:textSize">15.0sp</item>
-        <item name="android:textColor">?attachment_text_primary_color</item>
-        <item name="android:layout_marginLeft">8.0dip</item>
-        <item name="android:layout_marginTop">10.0dip</item>
-        <item name="android:layout_marginBottom">2.0dip</item>
-    </style>
-    <style name="Text.AttachmentSecondary" parent="@style/Text">
-        <item name="android:textSize">12.0sp</item>
-        <item name="android:textColor">?attachment_text_secondary_color</item>
-        <item name="android:layout_marginLeft">8.0dip</item>
-        <item name="android:layout_marginTop">2.0dip</item>
-        <item name="android:layout_marginBottom">1.0dip</item>
-    </style>
-    <style name="Text.Title" parent="@style/Text">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:layout_marginBottom">6.0dip</item>
     </style>
     <style name="TextAppearance.AppCompat" parent="@style/Base.TextAppearance.AppCompat"/>
     <style name="TextAppearance.AppCompat.Body1" parent="@style/Base.TextAppearance.AppCompat.Body1"/>
@@ -1971,66 +1555,14 @@
         <item name="android:paddingLeft">@dimen/text_input_layout_padding</item>
         <item name="android:paddingRight">@dimen/text_input_layout_padding</item>
     </style>
-    <style name="TextInputLayout.Dialog" parent="@style/TextInputLayout">
-        <item name="hintEnabled">false</item>
-    </style>
     <style name="TextInputLayout.Fragments" parent="@style/TextInputLayout">
-        <item name="hintEnabled">false</item>
-    </style>
-    <style name="TextInputLayout.SearchByCoordinates" parent="@style/TextInputLayout">
-        <item name="android:layout_marginLeft">@dimen/search_by_coordinates_margin</item>
-        <item name="android:layout_marginRight">@dimen/search_by_coordinates_margin</item>
         <item name="hintEnabled">false</item>
     </style>
     <style name="TextInputLayout.Settings" parent="@style/TextInputLayout">
         <item name="hintEnabled">false</item>
     </style>
-    <style name="TextPicker">
-        <item name="np_dividerColor">?divider_item_color</item>
-        <item name="np_dividerDistance">40.0dip</item>
-        <item name="np_dividerThickness">1.0dip</item>
-        <item name="np_fadingEdgeEnabled">false</item>
-        <item name="np_selectedTextColor">?focusable_text</item>
-        <item name="np_selectedTextSize">18.0sp</item>
-        <item name="np_textColor">?not_focusable_text</item>
-        <item name="np_textSize">14.0sp</item>
-        <item name="np_wheelItemCount">5</item>
-        <item name="np_wrapSelectorWheel">false</item>
-    </style>
     <style name="TextView">
         <item name="android:textColor">?search_location_text</item>
-    </style>
-    <style name="TextView.DialogItem" parent="@style/TextView">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?dialog_item_text</item>
-        <item name="android:layout_marginLeft">24.0dip</item>
-        <item name="android:layout_marginRight">24.0dip</item>
-    </style>
-    <style name="TextView.DialogSubItem" parent="@style/TextView.DialogItem">
-        <item name="android:textSize">@dimen/font_small</item>
-    </style>
-    <style name="TextView.Item" parent="@style/TextView">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?dialog_item_text</item>
-    </style>
-    <style name="TextView.Link" parent="@style/TextView">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/link_color</item>
-        <item name="android:layout_marginLeft">@dimen/search_by_coordinates_margin</item>
-        <item name="android:layout_marginTop">@dimen/search_by_coordinates_margin</item>
-    </style>
-    <style name="TextView.NewText" parent="@style/TextView">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?new_text_color</item>
-        <item name="android:layout_marginLeft">@dimen/search_by_coordinates_margin</item>
-        <item name="android:layout_marginTop">@dimen/search_by_coordinates_margin</item>
-    </style>
-    <style name="TextView.SearchByCoordinates" parent="@style/TextView">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:layout_marginLeft">@dimen/search_by_coordinates_margin</item>
-        <item name="android:layout_marginTop">@dimen/search_by_coordinates_margin</item>
     </style>
     <style name="TextView.Text" parent="@style/TextView">
         <item name="android:textSize">@dimen/font_small</item>
@@ -2070,18 +1602,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    <style name="Theme.Design" parent="@style/Theme.AppCompat">
-        <item name="coordinatorLayoutStyle">@style/Widget.Design.CoordinatorLayout</item>
-        <item name="textColorError">?colorError</item>
-    </style>
     <style name="Theme.Design.BottomSheetDialog" parent="@style/Theme.AppCompat.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
         <item name="bottomSheetStyle">@style/Widget.Design.BottomSheet.Modal</item>
-    </style>
-    <style name="Theme.Design.Light" parent="@style/Theme.AppCompat.Light">
-        <item name="coordinatorLayoutStyle">@style/Widget.Design.CoordinatorLayout</item>
-        <item name="textColorError">?colorError</item>
     </style>
     <style name="Theme.Design.Light.BottomSheetDialog" parent="@style/Theme.AppCompat.Light.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -2108,10 +1632,6 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?title_text</item>
         <item name="android:layout_marginBottom">6.0dip</item>
-    </style>
-    <style name="TitleText.Clicked" parent="@style/TitleText">
-        <item name="android:background">?ripple_effect</item>
-        <item name="android:padding">@dimen/menu_margin_10</item>
     </style>
     <style name="Toolbar">
         <item name="android:background">?toolbar</item>
@@ -2207,7 +1727,6 @@
            parent="@style/Base.Widget.AppCompat.Toolbar.Button.Navigation"/>
     <style name="Widget.Compat.NotificationActionContainer" parent=""/>
     <style name="Widget.Compat.NotificationActionText" parent=""/>
-    <style name="Widget.Design.AppBarLayout" parent="@style/Base.Widget.Design.AppBarLayout"/>
     <style name="Widget.Design.BottomNavigationView" parent="">
         <item name="elevation">@dimen/design_bottom_navigation_elevation</item>
         <item name="itemBackground">?selectableItemBackgroundBorderless</item>
@@ -2221,9 +1740,6 @@
     <style name="Widget.Design.CollapsingToolbar" parent="@android:style/Widget">
         <item name="expandedTitleMargin">32.0dip</item>
         <item name="statusBarScrim">?colorPrimaryDark</item>
-    </style>
-    <style name="Widget.Design.CoordinatorLayout" parent="@style/Widget.Support.CoordinatorLayout">
-        <item name="statusBarBackground">?colorPrimaryDark</item>
     </style>
     <style name="Widget.Design.FloatingActionButton" parent="@android:style/Widget">
         <item name="android:background">@drawable/design_fab_background</item>
@@ -2268,14 +1784,6 @@
     <style name="Widget.Support.CoordinatorLayout" parent="@android:style/Widget">
         <item name="statusBarBackground">#ff000000</item>
     </style>
-    <style name="account_details">
-        <item name="android:textSize">@dimen/font_large</item>
-        <item name="android:textColor">?title_text</item>
-    </style>
-    <style name="author_details">
-        <item name="android:textSize">@dimen/font_large</item>
-        <item name="android:textColor">?author_title_text</item>
-    </style>
     <style name="button">
         <item name="android:textSize">@dimen/font_normal</item>
         <item name="android:textColor">?theme_background</item>
@@ -2283,89 +1791,6 @@
     </style>
     <style name="button.green" parent="@style/button">
         <item name="android:background">?card_button</item>
-    </style>
-    <style name="button.green.SearchByCoordinates" parent="@style/button.green">
-        <item name="android:layout_marginLeft">@dimen/search_by_coordinates_margin</item>
-        <item name="android:layout_marginTop">@dimen/dialog_button_search_by_coordinates_margin_vertical</item>
-        <item name="android:layout_marginRight">@dimen/search_by_coordinates_margin</item>
-        <item name="android:layout_marginBottom">@dimen/dialog_button_search_by_coordinates_margin_vertical</item>
-    </style>
-    <style name="button.grey" parent="@style/button">
-        <item name="android:background">?grey_button</item>
-    </style>
-    <style name="chat_date_message_style">
-        <item name="android:textSize">11.0sp</item>
-    </style>
-    <style name="chat_last_message_indicators">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">#ff4cb4ed</item>
-    </style>
-    <style name="chat_last_message_text">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-    </style>
-    <style name="chat_message_data">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?message_text_color</item>
-    </style>
-    <style name="chat_text_message_style">
-        <item name="android:textSize">16.0sp</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
-    <style name="com_facebook_activity_theme" parent="@style/Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-    </style>
-    <style name="com_facebook_auth_dialog" parent="@style/Theme.AppCompat.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-    </style>
-    <style name="com_facebook_auth_dialog_instructions_textview">
-        <item name="android:textSize">16.0sp</item>
-        <item name="android:typeface">sans</item>
-        <item name="android:textColor">@color/com_facebook_device_auth_text</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:singleLine">false</item>
-        <item name="android:drawablePadding">12.0dip</item>
-    </style>
-    <style name="com_facebook_button" parent="@android:style/Widget.Button">
-        <item name="android:textSize">14.0dip</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/com_facebook_button_background</item>
-        <item name="android:paddingLeft">8.0dip</item>
-        <item name="android:paddingTop">5.0dip</item>
-        <item name="android:paddingRight">8.0dip</item>
-        <item name="android:paddingBottom">5.0dip</item>
-        <item name="android:drawablePadding">6.0dip</item>
-    </style>
-    <style name="com_facebook_button_like" parent="@style/com_facebook_button">
-        <item name="android:background">@drawable/com_facebook_button_like_background</item>
-    </style>
-    <style name="com_facebook_button_send" parent="@style/com_facebook_button">
-        <item name="android:background">@drawable/com_facebook_button_send_background</item>
-        <item name="android:text">@string/com_facebook_send_button_text</item>
-        <item name="android:drawableLeft">@drawable/com_facebook_send_button_icon</item>
-    </style>
-    <style name="com_facebook_button_share" parent="@style/com_facebook_button">
-        <item name="android:text">@string/com_facebook_share_button_text</item>
-        <item name="android:drawableLeft">@drawable/com_facebook_button_icon</item>
-    </style>
-    <style name="com_facebook_loginview_default_style" parent="@style/com_facebook_button">
-        <item name="android:textSize">13.0dip</item>
-        <item name="android:background">@drawable/com_facebook_button_login_background</item>
-        <item name="android:paddingLeft">6.0dip</item>
-        <item name="android:paddingRight">6.0dip</item>
-        <item name="android:drawablePadding">5.0dip</item>
-    </style>
-    <style name="com_facebook_loginview_silver_style" parent="@style/com_facebook_loginview_default_style">
-        <item name="android:textColor">#ff4b5164</item>
-        <item name="android:background">@drawable/com_facebook_button_login_silver_background</item>
-        <item name="android:drawableLeft">@null</item>
     </style>
     <style name="contact_info_hint">
         <item name="android:textSize">@dimen/font_small</item>
@@ -2375,62 +1800,13 @@
         <item name="android:textSize">@dimen/font_small</item>
         <item name="android:textColor">?contact_options</item>
     </style>
-    <style name="data_text">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?sing_hint</item>
-    </style>
     <style name="dialog_list_item">
         <item name="android:textSize">@dimen/font_normal</item>
         <item name="android:textColor">?title_text</item>
     </style>
-    <style name="dialog_list_title">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?active_text</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-    <style name="dialog_unread_message_style">
-        <item name="android:textSize">16.0sp</item>
-        <item name="android:textColor">@android:color/holo_green_dark</item>
-    </style>
-    <style name="ef_AppTheme" parent="@style/ef_BaseTheme">
-        <item name="colorAccent">@color/ef_colorAccent</item>
-        <item name="colorPrimary">@color/ef_colorPrimary</item>
-        <item name="colorPrimaryDark">@color/ef_colorPrimaryDark</item>
-    </style>
-    <style name="ef_BaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-    <style name="ef_CustomToolbarTheme" parent="@style/Base.ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:textColorPrimary">@color/ef_colorTextPrimary</item>
-        <item name="actionMenuTextColor">@color/ef_colorTextPrimary</item>
-    </style>
     <style name="email_text">
         <item name="android:textSize">@dimen/font_small</item>
         <item name="android:textColor">?sing_hint</item>
-    </style>
-    <style name="footer_tab_text_active">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?footer_icon_color_active</item>
-    </style>
-    <style name="footer_tab_text_unactive">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?footer_icon_color</item>
-    </style>
-    <style name="fresh_messages">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/blue</item>
-    </style>
-    <style name="geolocation_header">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?geolocation_text_color</item>
-    </style>
-    <style name="geolocation_list_section">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?geolocation_text_color</item>
     </style>
     <style name="list_contact_item_connect_status">
         <item name="android:textSize">@dimen/font_small</item>
@@ -2444,66 +1820,6 @@
         <item name="android:layout_marginTop">8.0dip</item>
         <item name="android:maxLines">1</item>
     </style>
-    <style name="list_device_item_location">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:layout_marginTop">4.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_device_item_model">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?sing_hint</item>
-        <item name="android:layout_marginTop">4.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_device_item_title">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:layout_marginTop">4.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_report_coordinate_item">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:layout_marginTop">8.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_report_filter_parameter">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_report_info_hint_item">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:layout_marginTop">8.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_report_info_item">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-        <item name="android:layout_marginTop">8.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_report_title_item">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:layout_marginTop">8.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="list_storage_item_destination">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?sing_hint</item>
-    </style>
-    <style name="log_out_button">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@color/log_out</item>
-    </style>
-    <style name="medium_action_text">
-        <item name="android:textSize">@dimen/font_large</item>
-        <item name="android:textColor">?active_text</item>
-    </style>
     <style name="medium_text">
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:textColor">?medium_text_color</item>
@@ -2511,48 +1827,6 @@
     <style name="message_info_text">
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:textColor">?title_text</item>
-    </style>
-    <style name="object_info">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?sing_hint</item>
-        <item name="android:layout_marginTop">8.0dip</item>
-        <item name="android:maxLines">1</item>
-    </style>
-    <style name="object_info_data">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?title_text</item>
-    </style>
-    <style name="object_info_hint">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?object_info_hint</item>
-    </style>
-    <style name="object_title">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?title_text</item>
-        <item name="android:maxLines">5</item>
-    </style>
-    <style name="opponent_last_online_date">
-        <item name="android:textSize">12.0sp</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-    <style name="opponent_name_style">
-        <item name="android:textSize">16.0sp</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-    <style name="pin_text_view">
-        <item name="android:textSize">@dimen/font_normal</item>
-        <item name="android:textColor">?toolbar_color</item>
-    </style>
-    <style name="preview_geolocation_point">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?message_text_color</item>
-    </style>
-    <style name="preview_next_button_text">
-        <item name="android:textSize">@dimen/font_normal</item>
-    </style>
-    <style name="preview_normal_text">
-        <item name="android:textSize">@dimen/font_normal</item>
     </style>
     <style name="settings_software_version">
         <item name="android:textSize">12.0sp</item>
@@ -2563,32 +1837,10 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/blue</item>
     </style>
-    <style name="tab_text_unactive">
-        <item name="android:textSize">@dimen/font_small</item>
-        <item name="android:textColor">?text_color</item>
-    </style>
     <style name="toolbar_not_caps_text">
         <item name="android:textSize">@dimen/font_larger</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?toolbar_text</item>
-    </style>
-    <style name="toolbar_text">
-        <item name="android:textSize">@dimen/font_larger</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?toolbar_text</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-    <style name="tooltip_bubble_text">
-        <item name="android:textSize">12.0sp</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:gravity">left</item>
-        <item name="android:shadowColor">#40000000</item>
-        <item name="android:shadowDy">-1.0</item>
-        <item name="android:shadowRadius">0.25</item>
-    </style>
-    <style name="update_button">
-        <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:background">@color/update</item>
     </style>
     <style name="username_text">
         <item name="android:textSize">@dimen/font_large</item>

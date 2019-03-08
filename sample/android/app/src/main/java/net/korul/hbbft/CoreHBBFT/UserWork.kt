@@ -7,14 +7,13 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
-import net.korul.hbbft.CommonFragments.tabContacts.IAddToContacts2
+import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.data.model.conversation.Conversations
+import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.DatabaseApplication
-import net.korul.hbbft.common.data.model.User
-import net.korul.hbbft.common.data.model.conversation.Conversations
-import net.korul.hbbft.common.data.model.core.Getters
-import net.korul.hbbft.firebaseStorage.MyDownloadService
+import net.korul.hbbft.FirebaseStorageDU.MyDownloadUserService
 import java.io.File
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -25,7 +24,7 @@ object UserWork {
     fun initCurUser() {
         val strUser = ReadObjectFromFile("cur_user.out")
         if (strUser == null || strUser.isEmpty()) {
-            val user = User (
+            val user = User(
                 0,
                 DatabaseApplication.mCoreHBBFT2X.uniqueID1,
                 0.toString(),
@@ -99,7 +98,7 @@ object UserWork {
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val objectMap = dataSnapshot.value as HashMap<String, Any>?
-                if(objectMap != null) {
+                if (objectMap != null) {
                     for (obj in objectMap.values) {
                         val mapObj: Map<String, Any> = obj as Map<String, Any>
 
@@ -132,7 +131,7 @@ object UserWork {
         uid: String,
         dialogId: String,
         listObjectsOfUsers: MutableList<Users>,
-        listener: IAddToContacts2
+        listener: IAddToContacts
     ) {
         if (listObjectsOfUsers.isEmpty()) {
             listener.errorAddContact()
@@ -151,10 +150,10 @@ object UserWork {
                 )
                 Conversations.getDUser(users).insert()
 
-                // Kick off MyDownloadService to download the file
-                val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadService::class.java)
-                    .putExtra(MyDownloadService.EXTRA_DOWNLOAD_USERID, user.UID)
-                    .setAction(MyDownloadService.ACTION_DOWNLOAD)
+                // Kick off MyDownloadUserService to download the file
+                val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
+                    .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, user.UID)
+                    .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
                 CoreHBBFT.mApplicationContext.startService(intent)
             }
         }
@@ -174,8 +173,8 @@ object UserWork {
         listener.user(user)
     }
 
-    fun getUserFromLocalOrDownloadFromFirebase(uid: String, listener: IAddToContacts2) {
-        getUserFromLocalOrDownloadFromFirebase(uid, "", object : IAddToContacts2 {
+    fun getUserFromLocalOrDownloadFromFirebase(uid: String, listener: IAddToContacts) {
+        getUserFromLocalOrDownloadFromFirebase(uid, "", object : IAddToContacts {
             override fun user(user: User) {
                 listener.user(user)
             }
@@ -186,7 +185,7 @@ object UserWork {
         })
     }
 
-    fun getUserFromLocalOrDownloadFromFirebase(uid: String, dialogId: String, listener: IAddToContacts2) {
+    fun getUserFromLocalOrDownloadFromFirebase(uid: String, dialogId: String, listener: IAddToContacts) {
         val LocalUser = getAnyLocalUserByUid(uid)
         if (LocalUser != null) {
             val id = Getters.getNextUserID()
@@ -205,7 +204,7 @@ object UserWork {
         } else {
             thread {
                 val listOfUSer = getUsersFromFirebase(uid)
-                AddUserToLocalFromFirebaseWithAvatar(uid, dialogId, listOfUSer, object : IAddToContacts2 {
+                AddUserToLocalFromFirebaseWithAvatar(uid, dialogId, listOfUSer, object : IAddToContacts {
                     override fun user(user: User) {
                         listener.user(user)
                     }
@@ -284,19 +283,23 @@ object UserWork {
     }
 
     fun updateAllUsersFromFirebase() {
-        for (user in Getters.getAllLocalUsersDistinct()) {
+        for (user in Getters.getAllLocalUsersDistinct().filter { it.uid != CoreHBBFT.uniqueID1 }) {
             val listObjectsOfUsers: MutableList<Users> = getUsersFromFirebase(user.uid)
             if (listObjectsOfUsers.isEmpty())
-                Toast.makeText(CoreHBBFT.mApplicationContext, "ERROR Adding Contact with uid ${user.uid}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    CoreHBBFT.mApplicationContext,
+                    "ERROR Adding Contact with uid ${user.uid}",
+                    Toast.LENGTH_LONG
+                ).show()
             else {
                 for (us in listObjectsOfUsers) {
 
                     updateMetaInAllLocalUserByUidWithoutNick(us)
 
-                    // Kick off MyDownloadService to download the file
-                    val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadService::class.java)
-                        .putExtra(MyDownloadService.EXTRA_DOWNLOAD_USERID, us.UID)
-                        .setAction(MyDownloadService.ACTION_DOWNLOAD)
+                    // Kick off MyDownloadUserService to download the file
+                    val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
+                        .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, us.UID)
+                        .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
                     CoreHBBFT.mApplicationContext.startService(intent)
                 }
             }

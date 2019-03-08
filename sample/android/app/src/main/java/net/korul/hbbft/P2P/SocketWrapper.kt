@@ -34,7 +34,7 @@ class SocketWrapper {
     var mAllStop = false
     var mStarted = false
 
-    lateinit var mRoomName: String
+    lateinit var mRoomId: String
     lateinit var myUID1: String
     lateinit var myUID2: String
 
@@ -42,11 +42,11 @@ class SocketWrapper {
         mP2PMesh = p_
     }
 
-    fun initSocketWrapper(roomName: String, myUID_: String, users: List<String>) {
-        Log.d(TAG, "SocketWrapper initSocketWrapper2X $roomName - roomName, $myUID_ - myUID")
+    fun initSocketWrapper(roomId: String, myUID_: String, users: List<String>) {
+        Log.d(TAG, "SocketWrapper initSocketWrapper2X $roomId - roomId, $myUID_ - myUID")
 
         myUID1 = myUID_
-        mRoomName = roomName
+        mRoomId = roomId
 
         myLocalPort1 = getPortForUID(myUID1)
 
@@ -58,12 +58,12 @@ class SocketWrapper {
         mStarted = true
     }
 
-    fun initSocketWrapper2X(roomName: String, myUID_: String, myUID_2: String, users: List<String>) {
-        Log.d(TAG, "SocketWrapper initSocketWrapper2X $roomName - roomName, $myUID_ - myUID")
+    fun initSocketWrapper2X(roomId: String, myUID_: String, myUID_2: String, users: List<String>) {
+        Log.d(TAG, "SocketWrapper initSocketWrapper2X $roomId - roomId, $myUID_ - myUID")
 
         myUID1 = myUID_
         myUID2 = myUID_2
-        mRoomName = roomName
+        mRoomId = roomId
 
         myLocalPort1 = getPortForUID(myUID1)
         myLocalPort2 = getPortForUID(myUID2)
@@ -170,7 +170,7 @@ class SocketWrapper {
     }
 
     fun startPseudoNotLocalSocketALoop(uid: String, port: Int) {
-        Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop new user - $uid ; port - $port")
+        Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop new dialog - $uid ; port - $port")
 
         mPseudoNotLocalThread[uid] = thread {
             mPseudoNotLocalSocketServer[uid] = ServerSocket(port)

@@ -12,10 +12,13 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import net.korul.hbbft.CommonData.data.model.core.Getters.getAllDialogsUids
+import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.CoreHBBFT.PushWork.preSendPushToStart
 import net.korul.hbbft.CoreHBBFT.PushWork.registerForPush
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.updateAllRoomsFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.getUIDsInRoomFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.isSomeBodyOnlineInList
 import net.korul.hbbft.CoreHBBFT.RoomWork.reregisterInFirebase
@@ -30,8 +33,6 @@ import net.korul.hbbft.P2P.P2PMesh
 import net.korul.hbbft.P2P.SocketWrapper
 import net.korul.hbbft.R
 import net.korul.hbbft.Session
-import net.korul.hbbft.common.data.model.core.Getters.getAllDialogsName
-import net.korul.hbbft.common.utils.AppUtils
 import net.korul.hbbft.services.ClosingService
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -60,7 +61,7 @@ object CoreHBBFT : IGetData {
     private val listeners = ArrayList<CoreHBBFTListener?>()
 
     var mUpdateStateToOnline = false
-    var mRoomName: String = ""
+    var mRoomId: String = ""
 
     var lastMes: String = ""
     var lastMestime = Calendar.getInstance().timeInMillis
@@ -112,12 +113,13 @@ object CoreHBBFT : IGetData {
             latch.await()
             saveCurUserSync(DatabaseApplication.mCurUser)
             updateAllUsersFromFirebase()
-            reregisterInFirebase(getAllDialogsName(), uniqueID1)
+            updateAllRoomsFromFirebase()
+            reregisterInFirebase(getAllDialogsUids(), uniqueID1)
         }
     }
 
-    fun setRoomName(roomname: String) {
-        mRoomName = roomname
+    fun setRoomId(roomid: String) {
+        mRoomId = roomid
     }
 
     fun authAnonymouslyInFirebase(): CountDownLatch {
@@ -125,11 +127,11 @@ object CoreHBBFT : IGetData {
         mAuth.signInAnonymously()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
+                    // Sign in success, update UI with the signed-in dialog's information
                     Log.d(TAG, "signInAnonymously:success")
                     val user = mAuth.currentUser
                 } else {
-                    // If sign in fails, display a message to the user.
+                    // If sign in fails, display a message to the dialog.
                     Log.w(TAG, "signInAnonymously:failure", task.exception)
 
                     AppUtils.showToast(
@@ -156,24 +158,24 @@ object CoreHBBFT : IGetData {
         return latch
     }
 
-    fun startAllNode(RoomName: String) {
+    fun startAllNode(RoomId: String) {
         thread {
-            val listObjectsOfUIds = getUIDsInRoomFromFirebase(RoomName)
+            val listObjectsOfUIds = getUIDsInRoomFromFirebase(RoomId)
             val isSomebodyOnline = isSomeBodyOnlineInList(listObjectsOfUIds)
             val cntUsers = listObjectsOfUIds.count()
 
-            // if 1 user
+            // if 1 dialog
             if (cntUsers < 2) {
                 AppUtils.showToast(
                     mApplicationContext,
                     "Room is empty", true
                 )
-                Log.d(TAG, "Room is empty $RoomName")
+                Log.d(TAG, "Room is empty $RoomId")
 
             }
             // if 2 users and i am first
             else if (cntUsers == 2 && !isSomebodyOnline) {
-                start_node_2x(RoomName)
+                start_node_2x(RoomId)
 
                 var uid = ""
                 for (ui in listObjectsOfUIds) {
@@ -183,10 +185,10 @@ object CoreHBBFT : IGetData {
                     }
                 }
                 if (uid.isNotEmpty()) {
-                    Log.d(TAG, "2 users and i am first in room $RoomName")
-                    preSendPushToStart(listOf(uid), RoomName, uniqueID1)
+                    Log.d(TAG, "2 users and i am first in room $RoomId")
+                    preSendPushToStart(listOf(uid), RoomId, uniqueID1)
                 } else {
-                    Log.d(TAG, "Room uid is empty $RoomName")
+                    Log.d(TAG, "Room uid is empty $RoomId")
                     AppUtils.showToast(
                         mApplicationContext,
                         "Room is empty", true
@@ -195,12 +197,12 @@ object CoreHBBFT : IGetData {
             }
             // if 2 users and second start
             else if (cntUsers == 2 && isSomebodyOnline) {
-                Log.d(TAG, "2 users and second start in room $RoomName")
-                start_node(RoomName)
+                Log.d(TAG, "2 users and second start in room $RoomId")
+                start_node(RoomId)
             }
             // if many users and i am first
             else if (cntUsers > 2 && !isSomebodyOnline) {
-                start_node(RoomName)
+                start_node(RoomId)
 
                 val uids = mutableListOf<String>()
                 for (ui in listObjectsOfUIds) {
@@ -209,10 +211,10 @@ object CoreHBBFT : IGetData {
                     }
                 }
                 if (uids.isNotEmpty()) {
-                    Log.d(TAG, "many users and i am first in room $RoomName")
-                    preSendPushToStart(uids, RoomName, uniqueID1)
+                    Log.d(TAG, "many users and i am first in room $RoomId")
+                    preSendPushToStart(uids, RoomId, uniqueID1)
                 } else {
-                    Log.d(TAG, "Room uid is empty $RoomName")
+                    Log.d(TAG, "Room uid is empty $RoomId")
                     AppUtils.showToast(
                         mApplicationContext,
                         "Room uids is empty", true
@@ -221,24 +223,24 @@ object CoreHBBFT : IGetData {
             }
             // if many users and i am not first
             else {
-                Log.d(TAG, "many users and i am not first in room $RoomName")
-                start_node(RoomName)
+                Log.d(TAG, "many users and i am not first in room $RoomId")
+                start_node(RoomId)
             }
         }
     }
 
 
-    fun start_node(RoomName: String) {
-        setOnlineModeInRoomInFirebase(RoomName)
+    fun start_node(RoomId: String) {
+        setOnlineModeInRoomInFirebase(RoomId)
 
-        mRoomName = RoomName
+        mRoomId = RoomId
 
-        mP2PMesh?.initOneMesh(RoomName, uniqueID1)
-        mP2PMesh?.publishAboutMe(RoomName, uniqueID1)
+        mP2PMesh?.initOneMesh(RoomId, uniqueID1)
+        mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
 
         waitForConnect()
 
-        mSocketWrapper!!.initSocketWrapper(RoomName, uniqueID1, mP2PMesh!!.usersCon.toList())
+        mSocketWrapper!!.initSocketWrapper(RoomId, uniqueID1, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
@@ -257,20 +259,20 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun start_node_2x(RoomName: String) {
-        setOnlineModeInRoomInFirebase(RoomName)
+    fun start_node_2x(RoomId: String) {
+        setOnlineModeInRoomInFirebase(RoomId)
 
-        mRoomName = RoomName
+        mRoomId = RoomId
 
-        mP2PMesh?.initOneMesh(RoomName, uniqueID1)
-        mP2PMesh?.initOneMesh(RoomName, uniqueID2)
-        mP2PMesh?.publishAboutMe(RoomName, uniqueID1)
+        mP2PMesh?.initOneMesh(RoomId, uniqueID1)
+        mP2PMesh?.initOneMesh(RoomId, uniqueID2)
+        mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
         Thread.sleep(100)
-        mP2PMesh?.publishAboutMe(RoomName, uniqueID2)
+        mP2PMesh?.publishAboutMe(RoomId, uniqueID2)
 
         waitForConnectWithoutSelf()
 
-        mSocketWrapper!!.initSocketWrapper2X(RoomName, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
+        mSocketWrapper!!.initSocketWrapper2X(RoomId, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
@@ -349,7 +351,7 @@ object CoreHBBFT : IGetData {
         mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
 
-        setOfflineModeInRoomInFirebase(mRoomName)
+        setOfflineModeInRoomInFirebase(mRoomId)
     }
 
     override fun dataReceived(bytes: ByteArray) {

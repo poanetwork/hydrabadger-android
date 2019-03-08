@@ -4,7 +4,9 @@
         android:layout_height="match_parent"
         android:background="?android:attr/windowBackground"
         android:theme="?attr/actionBarTheme"
-        android:minHeight="?attr/actionBarSize">
+        android:minHeight="?attr/actionBarSize"
+        android:clickable="true"
+        android:focusable="true">
 
     <com.stfalcon.chatkit.dialogs.DialogsList
             android:id="@+id/dialogsList"
