@@ -18,6 +18,7 @@ import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.CoreHBBFT.PushWork.preSendPushToStart
 import net.korul.hbbft.CoreHBBFT.PushWork.registerForPush
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.updateAllRoomsFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.getUIDsInRoomFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.isSomeBodyOnlineInList
 import net.korul.hbbft.CoreHBBFT.RoomWork.reregisterInFirebase
@@ -112,6 +113,7 @@ object CoreHBBFT : IGetData {
             latch.await()
             saveCurUserSync(DatabaseApplication.mCurUser)
             updateAllUsersFromFirebase()
+            updateAllRoomsFromFirebase()
             reregisterInFirebase(getAllDialogsUids(), uniqueID1)
         }
     }
@@ -125,11 +127,11 @@ object CoreHBBFT : IGetData {
         mAuth.signInAnonymously()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
+                    // Sign in success, update UI with the signed-in dialog's information
                     Log.d(TAG, "signInAnonymously:success")
                     val user = mAuth.currentUser
                 } else {
-                    // If sign in fails, display a message to the user.
+                    // If sign in fails, display a message to the dialog.
                     Log.w(TAG, "signInAnonymously:failure", task.exception)
 
                     AppUtils.showToast(
@@ -162,7 +164,7 @@ object CoreHBBFT : IGetData {
             val isSomebodyOnline = isSomeBodyOnlineInList(listObjectsOfUIds)
             val cntUsers = listObjectsOfUIds.count()
 
-            // if 1 user
+            // if 1 dialog
             if (cntUsers < 2) {
                 AppUtils.showToast(
                     mApplicationContext,

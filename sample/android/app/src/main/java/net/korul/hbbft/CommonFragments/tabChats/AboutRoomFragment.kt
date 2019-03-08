@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments.tabSettings
+package net.korul.hbbft.CommonFragments.tabChats
 
 import android.app.Activity
 import android.app.ProgressDialog
@@ -19,33 +19,43 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import kotlinx.android.synthetic.main.fragment_settings_account.*
+import kotlinx.android.synthetic.main.fragment_about_dialog.*
 import lib.folderpicker.FolderPicker
-import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.data.model.Dialog
+import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.utils.AppUtils
-import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
-import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
-import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
-import net.korul.hbbft.FirebaseStorageDU.MyUploadUserService
+import net.korul.hbbft.CommonFragments.ShowBigQRActivity
+import net.korul.hbbft.CoreHBBFT.IComplete
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.reregisterInRoomDescrFirebase
+import net.korul.hbbft.Dialogs.DialogsFragment
+import net.korul.hbbft.FirebaseStorageDU.MyUploadRoomService
 import net.korul.hbbft.ImageWork.ImageUtil.circleShape
 import net.korul.hbbft.R
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import kotlin.concurrent.thread
 
 
-class SettingsUserFragment : Fragment() {
-
+class AboutRoomFragment : Fragment() {
     lateinit var progress: ProgressDialog
     val handle = Handler()
     var clickOnAvatar: Boolean = false
 
+    private var mFile: File? = null
+    private var mCurDialog: Dialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.hide()
+
+        val bundle = arguments
+        if (bundle != null && !bundle.isEmpty) {
+            val extraDialog = bundle.getString("dialog")
+            mCurDialog = Gson().fromJson(extraDialog, Dialog::class.java)
+        }
 
         progress = ProgressDialog(context!!)
         progress.setTitle("Working")
@@ -54,35 +64,18 @@ class SettingsUserFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_settings_account, container, false)
+        return inflater.inflate(R.layout.fragment_about_dialog, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        account_generate_qr.setOnClickListener {
-            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-            transaction.add(
-                R.id.view,
-                SettingsQRFragment.newInstance(mCurUser.uid), getString(R.string.tag_settings)
-            )
-            transaction.addToBackStack(getString(R.string.tag_settings))
-            transaction.commit()
-        }
 
         action_back.setOnClickListener {
             if (somethingChanged()) {
                 val builder = AlertDialog.Builder(activity!!)
                 builder.setMessage(R.string.save_user_settings)
                     .setPositiveButton(R.string.action_ok) { _, _ ->
-                        saveUser()
-                        val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-                        transaction.replace(
-                            R.id.view,
-                            SettingsFragment.newInstance(), getString(R.string.tag_settings)
-                        )
-                        transaction.addToBackStack(getString(R.string.tag_settings))
-                        transaction.commit()
+                        saveRoom()
                     }
                     .setNegativeButton(R.string.cancel) { _, _ ->
                         (activity as AppCompatActivity).supportFragmentManager.popBackStack()
@@ -96,49 +89,45 @@ class SettingsUserFragment : Fragment() {
 
         try {
             val barcodeEncoder = BarcodeEncoder()
-            val bitmap = barcodeEncoder.encodeBitmap(mCurUser.uid, BarcodeFormat.QR_CODE, 400, 400)
+            val bitmap = barcodeEncoder.encodeBitmap(mCurDialog!!.id, BarcodeFormat.QR_CODE, 400, 400)
             qr_code_view.setImageBitmap(bitmap)
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
         qr_code_view.setOnClickListener {
-            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-            transaction.add(
-                R.id.view,
-                SettingsQRFragment.newInstance(mCurUser.uid), getString(R.string.tag_settings)
-            )
-            transaction.addToBackStack(getString(R.string.tag_settings))
-            transaction.commit()
+            ShowBigQRActivity.open(context!!, mCurDialog!!.id)
         }
 
         action_confirm.setOnClickListener {
             if (somethingChanged())
-                saveUser()
-            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-            transaction.replace(
-                R.id.view,
-                SettingsFragment.newInstance(), getString(R.string.tag_settings)
-            )
-            transaction.addToBackStack(getString(R.string.tag_settings))
-            transaction.commit()
+                saveRoom()
+            else {
+                val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+                transaction.replace(
+                    R.id.view,
+                    DialogsFragment.newInstance(), getString(R.string.tag_chats)
+                )
+                transaction.addToBackStack(getString(R.string.tag_chats))
+                transaction.commit()
+            }
         }
 
-        account_name.text = SpannableStringBuilder(mCurUser.name)
-        account_nick.text = SpannableStringBuilder(mCurUser.nick)
-        account_id.text = SpannableStringBuilder(mCurUser.uid)
+        dialog_name.text = SpannableStringBuilder(mCurDialog!!.dialogName)
+        dialog_descr.text = SpannableStringBuilder(mCurDialog!!.dialogDescr)
+        dialog_id.text = SpannableStringBuilder(mCurDialog!!.id)
 
-        account_icon.setOnClickListener {
+        room_icon.setOnClickListener {
             clickOnAvatar = true
             verifyStoragePermissionsAndPickFile(activity!!)
         }
 
-        val pathAvatar = mCurUser.avatar
+        val pathAvatar = mCurDialog!!.dialogPhoto
         if (pathAvatar != "") {
             val image = BitmapFactory.decodeFile(pathAvatar)
-            account_icon.setImageBitmap(image)
+            room_icon.setImageBitmap(image)
         } else {
-            account_icon.setImageResource(R.drawable.ic_contact)
+            room_icon.setImageResource(R.drawable.ic_nophoto)
         }
 
         save_qr_code.setOnClickListener {
@@ -172,9 +161,9 @@ class SettingsUserFragment : Fragment() {
     fun somethingChanged(): Boolean {
         if (clickOnAvatar)
             return true
-        if (account_name.text.toString() != mCurUser.name)
+        if (dialog_name.text.toString() != mCurDialog!!.dialogName)
             return true
-        if (account_nick.text.toString() != mCurUser.nick)
+        if (dialog_descr.text.toString() != mCurDialog!!.dialogDescr)
             return true
 
         return false
@@ -184,9 +173,9 @@ class SettingsUserFragment : Fragment() {
         val pathAvatar = file.path
         if (pathAvatar != "") {
             val image = BitmapFactory.decodeFile(pathAvatar)
-            account_icon.setImageBitmap(image)
+            room_icon.setImageBitmap(image)
         } else {
-            account_icon.setImageResource(R.drawable.ic_contact)
+            room_icon.setImageResource(R.drawable.ic_nophoto)
         }
     }
 
@@ -211,9 +200,9 @@ class SettingsUserFragment : Fragment() {
 
             if (folderLocation != null && folderLocation.isNotEmpty()) {
                 val barcodeEncoder = BarcodeEncoder()
-                val bitmap = barcodeEncoder.encodeBitmap(mCurUser.uid, BarcodeFormat.QR_CODE, 400, 400)
+                val bitmap = barcodeEncoder.encodeBitmap(mCurDialog!!.id, BarcodeFormat.QR_CODE, 400, 400)
                 try {
-                    val filename = folderLocation + File.separator + mCurUser.uid
+                    val filename = folderLocation + File.separator + mCurDialog!!.id
                     val file = File(filename)
                     if (file.exists())
                         file.delete()
@@ -241,31 +230,22 @@ class SettingsUserFragment : Fragment() {
             val folderLocation = data?.extras?.getString("data")
             if (folderLocation != null && folderLocation.isNotEmpty()) {
                 if (resultCode == Activity.RESULT_OK && data.hasExtra("data")) {
-                    progress.show()
-                    thread {
-                        val fileLocation = data.extras.getString("data")
+                    val fileLocation = data.extras.getString("data")
 
-                        val outputDir = activity!!.filesDir
-                        val localFile = File.createTempFile(mCurUser.uid, "png", outputDir)
+                    val outputDir = activity!!.filesDir
+                    val localFile = File.createTempFile(mCurDialog!!.id, "png", outputDir)
 
-                        val bitmap = BitmapFactory.decodeFile(fileLocation)
-                        val resized = Bitmap.createScaledBitmap(bitmap, 250, 250, true)
-                        val uImage = circleShape(resized)
+                    val bitmap = BitmapFactory.decodeFile(fileLocation)
+                    val resized = Bitmap.createScaledBitmap(bitmap, 250, 250, true)
+                    val uImage = circleShape(resized)
 
-                        val out = FileOutputStream(localFile)
-                        uImage.compress(Bitmap.CompressFormat.PNG, 90, out) //100-best quality
-                        out.close()
+                    val out = FileOutputStream(localFile)
+                    uImage.compress(Bitmap.CompressFormat.PNG, 90, out) //100-best quality
+                    out.close()
 
-                        updateAvatarInAllLocalUserByUid(mCurUser.uid, localFile)
+                    mFile = localFile
 
-                        val uploadUri = Uri.fromFile(localFile)
-                        context!!.startService(
-                            Intent(context, MyUploadUserService::class.java)
-                                .putExtra(MyUploadUserService.EXTRA_FILE_URI, uploadUri)
-                                .putExtra(MyUploadUserService.EXTRA_USER_ID, mCurUser.uid)
-                                .setAction(MyUploadUserService.ACTION_UPLOAD)
-                        )
-                    }
+                    setImageAvatar(localFile)
                 } else if (resultCode == Activity.RESULT_CANCELED) {
                     AppUtils.showToast(
                         activity!!,
@@ -290,19 +270,66 @@ class SettingsUserFragment : Fragment() {
         }
     }
 
-    fun saveUser() {
-        val user = User(
-            mCurUser.id_,
-            mCurUser.uid,
-            mCurUser.id,
-            mCurUser.idDialog,
-            account_name.text.toString(),
-            account_nick.text.toString(),
-            mCurUser.avatar,
-            mCurUser.isOnline
-        )
+    fun saveRoom() {
+        if (mFile != null) {
+            handle.post {
+                progress.show()
+            }
 
-        saveCurUser(user)
+            val dialog = Dialog(
+                mCurDialog!!.id,
+                dialog_name.text.toString(),
+                dialog_descr.text.toString(),
+                mFile!!.path,
+                mCurDialog!!.users,
+                mCurDialog!!.lastMessage,
+                mCurDialog!!.unreadCount
+            )
+
+            Conversations.getDDialog(dialog).update()
+
+            reregisterInRoomDescrFirebase(dialog, object : IComplete {
+                override fun complete() {
+                }
+            })
+
+            val uploadUri = Uri.fromFile(mFile)
+            context!!.startService(
+                Intent(context, MyUploadRoomService::class.java)
+                    .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+                    .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
+                    .setAction(MyUploadRoomService.ACTION_UPLOAD)
+            )
+        } else {
+            handle.post {
+                progress.show()
+            }
+
+            val dialog = Dialog(
+                mCurDialog!!.id,
+                dialog_name.text.toString(),
+                dialog_descr.text.toString(),
+                mCurDialog!!.dialogPhoto,
+                mCurDialog!!.users,
+                mCurDialog!!.lastMessage,
+                mCurDialog!!.unreadCount
+            )
+
+            Conversations.getDDialog(dialog).update()
+
+            reregisterInRoomDescrFirebase(dialog, object : IComplete {
+                override fun complete() {
+                    dismissProgressBar()
+                    val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+                    transaction.replace(
+                        R.id.view,
+                        DialogsFragment.newInstance(), getString(R.string.tag_chats)
+                    )
+                    transaction.addToBackStack(getString(R.string.tag_chats))
+                    transaction.commit()
+                }
+            })
+        }
     }
 
     fun verifyStoragePermissionsAndPickFile(activity: Activity) {
@@ -321,6 +348,11 @@ class SettingsUserFragment : Fragment() {
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        (activity as AppCompatActivity).supportActionBar?.show()
+    }
+
     companion object {
         private val FOLDERPICKER_CODE = 111
 
@@ -334,6 +366,13 @@ class SettingsUserFragment : Fragment() {
             )
 
 
-        fun newInstance() = SettingsUserFragment()
+        fun newInstance(dialog: Dialog): AboutRoomFragment {
+            val f = AboutRoomFragment()
+            val b = Bundle()
+            b.putString("dialog", Gson().toJson(dialog))
+            f.arguments = b
+
+            return f
+        }
     }
 }

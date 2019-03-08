@@ -34,5 +34,9 @@ interface IAddToContacts {
 
 interface IAddToRooms {
     fun errorAddRoom()
-    fun user(dialog: Dialog)
+    fun dialog(dialog: Dialog)
+}
+
+interface IComplete {
+    fun complete()
 }

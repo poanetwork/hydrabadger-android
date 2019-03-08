@@ -90,14 +90,14 @@ class MyDownloadRoomService : MyBaseTaskService() {
      * Broadcast finished download (success or failure).
      * @return true if a running receiver received the broadcast.
      */
-    private fun broadcastDownloadFinished(file: File, bytesDownloaded: Long, userId: String): Boolean {
+    private fun broadcastDownloadFinished(file: File, bytesDownloaded: Long, dialogId: String): Boolean {
         val success = bytesDownloaded != -1L
         val action = if (success) DOWNLOAD_COMPLETED else DOWNLOAD_ERROR
 
         val broadcast = Intent(action)
             .putExtra(EXTRA_BYTES_DOWNLOADED, bytesDownloaded)
             .putExtra(EXTRA_FILE_DOWNLOADED, file.path)
-            .putExtra(EXTRA_UID_DOWNLOADED, userId)
+            .putExtra(EXTRA_UID_DOWNLOADED, dialogId)
         return LocalBroadcastManager.getInstance(applicationContext)
             .sendBroadcast(broadcast)
     }

@@ -170,7 +170,7 @@ class SocketWrapper {
     }
 
     fun startPseudoNotLocalSocketALoop(uid: String, port: Int) {
-        Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop new user - $uid ; port - $port")
+        Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop new dialog - $uid ; port - $port")
 
         mPseudoNotLocalThread[uid] = thread {
             mPseudoNotLocalSocketServer[uid] = ServerSocket(port)

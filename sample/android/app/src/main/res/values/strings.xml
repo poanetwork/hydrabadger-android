@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string-array name="view_types_dialog">
         <item name="image">Image (default)</item>
@@ -7,12 +7,20 @@
     </string-array>
 
     <string-array name="view_do_dialog">
-        <item name="image">Delete</item>
-        <item name="voice">Cancel</item>
+        <item name="Export">About Dialog</item>
+        <item name="Delete">Delete</item>
+        <item name="Cancel">Cancel</item>
+    </string-array>
+
+    <string-array name="view_do_new_dialog">
+        <item name="add_exist">Add exist dialog</item>
+        <item name="create_new">Create new dialog</item>
     </string-array>
 
     <string name="avatar_file_not_found">User without avatar</string>
     <string name="room_file_not_found" translatable="false">Room without avatar</string>
+
+    <string name="name_dialog_isempty">Name of dialog is empty</string>
 
 
     <string name="SelectFolder">Select Folder</string>
@@ -239,6 +247,7 @@
     <string name="contact_add_new_contact">Send request for adding to contact</string>
     <string name="contact_add_request">Add to contact list</string>
     <string name="contact_add_title">Add to contact</string>
+    <string name="room_add_title">Add Dialog</string>
     <string name="contact_clear_chat_history">Clear chat history</string>
     <string name="contact_email_invite_send">Request for adding to contact is send</string>
     <string name="contact_email_not_exist">User with this email does not exist</string>
@@ -252,16 +261,18 @@
     <string name="contact_pinned">Pinned</string>
     <string name="contact_placeholder">Contact</string>
     <string name="contact_qr_scan">Scan QR-code</string>
+    <string name="contact_qr_gallary">Get QR-code from Image</string>
     <string name="contact_qr_scan_help">Set QR-code in square</string>
     <string name="contact_reject">Reject</string>
     <string name="contact_remove">Remove</string>
     <string name="contact_request">Request for adding you to contact:</string>
     <string name="contact_request_accept">Accept</string>
     <string name="contact_request_contact_exist">This user was added to your contact list!</string>
-    <string name="contact_request_error_email_or_id">Enter correct user email or id</string>
+    <string name="contact_request_error_id">Enter correct user id</string>
     <string name="contact_request_prompt_email">Enter user email</string>
     <string name="contact_request_prompt_email_or_id">Enter user email or ID</string>
     <string name="contact_request_prompt_id">Enter user ID</string>
+    <string name="room_request_prompt_id">Enter dialog ID</string>
     <string name="contact_request_reject">Reject</string>
     <string name="contact_request_request_exist">Request to contact was send!</string>
     <string name="contact_request_to_contact">Requests for adding to contact</string>
@@ -370,10 +381,12 @@
     <string name="group_change_avatar">Change the group avatar</string>
     <string name="group_create_add_avatar">Add avatar of group</string>
     <string name="group_create_description_hint">Enter the description of group</string>
+    <string name="group_export_description_hint">Description of group</string>
     <string name="group_create_select_admins">Select group administrators:</string>
     <string name="group_create_select_member">Select group members:</string>
     <string name="group_create_select_moderators">Select group moderators:</string>
     <string name="group_create_title_hint">Enter the name of group</string>
+    <string name="group_export_title_hint">Name of group</string>
     <string name="group_delete">Delete group</string>
     <string name="group_delete_admin_authority">Downgrade</string>
     <string name="group_delete_leave">Delete and leave group</string>
@@ -661,8 +674,11 @@
     <string name="prompt_select_contact">Select contact</string>
     <string name="prompt_username">Username</string>
     <string name="push_notification">Push notification</string>
+    <string name="avatar">Avatar</string>
+    <string name="qr">QR</string>
+    <string name="qr_code_file_selected">QR code file selected successfully!</string>
     <string name="qr_code_disk_saved">QR code saved successfully!</string>
-    <string name="qr_code_disk_saved_fail">"Can't save qr code in this dir"</string>
+    <string name="qr_code_disk_saved_fail" tools:ignore="ExtraTranslation">"Can't save qr code in this dir"</string>
     <string name="recover_password_bad_request">Invalid link.</string>
     <string name="recover_password_changed">Password is successfully changed. Try to login with it</string>
     <string name="recover_password_confirm_password">Confirm password</string>
@@ -972,6 +988,7 @@
     <string name="qr_code_file_name">my_qr_code.png</string>
     <string name="save_user_settings">Save changes?</string>
     <string name="select_dir_for_saving">Select a directory to save</string>
+    <string name="select_qr_image">Select image with QR</string>
     <string name="settings_emergency_delete_data">Delete all data</string>
     <string name="settings_help_Hydrabadger">Help Hydrabadger</string>
     <string name="start">Start</string>

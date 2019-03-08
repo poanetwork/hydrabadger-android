@@ -1,9 +1,11 @@
 package net.korul.hbbft.Dialogs
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.FragmentManager
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,8 +23,11 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CommonData.data.model.core.Getters.getDialogByRoomId
-import net.korul.hbbft.CommonFragments.tabChats.AddDialogFragment
+import net.korul.hbbft.CommonFragments.tabChats.AddDialogExistFragment
+import net.korul.hbbft.CommonFragments.tabChats.AddNewDialogFragment
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.CoreHBBFT.IAddToContacts
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.Dialogs.holder.holders.dialogs.CustomDialogViewHolder
@@ -97,7 +102,21 @@ class DialogsFragment :
         super.onViewCreated(view, savedInstanceState)
 
         addDialog.setOnClickListener {
-            onAddDialog()
+
+            AlertDialog.Builder(context!!)
+                .setItems(R.array.view_do_new_dialog, object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        when (which) {
+                            0 -> {
+                                onAddExistDialog()
+                            }
+                            1 -> {
+                                onAddNewDialog()
+                            }
+                        }
+                    }
+                })
+                .show()
         }
     }
 
@@ -130,9 +149,10 @@ class DialogsFragment :
         )
 
         val transaction = activity!!.supportFragmentManager.beginTransaction()
+        val curuser = dialog.users.first { it.uid == CoreHBBFT.uniqueID1 }
         transaction.replace(
             R.id.view,
-            MessagesFragment.newInstance(dialog, dialog.users[0])
+            MessagesFragment.newInstance(dialog, curuser)
         )
         transaction.addToBackStack(getString(R.string.tag_chats2))
         transaction.commit()
@@ -142,10 +162,20 @@ class DialogsFragment :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_add -> {
-                val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-                transaction.add(R.id.view, AddDialogFragment.newInstance(), getString(R.string.tag_chats))
-                transaction.addToBackStack(getString(R.string.tag_chats))
-                transaction.commit()
+                AlertDialog.Builder(context!!)
+                    .setItems(R.array.view_do_new_dialog, object : DialogInterface.OnClickListener {
+                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                            when (which) {
+                                0 -> {
+                                    onAddExistDialog()
+                                }
+                                1 -> {
+                                    onAddNewDialog()
+                                }
+                            }
+                        }
+                    })
+                    .show()
             }
         }
 
@@ -170,7 +200,6 @@ class DialogsFragment :
         )
 
         super.dialogsAdapter!!.setItems(DialogsFixtures.dialogs)
-
         super.dialogsAdapter!!.setOnDialogClickListener(this)
         super.dialogsAdapter!!.setOnDialogLongClickListener(this)
         super.dialogsAdapter!!.setDatesFormatter(this)
@@ -232,10 +261,17 @@ class DialogsFragment :
         }
     }
 
-
-    fun onAddDialog() {
+    fun onAddExistDialog() {
         val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-        transaction.add(R.id.view, AddDialogFragment.newInstance(), getString(R.string.tag_chats))
+        transaction.add(R.id.view, AddDialogExistFragment.newInstance(), getString(R.string.tag_chats))
+        transaction.addToBackStack(getString(R.string.tag_chats))
+        transaction.commit()
+    }
+
+
+    fun onAddNewDialog() {
+        val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+        transaction.add(R.id.view, AddNewDialogFragment.newInstance(), getString(R.string.tag_chats))
         transaction.addToBackStack(getString(R.string.tag_chats))
         transaction.commit()
     }

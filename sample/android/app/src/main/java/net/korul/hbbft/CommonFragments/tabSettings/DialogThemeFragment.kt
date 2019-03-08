@@ -55,6 +55,15 @@ class DialogThemeFragment : Fragment() {
             activity!!.recreate()
         }
 
+        val prefs = context!!.getSharedPreferences("HYRABADGER", Application.MODE_PRIVATE)
+        val theme = prefs!!.getString("Theme", "night")
+        if (theme == "night") {
+            mib_app_theme.isChecked = true
+        } else if (theme == "light") {
+            healin_app_theme.isChecked = true
+        }
+
+
         action_back.setOnClickListener {
             (activity as AppCompatActivity).supportFragmentManager.popBackStack()
         }

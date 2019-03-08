@@ -100,7 +100,7 @@ class SettingsFragment : Fragment() {
             transaction.commit()
         }
 
-        action_emergency_delete.setOnClickListener {
+        settings_emergency_delete.setOnClickListener {
             val dialog = Dialog(context!!)
             dialog.setContentView(R.layout.dialog_emergency_delete)
             dialog.setTitle("")

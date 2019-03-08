@@ -13,6 +13,7 @@ import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures.Companion.deleteDialog
 import net.korul.hbbft.CommonData.data.model.Dialog
 import net.korul.hbbft.CommonData.utils.AppUtils
+import net.korul.hbbft.CommonFragments.tabChats.AboutRoomFragment
 import net.korul.hbbft.R
 
 
@@ -45,10 +46,6 @@ abstract class BaseDialogsFragment :
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-//            try {
-//                Picasso.with(context).load(url).into(imageView)
-//            } catch (e: IllegalArgumentException) {
-//            }
         }
     }
 
@@ -81,11 +78,22 @@ abstract class BaseDialogsFragment :
     override fun onClick(dialogInterface: DialogInterface, i: Int) {
         when (i) {
             0 -> {
+                val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+                transaction.add(
+                    R.id.view,
+                    AboutRoomFragment.newInstance(mDialog!!), getString(R.string.tag_chats)
+                )
+                transaction.addToBackStack(getString(R.string.tag_chats))
+                transaction.commit()
+            }
+            1 -> {
                 dialogsAdapter?.deleteById(mDialog!!.id)
                 dialogsAdapter?.notifyDataSetChanged()
                 deleteDialog(mDialog!!)
             }
-            1 -> mDialog = null
+            2 -> {
+                mDialog = null
+            }
         }
     }
 }

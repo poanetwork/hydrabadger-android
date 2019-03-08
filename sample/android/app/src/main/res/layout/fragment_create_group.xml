@@ -30,9 +30,22 @@
                     app:layout_constraintTop_toTopOf="parent">
             <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" style="@style/Screen">
-                <ImageView android:layout_gravity="center_horizontal" android:id="@+id/group_icon"
-                           android:layout_width="@dimen/avatar_icon_size_156"
-                           android:layout_height="@dimen/avatar_icon_size_156" app:srcCompat="@drawable/ic_nophoto"/>
+                <RelativeLayout android:layout_gravity="center_horizontal" android:id="@+id/account_icon_layout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent">
+                    <ImageView android:layout_gravity="center_horizontal" android:id="@+id/group_icon"
+                               android:layout_width="@dimen/avatar_icon_size_156"
+                               android:layout_height="@dimen/avatar_icon_size_156"
+                               app:srcCompat="@drawable/ic_nophoto"/>
+                    <android.support.v7.widget.AppCompatTextView android:textSize="@dimen/font_normal"
+                                                                 android:textColor="@color/white"
+                                                                 android:layout_width="wrap_content"
+                                                                 android:layout_height="wrap_content"
+                                                                 android:layout_marginBottom="6.0dip"
+                                                                 android:text="@string/settings_change"
+                                                                 android:layout_alignParentBottom="true"
+                                                                 android:layout_centerHorizontal="true"/>
+                </RelativeLayout>
                 <TextView android:id="@+id/group_name_info_hint" android:layout_width="wrap_content"
                           android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_32"
                           android:text="@string/group_create_title_hint" style="@style/contact_info_hint"/>

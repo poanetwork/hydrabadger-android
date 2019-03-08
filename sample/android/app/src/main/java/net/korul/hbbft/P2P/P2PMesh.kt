@@ -71,7 +71,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
     fun publishAboutMe(roomId: String, UID: String) {
         val json = JSONObject()
         json.put("type", "addUser")
-        json.put("user", UID)
+        json.put("dialog", UID)
 
         val message = json.toString()
 
@@ -108,7 +108,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 val message: String
 
                 json.put("type", "deleteUser")
-                json.put("user", user)
+                json.put("dialog", user)
 
                 message = json.toString()
 
@@ -126,7 +126,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
             val json2 = JSONObject(message)
 
             if (json2.getString("type") == "addUser") {
-                val user = json2.getString("user")
+                val user = json2.getString("dialog")
                 val myUid = UID
                 val pair: Pair<String, String> = Pair(user, myUid)
                 val pair2: Pair<String, String> = Pair(myUid, user)
@@ -142,7 +142,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 }
             } else if (json2.getString("type") == "deleteUser") {
                 try {
-                    val user = json2.getString("user")
+                    val user = json2.getString("dialog")
                     val myUid = UID
 
                     val pair: Pair<String, String> = Pair(user, myUid)

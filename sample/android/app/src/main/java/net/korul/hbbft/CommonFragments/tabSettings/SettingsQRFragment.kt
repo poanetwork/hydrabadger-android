@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_settings_account_qr_code.*
 import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.IAddToContacts
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.R
 import java.io.File
@@ -92,7 +93,7 @@ class SettingsQRFragment : Fragment() {
             ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
+            // We don't have permission so prompt the dialog
             ActivityCompat.requestPermissions(
                 activity,
                 PERMISSIONS_STORAGE,

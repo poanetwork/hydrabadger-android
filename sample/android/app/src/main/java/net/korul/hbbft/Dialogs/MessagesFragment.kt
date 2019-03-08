@@ -27,6 +27,7 @@ import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CommonData.data.model.core.Getters.getDialog
 import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
+import net.korul.hbbft.CoreHBBFT.IAddToContacts
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.DatabaseApplication.Companion.mCoreHBBFT2X

@@ -31,7 +31,7 @@ import java.util.*
 import kotlin.concurrent.thread
 
 
-class AddDialogFragment : Fragment() {
+class AddNewDialogFragment : Fragment() {
     lateinit var progress: ProgressDialog
     val handle = Handler()
     var mFileLocation: String = ""
@@ -62,11 +62,21 @@ class AddDialogFragment : Fragment() {
         }
 
         button_add_create_group.setOnClickListener {
-            addDialog()
+            if (group_name.text.toString().isEmpty())
+                group_name.error = getString(R.string.name_dialog_isempty)
+            else {
+                group_name.error = ""
+                addDialog()
+            }
         }
 
         action_create.setOnClickListener {
-            addDialog()
+            if (group_name.text.toString().isEmpty())
+                group_name.error = getString(R.string.name_dialog_isempty)
+            else {
+                group_name.error = ""
+                addDialog()
+            }
         }
     }
 
@@ -82,18 +92,21 @@ class AddDialogFragment : Fragment() {
         val dialogName = group_name.text.toString()
         val dialogDescription = group_description.text.toString()
 
-        group_icon.invalidate()
-        val drawable = group_icon.drawable as BitmapDrawable
-        val bitmap = drawable.bitmap
-
-        val dialogUID = dialogName + "_" + UUID.randomUUID().toString()
-
+        val dialogUID = UUID.randomUUID().toString() + "_" + UUID.randomUUID().toString()
         val outputDir = activity!!.filesDir
         val localFile = File.createTempFile(dialogUID, "png", outputDir)
 
-        val out = FileOutputStream(localFile)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-        out.close()
+        try {
+            group_icon.invalidate()
+            val drawable = group_icon.drawable as BitmapDrawable
+            val bitmap = drawable.bitmap
+
+            val out = FileOutputStream(localFile)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         setNewExtDialog(dialogUID, dialogName, dialogDescription, localFile.path, DatabaseApplication.mCurUser)
 
@@ -148,7 +161,7 @@ class AddDialogFragment : Fragment() {
             ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
+            // We don't have permission so prompt the dialog
             requestPermissions(
                 PERMISSIONS_STORAGE,
                 REQUEST_EXTERNAL_STORAGE
@@ -168,7 +181,7 @@ class AddDialogFragment : Fragment() {
             "location",
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath
         )
-        intent.putExtra("pickFile", true)
+        intent.putExtra("pickFiles", true)
         //Optional
 
         startActivityForResult(intent, FILE_PICKER_CODE)
@@ -188,6 +201,6 @@ class AddDialogFragment : Fragment() {
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
 
-        fun newInstance() = AddDialogFragment()
+        fun newInstance() = AddNewDialogFragment()
     }
 }

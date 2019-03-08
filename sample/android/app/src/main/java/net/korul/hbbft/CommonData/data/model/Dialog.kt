@@ -11,7 +11,9 @@ class Dialog(
     private val dialogName: String,
     private val dialogDescr: String,
     private val dialogPhoto: String,
-    private val users: ArrayList<User>, private var lastMessage: Message?, private var unreadCount: Int
+    private val users: ArrayList<User>,
+    private var lastMessage: Message?,
+    private var unreadCount: Int
 ) : IDialog<Message> {
 
     override fun getId(): String {

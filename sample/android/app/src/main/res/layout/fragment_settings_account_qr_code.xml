@@ -24,19 +24,24 @@
                                                          android:layout_height="wrap_content"
                                                          android:text="@string/account_qr_info"
                                                          style="@style/message_info_text"/>
-            <ImageView android:layout_gravity="center_horizontal" android:id="@+id/qr_code_view"
-                       android:background="@color/white" android:layout_width="fill_parent"
-                       android:layout_height="260.0dip" android:layout_marginTop="48.0dip"
-                       android:layout_marginBottom="@dimen/menu_margin_32"/>
+
+            <ImageView android:id="@+id/qr_code_view"
+                       android:layout_width="320dp"
+                       android:layout_height="320dp" android:layout_centerInParent="true"
+                       android:layout_marginTop="25dp"
+                       android:layout_marginStart="25dp" android:layout_marginEnd="25dp"
+                       android:layout_marginBottom="25dp" android:foregroundGravity="center_horizontal"
+                       android:layout_gravity="center_horizontal"/>
+
             <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
-                          android:layout_height="wrap_content">
+                          android:layout_height="wrap_content" android:layout_gravity="bottom">
                 <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/account_qr_options"
-                                                             style="@style/TitleText"/>
+                                                             style="@style/TitleText" android:visibility="gone"/>
                 <LinearLayout android:orientation="horizontal" android:id="@+id/account_scan_qr_code"
                               android:layout_width="fill_parent" android:layout_height="wrap_content"
-                              style="@style/SubTitle.Clicked">
+                              style="@style/SubTitle.Clicked" android:visibility="gone">
                     <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
                                android:layout_height="wrap_content" app:srcCompat="@drawable/ic_qr_scan"/>
                     <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"

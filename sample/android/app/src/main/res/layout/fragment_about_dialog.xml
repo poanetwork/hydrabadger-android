@@ -26,8 +26,8 @@
             <RelativeLayout android:layout_gravity="center_horizontal" android:id="@+id/account_icon_layout"
                             android:layout_width="110dp"
                             android:layout_height="110dp">
-                <ImageView android:id="@+id/account_icon" android:layout_width="fill_parent"
-                           android:layout_height="fill_parent" app:srcCompat="@drawable/ic_contact"/>
+                <ImageView android:id="@+id/room_icon" android:layout_width="fill_parent"
+                           android:layout_height="fill_parent" app:srcCompat="@drawable/ic_nophoto"/>
                 <android.support.v7.widget.AppCompatTextView android:textSize="@dimen/font_normal"
                                                              android:textColor="@color/white"
                                                              android:layout_width="wrap_content"
@@ -39,30 +39,31 @@
             </RelativeLayout>
             <RelativeLayout android:orientation="vertical" android:layout_width="fill_parent"
                             android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_32">
-                <TextView android:gravity="center_vertical" android:id="@+id/account_name_hint"
-                          android:layout_width="wrap_content" android:layout_height="wrap_content"
-                          android:text="@string/account_name" style="@style/TextView.Text" android:visibility="gone"/>
-                <EditText android:id="@+id/account_name" android:background="@drawable/edit_text_border"
-                          android:paddingTop="11.0dip" android:paddingBottom="10.0dip"
-                          android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1"
-                          android:maxLength="35" android:layout_below="@id/account_name_hint"
-                          android:inputType="textPersonName" android:imeOptions="flagNoExtractUi"
-                          style="@style/EditText.Settings" android:visibility="gone"/>
                 <TextView android:gravity="center_vertical" android:id="@+id/account_email_nick"
                           android:layout_width="wrap_content" android:layout_height="wrap_content"
-                          android:text="@string/account_nickname" android:layout_below="@id/account_name"
+                          android:text="@string/group_export_title_hint"
                           style="@style/TextView.Text"/>
-                <EditText android:id="@+id/account_nick" android:background="@drawable/edit_text_border"
+                <EditText android:id="@+id/dialog_name" android:background="@drawable/edit_text_border"
                           android:paddingTop="11.0dip" android:paddingBottom="10.0dip"
                           android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1"
                           android:maxLength="35" android:layout_below="@id/account_email_nick"
                           android:inputType="textPersonName" android:imeOptions="flagNoExtractUi"
                           style="@style/EditText.Settings"/>
+                <TextView android:gravity="center_vertical" android:id="@+id/account_email_nick2"
+                          android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:text="@string/group_export_description_hint" android:layout_below="@id/dialog_name"
+                          style="@style/TextView.Text"/>
+                <EditText android:id="@+id/dialog_descr" android:background="@drawable/edit_text_border"
+                          android:paddingTop="11.0dip" android:paddingBottom="10.0dip"
+                          android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1"
+                          android:maxLength="35" android:layout_below="@id/account_email_nick2"
+                          android:inputType="textPersonName" android:imeOptions="flagNoExtractUi"
+                          style="@style/EditText.Settings"/>
                 <TextView android:gravity="center_vertical" android:id="@+id/account_id_hint"
                           android:layout_width="wrap_content" android:layout_height="wrap_content"
-                          android:text="@string/uid" android:layout_below="@id/account_nick"
+                          android:text="@string/uid" android:layout_below="@id/dialog_descr"
                           style="@style/TextView.Text"/>
-                <TextView android:id="@+id/account_id" android:background="@drawable/edit_text_border"
+                <TextView android:id="@+id/dialog_id" android:background="@drawable/edit_text_border"
                           android:paddingTop="11.0dip" android:paddingBottom="10.0dip"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
                           android:layout_below="@id/account_id_hint" style="@style/EditText.Settings"
@@ -82,17 +83,6 @@
                                                              android:layout_width="wrap_content"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/account_send"
-                                                             style="@style/SubTitleText.BigMargin"/>
-            </LinearLayout>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/account_generate_qr"
-                          android:layout_width="fill_parent" android:layout_height="wrap_content"
-                          style="@style/SubTitle.Clicked" android:visibility="gone">
-                <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
-                           android:layout_height="wrap_content" app:srcCompat="@drawable/ic_qr_code"/>
-                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
-                                                             android:layout_width="wrap_content"
-                                                             android:layout_height="wrap_content"
-                                                             android:text="@string/account_generate_qr_code"
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/account_invite_list"

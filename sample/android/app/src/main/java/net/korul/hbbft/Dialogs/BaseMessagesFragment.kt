@@ -116,7 +116,11 @@ abstract class BaseMessagesFragment :
             }
             R.id.action_startALL -> {
                 Handler().post {
-                    progress.show()
+                    try {
+                        progress.show()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
                 DatabaseApplication.mCoreHBBFT2X.subscribeSession()
                 DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()

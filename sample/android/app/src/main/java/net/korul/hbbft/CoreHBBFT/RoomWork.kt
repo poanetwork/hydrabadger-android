@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.unreregisterInRoomDescrFirebase
 import java.util.*
 import java.util.concurrent.CountDownLatch
 
@@ -36,8 +37,7 @@ object RoomWork {
 
 
     fun unregisterInRoomInFirebase(RoomId: String) {
-        val queryRef =
-            CoreHBBFT.mDatabase.child("Rooms").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
+        val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
@@ -49,6 +49,21 @@ object RoomWork {
                         postsnapshot.ref.removeValue()
                     }
                     Log.d(CoreHBBFT.TAG, "Succes unregisterInRoomInFirebase ${CoreHBBFT.uniqueID1}")
+
+
+                    val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(RoomId)
+                    queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.children.count() == 0) {
+                                unreregisterInRoomDescrFirebase(RoomId)
+                            }
+                        }
+                    })
+
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -71,7 +86,7 @@ object RoomWork {
                     }
                     Log.d(CoreHBBFT.TAG, "Succes unregisterInRoomInFirebase ${CoreHBBFT.uniqueID1}")
 
-                    // Add user
+                    // Add dialog
                     val uid = Uids()
                     uid.UID = CoreHBBFT.uniqueID1
                     uid.isOnline = false

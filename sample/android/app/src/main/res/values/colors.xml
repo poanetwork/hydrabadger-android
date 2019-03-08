@@ -85,7 +85,7 @@
     <color name="dark_black_grey">#ff2f343d</color>
     <color name="dark_blue">#ff21daf3</color>
     <color name="dark_dark_blue">#ff0e7d8c</color>
-    <color name="dark_den_grey">#ff83949b</color>
+    <color name="dark_den_grey">#83949B</color>
     <color name="dark_edit_text_border">#ffa1a5ad</color>
     <color name="dark_grey">#ffa1a5ad</color>
     <color name="dark_light_grey">#ffb9bec7</color>
@@ -184,7 +184,7 @@
     <color name="new_dialog_title_light">#ff3f4a49</color>
     <color name="new_healing_text_color">#ff3f4a49</color>
     <color name="new_text_attachment_primary_color_dark">#ffffffff</color>
-    <color name="new_text_attachment_primary_color_light">#ff6f8180</color>
+    <color name="new_text_attachment_primary_color_light">#6F8180</color>
     <color name="new_text_attachment_secondary_color_dark">#ffa1a5ad</color>
     <color name="new_text_attachment_secondary_color_light">#ff72a8af</color>
     <color name="new_text_color_light">#ff6f8180</color>

@@ -12,8 +12,12 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
 import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures
+import net.korul.hbbft.CommonData.data.model.Dialog
+import net.korul.hbbft.CommonData.data.model.conversation.Conversations
+import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CommonData.utils.AppUtils
-import net.korul.hbbft.CommonFragments.tabChats.AddDialogFragment
+import net.korul.hbbft.CommonFragments.tabChats.AboutRoomFragment
+import net.korul.hbbft.CommonFragments.tabChats.AddNewDialogFragment
 import net.korul.hbbft.CommonFragments.tabContacts.ContactsFragment
 import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
@@ -172,6 +176,8 @@ class MainActivity : AppCompatActivity() {
         val manager = LocalBroadcastManager.getInstance(this)
         manager.registerReceiver(broadcastReceiver, MyDownloadUserService.intentFilter)
         manager.registerReceiver(broadcastReceiver, MyUploadUserService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyDownloadRoomService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyUploadRoomService.intentFilter)
     }
 
     public override fun onStop() {
@@ -250,18 +256,31 @@ class MainActivity : AppCompatActivity() {
 
                     // Room
                     MyDownloadRoomService.DOWNLOAD_COMPLETED -> {
+                        val filepath = intent.getStringExtra(MyDownloadRoomService.EXTRA_FILE_DOWNLOADED)
                         val uid = intent.getStringExtra(MyDownloadRoomService.EXTRA_UID_DOWNLOADED)
+
+                        val dialog = Getters.getDialogByRoomId(uid)
+                        val Dialog = Dialog(
+                            dialog.id,
+                            dialog.dialogName,
+                            dialog.dialogDescr,
+                            filepath,
+                            dialog.users,
+                            dialog.lastMessage,
+                            dialog.unreadCount
+                        )
+                        Conversations.getDDialog(Dialog).update()
 
                         AppUtils.showToast(
                             context,
-                            "ADDED DIALOG complete - $uid", true
+                            "ADDED OR UPDATE DIALOG complete - $uid", true
                         )
                     }
 
                     MyDownloadRoomService.DOWNLOAD_ERROR -> {
                         AppUtils.showToast(
                             context,
-                            "ADDED DIALOGError", true
+                            "ADDED OR UPDATE DIALOG error", true
                         )
                     }
 
@@ -275,10 +294,28 @@ class MainActivity : AppCompatActivity() {
                         if (filepath != null && roomID != null) {
                             File(filepath)
 
-                            val myFragment =
-                                supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AddDialogFragment?
-                            if (myFragment != null && myFragment.isVisible) {
-                                myFragment.dismissProgressBar()
+                            try {
+                                val myFragment =
+                                    supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AddNewDialogFragment?
+                                if (myFragment != null && myFragment.isVisible) {
+                                    myFragment.dismissProgressBar()
+
+                                    dissmisDialog()
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                            try {
+                                val myFragment2 =
+                                    supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AboutRoomFragment?
+                                if (myFragment2 != null && myFragment2.isVisible) {
+                                    myFragment2.dismissProgressBar()
+
+                                    dissmisDialog()
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
 
                             AppUtils.showToast(
@@ -290,7 +327,7 @@ class MainActivity : AppCompatActivity() {
 
                     MyUploadRoomService.UPLOAD_ROOM_ERROR -> {
                         val myFragment =
-                            supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AddDialogFragment?
+                            supportFragmentManager.findFragmentByTag(getString(R.string.tag_chats)) as AddNewDialogFragment?
                         if (myFragment != null && myFragment.isVisible) {
                             myFragment.dismissProgressBar()
                         }
@@ -302,6 +339,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun dissmisDialog() {
+        supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
+        supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
+
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.view, DialogsFragment.newInstance(), getString(R.string.tag_chats))
+        transaction.addToBackStack(getString(R.string.tag_chats))
+        transaction.commit()
     }
 
     override fun onBackPressed() {

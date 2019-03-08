@@ -59,7 +59,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     /**
      * Persist token to third-party servers.
      *
-     * Modify this method to associate the user's FCM InstanceID token with any server-side account
+     * Modify this method to associate the dialog's FCM InstanceID token with any server-side account
      * maintained by your application.
      *
      * @param token The new token.

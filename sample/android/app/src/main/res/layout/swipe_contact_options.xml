@@ -47,7 +47,7 @@
                 <TextView android:id="@+id/contact_search_status" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" android:layout_toRightOf="@id/contact_search_icon"
                           android:layout_below="@id/contact_search_name"
-                          style="@style/list_contact_item_connect_status"/>
+                          style="@style/list_contact_item_connect_status" android:visibility="gone"/>
                 <TextView android:id="@+id/contact_search_uid" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" android:layout_toRightOf="@id/contact_search_icon"
                           android:layout_below="@id/contact_search_status"

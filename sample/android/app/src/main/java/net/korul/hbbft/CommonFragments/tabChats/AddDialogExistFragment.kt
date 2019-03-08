@@ -1,4 +1,4 @@
-package net.korul.hbbft.CommonFragments.tabContacts
+package net.korul.hbbft.CommonFragments.tabChats
 
 import android.app.Activity
 import android.content.Intent
@@ -19,20 +19,20 @@ import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import kotlinx.android.synthetic.main.fragment_add_to_contact.*
+import kotlinx.android.synthetic.main.fragment_add_room.*
 import lib.folderpicker.FolderPicker
-import net.korul.hbbft.CommonData.data.model.User
+import net.korul.hbbft.CommonData.data.model.Dialog
 import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
-import net.korul.hbbft.CoreHBBFT.IAddToContacts
-import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
+import net.korul.hbbft.CoreHBBFT.IAddToRooms
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.getDialogFromFirebase
+import net.korul.hbbft.Dialogs.DialogsFragment
 import net.korul.hbbft.ImageWork.ImageUtil.blurRenderScript
 import net.korul.hbbft.R
 
 
-class AddToContactsFragment : Fragment() {
+class AddDialogExistFragment : Fragment() {
 
-    private val FILEPICKER_CODE = 111
     private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,7 @@ class AddToContactsFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_add_to_contact, container, false)
+        return inflater.inflate(R.layout.fragment_add_room, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,18 +72,18 @@ class AddToContactsFragment : Fragment() {
             verifyStoragePermissionsAndGetQRCode(activity!!)
         }
 
-        contact_id.hint = CoreHBBFT.uniqueID1
-        contact_id.addTextChangedListener(object : TextWatcher {
+        dialog_id.hint = CoreHBBFT.uniqueID1 + "_" + CoreHBBFT.uniqueID2
+        dialog_id.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val str = s.toString()
 
-                if (str.count() != 36)
-                    button_add_contact.visibility = View.GONE
+                if (str.count() != 73)
+                    button_add_dialog.visibility = View.GONE
                 else {
-                    if (str.filter { it == '-' }.count() != 4)
-                        button_add_contact.visibility = View.GONE
+                    if (str.filter { it == '-' }.count() != 8 && str.filter { it == '_' }.count() != 1)
+                        button_add_dialog.visibility = View.GONE
                     else
-                        button_add_contact.visibility = View.VISIBLE
+                        button_add_dialog.visibility = View.VISIBLE
                 }
             }
 
@@ -95,29 +95,29 @@ class AddToContactsFragment : Fragment() {
         })
 
 
-        button_add_contact.setOnClickListener {
-            if (contact_id.text.toString().isEmpty()) {
-                contact_id_layout.error = getString(R.string.contact_request_error_id)
-            } else
-                getUserFromLocalOrDownloadFromFirebase(contact_id.text.toString(), object :
-                    IAddToContacts {
-                    override fun user(user: User) {
+        button_add_dialog.setOnClickListener {
+            if (dialog_id.text.toString().isEmpty()) {
+                dialog_id_layout.error = getString(R.string.contact_request_error_id)
+            } else {
+                getDialogFromFirebase(dialog_id.text.toString(), object : IAddToRooms {
+                    override fun dialog(dialog: Dialog) {
                         val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
                         transaction.replace(
                             R.id.view,
-                            ContactsFragment.newInstance(), getString(R.string.tag_contacts)
+                            DialogsFragment.newInstance(), getString(R.string.tag_chats)
                         )
-                        transaction.addToBackStack(getString(R.string.tag_contacts))
+                        transaction.addToBackStack(getString(R.string.tag_chats))
                         transaction.commit()
                     }
 
-                    override fun errorAddContact() {
-                        contact_id_layout.error = getString(R.string.contact_request_error_id)
+                    override fun errorAddRoom() {
+                        dialog_id_layout.error = getString(R.string.contact_request_error_id)
                     }
                 })
+            }
         }
 
-        button_add_contact_qr.setOnClickListener {
+        button_add_dialog_qr.setOnClickListener {
             my_qr_code_view.invalidate()
             val drawable = my_qr_code_view.drawable as BitmapDrawable
             val generatedQRCode = drawable.bitmap
@@ -147,27 +147,29 @@ class AddToContactsFragment : Fragment() {
             if (result != null) {
                 val text = result.text
 
-                getUserFromLocalOrDownloadFromFirebase(text, object :
-                    IAddToContacts {
-                    override fun user(user: User) {
-                        val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
-                        transaction.replace(
-                            R.id.view,
-                            ContactsFragment.newInstance(), getString(R.string.tag_contacts)
-                        )
-                        transaction.addToBackStack(getString(R.string.tag_contacts))
-                        transaction.commit()
+                getDialogFromFirebase(text, object : IAddToRooms {
+                    override fun dialog(dialog: Dialog) {
+                        handler.post {
+                            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+                            transaction.replace(
+                                R.id.view,
+                                DialogsFragment.newInstance(), getString(R.string.tag_chats)
+                            )
+                            transaction.addToBackStack(getString(R.string.tag_chats))
+
+                            transaction.commit()
+                        }
                     }
 
-                    override fun errorAddContact() {
+                    override fun errorAddRoom() {
                         handler.post {
-                            contact_id_layout.error = getString(R.string.contact_request_error_id)
+                            dialog_id_layout.error = getString(R.string.contact_request_error_id)
                         }
                     }
                 })
             } else {
                 handler.post {
-                    contact_id_layout.error = getString(R.string.contact_request_error_id)
+                    dialog_id_layout.error = getString(R.string.contact_request_error_id)
                 }
             }
         }
@@ -207,7 +209,7 @@ class AddToContactsFragment : Fragment() {
                 val bitmap = BitmapFactory.decodeFile(fileLocation)
 
                 my_qr_code_view.setImageBitmap(bitmap)
-                button_add_contact_qr.visibility = View.VISIBLE
+                button_add_dialog_qr.visibility = View.VISIBLE
 
                 AppUtils.showToast(
                     activity!!,
@@ -242,7 +244,7 @@ class AddToContactsFragment : Fragment() {
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                    button_add_contact_qr.visibility = View.VISIBLE
+                    button_add_dialog_qr.visibility = View.VISIBLE
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
@@ -250,9 +252,15 @@ class AddToContactsFragment : Fragment() {
         }
     }
 
-    companion object {
-        fun newInstance() = AddToContactsFragment()
+    override fun onDetach() {
+        super.onDetach()
+        (activity as AppCompatActivity).supportActionBar?.show()
+    }
 
+    companion object {
+        fun newInstance() = AddDialogExistFragment()
+
+        private val FILEPICKER_CODE = 111
         private val REQUEST_EXTERNAL_STORAGE = 1
         private val PERMISSIONS_STORAGE =
             arrayOf(

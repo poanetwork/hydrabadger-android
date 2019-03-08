@@ -16,15 +16,6 @@
                   android:layout_height="wrap_content"
                   android:text="@string/settings" android:layout_centerHorizontal="true"
                   android:layout_centerVertical="true" style="@style/toolbar_not_caps_text"/>
-        <RelativeLayout android:id="@+id/action_emergency_delete" android:padding="@dimen/padding_16"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true" android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true">
-            <ImageView android:id="@+id/emergency_icon" android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:contentDescription="@string/settings_delete_data" app:srcCompat="@drawable/ic_warning"
-                       android:layout_centerHorizontal="true"/>
-        </RelativeLayout>
     </RelativeLayout>
 
 
@@ -57,7 +48,7 @@
                               android:layout_height="wrap_content" style="@style/username_text"/>
                     <TextView android:gravity="center_vertical" android:id="@+id/settings_account_email"
                               android:layout_width="wrap_content" android:layout_height="wrap_content"
-                              android:layout_marginTop="8.0dip" style="@style/email_text"/>
+                              android:layout_marginTop="8.0dip" style="@style/email_text" android:visibility="gone"/>
                     <TextView android:gravity="center_vertical" android:id="@+id/settings_account_id"
                               android:layout_width="wrap_content" android:layout_height="wrap_content"
                               android:layout_marginTop="8.0dip" style="@style/email_text"/>
@@ -96,6 +87,17 @@
                                                          android:text="@string/settings_clear_media"
                                                          style="@style/SettingTitle.Ripple"/>
             <View android:visibility="gone" style="@style/Divider"/>
+            <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_emergency_delete"
+                                                         android:visibility="visible"
+                                                         android:layout_width="match_parent"
+                                                         android:layout_height="wrap_content"
+                                                         android:text="@string/settings_emergency_delete_data_accept"
+                                                         android:drawablePadding="10dp"
+                                                         style="@style/SettingTitle.Ripple"
+                                                         android:drawableStart="@drawable/ic_warning"
+            />
+            <View android:visibility="gone" style="@style/Divider" android:layout_width="match_parent"
+                  android:layout_height="wrap_content"/>
             <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_help" android:visibility="gone"
                                                          android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"
