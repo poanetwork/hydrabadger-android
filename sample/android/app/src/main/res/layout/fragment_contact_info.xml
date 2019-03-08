@@ -28,7 +28,7 @@
             <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" android:layout_marginTop="@dimen/menu_margin_32"
                           android:visibility="visible">
-                <RelativeLayout android:orientation="vertical" android:id="@+id/contact_nickname_panel"
+                <RelativeLayout android:orientation="vertical"
                                 android:layout_width="fill_parent" android:layout_height="wrap_content">
                     <TextView android:gravity="center_vertical" android:id="@+id/contact_info_hint"
                               android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -68,8 +68,8 @@
                                                              android:text="@string/notifications"
                                                              android:layout_centerVertical="true"
                                                              style="@style/TitleText"/>
-                <android.support.v7.widget.SwitchCompat android:id="@+id/switch_contact_notification"
-                                                        android:layout_width="wrap_content"
+                <android.support.v7.widget.SwitchCompat
+                        android:layout_width="wrap_content"
                                                         android:layout_height="wrap_content" android:checked="true"
                                                         android:layout_alignParentRight="true"
                                                         android:layout_centerVertical="true"
@@ -86,7 +86,7 @@
                                                              android:text="@string/account_generate_qr_code"
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_2_hour"
+            <LinearLayout android:orientation="horizontal"
                           android:visibility="gone" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
                                                              android:text="@string/notification_mute_2_hours"
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_6_hour"
+            <LinearLayout android:orientation="horizontal"
                           android:visibility="gone" android:layout_width="fill_parent"
                           android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
                 <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -108,7 +108,7 @@
                                                              android:text="@string/notification_mute_6_hours"
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/contact_mute_1_day"
+            <LinearLayout android:orientation="horizontal"
                           android:visibility="gone"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
                           style="@style/SubTitle.Clicked">
@@ -127,7 +127,7 @@
                 <android.support.v7.widget.AppCompatTextView android:layout_width="wrap_content"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/options" style="@style/TitleText"/>
-                <LinearLayout android:orientation="horizontal" android:id="@+id/contact_info_share"
+                <LinearLayout android:orientation="horizontal"
                               android:visibility="gone" android:layout_width="fill_parent"
                               android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
                     <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -138,7 +138,7 @@
                                                                  android:text="@string/contact_share"
                                                                  style="@style/SubTitleText.BigMargin"/>
                 </LinearLayout>
-                <LinearLayout android:orientation="horizontal" android:id="@+id/contact_info_clear_chat_history"
+                <LinearLayout android:orientation="horizontal"
                               android:layout_width="fill_parent" android:layout_height="wrap_content"
                               style="@style/SubTitle.Clicked">
                     <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -149,7 +149,7 @@
                                                                  android:text="@string/contact_clear_chat_history"
                                                                  style="@style/SubTitleText.BigMargin"/>
                 </LinearLayout>
-                <LinearLayout android:orientation="horizontal" android:id="@+id/contact_info_block"
+                <LinearLayout android:orientation="horizontal"
                               android:visibility="gone" android:layout_width="fill_parent"
                               android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
                     <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -180,6 +180,21 @@
                                                              android:layout_width="wrap_content"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/account_qr_save"
+                                                             style="@style/SubTitleText.BigMargin"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@+id/export_qr_code"
+                          android:paddingLeft="32.0dip"
+                          android:paddingRight="32.0dip" android:paddingBottom="16.0dip"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent" android:layout_marginBottom="@dimen/dimen_20dp"
+                          android:layout_alignParentLeft="true" android:layout_alignParentBottom="true"
+                          style="@style/SubTitle.Clicked">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="30dp"
+                           android:layout_height="30dp" app:srcCompat="@drawable/export_action"/>
+                <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/export_qr"
                                                              style="@style/SubTitleText.BigMargin"/>
             </LinearLayout>
         </LinearLayout>

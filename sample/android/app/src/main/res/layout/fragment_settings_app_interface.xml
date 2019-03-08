@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
+              xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
               android:id="@+id/main_layout" android:fitsSystemWindows="true"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
@@ -23,7 +24,7 @@
                                                          android:layout_height="wrap_content"
                                                          android:text="@string/settings_chat_background"
                                                          style="@style/TitleText"/>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/chat_background"
+            <LinearLayout android:orientation="horizontal"
                           android:visibility="gone"
                           android:layout_width="fill_parent" android:layout_height="wrap_content"
                           style="@style/SubTitle.Clicked">
@@ -39,31 +40,36 @@
                                                          android:layout_marginTop="@dimen/menu_margin_16"
                                                          android:text="@string/settings_app_theme"
                                                          style="@style/TitleText"/>
-            <LinearLayout android:orientation="horizontal" android:id="@+id/app_theme"
+            <LinearLayout android:orientation="horizontal"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content" style="@style/SubTitle.Clicked">
-                <RadioGroup android:id="@id/app_theme_radio_group" android:layout_width="fill_parent"
+                <RadioGroup android:id="@+id/app_theme_radio_group" android:layout_width="fill_parent"
                             android:layout_height="wrap_content" android:divider="@drawable/radio_group_divider"
                             android:showDividers="middle" android:dividerPadding="60.0dip">
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
-                                                                    android:id="@id/healin_app_theme"
+                                                                    android:id="@+id/healin_app_theme"
                                                                     android:layout_width="fill_parent"
                                                                     android:layout_height="58.0dip"
                                                                     android:text="@string/settings_app_theme_light"
                                                                     android:selectAllOnFocus="false"
-                                                                    android:drawableRight="@drawable/radio_button_healin_theme"
                                                                     android:drawablePadding="20.0dip"
                                                                     android:drawableEnd="@drawable/radio_button_healin_theme"
-                                                                    style="@style/dialog_list_item"/>
+                                                                    android:layoutDirection="rtl"
+                                                                    style="@style/dialog_list_item"
+                                                                    android:gravity="right|center_vertical"
+                                                                    android:drawableRight="@drawable/radio_button_healin_theme"
+                                                                    tools:ignore="RtlCompat,RtlHardcoded,UnusedAttribute"/>
                     <android.support.v7.widget.AppCompatRadioButton android:layout_gravity="start"
-                                                                    android:id="@id/mib_app_theme"
+                                                                    android:id="@+id/mib_app_theme"
                                                                     android:layout_width="fill_parent"
                                                                     android:layout_height="58.0dip"
                                                                     android:text="@string/settings_app_theme_dark"
-                                                                    android:drawableRight="@drawable/radio_button_black_theme"
                                                                     android:drawablePadding="20.0dip"
                                                                     android:drawableEnd="@drawable/radio_button_black_theme"
-                                                                    style="@style/dialog_list_item"/>
+                                                                    android:layoutDirection="rtl"
+                                                                    style="@style/dialog_list_item"
+                                                                    android:gravity="right|center_vertical"
+                                                                    tools:ignore="RtlCompat,RtlHardcoded,UnusedAttribute"/>
                 </RadioGroup>
             </LinearLayout>
         </LinearLayout>

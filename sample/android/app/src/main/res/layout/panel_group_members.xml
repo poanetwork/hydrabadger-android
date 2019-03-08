@@ -3,10 +3,10 @@
               xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
-    <android.support.v7.widget.AppCompatTextView android:id="@+id/group_member_count"
-                                                 android:layout_width="wrap_content"
+    <android.support.v7.widget.AppCompatTextView
+            android:layout_width="wrap_content"
                                                  android:layout_height="wrap_content" style="@style/TitleText"/>
-    <LinearLayout android:orientation="horizontal" android:id="@+id/add_admin" android:visibility="gone"
+    <LinearLayout android:orientation="horizontal" android:visibility="gone"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:layout_marginTop="16.0dip">
         <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -18,19 +18,19 @@
                                                      android:text="@string/create_add_admin"
                                                      style="@style/SubTitleText.BigMargin"/>
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal" android:id="@+id/admin_edit_panel" android:visibility="gone"
+    <LinearLayout android:orientation="horizontal" android:visibility="gone"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:layout_marginTop="16.0dip">
         <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
                    android:layout_height="wrap_content" android:layout_marginLeft="14.0dip"
                    app:srcCompat="@drawable/ic_add_admin"/>
         <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
-                                                     android:id="@+id/total_admins" android:layout_width="wrap_content"
+                                                     android:layout_width="wrap_content"
                                                      android:layout_height="wrap_content"
                                                      android:text="@string/create_total_admins"
                                                      style="@style/SubTitleText.BigMargin"/>
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal" android:id="@+id/add_member" android:visibility="gone"
+    <LinearLayout android:orientation="horizontal" android:visibility="gone"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:layout_marginTop="16.0dip">
         <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
@@ -42,14 +42,14 @@
                                                      android:text="@string/create_add_member"
                                                      style="@style/SubTitleText.BigMargin"/>
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal" android:id="@+id/member_edit_panel" android:visibility="gone"
+    <LinearLayout android:orientation="horizontal" android:visibility="gone"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:layout_marginTop="16.0dip">
         <ImageView android:layout_gravity="center_vertical" android:layout_width="wrap_content"
                    android:layout_height="wrap_content" android:layout_marginLeft="14.0dip"
                    app:srcCompat="@drawable/ic_members"/>
         <android.support.v7.widget.AppCompatTextView android:layout_gravity="center_vertical"
-                                                     android:id="@+id/total_members" android:layout_width="wrap_content"
+                                                     android:layout_width="wrap_content"
                                                      android:layout_height="wrap_content"
                                                      android:text="@string/create_total_members"
                                                      style="@style/SubTitleText.BigMargin"/>

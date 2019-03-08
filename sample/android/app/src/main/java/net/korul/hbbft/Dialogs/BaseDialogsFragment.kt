@@ -12,7 +12,6 @@ import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures.Companion.deleteDialog
 import net.korul.hbbft.CommonData.data.model.Dialog
-import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CommonFragments.tabChats.AboutRoomFragment
 import net.korul.hbbft.R
 
@@ -62,12 +61,6 @@ abstract class BaseDialogsFragment :
 
 
     override fun onDialogLongClick(dialog: Dialog) {
-        AppUtils.showToast(
-            context!!,
-            dialog.dialogName,
-            false
-        )
-
         mDialog = dialog
 
         AlertDialog.Builder(context!!)

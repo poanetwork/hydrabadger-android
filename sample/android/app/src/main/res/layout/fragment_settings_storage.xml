@@ -26,17 +26,17 @@
     </RelativeLayout>
     <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
                   android:layout_below="@id/toolbar">
-        <TextView android:id="@+id/attachment_hint" android:paddingLeft="16.0dip" android:paddingRight="20.0dip"
+        <TextView android:paddingLeft="16.0dip" android:paddingRight="20.0dip"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:layout_marginTop="18.0dip" android:text="@string/settings_media_storage_title"
                   style="@style/TextView.TitleText"/>
-        <TextView android:id="@+id/attachment_info" android:paddingLeft="16.0dip" android:paddingRight="20.0dip"
+        <TextView android:paddingLeft="16.0dip" android:paddingRight="20.0dip"
                   android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/TextView.Text"/>
-        <ListView android:id="@+id/media_storage_list" android:descendantFocusability="blocksDescendants"
+        <ListView android:descendantFocusability="blocksDescendants"
                   android:layout_width="fill_parent" android:layout_height="wrap_content"
                   android:divider="@color/divider_item_color" android:dividerHeight="0.5dip"/>
     </LinearLayout>
-    <ProgressBar android:id="@+id/media_storage_progress" android:visibility="gone" android:layout_width="fill_parent"
+    <ProgressBar android:visibility="gone" android:layout_width="fill_parent"
                  android:layout_height="wrap_content" android:indeterminate="false"
                  android:layout_alignParentBottom="true" style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
 </RelativeLayout>

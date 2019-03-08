@@ -23,8 +23,8 @@
                 android:layout_below="@id/toolbar">
         <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                       android:layout_height="wrap_content" style="@style/Screen">
-            <RelativeLayout android:id="@+id/account_data"
-                            android:layout_width="fill_parent"
+            <RelativeLayout
+                    android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:paddingLeft="@dimen/menu_margin_5"
                             style="@style/Clicked"/>
@@ -75,8 +75,8 @@
                                                          android:text="@string/settings_security_options"
                                                          style="@style/SettingTitle.Ripple"/>
             <View style="@style/Divider"/>
-            <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_maps"
-                                                         android:layout_width="fill_parent"
+            <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"
                                                          android:text="@string/settings_map_coordinate_title"
                                                          style="@style/SettingTitle.Ripple" android:visibility="gone"/>
@@ -98,13 +98,13 @@
             />
             <View android:visibility="gone" style="@style/Divider" android:layout_width="match_parent"
                   android:layout_height="wrap_content"/>
-            <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_help" android:visibility="gone"
+            <android.support.v7.widget.AppCompatTextView android:visibility="gone"
                                                          android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"
                                                          android:text="@string/settings_help_title"
                                                          style="@style/SettingTitle.Ripple"/>
             <View android:visibility="gone" style="@style/Divider"/>
-            <TextView android:id="@+id/software_version" android:paddingTop="@dimen/menu_margin_10"
+            <TextView android:paddingTop="@dimen/menu_margin_10"
                       android:layout_width="fill_parent" android:layout_height="wrap_content"
                       style="@style/settings_software_version"/>
         </LinearLayout>

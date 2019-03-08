@@ -7,9 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
+import android.os.*
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -19,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -132,6 +131,64 @@ class AboutRoomFragment : Fragment() {
 
         save_qr_code.setOnClickListener {
             verifyStoragePermissionsAndSave(activity!!)
+        }
+
+        export_qr_code.setOnClickListener {
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap = barcodeEncoder.encodeBitmap(mCurDialog!!.id, BarcodeFormat.QR_CODE, 400, 400)
+            try {
+                val outputDir = context!!.externalCacheDir
+                val localFile = File.createTempFile(mCurDialog!!.id, "__.png", outputDir)
+                if (localFile.exists())
+                    localFile.delete()
+                val create = localFile.createNewFile()
+                if (!create) {
+                    Toast.makeText(context!!, getString(R.string.qr_code_disk_saved_fail), Toast.LENGTH_LONG).show()
+                } else {
+                    FileOutputStream(localFile).use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    }
+
+                    sendFileByEmail(localFile.path)
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Toast.makeText(context!!, getString(R.string.qr_code_disk_saved_fail), Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun sendFileByEmail(filePath: String) {
+        try {
+            if (Build.VERSION.SDK_INT >= 24) {
+                try {
+                    val m = StrictMode::class.java.getMethod("disableDeathOnFileUriExposure")
+                    m.invoke(null)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            val file = File(filePath)
+
+            val intent = Intent(Intent.ACTION_SEND)
+            val extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString())
+            val mimetype = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+            if (extension.equals("", ignoreCase = true) || mimetype == null) {
+//                 if there is no extension or there is no definite mimetype, still try to open the file
+                intent.type = "application/*"
+            } else {
+                intent.type = mimetype
+            }
+            intent.putExtra(
+                android.content.Intent.EXTRA_SUBJECT,
+                activity!!.getString(R.string.export_chooser_title)
+            )
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + file.path))
+
+            startActivity(Intent.createChooser(intent, activity!!.getString(R.string.export_chooser_title)))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Crashlytics.logException(e)
         }
     }
 

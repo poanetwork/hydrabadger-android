@@ -21,6 +21,8 @@
     <string name="room_file_not_found" translatable="false">Room without avatar</string>
 
     <string name="name_dialog_isempty">Name of dialog is empty</string>
+    <string name="export_qr">Export QR..</string>
+    <string name="export_chooser_title" tools:ignore="TypographyEllipsis">"Export...</string>
 
 
     <string name="SelectFolder">Select Folder</string>
