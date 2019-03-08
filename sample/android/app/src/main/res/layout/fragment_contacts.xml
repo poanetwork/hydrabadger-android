@@ -28,7 +28,7 @@
     </android.support.constraint.ConstraintLayout>
     <android.support.constraint.ConstraintLayout
             android:layout_width="fill_parent"
-                                                 android:layout_height="fill_parent" android:layout_below="@id/toolbar">
+            android:layout_height="fill_parent" android:layout_below="@id/toolbar">
         <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                       android:layout_height="fill_parent" app:layout_constraintEnd_toEndOf="parent"
                       app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
@@ -38,10 +38,10 @@
                             android:layout_marginTop="16.0dip" android:weightSum="100.0" style="@style/Clicked">
                 <android.support.v7.widget.AppCompatTextView
                         android:layout_width="wrap_content"
-                                                             android:layout_height="wrap_content"
-                                                             android:text="@string/contact_request"
-                                                             android:layout_centerVertical="true"
-                                                             style="@style/TitleText"/>
+                        android:layout_height="wrap_content"
+                        android:text="@string/contact_request"
+                        android:layout_centerVertical="true"
+                        style="@style/TitleText"/>
                 <ImageView android:layout_width="wrap_content"
                            android:layout_height="wrap_content" android:layout_alignParentRight="true"
                            android:layout_centerVertical="true" app:srcCompat="@drawable/ic_check_down"/>

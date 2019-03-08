@@ -76,8 +76,8 @@
                                                              style="@style/SubTitleText.BigMargin"/>
                 <android.support.v7.widget.SwitchCompat
                         android:layout_width="fill_parent"
-                                                        android:layout_height="wrap_content" android:checked="true"
-                                                        style="@style/SwitchCyclops"/>
+                        android:layout_height="wrap_content" android:checked="true"
+                        style="@style/SwitchCyclops"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

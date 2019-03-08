@@ -70,10 +70,10 @@
                                                              style="@style/TitleText"/>
                 <android.support.v7.widget.SwitchCompat
                         android:layout_width="wrap_content"
-                                                        android:layout_height="wrap_content" android:checked="true"
-                                                        android:layout_alignParentRight="true"
-                                                        android:layout_centerVertical="true"
-                                                        style="@style/SwitchCyclops"/>
+                        android:layout_height="wrap_content" android:checked="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        style="@style/SwitchCyclops"/>
             </RelativeLayout>
             <LinearLayout android:orientation="horizontal" android:id="@+id/account_generate_qr"
                           android:layout_width="match_parent" android:layout_height="match_parent"
