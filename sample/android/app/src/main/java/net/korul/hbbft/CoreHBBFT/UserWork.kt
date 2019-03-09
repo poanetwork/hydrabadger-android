@@ -7,9 +7,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
+import com.raizlabs.android.dbflow.config.FlowManager
 import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
+import net.korul.hbbft.CommonData.data.model.coreDataBase.AppDatabase
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.DatabaseApplication
@@ -36,7 +38,13 @@ object UserWork {
             )
 
             DatabaseApplication.mCurUser = user
-            Conversations.getDUser(user).insert()
+            try {
+                Conversations.getDUser(user).insert()
+            } catch (e: Exception) {
+                FlowManager.getDatabase(AppDatabase::class.java)
+                    .reset(DatabaseApplication.mCoreHBBFT2X.mApplicationContext)
+                Conversations.getDUser(user).insert()
+            }
         } else
             DatabaseApplication.mCurUser = Gson().fromJson(strUser, User::class.java)
     }

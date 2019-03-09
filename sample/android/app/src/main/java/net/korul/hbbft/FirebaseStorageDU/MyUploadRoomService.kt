@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -73,9 +74,13 @@ class MyUploadRoomService : MyBaseTaskService() {
             .child("avatar.png")
         // [END get_child_ref]
 
+        val metadata = StorageMetadata.Builder()
+            .setCustomMetadata("uid", dialogId)
+            .build()
+
         // Upload file to Firebase Storage
         Log.d(TAG, "uploadFromUri:dst:" + photoRef.path)
-        photoRef.putFile(fileUri).addOnProgressListener {
+        photoRef.putFile(fileUri, metadata).addOnProgressListener {
 
         }.continueWithTask { task ->
             // Forward any exceptions
