@@ -40,7 +40,7 @@ class RingtonePickerDialog : BaseAlertDialogFragment() {
         if (savedInstanceState != null)
             mRingtoneUri = savedInstanceState.getParcelable(KEY_RINGTONE_URI)
         mRingtoneManager = RingtoneManager(activity)
-        mRingtoneManager!!.setType(RingtoneManager.TYPE_ALARM)
+        mRingtoneManager!!.setType(RingtoneManager.TYPE_ALL)
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)

@@ -33,14 +33,13 @@ class NotificationFragment : Fragment() {
     private var mRingtone: Uri? = null
     private var mMediaPlayer: MediaPlayer? = null
 
-    private var curAllarm: String? = null
+    private var curAllarmringtone: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.hide()
 
-
-        curAllarm = loadUserCurAlarm(context!!)
+        curAllarmringtone = loadUserCurRingtone(context!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,12 +49,12 @@ class NotificationFragment : Fragment() {
     override fun onStop() {
         super.onStop()
 
-        curAllarm = if (mRingtone != null)
+        curAllarmringtone = if (mRingtone != null)
             mRingtone.toString()
         else
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString()
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL).toString()
 
-        saveUserCurAlarm(context!!, curAllarm!!)
+        saveUserCurRingtone(context!!, curAllarmringtone!!)
     }
 
 
@@ -84,16 +83,16 @@ class NotificationFragment : Fragment() {
         }
 
         try {
-            if (curAllarm == null) {
-                mRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            if (curAllarmringtone == null) {
+                mRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL)
 
                 val ringtone = RingtoneManager.getRingtone(context, mRingtone)
                 val title = ringtone.getTitle(context)
                 ringtone_name.text = title
             } else {
-                mRingtone = Uri.parse(curAllarm)
+                mRingtone = Uri.parse(curAllarmringtone)
 
-                val ringtone = RingtoneManager.getRingtone(context, Uri.parse(curAllarm))
+                val ringtone = RingtoneManager.getRingtone(context, Uri.parse(curAllarmringtone))
                 val title = ringtone.getTitle(context)
                 ringtone_name.text = title
             }
@@ -104,14 +103,20 @@ class NotificationFragment : Fragment() {
 
         try {
             ringtone.setOnClickListener {
-                if (curAllarm == null)
-                    mRingtonePickerController!!.show(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), TAG)
+                if (curAllarmringtone == null)
+                    mRingtonePickerController!!.show(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL), TAG)
                 else
-                    mRingtonePickerController!!.show(Uri.parse(curAllarm), TAG)
+                    mRingtonePickerController!!.show(Uri.parse(curAllarmringtone), TAG)
             }
         } catch (e: Exception) {
             e.printStackTrace()
             Crashlytics.logException(e)
+        }
+
+
+        open_activity_or_push.isChecked = loadNeedActivity(context!!)
+        open_activity_or_push.setOnClickListener {
+            saveNeedActivity(context!!, open_activity_or_push.isChecked)
         }
 
         hasNeededPermission()
@@ -171,7 +176,25 @@ class NotificationFragment : Fragment() {
     }
 
     companion object {
-        fun loadUserCurAlarm(context: Context): String? {
+        fun loadNeedActivity(context: Context): Boolean {
+            val activityPreferences = context.applicationContext.getSharedPreferences(
+                "curUsersAlarm",
+                AppCompatActivity.MODE_PRIVATE
+            )
+            val dateLastBackupString = activityPreferences.getBoolean("needActivity", true)
+            return dateLastBackupString
+        }
+
+        fun saveNeedActivity(context: Context, needActivity: Boolean) {
+            val editor = context.applicationContext.getSharedPreferences(
+                "curUsersAlarm",
+                AppCompatActivity.MODE_PRIVATE
+            ).edit()
+            editor.putBoolean("needActivity", needActivity)
+            editor.apply()
+        }
+
+        fun loadUserCurRingtone(context: Context): String? {
             try {
                 val activityPreferences = context.applicationContext.getSharedPreferences(
                     "curUsersAlarm",
@@ -191,7 +214,7 @@ class NotificationFragment : Fragment() {
             }
         }
 
-        fun saveUserCurAlarm(context: Context, newAlarmRingtone: String) {
+        fun saveUserCurRingtone(context: Context, newAlarmRingtone: String) {
             try {
                 val editor = context.applicationContext.getSharedPreferences(
                     "curUsersAlarm",

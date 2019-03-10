@@ -28,6 +28,13 @@
     <string name="ringtone">Rington</string>
 
 
+    <string name="ringtone_alarm_tittle">Incomig connections</string>
+    <string name="open_application_button">Open application</string>
+    <string name="close_button">Close application</string>
+    <string name="open_activity">Notification with activity or push</string>
+    <string name="need_online">Offline mode</string>
+
+
     <string name="abc_action_bar_home_description">Navigate home</string>
     <string name="abc_action_bar_up_description">Navigate up</string>
     <string name="abc_action_menu_overflow_description">More options</string>

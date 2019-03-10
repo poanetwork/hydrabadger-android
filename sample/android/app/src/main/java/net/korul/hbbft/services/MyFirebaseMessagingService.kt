@@ -14,6 +14,8 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import net.korul.hbbft.CommonFragments.tabSettings.NotificationFragment
+import net.korul.hbbft.FireAlarm.FireAlarmActivity
 import net.korul.hbbft.MainActivity
 import net.korul.hbbft.R
 
@@ -75,46 +77,59 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * @param messageBody FCM message body received.
      */
     private fun sendNotification(roomid: String) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        intent.putExtra("Start_App", true)
-        intent.putExtra("RoomId", roomid)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0 /* Request code */, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
 
-        val channelId = getString(R.string.default_notification_channel_id)
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.mipmap.ic_launcher))
-            .setContentTitle("Start connect?")
-            .setContentText("User want start messaging in Room - $roomid")
-            .setAutoCancel(true)
-            .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        Log.d(TAG, " sendNotification  ")
-
-        // Since android Oreo notification channel is needed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create channel to show notifications.
-            val channelId = getString(R.string.default_notification_channel_id)
-            val channelName = getString(R.string.default_notification_channel_name)
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(
-                NotificationChannel(
-                    channelId,
-                    channelName, NotificationManager.IMPORTANCE_HIGH
-                )
+        val needAlarm = NotificationFragment.loadNeedActivity(this)
+        if (needAlarm) {
+            val i = Intent(this, FireAlarmActivity::class.java)
+            i.flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            i.putExtra("Start_App", true)
+            i.putExtra("RoomId", roomid)
+            i.putExtra("ringtone", NotificationFragment.loadUserCurRingtone(this))
+            this.startActivity(i)
+        } else {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            intent.putExtra("Start_App", true)
+            intent.putExtra("RoomId", roomid)
+            val pendingIntent = PendingIntent.getActivity(
+                this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
             )
-        }
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+            val channelId = getString(R.string.default_notification_channel_id)
+            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.mipmap.ic_launcher))
+                .setContentTitle("Start connect?")
+                .setContentText("User want start messaging in Room - $roomid")
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent)
+
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            Log.d(TAG, " sendNotification  ")
+
+            // Since android Oreo notification channel is needed.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Create channel to show notifications.
+                val channelId = getString(R.string.default_notification_channel_id)
+                val channelName = getString(R.string.default_notification_channel_name)
+                val notificationManager = getSystemService(NotificationManager::class.java)
+                notificationManager?.createNotificationChannel(
+                    NotificationChannel(
+                        channelId,
+                        channelName, NotificationManager.IMPORTANCE_HIGH
+                    )
+                )
+            }
+
+            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+        }
     }
 
     companion object {

@@ -77,6 +77,13 @@
     <string name="ringtones">Рингтоны</string>
     <string name="ringtone">Рингтон</string>
 
+    <string name="ringtone_alarm_tittle">Входящее соединение</string>
+    <string name="open_application_button">Открыть приложение</string>
+    <string name="close_button">Закрыть приложение</string>
+    <string name="open_activity">Оповещение с помощью активити или пуш</string>
+
+    <string name="need_online">Оффлайн режим</string>
+
     <!--NOT MINE-->
     <string name="export_qr">Экспорт QR..</string>
     <string name="export_chooser_title" tools:ignore="TypographyEllipsis">"Экспорт...</string>
