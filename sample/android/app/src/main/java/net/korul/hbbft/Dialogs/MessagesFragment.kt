@@ -87,6 +87,15 @@ class MessagesFragment :
         }
     }
 
+    var handlerShowProcess = Handler(Handler.Callback { msg ->
+        try {
+            progress.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        false
+    })
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments
@@ -161,9 +170,10 @@ class MessagesFragment :
     }
 
     fun startAll() {
-        handlerProgress.post {
-            progress.show()
-        }
+        val msg = handlerShowProcess.obtainMessage(0)
+        msg.obj = ""
+        handlerShowProcess.sendMessage(msg)
+
         DatabaseApplication.mCoreHBBFT2X.subscribeSession()
         DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
 

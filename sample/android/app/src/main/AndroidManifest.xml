@@ -122,6 +122,14 @@
                 android:exported="false" tools:ignore="InnerclassSeparator"/>
 
         <service
+                android:name=".FirebaseStorageDU.MyGetLastModificationUserService"
+                android:exported="false" tools:ignore="InnerclassSeparator"/>
+
+        <service
+                android:name=".FirebaseStorageDU.MyGetLastModificationRoomService"
+                android:exported="false" tools:ignore="InnerclassSeparator"/>
+
+        <service
                 android:name=".FirebaseStorageDU.MyDownloadRoomService"
                 android:exported="false" tools:ignore="InnerclassSeparator"/>
 

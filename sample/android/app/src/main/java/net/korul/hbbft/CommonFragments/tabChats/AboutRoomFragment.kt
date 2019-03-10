@@ -290,7 +290,9 @@ class AboutRoomFragment : Fragment() {
                     val fileLocation = data.extras.getString("data")
 
                     val outputDir = activity!!.filesDir
-                    val localFile = File.createTempFile(mCurDialog!!.id, "png", outputDir)
+                    val localFile = File(outputDir!!.path + File.separator + mCurDialog!!.id + ".png")
+                    if (localFile.exists())
+                        localFile.delete()
 
                     val bitmap = BitmapFactory.decodeFile(fileLocation)
                     val resized = Bitmap.createScaledBitmap(bitmap, 250, 250, true)

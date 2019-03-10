@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
@@ -18,6 +19,9 @@ import net.korul.hbbft.CommonFragments.tabSettings.NotificationFragment
 import net.korul.hbbft.FireAlarm.FireAlarmActivity
 import net.korul.hbbft.MainActivity
 import net.korul.hbbft.R
+import java.lang.Math.abs
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     // [START receive_message]
@@ -77,6 +81,32 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * @param messageBody FCM message body received.
      */
     private fun sendNotification(roomid: String) {
+
+        val activityPreferences = this.applicationContext.getSharedPreferences(
+            "lasFireActivity",
+            AppCompatActivity.MODE_PRIVATE
+        )
+        val dateLastActivityString = activityPreferences.getString("lasFireActivity", "")
+        if (dateLastActivityString != "") {
+            val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+            val date = formatter.parse(dateLastActivityString)
+
+            if (abs(date.time - Calendar.getInstance().timeInMillis) < 1000 * 5) {
+                return
+            }
+        }
+
+        val calendar = Calendar.getInstance()
+        val date = calendar.time
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+        val dateStr = formatter.format(date)
+
+        val editor = this.applicationContext.getSharedPreferences(
+            "lasFireActivity",
+            AppCompatActivity.MODE_PRIVATE
+        ).edit()
+        editor.putString("lasFireActivity", dateStr)
+        editor.apply()
 
         val needAlarm = NotificationFragment.loadNeedActivity(this)
         if (needAlarm) {

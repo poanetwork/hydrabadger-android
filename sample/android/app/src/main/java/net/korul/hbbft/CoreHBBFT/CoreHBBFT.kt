@@ -112,9 +112,14 @@ object CoreHBBFT : IGetData {
             val latch = authAnonymouslyInFirebase()
             latch.await()
             saveCurUserSync(DatabaseApplication.mCurUser)
+            reregisterInFirebase(getAllDialogsUids(), uniqueID1)
+        }
+    }
+
+    fun ALLUpdate() {
+        thread {
             updateAllUsersFromFirebase()
             updateAllRoomsFromFirebase()
-            reregisterInFirebase(getAllDialogsUids(), uniqueID1)
         }
     }
 

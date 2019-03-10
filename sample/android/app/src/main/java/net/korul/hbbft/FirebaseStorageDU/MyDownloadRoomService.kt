@@ -7,7 +7,6 @@ import android.os.IBinder
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -50,22 +49,15 @@ class MyDownloadRoomService : MyBaseTaskService() {
 
         val outputDir = this.filesDir
         val localFile = File.createTempFile(dialogId, "png", outputDir)
+        val avatarFile = File(outputDir.path + File.separator + dialogId + ".png")
+
         storageRef.child("roomsAvatars").child(dialogId).child("avatar.png").getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "download:SUCCESS")
 
-            // Create file metadata with property to delete
-            val metadata = StorageMetadata.Builder()
-                .setContentType(null)
-                .build()
-
-            // Delete the metadata property
-            storageRef.child("roomsAvatars").child(dialogId).child("avatar.png").updateMetadata(metadata)
-                .addOnSuccessListener {
-                }.addOnFailureListener {
-                }
-
+            localFile.copyTo(avatarFile, true)
+            localFile.delete()
             // Send success broadcast with number of bytes downloaded
-            broadcastDownloadFinished(localFile, localFile.length(), dialogId)
+            broadcastDownloadFinished(avatarFile, avatarFile.length(), dialogId)
             // showDownloadFinishedNotification(localFile.length().toInt())
 
             // Mark task completed

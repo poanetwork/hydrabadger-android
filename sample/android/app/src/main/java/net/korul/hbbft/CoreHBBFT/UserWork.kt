@@ -16,6 +16,7 @@ import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.FirebaseStorageDU.MyDownloadUserService
+import net.korul.hbbft.FirebaseStorageDU.MyGetLastModificationUserService
 import java.io.File
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -304,11 +305,16 @@ object UserWork {
 
                     updateMetaInAllLocalUserByUidWithoutNick(us)
 
+                    CoreHBBFT.mApplicationContext.startService(
+                        Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationUserService::class.java)
+                            .putExtra(MyGetLastModificationUserService.EXTRA_COMPARE_UID, us.UID)
+                            .setAction(MyGetLastModificationUserService.ACTION_COMPARE)
+                    )
                     // Kick off MyDownloadUserService to download the file
-                    val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
-                        .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, us.UID)
-                        .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
-                    CoreHBBFT.mApplicationContext.startService(intent)
+//                    val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
+//                        .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, us.UID)
+//                        .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
+//                    CoreHBBFT.mApplicationContext.startService(intent)
                 }
             }
         }
