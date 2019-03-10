@@ -13,6 +13,7 @@ import android.os.Environment
 import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import lib.folderpicker.FolderPicker
 import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures.Companion.setNewExtDialog
 import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.DatabaseApplication
+import net.korul.hbbft.Dialogs.DialogsFragment
 import net.korul.hbbft.FirebaseStorageDU.MyUploadRoomService
 import net.korul.hbbft.ImageWork.ImageUtil.circleShape
 import net.korul.hbbft.R
@@ -65,7 +67,6 @@ class AddNewDialogFragment : Fragment() {
             if (group_name.text.toString().isEmpty())
                 group_name.error = getString(R.string.name_dialog_isempty)
             else {
-                group_name.error = ""
                 addDialog()
             }
         }
@@ -74,7 +75,6 @@ class AddNewDialogFragment : Fragment() {
             if (group_name.text.toString().isEmpty())
                 group_name.error = getString(R.string.name_dialog_isempty)
             else {
-                group_name.error = ""
                 addDialog()
             }
         }
@@ -93,9 +93,10 @@ class AddNewDialogFragment : Fragment() {
         val dialogDescription = group_description.text.toString()
 
         val dialogUID = UUID.randomUUID().toString() + "_" + UUID.randomUUID().toString()
-        val outputDir = activity!!.filesDir
-        val localFile = File.createTempFile(dialogUID, "png", outputDir)
 
+        val localFile = File(activity!!.filesDir.path + File.separator + dialogUID + ".png")
+        if (localFile.exists())
+            localFile.delete()
         try {
             group_icon.invalidate()
             val drawable = group_icon.drawable as BitmapDrawable
@@ -111,12 +112,29 @@ class AddNewDialogFragment : Fragment() {
         setNewExtDialog(dialogUID, dialogName, dialogDescription, localFile.path, DatabaseApplication.mCurUser)
 
         val uploadUri = Uri.fromFile(localFile)
-        context!!.startService(
-            Intent(context, MyUploadRoomService::class.java)
-                .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
-                .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialogUID)
-                .setAction(MyUploadRoomService.ACTION_UPLOAD)
-        )
+        if (localFile.exists())
+            context!!.startService(
+                Intent(context, MyUploadRoomService::class.java)
+                    .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+                    .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialogUID)
+                    .setAction(MyUploadRoomService.ACTION_UPLOAD)
+            )
+        else {
+            dismissProgressBar()
+            activity!!.supportFragmentManager.popBackStack(
+                getString(R.string.tag_chats2),
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            activity!!.supportFragmentManager.popBackStack(
+                getString(R.string.tag_chats),
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+
+            val transaction = activity!!.supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.view, DialogsFragment.newInstance(), getString(R.string.tag_chats))
+            transaction.addToBackStack(getString(R.string.tag_chats))
+            transaction.commit()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

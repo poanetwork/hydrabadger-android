@@ -23,6 +23,8 @@ import net.korul.hbbft.CommonFragments.tabLenta.ListNewsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsUserFragment
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.ALLUpdate
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT.uniqueID1
 import net.korul.hbbft.CoreHBBFT.UserWork.getAnyLocalUserByUid
 import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
@@ -30,11 +32,10 @@ import net.korul.hbbft.CoreHBBFT.UserWork.updateAvatarInAllLocalUserByUid
 import net.korul.hbbft.DatabaseApplication.Companion.mCurUser
 import net.korul.hbbft.Dialogs.DialogsFragment
 import net.korul.hbbft.Dialogs.MessagesFragment
-import net.korul.hbbft.FirebaseStorageDU.MyDownloadRoomService
-import net.korul.hbbft.FirebaseStorageDU.MyDownloadUserService
-import net.korul.hbbft.FirebaseStorageDU.MyUploadRoomService
-import net.korul.hbbft.FirebaseStorageDU.MyUploadUserService
+import net.korul.hbbft.FirebaseStorageDU.*
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 //import com.judemanutd.autostarter.AutoStartPermissionHelper
 
@@ -117,56 +118,42 @@ class MainActivity : AppCompatActivity() {
             navView.setBackgroundDrawable(this.resources.getDrawable(R.drawable.footer_bar_healin))
         }
 
-        if (this.intent.getBooleanExtra("Start_App", false)) {
-            Log.d(TAG, "Receive push and start activity")
-            val RoomId = intent.getStringExtra("RoomId")
+        initSyncSystem()
 
-            val dialogs = DialogsFixtures.dialogs
-            for (diag in dialogs) {
-                if (diag.id == RoomId) {
-                    Log.d(TAG, "Found dialog and start it $RoomId")
+        when {
+            prefs.getBoolean("Theme_NeedRestart", false) -> {
+                val editor = prefs.edit()
+                editor.putBoolean("Theme_NeedRestart", false)
+                editor.apply()
 
-                    supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
-                    supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
+                navView.selectedItemId = R.id.navigation_settings
 
-                    val transaction = supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.view, DialogsFragment.newInstance(true, RoomId))
-                    transaction.addToBackStack(getString(R.string.tag_chats))
-                    transaction.commit()
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.add(R.id.view, DialogThemeFragment.newInstance(), getString(R.string.tag_settings))
+                transaction.addToBackStack(getString(R.string.tag_settings))
+                transaction.commit()
+            }
+            this.intent.getBooleanExtra("Start_App", false) -> {
+                Log.d(TAG, "Receive push and start activity")
+                val RoomId = intent.getStringExtra("RoomId")
+
+                val dialogs = DialogsFixtures.dialogs
+                for (diag in dialogs) {
+                    if (diag.id == RoomId) {
+                        Log.d(TAG, "Found dialog and start it $RoomId")
+
+                        supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)
+                        supportFragmentManager.popBackStack(getString(R.string.tag_chats), POP_BACK_STACK_INCLUSIVE)
+
+                        val transaction = supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.view, DialogsFragment.newInstance(true, RoomId))
+                        transaction.addToBackStack(getString(R.string.tag_chats))
+                        transaction.commit()
+                    }
                 }
             }
+            else -> ALLUpdate()
         }
-//        else {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                val intent = Intent()
-//                val packageName = packageName
-//                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-//                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-//                    intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-//                    intent.data = Uri.parse("package:net.korul.hbbft")
-//                    startActivity(intent)
-
-//                    AutoStartPermissionHelper.getInstance().getAutoStartPermission(this)
-//                }
-//            }
-//        }
-
-        val themeRestart = prefs.getBoolean("Theme_NeedRestart", false)
-        if (themeRestart) {
-            val editor = prefs.edit()
-            editor.putBoolean("Theme_NeedRestart", false)
-            editor.apply()
-
-            navView.selectedItemId = R.id.navigation_settings
-
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.add(R.id.view, DialogThemeFragment.newInstance(), getString(R.string.tag_settings))
-            transaction.addToBackStack(getString(R.string.tag_settings))
-            transaction.commit()
-        }
-
-
-        initSyncSystem()
     }
 
     public override fun onStart() {
@@ -178,6 +165,8 @@ class MainActivity : AppCompatActivity() {
         manager.registerReceiver(broadcastReceiver, MyUploadUserService.intentFilter)
         manager.registerReceiver(broadcastReceiver, MyDownloadRoomService.intentFilter)
         manager.registerReceiver(broadcastReceiver, MyUploadRoomService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyGetLastModificationUserService.intentFilter)
+        manager.registerReceiver(broadcastReceiver, MyGetLastModificationRoomService.intentFilter)
     }
 
     public override fun onStop() {
@@ -216,6 +205,57 @@ class MainActivity : AppCompatActivity() {
 
                     MyDownloadUserService.DOWNLOAD_FILE_NOT_FOUND -> {
                         Log.d(TAG, getString(R.string.avatar_file_not_found))
+                    }
+
+
+                    MyGetLastModificationUserService.COMPARE_COMPLETED -> {
+                        val m = intent.getStringExtra(MyGetLastModificationUserService.EXTRA_COMPARE_DATE)
+                        val uid = intent.getStringExtra(MyGetLastModificationUserService.EXTRA_COMPARE_UID)
+
+                        val file = File(context.filesDir.path + File.separator + uid + ".png")
+
+                        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+                        val date = formatter.parse(m)
+
+                        val compare = compareDriveLocalNewer(file, date)
+                        when (compare) {
+                            1 -> {
+                                val int = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
+                                    .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, uid)
+                                    .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
+                                CoreHBBFT.mApplicationContext.startService(int)
+                            }
+                        }
+                    }
+
+                    MyGetLastModificationRoomService.COMPARE_COMPLETED -> {
+                        val m = intent.getStringExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_DATE)
+                        val uid = intent.getStringExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID)
+
+                        val file = File(context.filesDir.path + File.separator + uid + ".png")
+
+                        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+                        val date = formatter.parse(m)
+
+                        val compare = compareDriveLocalNewer(file, date)
+                        when (compare) {
+                            1 -> {
+                                val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadRoomService::class.java)
+                                    .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, uid)
+                                    .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
+                                CoreHBBFT.mApplicationContext.startService(intent)
+                            }
+                        }
+                    }
+
+                    MyGetLastModificationRoomService.COMPARE_ERROR -> {
+                        // Alert failure
+                        showMessageDialog("Error", "Failed to get dialog update")
+                    }
+
+                    MyGetLastModificationUserService.COMPARE_ERROR -> {
+                        // Alert failure
+                        showMessageDialog("Error", "Failed to get user update")
                     }
 
                     MyUploadUserService.UPLOAD_COMPLETED -> {
@@ -320,7 +360,7 @@ class MainActivity : AppCompatActivity() {
 
                             AppUtils.showToast(
                                 context,
-                                "ADDED DIALOG COMPLETED", true
+                                "ADDED OR UPDATE DIALOG COMPLETED", true
                             )
                         }
                     }
@@ -333,13 +373,38 @@ class MainActivity : AppCompatActivity() {
                         }
                         AppUtils.showToast(
                             context,
-                            "ADDED DIALOG Error", true
+                            "ADDED OR UPDATE DIALOG Error", true
                         )
                     }
                 }
             }
         }
     }
+
+    private fun compareDriveLocalNewer(file: File, deltaDate: Date): Int {
+        val lastLocalUpdate = file.lastModified()
+        val lastDriveUpdate = deltaDate.time
+
+        return when {
+            lastDriveUpdate <= 0 -> 0
+            lastLocalUpdate <= 0 -> 1
+            else -> {
+                when {
+                    lastDriveUpdate > lastLocalUpdate -> 1
+                    else -> 0
+                }
+            }
+        }
+    }
+
+    private fun showMessageDialog(title: String, message: String) {
+        val ad = android.support.v7.app.AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .create()
+        ad.show()
+    }
+
 
     fun dissmisDialog() {
         supportFragmentManager.popBackStack(getString(R.string.tag_chats2), POP_BACK_STACK_INCLUSIVE)

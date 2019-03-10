@@ -17,6 +17,7 @@ import net.korul.hbbft.CoreHBBFT.RoomWork.registerInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.FirebaseStorageDU.MyDownloadRoomService
+import net.korul.hbbft.FirebaseStorageDU.MyGetLastModificationRoomService
 import java.io.File
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -113,7 +114,7 @@ object RoomDescrWork {
                             roomDescr.dialogDescription = mapObj["dialogDescription"] as String
 
                             val outputDir = CoreHBBFT.mApplicationContext.filesDir
-                            val localFile = File.createTempFile(dialogID, "png", outputDir)
+                            val localFile = File(outputDir.path + File.separator + dialogID + ".png")
 
                             val dialog = Getters.getDialogByRoomId(dialogID)
                             val saveDialog = Dialog(
@@ -126,11 +127,16 @@ object RoomDescrWork {
                                 dialog.unreadCount
                             )
 
+                            CoreHBBFT.mApplicationContext.startService(
+                                Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
+                                    .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
+                                    .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
+                            )
                             // Kick off MyDownloadUserService to download the file
-                            val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadRoomService::class.java)
-                                .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, dialogID)
-                                .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
-                            CoreHBBFT.mApplicationContext.startService(intent)
+//                            val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadRoomService::class.java)
+//                                .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, dialogID)
+//                                .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
+//                            CoreHBBFT.mApplicationContext.startService(intent)
 
                             listener.dialog(saveDialog)
                         }
@@ -190,7 +196,8 @@ object RoomDescrWork {
                             listOfUsers.add(user)
 
                             val outputDir = CoreHBBFT.mApplicationContext.filesDir
-                            val localFile = File.createTempFile(roomDescr.id, "png", outputDir)
+                            val localFile = File(outputDir.path + File.separator + roomDescr.id + ".png")
+
                             val dialog = setNewExtDialog(
                                 roomDescr.id!!,
                                 roomDescr.dialogName!!,

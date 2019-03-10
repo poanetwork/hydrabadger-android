@@ -74,6 +74,15 @@
     <string name="room_add_title">Добавение диалога</string>
     <string name="room_request_prompt_id">Введите ID диалога</string>
 
+    <string name="ringtones">Рингтоны</string>
+    <string name="ringtone">Рингтон</string>
+
+    <string name="ringtone_alarm_tittle">Входящее соединение</string>
+    <string name="open_application_button">Открыть приложение</string>
+    <string name="close_button">Закрыть приложение</string>
+    <string name="open_activity">Оповещение с помощью активити или пуш</string>
+
+    <string name="need_online">Оффлайн режим</string>
 
     <!--NOT MINE-->
     <string name="export_qr">Экспорт QR..</string>

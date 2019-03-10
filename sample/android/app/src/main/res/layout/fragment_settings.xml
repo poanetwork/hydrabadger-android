@@ -55,7 +55,7 @@
                 </LinearLayout>
             </RelativeLayout>
             <!--</RelativeLayout>-->
-            <View android:visibility="visible" style="@style/Divider"/>
+            <View android:visibility="visible" style="@style/Divider" android:layout_marginTop="10dp"/>
             <android.support.v7.widget.AppCompatTextView android:id="@+id/settings_interface"
                                                          android:layout_width="fill_parent"
                                                          android:layout_height="wrap_content"

@@ -41,7 +41,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                 try {
                     AppUtils.showToast(
                         applicationContext,
-                        msg.obj as String, true
+                        msg.obj as String, false
                     )
                 } catch (e: Exception) {
                     e.printStackTrace()
