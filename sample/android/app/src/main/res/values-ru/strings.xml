@@ -74,6 +74,8 @@
     <string name="room_add_title">Добавение диалога</string>
     <string name="room_request_prompt_id">Введите ID диалога</string>
 
+    <string name="ringtones">Рингтоны</string>
+    <string name="ringtone">Рингтон</string>
 
     <!--NOT MINE-->
     <string name="export_qr">Экспорт QR..</string>

@@ -24,6 +24,9 @@
     <string name="export_qr">Export QR..</string>
     <string name="export_chooser_title" tools:ignore="TypographyEllipsis">"Export...</string>
 
+    <string name="ringtones">Ringtones</string>
+    <string name="ringtone">Rington</string>
+
 
     <string name="abc_action_bar_home_description">Navigate home</string>
     <string name="abc_action_bar_up_description">Navigate up</string>
