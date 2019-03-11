@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
               android:id="@+id/main_layout"
               android:fitsSystemWindows="true" android:layout_width="fill_parent"
               android:layout_height="fill_parent" android:background="?android:attr/windowBackground"
@@ -26,16 +27,6 @@
                           android:layout_height="wrap_content" android:weightSum="100.0" style="@style/SubTitle">
                 <android.support.v7.widget.AppCompatTextView android:layout_width="0.0dip"
                                                              android:layout_height="wrap_content"
-                                                             android:text="@string/settings_sound_message"
-                                                             android:layout_weight="80.0" style="@style/SubTitleText"/>
-                <android.support.v7.widget.SwitchCompat android:layout_width="0.0dip"
-                                                        android:layout_height="wrap_content" android:checked="true"
-                                                        android:layout_weight="20.0" style="@style/SwitchCyclops"/>
-            </LinearLayout>
-            <LinearLayout android:visibility="gone" android:layout_width="fill_parent"
-                          android:layout_height="wrap_content" android:weightSum="100.0" style="@style/SubTitle">
-                <android.support.v7.widget.AppCompatTextView android:layout_width="0.0dip"
-                                                             android:layout_height="wrap_content"
                                                              android:text="@string/settings_sound_invite_to_contact"
                                                              android:layout_weight="80.0" style="@style/SubTitleText"/>
                 <android.support.v7.widget.SwitchCompat android:layout_width="0.0dip"
@@ -43,7 +34,8 @@
                                                         android:layout_weight="20.0" style="@style/SwitchCyclops"/>
             </LinearLayout>
             <LinearLayout android:visibility="gone" android:layout_width="fill_parent"
-                          android:layout_height="wrap_content" android:weightSum="100.0" style="@style/SubTitle">
+                          android:layout_height="wrap_content" android:weightSum="100.0" style="@style/SubTitle"
+                          tools:visibility="gone">
                 <android.support.v7.widget.AppCompatTextView android:layout_width="0.0dip"
                                                              android:layout_height="wrap_content"
                                                              android:text="@string/settings_sound_invite_to_group"
@@ -61,12 +53,25 @@
                           android:layout_height="wrap_content" android:text="@string/no_sound"
                           android:layout_weight="50.0" style="@style/sound_notification_style"/>
             </LinearLayout>
-            <android.support.v7.widget.AppCompatTextView android:visibility="gone" android:layout_width="wrap_content"
+            <LinearLayout android:visibility="visible" android:layout_width="fill_parent"
+                          android:layout_height="wrap_content" android:weightSum="100.0" style="@style/SubTitle">
+                <android.support.v7.widget.AppCompatTextView android:layout_width="0.0dip"
+                                                             android:layout_height="wrap_content"
+                                                             android:text="@string/open_activity"
+                                                             android:layout_weight="80.0" style="@style/SubTitleText"/>
+                <android.support.v7.widget.SwitchCompat android:layout_width="0.0dip"
+                                                        android:layout_height="wrap_content" android:checked="true"
+                                                        android:layout_weight="20.0" style="@style/SwitchCyclops"
+                                                        android:id="@+id/open_activity_or_push"/>
+            </LinearLayout>
+            <android.support.v7.widget.AppCompatTextView android:visibility="gone"
+                                                         android:layout_width="wrap_content"
                                                          android:layout_height="wrap_content"
                                                          android:layout_marginTop="@dimen/menu_margin_16"
                                                          android:text="@string/settings_sound_volume"
                                                          style="@style/TitleText"/>
-            <SeekBar android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content"
+            <SeekBar android:visibility="gone" android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
                      android:layout_marginTop="@dimen/menu_margin_16" android:max="100" android:progress="50"/>
         </LinearLayout>
     </ScrollView>

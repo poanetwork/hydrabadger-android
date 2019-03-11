@@ -3,9 +3,11 @@ package net.korul.hbbft.Dialogs
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
@@ -40,6 +42,7 @@ import net.korul.hbbft.Dialogs.holder.holders.messages.CustomOutcomingTextMessag
 import net.korul.hbbft.R
 import java.util.*
 import kotlin.concurrent.thread
+
 
 class MessagesFragment :
     BaseMessagesFragment(),
@@ -84,6 +87,15 @@ class MessagesFragment :
         }
     }
 
+    var handlerShowProcess = Handler(Handler.Callback { msg ->
+        try {
+            progress.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        false
+    })
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments
@@ -116,13 +128,22 @@ class MessagesFragment :
     }
 
     override fun onSubmit(input: CharSequence): Boolean {
-        val mes = MessagesFixtures.setNewMessage(input.toString(), mCurDialog!!, mCurUser!!)
-        super.messagesAdapter!!.addToStart(
-            mes, true
-        )
+        if (isNeedVilibleMenuHbbft()) {
+            val mes = MessagesFixtures.setNewMessage(input.toString(), mCurDialog!!, mCurUser!!)
+            super.messagesAdapter!!.addToStart(
+                mes, true
+            )
 
-        DatabaseApplication.mCoreHBBFT2X.sendMessage(mes.text.toString())
-        mCurDialog = getDialog(mCurDialog!!.id)
+            DatabaseApplication.mCoreHBBFT2X.sendMessage(mes.text.toString())
+            mCurDialog = getDialog(mCurDialog!!.id)
+        } else {
+            val mSnackbar = Snackbar.make(view!!, getString(R.string.need_online), Snackbar.LENGTH_LONG)
+                .setAction("Action", null)
+
+            val snackbarView = mSnackbar.view
+            snackbarView.setBackgroundColor(Color.BLUE)
+            mSnackbar.show()
+        }
 
         return true
     }
@@ -149,9 +170,10 @@ class MessagesFragment :
     }
 
     fun startAll() {
-        handlerProgress.post {
-            progress.show()
-        }
+        val msg = handlerShowProcess.obtainMessage(0)
+        msg.obj = ""
+        handlerShowProcess.sendMessage(msg)
+
         DatabaseApplication.mCoreHBBFT2X.subscribeSession()
         DatabaseApplication.mCoreHBBFT2X.afterSubscribeSession()
 

@@ -7,7 +7,6 @@ import android.os.IBinder
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
@@ -50,22 +49,15 @@ class MyDownloadUserService : MyBaseTaskService() {
 
         val outputDir = this.filesDir
         val localFile = File.createTempFile(userId, "png", outputDir)
+        val avatarFile = File(outputDir.path + File.separator + userId + ".png")
+
         storageRef.child("usersAvatars").child(userId).child("avatar.png").getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "download:SUCCESS")
 
-            // Create file metadata with property to delete
-            val metadata = StorageMetadata.Builder()
-                .setContentType(null)
-                .build()
-
-            // Delete the metadata property
-            storageRef.child("usersAvatars").child(userId).child("avatar.png").updateMetadata(metadata)
-                .addOnSuccessListener {
-                }.addOnFailureListener {
-                }
-
+            localFile.copyTo(avatarFile, true)
+            localFile.delete()
             // Send success broadcast with number of bytes downloaded
-            broadcastDownloadFinished(localFile, localFile.length(), userId)
+            broadcastDownloadFinished(avatarFile, avatarFile.length(), userId)
             // showDownloadFinishedNotification(localFile.length().toInt())
 
             // Mark task completed
@@ -103,11 +95,11 @@ class MyDownloadUserService : MyBaseTaskService() {
     }
 
     private fun broadcastDownloadFinished(bytesDownloaded: Long): Boolean {
-        if (bytesDownloaded == -2L) {
+        return if (bytesDownloaded == -2L) {
             val action = DOWNLOAD_FILE_NOT_FOUND
 
             val broadcast = Intent(action)
-            return LocalBroadcastManager.getInstance(this)
+            LocalBroadcastManager.getInstance(this)
                 .sendBroadcast(broadcast)
         } else {
             val success = bytesDownloaded != -1L
@@ -115,7 +107,7 @@ class MyDownloadUserService : MyBaseTaskService() {
 
             val broadcast = Intent(action)
                 .putExtra(EXTRA_BYTES_DOWNLOADED, bytesDownloaded)
-            return LocalBroadcastManager.getInstance(this)
+            LocalBroadcastManager.getInstance(this)
                 .sendBroadcast(broadcast)
         }
     }

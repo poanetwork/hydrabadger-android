@@ -23,8 +23,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         buildToolsVersion "28.0.3"
-        versionCode 20
-        versionName "2.5.0"
+        versionCode 23
+        versionName "2.5.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -157,11 +157,6 @@ dependencies {
     implementation 'com.nineoldandroids:library:2.4.0'
     // This dude gave a shoutout to you (daimajia) on his github page:
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0@aar'
-
-//    // blur image
-//    implementation 'jp.wasabeef:glide-transformations:4.0.0'
-//    // If you want to use the GPU Filters
-//    implementation 'jp.co.cyberagent.android:gpuimage:2.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

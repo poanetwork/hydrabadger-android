@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
 import com.stfalcon.chatkit.commons.ImageLoader
-import com.stfalcon.chatkit.dialogs.DialogsListAdapter
+import net.korul.hbbft.AdapterRecycler.DialogsSwipeListAdapter
 import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures.Companion.deleteDialog
 import net.korul.hbbft.CommonData.data.model.Dialog
 import net.korul.hbbft.CommonFragments.tabChats.AboutRoomFragment
@@ -18,12 +18,12 @@ import net.korul.hbbft.R
 
 abstract class BaseDialogsFragment :
     Fragment(),
-    DialogsListAdapter.OnDialogClickListener<Dialog>,
-    DialogsListAdapter.OnDialogLongClickListener<Dialog>,
+    DialogsSwipeListAdapter.OnDialogClickListener<Dialog>,
+    DialogsSwipeListAdapter.OnDialogLongClickListener<Dialog>,
     DialogInterface.OnClickListener {
 
     protected lateinit var imageLoader: ImageLoader
-    protected var dialogsAdapter: DialogsListAdapter<Dialog>? = null
+    protected var dialogsAdapter: DialogsSwipeListAdapter<Dialog>? = null
 
     private var mDialog: Dialog? = null
     var menu: Menu? = null

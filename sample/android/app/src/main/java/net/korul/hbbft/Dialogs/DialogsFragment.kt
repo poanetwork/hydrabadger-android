@@ -12,9 +12,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import com.stfalcon.chatkit.utils.DateFormatter
 import kotlinx.android.synthetic.main.fragment_default_dialogs.*
+import net.korul.hbbft.AdapterRecycler.DialogsSwipeListAdapter
 import net.korul.hbbft.CommonData.data.fixtures.DialogsFixtures
 import net.korul.hbbft.CommonData.data.fixtures.MessagesFixtures
 import net.korul.hbbft.CommonData.data.model.Dialog
@@ -23,6 +23,7 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CommonData.data.model.core.Getters.getDialogByRoomId
+import net.korul.hbbft.CommonFragments.tabChats.AboutRoomFragment
 import net.korul.hbbft.CommonFragments.tabChats.AddDialogExistFragment
 import net.korul.hbbft.CommonFragments.tabChats.AddNewDialogFragment
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
@@ -30,11 +31,15 @@ import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.CoreHBBFT.IAddToContacts
 import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
-import net.korul.hbbft.Dialogs.holder.holders.dialogs.CustomDialogViewHolder
 import net.korul.hbbft.R
 import java.util.*
 import kotlin.concurrent.thread
 
+
+interface DialogClickListener {
+    fun onItemButtonAboutClick(view: View, dialog: Dialog)
+    fun onItemButtonRemoeClick(view: View, dialog: Dialog)
+}
 
 class DialogsFragment :
     BaseDialogsFragment(),
@@ -193,18 +198,42 @@ class DialogsFragment :
 
 
     private fun initAdapter() {
-        super.dialogsAdapter = DialogsListAdapter(
-            R.layout.item_custom_dialog_view_holder,
-            CustomDialogViewHolder::class.java,
-            super.imageLoader
-        )
+        super.dialogsAdapter = DialogsSwipeListAdapter(
+            R.layout.item_custom_swipe_dialog_view_holder,
+            super.imageLoader,
+            object : DialogClickListener {
+                override fun onItemButtonAboutClick(view: View, dialog: Dialog) {
+                    val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+                    transaction.add(
+                        R.id.view,
+                        AboutRoomFragment.newInstance(dialog), getString(R.string.tag_chats)
+                    )
+                    transaction.addToBackStack(getString(R.string.tag_chats))
+                    transaction.commit()
+                }
+
+                override fun onItemButtonRemoeClick(view: View, dialog: Dialog) {
+                    dialogsAdapter?.deleteById(dialog.id)
+                    dialogsAdapter?.notifyDataSetChanged()
+                    DialogsFixtures.deleteDialog(dialog)
+                }
+            })
 
         super.dialogsAdapter!!.setItems(DialogsFixtures.dialogs)
         super.dialogsAdapter!!.setOnDialogClickListener(this)
         super.dialogsAdapter!!.setOnDialogLongClickListener(this)
         super.dialogsAdapter!!.setDatesFormatter(this)
+        super.dialogsAdapter!!.setOnDialogViewClickListener { view, dialog ->
+            val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
+            transaction.add(
+                R.id.view,
+                AboutRoomFragment.newInstance(dialog), getString(R.string.tag_chats)
+            )
+            transaction.addToBackStack(getString(R.string.tag_chats))
+            transaction.commit()
+        }
 
-        dialogsList!!.setAdapter(super.dialogsAdapter)
+        dialogsList!!.setAdapter(super.dialogsAdapter!!, false)
     }
 
     override fun updateStateToOnline() {

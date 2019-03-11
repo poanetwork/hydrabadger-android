@@ -303,7 +303,9 @@ class SettingsUserFragment : Fragment() {
                         val fileLocation = data.extras.getString("data")
 
                         val outputDir = activity!!.filesDir
-                        val localFile = File.createTempFile(mCurUser.uid, "png", outputDir)
+                        val localFile = File(outputDir.path + File.separator + mCurUser.uid + ".png")
+                        if (localFile.exists())
+                            localFile.delete()
 
                         val bitmap = BitmapFactory.decodeFile(fileLocation)
                         val resized = Bitmap.createScaledBitmap(bitmap, 250, 250, true)

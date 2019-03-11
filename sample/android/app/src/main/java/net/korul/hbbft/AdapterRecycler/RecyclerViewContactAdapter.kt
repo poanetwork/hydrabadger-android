@@ -51,7 +51,6 @@ class RecyclerViewContactAdapter(
         val item = mDataset[position]
         viewHolder.swipeLayout.showMode = SwipeLayout.ShowMode.LayDown
 
-
         viewHolder.swipeLayout.addSwipeListener(object : SimpleSwipeListener() {
             override fun onOpen(layout: SwipeLayout?) {
             }
