@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:gravity="center"
+              android:orientation="vertical" android:background="?red_button"
+              android:layout_width="75dp"
+              android:layout_height="60dp">
+    <RelativeLayout android:layout_gravity="center_horizontal" android:layout_width="@dimen/options_icon_size"
+                    android:layout_height="@dimen/options_icon_size">
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                   android:layout_centerInParent="true" app:srcCompat="@drawable/actiondelete"/>
+    </RelativeLayout>
+    <TextView android:textColor="#fff25c5c" android:layout_gravity="center_horizontal"
+              android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="1.0dip"
+              android:text="@string/contact_options_delete" android:maxLines="1" style="@style/contact_options"/>
+</LinearLayout>

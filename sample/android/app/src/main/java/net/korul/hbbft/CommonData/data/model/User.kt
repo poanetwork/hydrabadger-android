@@ -5,13 +5,13 @@ import com.stfalcon.chatkit.commons.models.IUser
 
 class User(
     var id_: Long = 0,
-    var uid: String,
-    private var id: String,
-    var idDialog: String,
-    private val name: String,
-    private val nick: String,
-    private val avatar: String,
-    val isOnline: Boolean,
+    var uid: String = "",
+    private var id: String = "",
+    var idDialog: String = "",
+    private val name: String = "",
+    private val nick: String = "",
+    private val avatar: String = "",
+    val isOnline: Boolean = false,
     val isVisible: Boolean = true
 ) :
     IUser {

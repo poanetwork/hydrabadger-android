@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-
 import com.stfalcon.chatkit.R;
 import com.stfalcon.chatkit.commons.Style;
 
@@ -28,6 +27,7 @@ import com.stfalcon.chatkit.commons.Style;
  * Style for DialogList customization by xml attributes
  */
 @SuppressWarnings("WeakerAccess")
+public
 class DialogListStyle extends Style {
 
     private int dialogTitleTextColor;
@@ -69,7 +69,7 @@ class DialogListStyle extends Style {
     private int dialogItemBackground;
     private int dialogUnreadItemBackground;
 
-    static DialogListStyle parse(Context context, AttributeSet attrs) {
+    public static DialogListStyle parse(Context context, AttributeSet attrs) {
         DialogListStyle style = new DialogListStyle(context, attrs);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.DialogsList);
@@ -158,127 +158,127 @@ class DialogListStyle extends Style {
         super(context, attrs);
     }
 
-    protected int getDialogTitleTextColor() {
+    public int getDialogTitleTextColor() {
         return dialogTitleTextColor;
     }
 
-    protected int getDialogTitleTextSize() {
+    public int getDialogTitleTextSize() {
         return dialogTitleTextSize;
     }
 
-    protected int getDialogTitleTextStyle() {
+    public int getDialogTitleTextStyle() {
         return dialogTitleTextStyle;
     }
 
-    protected int getDialogUnreadTitleTextColor() {
+    public int getDialogUnreadTitleTextColor() {
         return dialogUnreadTitleTextColor;
     }
 
-    protected int getDialogUnreadTitleTextStyle() {
+    public int getDialogUnreadTitleTextStyle() {
         return dialogUnreadTitleTextStyle;
     }
 
-    protected int getDialogMessageTextColor() {
+    public int getDialogMessageTextColor() {
         return dialogMessageTextColor;
     }
 
-    protected int getDialogMessageTextSize() {
+    public int getDialogMessageTextSize() {
         return dialogMessageTextSize;
     }
 
-    protected int getDialogMessageTextStyle() {
+    public int getDialogMessageTextStyle() {
         return dialogMessageTextStyle;
     }
 
-    protected int getDialogUnreadMessageTextColor() {
+    public int getDialogUnreadMessageTextColor() {
         return dialogUnreadMessageTextColor;
     }
 
-    protected int getDialogUnreadMessageTextStyle() {
+    public int getDialogUnreadMessageTextStyle() {
         return dialogUnreadMessageTextStyle;
     }
 
-    protected int getDialogDateColor() {
+    public int getDialogDateColor() {
         return dialogDateColor;
     }
 
-    protected int getDialogDateSize() {
+    public int getDialogDateSize() {
         return dialogDateSize;
     }
 
-    protected int getDialogDateStyle() {
+    public int getDialogDateStyle() {
         return dialogDateStyle;
     }
 
-    protected int getDialogUnreadDateColor() {
+    public int getDialogUnreadDateColor() {
         return dialogUnreadDateColor;
     }
 
-    protected int getDialogUnreadDateStyle() {
+    public int getDialogUnreadDateStyle() {
         return dialogUnreadDateStyle;
     }
 
-    protected boolean isDialogUnreadBubbleEnabled() {
+    public boolean isDialogUnreadBubbleEnabled() {
         return dialogUnreadBubbleEnabled;
     }
 
-    protected int getDialogUnreadBubbleTextColor() {
+    public int getDialogUnreadBubbleTextColor() {
         return dialogUnreadBubbleTextColor;
     }
 
-    protected int getDialogUnreadBubbleTextSize() {
+    public int getDialogUnreadBubbleTextSize() {
         return dialogUnreadBubbleTextSize;
     }
 
-    protected int getDialogUnreadBubbleTextStyle() {
+    public int getDialogUnreadBubbleTextStyle() {
         return dialogUnreadBubbleTextStyle;
     }
 
-    protected int getDialogUnreadBubbleBackgroundColor() {
+    public int getDialogUnreadBubbleBackgroundColor() {
         return dialogUnreadBubbleBackgroundColor;
     }
 
-    protected int getDialogAvatarWidth() {
+    public int getDialogAvatarWidth() {
         return dialogAvatarWidth;
     }
 
-    protected int getDialogAvatarHeight() {
+    public int getDialogAvatarHeight() {
         return dialogAvatarHeight;
     }
 
-    protected boolean isDialogDividerEnabled() {
+    public boolean isDialogDividerEnabled() {
         return dialogDividerEnabled;
     }
 
-    protected int getDialogDividerColor() {
+    public int getDialogDividerColor() {
         return dialogDividerColor;
     }
 
-    protected int getDialogDividerLeftPadding() {
+    public int getDialogDividerLeftPadding() {
         return dialogDividerLeftPadding;
     }
 
-    protected int getDialogDividerRightPadding() {
+    public int getDialogDividerRightPadding() {
         return dialogDividerRightPadding;
     }
 
-    protected int getDialogItemBackground() {
+    public int getDialogItemBackground() {
         return dialogItemBackground;
     }
 
-    protected int getDialogUnreadItemBackground() {
+    public int getDialogUnreadItemBackground() {
         return dialogUnreadItemBackground;
     }
 
-    protected boolean isDialogMessageAvatarEnabled() {
+    public boolean isDialogMessageAvatarEnabled() {
         return dialogMessageAvatarEnabled;
     }
 
-    protected int getDialogMessageAvatarWidth() {
+    public int getDialogMessageAvatarWidth() {
         return dialogMessageAvatarWidth;
     }
 
-    protected int getDialogMessageAvatarHeight() {
+    public int getDialogMessageAvatarHeight() {
         return dialogMessageAvatarHeight;
     }
 }

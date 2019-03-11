@@ -34,6 +34,7 @@
     <string name="open_activity">Notification with activity or push</string>
     <string name="need_online">Offline mode</string>
 
+    <string name="dialog_options">Information</string>
 
     <string name="abc_action_bar_home_description">Navigate home</string>
     <string name="abc_action_bar_up_description">Navigate up</string>

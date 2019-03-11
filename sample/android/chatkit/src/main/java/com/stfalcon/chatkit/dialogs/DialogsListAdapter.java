@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.stfalcon.chatkit.R;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.ViewHolder;
@@ -36,11 +35,7 @@ import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.utils.DateFormatter;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -438,7 +433,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
     }
 
     //TODO ability to set style programmatically
-    void setStyle(DialogListStyle dialogStyle) {
+    public void setStyle(DialogListStyle dialogStyle) {
         this.dialogStyle = dialogStyle;
     }
 
@@ -525,17 +520,16 @@ public class DialogsListAdapter<DIALOG extends IDialog>
 
         public DialogViewHolder(View itemView) {
             super(itemView);
-            root = (ViewGroup) itemView.findViewById(R.id.dialogRootLayout);
-            container = (ViewGroup) itemView.findViewById(R.id.dialogContainer);
-            tvName = (TextView) itemView.findViewById(R.id.dialogName);
-            tvDate = (TextView) itemView.findViewById(R.id.dialogDate);
-            tvLastMessage = (TextView) itemView.findViewById(R.id.dialogLastMessage);
-            tvBubble = (TextView) itemView.findViewById(R.id.dialogUnreadBubble);
-            ivLastMessageUser = (ImageView) itemView.findViewById(R.id.dialogLastMessageUserAvatar);
-            ivAvatar = (ImageView) itemView.findViewById(R.id.dialogAvatar);
-            dividerContainer = (ViewGroup) itemView.findViewById(R.id.dialogDividerContainer);
+            root = itemView.findViewById(R.id.dialogRootLayout);
+            container = itemView.findViewById(R.id.dialogContainer);
+            tvName = itemView.findViewById(R.id.dialogName);
+            tvDate = itemView.findViewById(R.id.dialogDate);
+            tvLastMessage = itemView.findViewById(R.id.dialogLastMessage);
+            tvBubble = itemView.findViewById(R.id.dialogUnreadBubble);
+            ivLastMessageUser = itemView.findViewById(R.id.dialogLastMessageUserAvatar);
+            ivAvatar = itemView.findViewById(R.id.dialogAvatar);
+            dividerContainer = itemView.findViewById(R.id.dialogDividerContainer);
             divider = itemView.findViewById(R.id.dialogDivider);
-
         }
 
         private void applyStyle() {
@@ -680,14 +674,30 @@ public class DialogsListAdapter<DIALOG extends IDialog>
             tvBubble.setVisibility(dialogStyle.isDialogUnreadBubbleEnabled() &&
                     dialog.getUnreadCount() > 0 ? VISIBLE : GONE);
 
+            ivAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onDialogViewClickListener != null) {
+                        onDialogViewClickListener.onDialogViewClick(view, dialog);
+                    }
+                }
+            });
+
+            ivAvatar.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if (onDialogViewLongClickListener != null) {
+                        onDialogViewLongClickListener.onDialogViewLongClick(view, dialog);
+                    }
+                    return onDialogViewLongClickListener != null;
+                }
+            });
+
             container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (onDialogClickListener != null) {
                         onDialogClickListener.onDialogClick(dialog);
-                    }
-                    if (onDialogViewClickListener != null) {
-                        onDialogViewClickListener.onDialogViewClick(view, dialog);
                     }
                 }
             });
@@ -699,10 +709,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
                     if (onLongItemClickListener != null) {
                         onLongItemClickListener.onDialogLongClick(dialog);
                     }
-                    if (onDialogViewLongClickListener != null) {
-                        onDialogViewLongClickListener.onDialogViewLongClick(view, dialog);
-                    }
-                    return onLongItemClickListener != null || onDialogViewLongClickListener != null;
+                    return onLongItemClickListener != null;
                 }
             });
         }

@@ -55,6 +55,8 @@
     <string name="tag_settings">TAG_SETTINGS</string>
     <string name="tag_lenta">TAG_LENTA</string>
 
+    <string name="dialog_options">Информация</string>
+
 
     <string name="canceled">Отменено</string>
     <string name="select_dir_for_saving">Выберите католог для сохранения</string>

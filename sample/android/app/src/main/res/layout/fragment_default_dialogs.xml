@@ -8,13 +8,13 @@
         android:clickable="true"
         android:focusable="true">
 
-    <com.stfalcon.chatkit.dialogs.DialogsList
+    <net.korul.hbbft.AdapterRecycler.DialogsSwipeList
             android:id="@+id/dialogsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:dialogMessageTextColor="?attr/message_text_color"
             app:dialogTitleTextColor="?attr/message_text_color">
-    </com.stfalcon.chatkit.dialogs.DialogsList>
+    </net.korul.hbbft.AdapterRecycler.DialogsSwipeList>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/addDialog"

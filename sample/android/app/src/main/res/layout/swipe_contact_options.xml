@@ -18,8 +18,7 @@
                 android:background="@color/brown_hint"
                 android:gravity="center"
                 android:tag="Bottom3"
-                android:weightSum="10"
-        >
+                android:weightSum="10">
 
             <include android:id="@+id/contact_remove" android:layout_width="74.0dip"
                      android:layout_height="match_parent"
