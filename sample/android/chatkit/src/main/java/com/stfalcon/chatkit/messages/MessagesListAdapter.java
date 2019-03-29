@@ -20,6 +20,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
@@ -29,7 +30,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.stfalcon.chatkit.R;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.ViewHolder;
@@ -141,6 +141,37 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     /*
      * PUBLIC METHODS
      * */
+
+    public void updateItems(List<MESSAGE> rawItems) {
+        final List<Wrapper> oldItems = this.items;
+
+        this.items = new ArrayList<>();
+        generateDateHeaders(rawItems);
+
+        DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return oldItems.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return items.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int i, int i1) {
+                return true;
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return oldItems.get(oldItemPosition).item == items.get(newItemPosition).item;
+            }
+
+        }).dispatchUpdatesTo(this);
+        notifyDataSetChanged();
+    }
 
     /**
      * Adds message to bottom of list and scroll if needed.
@@ -395,7 +426,6 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         }
         return allMessages;
     }
-
     /**
      * Returns selected messages text and do {@link #unselectAllItems()} for you.
      *
@@ -958,7 +988,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
 
         public DefaultDateHeaderViewHolder(View itemView) {
             super(itemView);
-            text = (TextView) itemView.findViewById(R.id.messageText);
+            text = itemView.findViewById(R.id.messageText);
         }
 
         @Override

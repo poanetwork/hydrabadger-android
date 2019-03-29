@@ -2,11 +2,14 @@ package net.korul.hbbft.CoreHBBFT
 
 import net.korul.hbbft.CommonData.data.model.Dialog
 import net.korul.hbbft.CommonData.data.model.User
+import java.util.*
 
 interface CoreHBBFTListener {
     fun updateStateToOnline()
 
-    fun reciveMessage(you: Boolean, uid: String, mes: String)
+    fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date)
+
+    fun setOnlineUser(uid: String, online: Boolean)
 }
 
 data class Uids(

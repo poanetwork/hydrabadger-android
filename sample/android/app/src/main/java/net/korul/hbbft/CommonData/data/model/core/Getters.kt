@@ -291,6 +291,20 @@ object Getters {
         return users.toTypedArray()
     }
 
+    fun getAllLocalOfflineUsers(uid: String, online: Boolean) {
+        val dusers = Select()
+            .from(DUser::class.java)
+            .where(DUser_Table.uid.eq(uid))
+            .and(DUser_Table.isOnline.eq(!online))
+            .queryList()
+
+        val dus = dusers.filterNotNull()
+        for (duser in dus) {
+            duser.isOnline = online
+            duser.update()
+        }
+    }
+
     fun getAllLocalUsers(uid: String): Array<User> {
         val users: MutableList<User> = arrayListOf()
 

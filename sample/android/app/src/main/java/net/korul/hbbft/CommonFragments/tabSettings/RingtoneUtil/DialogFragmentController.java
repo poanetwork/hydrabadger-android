@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 abstract class DialogFragmentController<T extends DialogFragment> {
-    private static final String TAG = "DialogController";
+    private static final String TAG = "HYDRA:DialogController";
 
     private final FragmentManager mFragmentManager;
 

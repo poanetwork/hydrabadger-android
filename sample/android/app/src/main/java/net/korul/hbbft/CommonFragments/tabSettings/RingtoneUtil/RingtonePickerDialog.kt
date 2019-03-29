@@ -98,7 +98,7 @@ class RingtonePickerDialog : BaseAlertDialogFragment() {
     }
 
     companion object {
-        private const val TAG = "RingtonePickerDialog"
+        private const val TAG = "HYDRA:RingtonePickerDialog"
         private const val KEY_RINGTONE_URI = "key_ringtone_uri"
 
         /**

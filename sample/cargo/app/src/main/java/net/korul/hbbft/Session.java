@@ -34,11 +34,11 @@ public final class Session {
     }
     private static native void do_after_subscribe(long me) ;
 
-    public final void change(boolean a0, @NonNull String a1, @NonNull String a2)  {
+    public final void change(@NonNull String a0, @NonNull String a1)  {
 
-        do_change(mNativeObj, a0, a1, a2);
+        do_change(mNativeObj, a0, a1);
     }
-    private static native void do_change(long me, boolean a0, String a1, String a2) ;
+    private static native void do_change(long me, String a0, String a1) ;
 
     public synchronized void delete() {
         if (mNativeObj != 0) {

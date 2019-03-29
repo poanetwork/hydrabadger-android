@@ -110,7 +110,9 @@ use std::{
 };
 
 // android fix
-use parking_lot::{Mutex};
+#[macro_use]
+extern crate lazy_static;
+use std::sync::Mutex;
 //
 
 use tokio::{
@@ -135,13 +137,31 @@ pub use hbbft::dynamic_honey_badger::Batch;
 // android fix
 /// A transaction.
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Ord, PartialOrd, Debug, Clone)]
-pub struct Transaction(pub String);
-
-static mut M_TEXT: Option<String> = None;
-static mut M_TEXT2: Option<String> = None;
+pub struct Transaction {
+    trVec: Vec<String>
+}
 
 impl Transaction {
-    fn random(len: usize) -> Option<Transaction> {
+    pub fn new(array: Vec<String>) -> Self {
+        let tr = Transaction {
+            trVec: array
+        };
+        tr
+    }
+
+    pub fn getMes(self) -> Vec<String> {
+        self.trVec
+    }
+}
+
+
+lazy_static! {
+    static ref M_TEXT: Mutex<Vec<String>> = Mutex::new(vec![]);
+    static ref M_TEXT2: Mutex<Vec<String>> = Mutex::new(vec![]);
+}
+
+impl Transaction {
+    fn random(len: usize) -> Transaction {
         let consonants = "bcdfghjk lmnpqrstvwxyz ";
         let mut result = String::new();
 
@@ -149,39 +169,36 @@ impl Transaction {
             result.push(rand::sample(&mut rand::thread_rng(), consonants.chars(), 1)[0]);
         }
 
-        Some(Transaction(result))
+        let array: Vec<String> = vec![result];
+        Transaction::new(array)
     }
 
-    fn get_tr() -> Option<Transaction> {
+    fn get_tr() -> Transaction {
         unsafe {
-            let mut vec: Option<Transaction> = None;
-            match M_TEXT {
-                Some(ref mut x) => {
-                    vec = Some(Transaction(x.to_string()));
-                    warn!("!!get_tr: {:?}", M_TEXT);
-                    M_TEXT = None;
-                    vec
-                }
-                None => {
-                    vec
-                }
+            if M_TEXT.lock().unwrap().is_empty() {
+                let ilive = format!("{}!", "ILIVE᳀†֍:");  
+                let array: Vec<String> = vec![ilive];
+                Transaction::new(array)
+            }
+            else {
+                let tr: Transaction = Transaction::new(M_TEXT.lock().unwrap().clone());
+                M_TEXT.lock().unwrap().clear();
+                tr
             }
         }
     }
 
-    fn get_tr2() -> Option<Transaction> {
+    fn get_tr2() -> Transaction {
         unsafe {
-            let mut vec: Option<Transaction> = None;
-            match M_TEXT2 {
-                Some(ref mut x) => {
-                    vec = Some(Transaction(x.to_string()));
-                    warn!("!!get_tr2: {:?}", M_TEXT2);
-                    M_TEXT2 = None;
-                    vec
-                }
-                None => {
-                    vec
-                }
+            if M_TEXT2.lock().unwrap().is_empty() {
+                let ilive = format!("{}!", "ILIVE᳀†֍:");  
+                let array: Vec<String> = vec![ilive];
+                Transaction::new(array)
+            }
+            else {
+                let tr: Transaction = Transaction::new(M_TEXT2.lock().unwrap().clone());
+                M_TEXT2.lock().unwrap().clear();
+                tr
             }
         }
     }
@@ -669,13 +686,13 @@ impl<C: Contribution, N: NodeId> InternalMessage<C, N> {
 use std::collections::HashSet;
 
 trait OnEvent {
-    fn changed(&self, its_me: bool, id: String, trans: String);
+    fn changed(&self, id: String, trans: String);
 }
 
-fn callback(its_me: bool, id: String, trans: String) {
+fn callback(id: String, trans: String) {
     unsafe {
         match M_SESSION_PTR {
-            Some(ref mut x) => x.change(its_me, id, trans),
+            Some(ref mut x) => x.change(id, trans),
             None => panic!(),
         } 
     }
@@ -713,23 +730,23 @@ impl Session {
             M_SESSION_PTR = Some(self);
         }
 
-        callback(true, "test".to_string(), "test".to_string());
+        callback("test".to_string(), "test".to_string());
     }
 
     pub fn send_message(&self, str1: String) {
         unsafe {
             let new_string = format!("{}!", str1);
             warn!("!!send_message string: {:?}", new_string);
-            M_TEXT = Some(new_string.clone());
+            M_TEXT.lock().unwrap().push(new_string.clone());
         }
     }
 
-    pub fn change(&self, its_me: bool, id: String, trans: String) {
+    pub fn change(&self, id: String, trans: String) {
         let mut i = 0;
         for cb in &self.observers {
             if i == 0 {
                 warn!("Call callback");
-                cb.changed(its_me, id.clone(), trans.clone());
+                cb.changed(id.clone(), trans.clone());
             }
             i += 1;
         }

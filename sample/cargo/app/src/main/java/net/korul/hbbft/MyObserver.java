@@ -5,6 +5,6 @@ import android.support.annotation.NonNull;
 public interface MyObserver {
 
 
-    void onStateChanged(boolean a0, @NonNull String a1, @NonNull String a2);
+    void onStateChanged(@NonNull String a0, @NonNull String a1);
 
 }

@@ -65,6 +65,14 @@ class Message(
         this.image = image
     }
 
+    override fun equals(other: Any?): Boolean {
+        return try { this.createdAt == (other as Message).createdAt && this.idDialog == other.idDialog && this.text == other.text }
+        catch (e: Exception) {
+            false
+        }
+    }
+
+
     class Image(val url: String)
 
     class Voice(val url: String, val duration: Int)

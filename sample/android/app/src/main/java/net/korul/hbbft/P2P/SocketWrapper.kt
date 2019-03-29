@@ -13,7 +13,7 @@ import java.security.MessageDigest
 import kotlin.concurrent.thread
 
 class SocketWrapper {
-    private var TAG = "HYDRABADGERTAG:SocketWrapper"
+    private var TAG = "HYDRA:SocketWrapper"
 
     private var mP2PMesh: P2PMesh? = null
 
@@ -195,7 +195,7 @@ class SocketWrapper {
                             sendBytesToDataChannel(uid, uid_, bytes)
 
                             while (!mAllStop) {
-                                din = mPseudoNotLocalSocket[pair2]!!.getInputStream()
+                                din = mPseudoNotLocalSocket[pair2]?.getInputStream()
                                 bytesnum = din.available()
 
                                 if (bytesnum > 0) {
@@ -237,17 +237,22 @@ class SocketWrapper {
         LocalALoopSocket: HashMap<String, Socket?>
     ) {
         LocalALoopThread[uid] = thread {
-            LocalALoopSocket[uid] = Socket("127.0.0.1", myLocalPort)
-            while (!mAllStop) {
-                val din = LocalALoopSocket[uid]?.getInputStream()
-                val bytesnum = din?.available()
-                if (bytesnum!! > 0) {
-                    val bytes = ByteArray(bytesnum)
-                    din.read(bytes, 0, bytesnum)
+            try {
+                LocalALoopSocket[uid] = Socket("127.0.0.1", myLocalPort)
+                while (!mAllStop) {
+                    val din = LocalALoopSocket[uid]?.getInputStream()
+                    val bytesnum = din?.available()
+                    if (bytesnum!! > 0) {
+                        val bytes = ByteArray(bytesnum)
+                        din.read(bytes, 0, bytesnum)
 
-                    sendBytesToDataChannel(uid, myUID, bytes)
-                } else
-                    Thread.sleep(10)
+                        sendBytesToDataChannel(uid, myUID, bytes)
+                    } else
+                        Thread.sleep(10)
+                }
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

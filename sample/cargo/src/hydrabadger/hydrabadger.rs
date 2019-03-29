@@ -120,7 +120,7 @@ struct Inner<C: Contribution, N: NodeId> {
 }
 
 // android fix
-type CallbackBatch = fn(its_me: bool, id: String, trans: String);
+type CallbackBatch = fn(id: String, trans: String);
 //
 
 /// A `HoneyBadger` network node.

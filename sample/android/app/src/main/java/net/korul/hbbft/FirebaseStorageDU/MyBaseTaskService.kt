@@ -119,6 +119,6 @@ abstract class MyBaseTaskService : Service() {
         internal const val PROGRESS_NOTIFICATION_ID = 0
         internal const val FINISHED_NOTIFICATION_ID = 1
 
-        private const val TAG = "MyBaseTaskService"
+        private const val TAG = "HYDRA:MyBaseTaskService"
     }
 }

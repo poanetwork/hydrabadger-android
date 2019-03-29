@@ -52,10 +52,10 @@ class MessagesFixtures private constructor() {
 
 
         // set new message
-        fun setNewMessage(text: String, curDialog: Dialog, user: User): Message {
+        fun setNewMessage(text: String, curDialog: Dialog, user: User, date: Date = Date()): Message {
             user.idDialog = curDialog.id
             val id = getNextMessageID()
-            val mes = Message(id, id.toString(), curDialog.id, user, text, Date())
+            val mes = Message(id, id.toString(), curDialog.id, user, text, date)
 
             val dmes = Conversations.getDMessage(mes)
             dmes?.insert()

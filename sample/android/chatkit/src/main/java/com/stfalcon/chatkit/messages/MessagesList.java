@@ -23,7 +23,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
-
 import com.stfalcon.chatkit.commons.models.IMessage;
 
 /**
@@ -52,13 +51,13 @@ public class MessagesList extends RecyclerView {
      */
     @Override
     public void setAdapter(Adapter adapter) {
-        throw new IllegalArgumentException("You can't set adapter to MessagesList. Use #setAdapter(MessagesListAdapter) instead.");
+        throw new IllegalArgumentException("You can't set adapter to MessagesList. Use #setAdapter(MessagesListAdapter.java) instead.");
     }
 
     /**
      * Sets adapter for MessagesList
      *
-     * @param adapter   Adapter. Must extend MessagesListAdapter
+     * @param adapter   Adapter. Must extend MessagesListAdapter.java
      * @param <MESSAGE> Message model class
      */
     public <MESSAGE extends IMessage>
@@ -69,7 +68,7 @@ public class MessagesList extends RecyclerView {
     /**
      * Sets adapter for MessagesList
      *
-     * @param adapter       Adapter. Must extend MessagesListAdapter
+     * @param adapter       Adapter. Must extend MessagesListAdapter.java
      * @param reverseLayout weather to use reverse layout for layout manager.
      * @param <MESSAGE>     Message model class
      */

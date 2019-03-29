@@ -148,7 +148,7 @@ class MyUploadRoomService : MyBaseTaskService() {
 
     companion object {
 
-        private const val TAG = "MyUploadUserService"
+        private const val TAG = "HYDRA:MyUploadUserService"
 
         /** Intent Actions  */
         const val ACTION_UPLOAD = "action_room_upload"

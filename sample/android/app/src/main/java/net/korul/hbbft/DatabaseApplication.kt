@@ -19,7 +19,7 @@ class DatabaseApplication : Application() {
         lateinit var mCoreHBBFT2X: CoreHBBFT
             private set
 
-        private var TAG = "HYDRABADGERTAG:DatabaseApplication"
+        private var TAG = "HYDRA:DatabaseApplication"
 
         var mToken = ""
 

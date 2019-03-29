@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 class Connections() {
-    private var TAG = "HYDRABADGERTAG:Connections"
+    private var TAG = "HYDRA:Connections"
 
     var peerConnection: PeerConnection? = null
 

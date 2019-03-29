@@ -6,7 +6,7 @@ use OnEvent;
 foreign_interface!(interface MyObserver {
     self_type OnEvent;
 
-    onStateChanged = OnEvent::changed(&self, ItsMe: bool, id: String, trans: String);
+    onStateChanged = OnEvent::changed(&self, id: String, trans: String);
 });
 
 foreigner_class!(class Session {
@@ -20,6 +20,6 @@ foreigner_class!(class Session {
     method Session::subscribe(&mut self, _: Box<OnEvent>);
     method Session::after_subscribe(&'static mut self);
 
-    method Session::change(&self, ItsMe: bool, id: String, trans: String);
+    method Session::change(&self, id: String, trans: String);
 });
 

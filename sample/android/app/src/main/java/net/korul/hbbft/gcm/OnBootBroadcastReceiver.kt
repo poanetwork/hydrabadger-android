@@ -17,7 +17,7 @@ import net.korul.hbbft.R
 
 
 class OnBootBroadcastReceiver : BroadcastReceiver() {
-    private val TAG = "GCM"
+    private val TAG = "HYDRA:GCM"
     private var mcontext: Context? = null
 
 

@@ -28,7 +28,7 @@ import java.io.IOException
 
 class NotificationFragment : Fragment() {
 
-    private val TAG = "NotificationFragment"
+    private val TAG = "HYDRA:NotificationFragment"
     private var mRingtonePickerController: RingtonePickerDialogController? = null
     private var mRingtone: Uri? = null
     private var mMediaPlayer: MediaPlayer? = null

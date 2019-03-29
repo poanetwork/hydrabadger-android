@@ -114,7 +114,7 @@ class MyDownloadRoomService : MyBaseTaskService() {
 
     companion object {
 
-        private const val TAG = "Storage#DownloadService"
+        private const val TAG = "HYDRA:DownloadService"
 
         /** Actions  */
         const val ACTION_DOWNLOAD = "action_room_download"

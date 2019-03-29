@@ -11,6 +11,7 @@ import com.raizlabs.android.dbflow.config.FlowManager
 import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
+import net.korul.hbbft.CommonData.data.model.core.Getters.getAllLocalOfflineUsers
 import net.korul.hbbft.CommonData.data.model.coreDataBase.AppDatabase
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
@@ -91,8 +92,20 @@ object UserWork {
                     postsnapshot.key
                     postsnapshot.ref.removeValue()
                 }
-                snapshot.ref.push().setValue(userToSave)
+                val ref = snapshot.ref.push()
+                ref.setValue(userToSave)
                 Log.d(CoreHBBFT.TAG, "Succes insertOrUpdateUserInFirebase ${CoreHBBFT.uniqueID1}")
+
+                if(user.uid == CoreHBBFT.uniqueID1) {
+                    val userToSave = Users(
+                        user.uid,
+                        false,
+                        user.name,
+                        user.nick
+                    )
+                    ref.onDisconnect().setValue(userToSave)
+                }
+
                 semaphore.release()
             }
         })
@@ -226,6 +239,25 @@ object UserWork {
         }
     }
 
+    fun updateOnlineInAllLocalUserByUid(uid: String, online: Boolean) {
+        for (user in Getters.getAllLocalUsers(uid)) {
+            if (user.uid == uid) {
+                val us = User(
+                    user.id_,
+                    user.uid,
+                    user.id,
+                    user.idDialog,
+                    user.name,
+                    user.nick,
+                    user.avatar,
+                    online
+                )
+
+                Conversations.getDUser(us).update()
+            }
+        }
+    }
+
     fun updateAvatarInAllLocalUserByUid(uid: String, avatarFile: File) {
         for (user in Getters.getAllLocalUsers(uid)) {
             if (user.uid == uid) {
@@ -291,6 +323,11 @@ object UserWork {
         return null
     }
 
+    fun setUnOnlineUserWithUID(uid: String, online: Boolean) {
+        getAllLocalOfflineUsers(uid, online)
+    }
+
+
     fun updateAllUsersFromFirebase() {
         for (user in Getters.getAllLocalUsersDistinct().filter { it.uid != CoreHBBFT.uniqueID1 }) {
             val listObjectsOfUsers: MutableList<Users> = getUsersFromFirebase(user.uid)
@@ -310,11 +347,6 @@ object UserWork {
                             .putExtra(MyGetLastModificationUserService.EXTRA_COMPARE_UID, us.UID)
                             .setAction(MyGetLastModificationUserService.ACTION_COMPARE)
                     )
-                    // Kick off MyDownloadUserService to download the file
-//                    val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
-//                        .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, us.UID)
-//                        .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
-//                    CoreHBBFT.mApplicationContext.startService(intent)
                 }
             }
         }

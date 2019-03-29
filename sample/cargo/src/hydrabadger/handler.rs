@@ -22,7 +22,7 @@ use std::{cell::RefCell, collections::HashMap};
 use tokio::{self, prelude::*};
 
 // android fix
-type CallbackBatch = fn(its_me: bool, id: String, trans: String);
+type CallbackBatch = fn(id: String, trans: String);
 //
 
 /// Hydrabadger event (internal message) handler.
@@ -301,7 +301,7 @@ impl<C: Contribution, N: NodeId> Handler<C, N> {
 
                 // android fix
                 if self.num == 1 {
-                    (self.callbackbatch)(true, "".to_string(), "".to_string());
+                    (self.callbackbatch)("".to_string(), "".to_string());
                 }
                 //
 
@@ -708,31 +708,17 @@ impl<C: Contribution, N: NodeId> Future for Handler<C, N> {
                 assert_eq!(prev_epoch, batch_epoch);
 
                 // android fix
-                //TODO need compare on empty
-                // if !batch.is_empty() {
-                    for (uid, int_contrib) in batch.contributions() {
-                        let local_uid = self.hdb.node_id();
-                        //TODO need compare on empty
-                        // if !int_contrib.is_empty() {
-                            let id_string = format!("{:?}", uid);
-                            let trans_string = format!("{:?}", int_contrib);
-                            
-                            if self.num == 1 {
-                                if !trans_string.is_empty() {
-                                    warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
-                                    if local_uid == uid {
-                                        // call
-                                        (self.callbackbatch)(true, id_string.clone(), trans_string.clone());
-                                    }
-                                    else {
-                                        // call
-                                        (self.callbackbatch)(false, id_string.clone(), trans_string.clone());
-                                    }
-                                }
-                            }
-                        // }
+                for (uid, int_contrib) in batch.contributions() {
+                    let local_uid = self.hdb.node_id();
+                    let id_string = format!("{:?}", uid);
+                    let trans_string = format!("{:?}", int_contrib);
+                    if self.num == 1 {
+                        if !trans_string.is_empty() {
+                            warn!("!!Future Handler: {:?}, {:?}", id_string, trans_string);
+                            (self.callbackbatch)(id_string.clone(), trans_string.clone());
+                        }
                     }
-                // }
+                }
 
                 // TODO: Remove
                 // if cfg!(exit_upon_epoch_1000) && batch_epoch >= 1000 {

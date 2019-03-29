@@ -106,7 +106,7 @@ class MyGetLastModificationRoomService : MyBaseTaskService() {
     }
 
     companion object {
-        private const val TAG = "Storage#COMPAREService"
+        private const val TAG = "HYDRA:COMPAREService"
 
         /** Actions  */
         const val ACTION_COMPARE = "action_room_compare"

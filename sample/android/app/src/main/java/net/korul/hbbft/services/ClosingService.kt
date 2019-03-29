@@ -11,7 +11,7 @@ import net.korul.hbbft.DatabaseApplication
 
 class ClosingService : Service() {
 
-    private var TAG = "HYDRABADGERTAG:ClosingService"
+    private var TAG = "HYDRA:ClosingService"
 
     @Nullable
     override fun onBind(intent: Intent): IBinder? {
@@ -25,15 +25,37 @@ class ClosingService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+//    /**
+//     * Schedule a job using FirebaseJobDispatcher.
+//     */
+//    fun scheduleJob(context: Context) {
+//        // [START dispatch_job]
+//        val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(context))
+//        val myJob = dispatcher.newJobBuilder()
+//            .setService(MyJobService::class.java)
+//            .setTag("MyJobService")
+//            .build()
+//        dispatcher.schedule(myJob)
+//        // [END dispatch_job]
+//    }
+
+
     @SuppressLint("CheckResult")
     override fun onTaskRemoved(rootIntent: Intent) {
         super.onTaskRemoved(rootIntent)
 
         Log.i(TAG, "Service: start close app")
 
-        DatabaseApplication.mCoreHBBFT2X.Free()
+        DatabaseApplication.mCoreHBBFT2X.sendMessageIDIE()
+        Log.i(TAG, "sendMessageIDIE()")
 
-        Log.i(TAG, "Service: finish close app")
+//        scheduleJob(this)
+
+        Thread.sleep(7*1000)
+        DatabaseApplication.mCoreHBBFT2X.Free()
+        Log.i(TAG, "Free()")
+
+
         // Destroy the service
         stopSelf()
     }

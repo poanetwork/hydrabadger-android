@@ -9,7 +9,7 @@ import android.util.Log;
  *
  */
 public class RingtonePickerDialogController extends DialogFragmentController<RingtonePickerDialog> {
-    private static final String TAG = "RingtonePickerCtrller";
+    private static final String TAG = "HYDRA:RingtonePickerCtrller";
 
     private final RingtonePickerDialog.OnRingtoneSelectedListener mListener;
 

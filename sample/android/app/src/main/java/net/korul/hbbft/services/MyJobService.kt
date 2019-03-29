@@ -3,12 +3,17 @@ package net.korul.hbbft.services
 import android.util.Log
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
+import net.korul.hbbft.DatabaseApplication
 
 
 class MyJobService : JobService() {
 
     override fun onStartJob(jobParameters: JobParameters): Boolean {
         Log.d(TAG, "Performing long running task in scheduled job")
+
+        Thread.sleep(7*1000)
+        DatabaseApplication.mCoreHBBFT2X.Free()
+        Log.i(TAG, "Free()")
 
         return false
     }
@@ -19,6 +24,6 @@ class MyJobService : JobService() {
 
     companion object {
 
-        private const val TAG = "HYDRABADGERTAG:JobSer"
+        private const val TAG = "HYDRA:JobSer"
     }
 }

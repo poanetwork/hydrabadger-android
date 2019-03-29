@@ -33,7 +33,6 @@ import net.korul.hbbft.CoreHBBFT.UserWork.getUserFromLocalOrDownloadFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.R
 import java.util.*
-import kotlin.concurrent.thread
 
 
 interface DialogClickListener {
@@ -45,8 +44,7 @@ class DialogsFragment :
     BaseDialogsFragment(),
     DateFormatter.Formatter,
     CoreHBBFTListener {
-
-    private var TAG = "HYDRABADGERTAG:DialogsFragment"
+    private var TAG = "HYDRA:DialogsFragment"
 
     companion object {
         private val handlerProgress = Handler()
@@ -79,8 +77,9 @@ class DialogsFragment :
             val dialogs = DialogsFixtures.dialogs
             for (diag in dialogs) {
                 if (diag.id == roomId) {
+                    val curuser = diag.users.first { it.uid == CoreHBBFT.uniqueID1 }
                     Log.d(TAG, "Found dialog and start it $roomId")
-                    startMesFragment(diag, true)
+                    startMesFragment(diag, true, curuser)
                 }
             }
         }
@@ -132,7 +131,7 @@ class DialogsFragment :
         initAdapter()
     }
 
-    fun startMesFragment(dialog: Dialog, startHbbft: Boolean) {
+    fun startMesFragment(dialog: Dialog, startHbbft: Boolean, curuser: User) {
         activity!!.supportFragmentManager.popBackStack(
             getString(R.string.tag_chats),
             FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -141,7 +140,7 @@ class DialogsFragment :
         val transaction = activity!!.supportFragmentManager.beginTransaction()
         transaction.replace(
             R.id.view,
-            MessagesFragment.newInstance(dialog, dialog.users[0], startHbbft)
+            MessagesFragment.newInstance(dialog, curuser, startHbbft)
         )
         transaction.addToBackStack(getString(R.string.tag_chats2))
         transaction.commit()
@@ -241,53 +240,58 @@ class DialogsFragment :
             DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
     }
 
-    override fun reciveMessage(you: Boolean, uid: String, mes: String) {
-        thread {
-            try {
-                if (!you) {
-                    val dialog = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mRoomId)
-
-                    var found = false
-                    for (user in dialog.users) {
-                        if (user.uid == uid)
-                            found = true
-                    }
-                    if (!found) {
-                        getUserFromLocalOrDownloadFromFirebase(uid, dialog.id, object : IAddToContacts {
-                            override fun errorAddContact() {
-                            }
-
-                            override fun user(user: User) {
-                                handlerNewMes.post {
-                                    dialog.users.add(user)
-                                    Conversations.getDUser(user).insert()
-
-                                    val userMes = Getters.getUserbyUIDFromDialog(uid, dialog.id)
-                                    val mess = MessagesFixtures.setNewMessage(mes, dialog, userMes!!)
-
-                                    dialog.unreadCount++
-                                    Conversations.getDDialog(dialog).update()
-
-                                    onNewMessage(dialog.id, mess)
-                                }
-                            }
-                        })
-                    } else {
-                        handlerNewMes.post {
-                            val user = Getters.getUserbyUIDFromDialog(uid, dialog.id)
-                            val mess = MessagesFixtures.setNewMessage(mes, dialog, user!!)
-
-                            dialog.unreadCount++
-                            Conversations.getDDialog(dialog).update()
-
-                            onNewMessage(dialog.id, mess)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    override fun setOnlineUser(uid: String, online: Boolean) {
+        val users = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mRoomId).users.filter { it.uid == uid && !it.isOnline}
+        for (user in users) {
+            val us = Conversations.getDUser(user)
+            us.isOnline = online
+            us.update()
         }
+//        dialogsAdapter!!.notifyDataSetChanged()
+    }
+
+    override fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date) {
+//        thread {
+        try {
+            if (!you) {
+                val dialog = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mRoomId)
+                val found = dialog.users.any { it.uid == uid }
+                if (!found) {
+                    getUserFromLocalOrDownloadFromFirebase(uid, dialog.id, object : IAddToContacts {
+                        override fun errorAddContact() {
+                        }
+
+                        override fun user(user: User) {
+                            Handler().post {
+                                dialog.users.add(user)
+                                Conversations.getDUser(user).insert()
+
+                                val userMes = Getters.getUserbyUIDFromDialog(uid, dialog.id)
+                                val mess = MessagesFixtures.setNewMessage(mes, dialog, userMes!!, data)
+
+                                dialog.unreadCount++
+                                Conversations.getDDialog(dialog).update()
+
+                                onNewMessage(dialog.id, mess)
+                            }
+                        }
+                    })
+                } else {
+//                    handlerNewMes.post {
+                        val user = Getters.getUserbyUIDFromDialog(uid, dialog.id)
+                        val mess = MessagesFixtures.setNewMessage(mes, dialog, user!!, data)
+
+                        dialog.unreadCount++
+                        Conversations.getDDialog(dialog).update()
+
+                        onNewMessage(dialog.id, mess)
+//                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+//        }
     }
 
     fun onAddExistDialog() {
@@ -310,6 +314,7 @@ class DialogsFragment :
         try {
             handlerNewMes.post {
                 val isUpdated = dialogsAdapter!!.updateDialogWithMessage(dialogId, message)
+                dialogsAdapter!!.sortByLastMessageDate()
                 if (!isUpdated) {
                     //Dialog with this ID doesn't exist, so you can create new Dialog or update all dialogs list
                 }

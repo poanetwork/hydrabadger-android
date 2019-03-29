@@ -87,6 +87,16 @@ class MessagesFragment :
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            progress.dismiss()
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     var handlerShowProcess = Handler(Handler.Callback { msg ->
         try {
             progress.show()
@@ -252,15 +262,21 @@ class MessagesFragment :
         menu?.findItem(R.id.action_startALL)?.isVisible = false
     }
 
-    override fun reciveMessage(you: Boolean, uid: String, mes: String) {
+    override fun setOnlineUser(uid: String, online: Boolean) {
+        val users = mCurDialog!!.users.filter { it.uid == uid && !it.isOnline }
+        for (user in users) {
+            val us = Conversations.getDUser(user)
+            us.isOnline = online
+            us.update()
+        }
+//        messagesAdapter!!.notifyDataSetChanged()
+    }
+
+    override fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date) {
         thread {
             try {
                 if (!you) {
-                    var found = false
-                    for (user in mCurDialog!!.users) {
-                        if (user.uid == uid)
-                            found = true
-                    }
+                    val found = mCurDialog!!.users.any { it.uid == uid }
                     if (!found) {
                         getUserFromLocalOrDownloadFromFirebase(uid, mCurDialog!!.id, object : IAddToContacts {
                             override fun errorAddContact() {
@@ -272,10 +288,8 @@ class MessagesFragment :
                                     Conversations.getDUser(user).insert()
 
                                     val userMes = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                                    messagesAdapter!!.addToStart(
-                                        MessagesFixtures.setNewMessage(mes, mCurDialog!!, userMes!!), true
-                                    )
-                                    messagesAdapter!!.notifyDataSetChanged()
+                                    val mess = MessagesFixtures.setNewMessage(mes, mCurDialog!!, userMes!!, data)
+                                    messagesAdapter!!.addToStart(mess, true)
                                     mCurDialog = getDialog(mCurDialog!!.id)
                                 }
                             }
@@ -283,10 +297,8 @@ class MessagesFragment :
                     } else {
                         handlerNewMes.post {
                             val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                            super.messagesAdapter!!.addToStart(
-                                MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!), true
-                            )
-                            super.messagesAdapter!!.notifyDataSetChanged()
+                            val mess= MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!, data)
+                            messagesAdapter!!.addToStart(mess, true)
                             mCurDialog = getDialog(mCurDialog!!.id)
                         }
                     }

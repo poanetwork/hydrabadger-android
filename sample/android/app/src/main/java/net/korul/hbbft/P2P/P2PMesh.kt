@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.locks.ReentrantLock
 
 class P2PMesh(private val applicationContext: Context, private val callback: IGetData) {
-    private var TAG = "HYDRABADGERTAG:P2PMesh"
+    private var TAG = "HYDRA:P2PMesh"
 
     var consNats: HashMap<String, Connection?> = hashMapOf()
     var mConnections: HashMap<Pair<String, String>, Connections> = hashMapOf()

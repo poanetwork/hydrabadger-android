@@ -41,7 +41,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var TAG = "HYDRABADGERTAG:MainActivity"
+    private var TAG = "HYDRA:MainActivity"
     lateinit var broadcastReceiver: BroadcastReceiver
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->

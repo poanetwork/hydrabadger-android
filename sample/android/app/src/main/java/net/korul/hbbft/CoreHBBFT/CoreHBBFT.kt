@@ -2,7 +2,7 @@ package net.korul.hbbft.CoreHBBFT
 
 import android.content.Context
 import android.content.Intent
-import android.text.SpannableStringBuilder
+import android.os.Handler
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -26,6 +26,7 @@ import net.korul.hbbft.CoreHBBFT.RoomWork.setOfflineModeInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.setOnlineModeInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.UserWork.initCurUser
 import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUserSync
+import net.korul.hbbft.CoreHBBFT.UserWork.setUnOnlineUserWithUID
 import net.korul.hbbft.CoreHBBFT.UserWork.updateAllUsersFromFirebase
 import net.korul.hbbft.DatabaseApplication
 import net.korul.hbbft.P2P.IGetData
@@ -34,6 +35,8 @@ import net.korul.hbbft.P2P.SocketWrapper
 import net.korul.hbbft.R
 import net.korul.hbbft.Session
 import net.korul.hbbft.services.ClosingService
+import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
@@ -41,7 +44,7 @@ import kotlin.math.abs
 
 
 object CoreHBBFT : IGetData {
-    val TAG = "HYDRABADGERTAG"
+    val TAG = "HYDRA"
 
     // p2p
     var mP2PMesh: P2PMesh? = null
@@ -72,6 +75,11 @@ object CoreHBBFT : IGetData {
     lateinit var mApplicationContext: Context
     var mDatabase: DatabaseReference
 
+    val formatDate= SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+
+    val handler = Handler()
+    var runnable: Runnable? = null
+
     init {
         System.loadLibrary("hydra_android")
 
@@ -98,7 +106,7 @@ object CoreHBBFT : IGetData {
 
         registerForPush(applicationContext)
 
-        FirebaseMessaging.getInstance().subscribeToTopic("$uniqueID1")
+        FirebaseMessaging.getInstance().subscribeToTopic(uniqueID1)
             .addOnCompleteListener { task ->
                 var msg = mApplicationContext.getString(R.string.msg_subscribed)
                 if (!task.isSuccessful) {
@@ -377,8 +385,9 @@ object CoreHBBFT : IGetData {
         session?.after_subscribe()
     }
 
+
     fun subscribeSession() {
-        session?.subscribe { you: Boolean, uid: String, mes: String ->
+        session?.subscribe {uid: String, mes: String ->
             if (uid == "test" && mes == "test") {
                 Log.d(TAG, "subscribeSession - init")
                 mShowError = false
@@ -392,7 +401,7 @@ object CoreHBBFT : IGetData {
                 }
             }
 
-            if (!uid.isEmpty() && !mes.isEmpty() && mes != "[None]" && uid != uniqueID2) {
+            if (!uid.isEmpty() && !mes.isEmpty() && uid != uniqueID2 && uid != uniqueID1) {
                 if (lastMes == mes) {
                     val mestime = Calendar.getInstance().timeInMillis
                     if (abs(mestime - lastMestime) < 500) {
@@ -401,27 +410,98 @@ object CoreHBBFT : IGetData {
                     }
                 }
 
-                val str = SpannableStringBuilder()
-                var mess = mes.removeRange(0, 19)
-                mess = mess.removeRange(mess.count() - 5, mess.count())
-                str.append(mess)
+                var message = mes.replace("[Transaction ", "")
+                message = message.removeRange(message.count() - 1, message.count())
+                val jsonObj = JSONObject(message)
+                val messJson = jsonObj.getJSONArray("trVec")
+                for (i in 0 until messJson!!.length()) {
+                    var mess = messJson.getString(i)
+                    if(mess.endsWith('!'))
+                        mess = mess.removeRange(mess.count() - 1, mess.count())
 
-                // Notify everybody that may be interested.
-                for (hl in listeners)
-                    hl?.reciveMessage(you, uid, str.toString())
+                    parseMessage(mess, uid)
+                }
 
                 lastMes = mes
                 lastMestime = Calendar.getInstance().timeInMillis
             }
         }
-        session?.subscribe { you: Boolean, uid: String, mes: String ->
+        session?.subscribe { uid: String, mes: String ->
 
         }
     }
 
+    fun parseMessage(mess: String, uid: String) {
+        val commMes = mess.split("᳀†\u058D:")
+        if(commMes.size >= 2) when(commMes[0]) {
+            "ILIVE" -> {
+                if(runnable == null) {
+                    runnable = Runnable {
+                        setUnOnlineUserWithUID(uid, true)
+                        for (hl in listeners)
+                            hl?.setOnlineUser(uid, true)
+                        runnable = null
+                    }
+                    handler.post(runnable)
+                }
+            }
+            "IDIE" -> {
+                if(runnable == null)
+                    handler.removeCallbacks(runnable)
+                runnable = Runnable {
+                    setUnOnlineUserWithUID(uid, false)
+                    for (hl in listeners)
+                        hl?.setOnlineUser(uid, false)
+                    runnable = null
+                }
+                handler.post(runnable)
+            }
+            "MESSFOR" -> {
+//                try {
+//                    val mesforUId = commMes[1]
+//                    if(mesforUId == uniqueID1) {
+//                        val you = uid == uniqueID1 || uid == uniqueID2
+//                        val date = formatDate.parse(commMes[2])
+//                        if(abs(date.time - Calendar.getInstance().timeInMillis) > 20*1000) {
+//                            for (hl in listeners)
+//                                hl?.reciveMessageHistory(you, uid, commMes[3], date)
+//                        }
+//                        else {
+//                            for (hl in listeners)
+//                                hl?.reciveMessage(you, uid, commMes[3], date)
+//                        }
+//                    }
+//                }
+//                catch (e: Exception) {
+//                    Log.d(TAG, "ERROR parse incoming message")
+//                    e.printStackTrace()
+//                }
+            }
+            "MESS" -> {
+                try {
+                    val you = uid == uniqueID1 || uid == uniqueID2
+                    val date = formatDate.parse(commMes[1])
+                    for (hl in listeners)
+                        hl?.reciveMessage(you, uid, commMes[2], date)
+                }
+                catch (e: Exception) {
+                    Log.d(TAG, "ERROR parse incoming message")
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    fun sendMessageIDIE() {
+        val mes = "IDIE᳀†\u058D:$uniqueID1"
+        session?.send_message(mes)
+    }
+
     fun sendMessage(str: String) {
         if (str.isNotEmpty()) {
-            session?.send_message(str)
+            val dateString = formatDate.format(Date())
+            val mes = "MESS᳀†\u058D:${dateString}᳀†\u058D:$str"
+            session?.send_message(mes)
         }
     }
 

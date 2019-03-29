@@ -28,6 +28,8 @@ no-simd = ["hbbft/no-simd"]
 log = "0.4"
 log-panics = "2.0"
 
+lazy_static = "1.3.0"
+
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger =  { git = "https://github.com/Nercury/android_logger-rs" }
 

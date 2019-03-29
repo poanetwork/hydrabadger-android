@@ -11,8 +11,6 @@ import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import net.korul.hbbft.CommonFragments.tabSettings.NotificationFragment
@@ -163,21 +161,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
-
-        private const val TAG = "HYDRABADGERTAG:PushServ"
-
-        /**
-         * Schedule a job using FirebaseJobDispatcher.
-         */
-        fun scheduleJob(context: Context) {
-            // [START dispatch_job]
-            val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(context))
-            val myJob = dispatcher.newJobBuilder()
-                .setService(MyJobService::class.java)
-                .setTag("my-job-tag")
-                .build()
-            dispatcher.schedule(myJob)
-            // [END dispatch_job]
-        }
+        private const val TAG = "HYDRA:PushServ"
     }
 }
