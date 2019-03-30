@@ -18,7 +18,7 @@ object PushWork {
 
     fun registerForPush(applicationContext: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create channel to show notifications.
+            // Create channel to isVisible notifications.
             val channelId = applicationContext.getString(R.string.default_notification_channel_id)
             val channelName = applicationContext.getString(R.string.default_notification_channel_name)
             val notificationManager = applicationContext.getSystemService(NotificationManager::class.java)

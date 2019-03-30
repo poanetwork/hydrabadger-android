@@ -28,7 +28,7 @@ import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CommonFragments.ShowBigQRActivity
 import net.korul.hbbft.CoreHBBFT.IComplete
-import net.korul.hbbft.CoreHBBFT.RoomDescrWork.reregisterInRoomDescrFirebase
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.registerInRoomDescFirebase
 import net.korul.hbbft.Dialogs.DialogsFragment
 import net.korul.hbbft.FirebaseStorageDU.MyUploadRoomService
 import net.korul.hbbft.ImageWork.ImageUtil.circleShape
@@ -347,7 +347,7 @@ class AboutRoomFragment : Fragment() {
 
             Conversations.getDDialog(dialog).update()
 
-            reregisterInRoomDescrFirebase(dialog, object : IComplete {
+            registerInRoomDescFirebase(dialog, object : IComplete {
                 override fun complete() {
                 }
             })
@@ -376,7 +376,7 @@ class AboutRoomFragment : Fragment() {
 
             Conversations.getDDialog(dialog).update()
 
-            reregisterInRoomDescrFirebase(dialog, object : IComplete {
+            registerInRoomDescFirebase(dialog, object : IComplete {
                 override fun complete() {
                     dismissProgressBar()
                     val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()

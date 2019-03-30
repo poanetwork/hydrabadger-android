@@ -6,7 +6,7 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters.getAllDialog
 import net.korul.hbbft.CommonData.data.model.core.Getters.getNextUserID
-import net.korul.hbbft.CoreHBBFT.RoomDescrWork.reregisterInRoomDescrFirebase
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.registerInRoomDescFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.registerInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.unregisterInRoomInFirebase
 
@@ -43,7 +43,7 @@ class DialogsFixtures private constructor() {
             ddialog.insert()
 
             registerInRoomInFirebase(dialogUID)
-            reregisterInRoomDescrFirebase(dialog)
+            registerInRoomDescFirebase(dialog)
 
             return dialog
         }
@@ -71,7 +71,7 @@ class DialogsFixtures private constructor() {
             ddialog.insert()
 
             registerInRoomInFirebase(dialogUID)
-            reregisterInRoomDescrFirebase(dialog)
+            registerInRoomDescFirebase(dialog)
 
             return dialog
         }

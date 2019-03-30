@@ -33,6 +33,7 @@
     <string name="close_button">Close application</string>
     <string name="open_activity">Notification with activity or push</string>
     <string name="need_online">Offline mode</string>
+    <string name="need_users">No users in room</string>
 
     <string name="dialog_options">Information</string>
 

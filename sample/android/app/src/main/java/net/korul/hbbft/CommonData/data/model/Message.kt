@@ -9,6 +9,7 @@ class Message(
     var id_: Long = 0,
     private var id: String,
     var idDialog: String,
+    var isVisible: Boolean,
     private var user: User,
     private var text: String?,
     private var createdAt: Date? = Date()

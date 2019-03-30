@@ -66,9 +66,9 @@ class FireAlarmActivity : AlarmActivity() {
         lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
         // XXX DO NOT COPY THIS!!!  THIS IS BOGUS!  Making an activity have
         // a system alert type is completely broken, because the activity
-        // manager will still hide/show it as if it is part of the normal
+        // manager will still hide/isVisible it as if it is part of the normal
         // activity stack.  If this is really what you want and you want it
-        // to work correctly, you should create and show your own custom window.TYPE_APPLICATION_OVERLAY
+        // to work correctly, you should create and isVisible your own custom window.TYPE_APPLICATION_OVERLAY
 //        lp.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT  TYPE_APPLICATION_OVERLAY
         lp.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT //TYPE_PHONE //TYPE_SYSTEM_ALERT
         lp.token = null

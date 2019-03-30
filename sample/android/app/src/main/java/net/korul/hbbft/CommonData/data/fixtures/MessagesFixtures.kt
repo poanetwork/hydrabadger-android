@@ -22,7 +22,7 @@ class MessagesFixtures private constructor() {
 
         fun getImageMessage(curDialog: Dialog, user: User): Message {
             val id = getNextMessageID()
-            val message = Message(id, id.toString(), curDialog.id, user, null, Date())
+            val message = Message(id, id.toString(), curDialog.id, true, user, null, Date())
             message.setImage(Message.Image("https://habrastorage.org/getpro/habr/post_images/e4b/067/b17/e4b067b17a3e414083f7420351db272b.jpg"))
 
             val dmes = Conversations.getDMessage(message)
@@ -37,7 +37,7 @@ class MessagesFixtures private constructor() {
 
         fun getVoiceMessage(curDialog: Dialog, user: User): Message {
             val id = getNextMessageID()
-            val message = Message(id, id.toString(), curDialog.id, user, null, Date())
+            val message = Message(id, id.toString(), curDialog.id, true, user, null, Date())
             message.voice = Message.Voice("http://example.com", rnd.nextInt(200) + 30)
 
             val dmes = Conversations.getDMessage(message)
@@ -55,23 +55,23 @@ class MessagesFixtures private constructor() {
         fun setNewMessage(text: String, curDialog: Dialog, user: User, date: Date = Date()): Message {
             user.idDialog = curDialog.id
             val id = getNextMessageID()
-            val mes = Message(id, id.toString(), curDialog.id, user, text, date)
 
-            val dmes = Conversations.getDMessage(mes)
-            dmes?.insert()
+            val mes = Message(id, id.toString(), curDialog.id, true, user, text, date)
+            Conversations.getDMessage(mes)?.insert()
 
             curDialog.setLastMessage(mes)
             curDialog.lastMessage?.user = user
-            val ddialog = Conversations.getDDialog(curDialog)
-            ddialog.update()
+            Conversations.getDDialog(curDialog).update()
 
             return mes
         }
 
-        fun deleteMeseges(messages: ArrayList<Message>) {
+        fun deleteMessages(messages: ArrayList<Message>) {
             for (message in messages) {
                 val dmes = Conversations.getDMessage(message)
-                dmes?.delete()
+                dmes?.text = ""
+                dmes?.isVisible = false
+                dmes?.update()
             }
         }
 

@@ -9,7 +9,7 @@ import java.util.*
 class Dialog(
     private val id: String,
     private val dialogName: String,
-    private val dialogDescr: String,
+    private val dialogDescry: String,
     private val dialogPhoto: String,
     private val users: ArrayList<User>,
     private var lastMessage: Message?,
@@ -45,7 +45,7 @@ class Dialog(
     }
 
     override fun getDialogDescr(): String {
-        return dialogDescr
+        return dialogDescry
     }
 
     fun setUnreadCount(unreadCount: Int) {

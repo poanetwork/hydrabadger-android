@@ -67,7 +67,7 @@ class OnBootBroadcastReceiver : BroadcastReceiver() {
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create channel to show notifications.
+            // Create channel to isVisible notifications.
             val channelId = mcontext?.getString(R.string.default_notification_channel_id)
             val channelName = mcontext?.getString(R.string.default_notification_channel_name)
             val notificationManager = mcontext?.getSystemService(NotificationManager::class.java)

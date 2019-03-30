@@ -97,7 +97,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             mDivider.draw(c);
         }
 
-        // show last divider
+        // isVisible last divider
         if (mShowLastDivider && childCount > 0) {
             View child = parent.getChildAt(childCount - 1);
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();

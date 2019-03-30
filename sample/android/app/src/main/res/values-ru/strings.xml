@@ -85,6 +85,7 @@
     <string name="open_activity">Оповещение с помощью активити или пуш</string>
 
     <string name="need_online">Оффлайн режим</string>
+    <string name="need_users">Комната без пользователей</string>
 
     <!--NOT MINE-->
     <string name="export_qr">Экспорт QR..</string>

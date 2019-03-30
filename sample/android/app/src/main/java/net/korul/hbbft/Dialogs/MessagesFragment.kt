@@ -55,7 +55,7 @@ class MessagesFragment :
     CoreHBBFTListener {
 
     companion object {
-        private val CONTENT_TYPE_VOICE: Byte = 1
+        private const val CONTENT_TYPE_VOICE: Byte = 1
 
         private val handlerProgress = Handler()
         private val handlerNewMes = Handler()
@@ -245,6 +245,22 @@ class MessagesFragment :
         }
     }
 
+    override fun updateStateToError() {
+        try {
+            handlerProgress.post {
+                progress.dismiss()
+                val mSnackbar = Snackbar.make(view!!, getString(R.string.need_users), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null)
+
+                val snackbarView = mSnackbar.view
+                snackbarView.setBackgroundColor(Color.BLUE)
+                mSnackbar.show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     override fun updateStateToOnline() {
         try {
             handlerProgress.post {
@@ -276,8 +292,7 @@ class MessagesFragment :
         thread {
             try {
                 if (!you) {
-                    val found = mCurDialog!!.users.any { it.uid == uid }
-                    if (!found) {
+                    if (!mCurDialog!!.users.any { it.uid == uid }) {
                         getUserFromLocalOrDownloadFromFirebase(uid, mCurDialog!!.id, object : IAddToContacts {
                             override fun errorAddContact() {
                             }
@@ -310,9 +325,7 @@ class MessagesFragment :
     }
 
     private fun initAdapter() {
-        //We can pass any data to ViewHolder with payload
         val payload = CustomIncomingTextMessageViewHolder.Payload()
-        //For example click listener
         payload.avatarClickListener = object : CustomIncomingTextMessageViewHolder.OnAvatarClickListener {
             override fun onAvatarClick() {
                 AppUtils.showToast(

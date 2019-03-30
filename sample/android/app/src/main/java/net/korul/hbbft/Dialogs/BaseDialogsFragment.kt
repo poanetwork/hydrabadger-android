@@ -33,11 +33,10 @@ abstract class BaseDialogsFragment :
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.show()
 
-        imageLoader = ImageLoader { imageView, url, payload ->
+        imageLoader = ImageLoader { imageView, url, _ ->
             try {
-                val pathAvatar = url
-                if (pathAvatar != "") {
-                    val image = BitmapFactory.decodeFile(pathAvatar)
+                if (url != "") {
+                    val image = BitmapFactory.decodeFile(url)
                     imageView.setImageBitmap(image)
                 } else {
                     imageView.setImageResource(R.drawable.ic_contact)

@@ -4,15 +4,15 @@ import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import net.korul.hbbft.CoreHBBFT.RoomDescrWork.unreregisterInRoomDescrFirebase
+import net.korul.hbbft.CoreHBBFT.RoomDescrWork.unregisterInRoomDescFirebase
 import java.util.*
 import java.util.concurrent.CountDownLatch
 
 object RoomWork {
 
-    fun reregisterInFirebase(ListDialogsId: List<String>, uid: String) {
+    fun registerInFirebase(ListDialogsId: List<String>, uid: String) {
         for (dialogId in ListDialogsId) {
-            val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(dialogId).orderByChild("uid").equalTo(uid)
+            val queryRef = CoreHBBFT.mDatabase.child("RoomsUsers").child(dialogId).orderByChild("uid").equalTo(uid)
             queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
                 }
@@ -29,7 +29,7 @@ object RoomWork {
                     val ref = snapshot.ref.push()
                     ref.setValue(uid)
 
-                    Log.d(CoreHBBFT.TAG, "Succes reregisterInFirebase ${CoreHBBFT.uniqueID1}")
+                    Log.d(CoreHBBFT.TAG, "Success registerInFirebase ${CoreHBBFT.uniqueID1}")
                 }
             })
         }
@@ -37,7 +37,8 @@ object RoomWork {
 
 
     fun unregisterInRoomInFirebase(RoomId: String) {
-        val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
+        val queryRef =
+            CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
@@ -48,17 +49,17 @@ object RoomWork {
                         postsnapshot.key
                         postsnapshot.ref.removeValue()
                     }
-                    Log.d(CoreHBBFT.TAG, "Succes unregisterInRoomInFirebase ${CoreHBBFT.uniqueID1}")
+                    Log.d(CoreHBBFT.TAG, "Success unregisterInRoomInFirebase ${CoreHBBFT.uniqueID1}")
 
 
-                    val queryRef = CoreHBBFT.mDatabase.child("Rooms").child(RoomId)
+                    val queryRef = CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId)
                     queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
                         }
 
                         override fun onDataChange(snapshot: DataSnapshot) {
                             if (snapshot.children.count() == 0) {
-                                unreregisterInRoomDescrFirebase(RoomId)
+                                unregisterInRoomDescFirebase(RoomId)
                             }
                         }
                     })
@@ -73,7 +74,7 @@ object RoomWork {
 
     fun registerInRoomInFirebase(RoomId: String) {
         val queryRef =
-            CoreHBBFT.mDatabase.child("Rooms").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
+            CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
@@ -84,15 +85,15 @@ object RoomWork {
                         postsnapshot.key
                         postsnapshot.ref.removeValue()
                     }
-                    Log.d(CoreHBBFT.TAG, "Succes unregisterInRoomInFirebase ${CoreHBBFT.uniqueID1}")
+                    Log.d(CoreHBBFT.TAG, "Success unregisterInRoomInFirebase ${CoreHBBFT.uniqueID1}")
 
                     // Add dialog
                     val uid = Uids()
                     uid.UID = CoreHBBFT.uniqueID1
                     uid.isOnline = false
-                    val ref = CoreHBBFT.mDatabase.child("Rooms").child(RoomId)
+                    val ref = CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId)
                     ref.push().setValue(uid).addOnSuccessListener {
-                        Log.d(CoreHBBFT.TAG, "Succes registerInRoomInFirebase ${CoreHBBFT.uniqueID1}")
+                        Log.d(CoreHBBFT.TAG, "Success registerInRoomInFirebase ${CoreHBBFT.uniqueID1}")
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -103,19 +104,20 @@ object RoomWork {
 
     fun setOfflineModeInRoomInFirebase(RoomId: String) {
         val queryRef =
-            CoreHBBFT.mDatabase.child("Rooms").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
+            CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                val uid = Uids()
-                uid.UID = CoreHBBFT.uniqueID1
-                uid.isOnline = false
                 for (postsnapshot in snapshot.children) {
                     postsnapshot.key
                     postsnapshot.ref.removeValue()
                 }
+
+                val uid = Uids()
+                uid.UID = CoreHBBFT.uniqueID1
+                uid.isOnline = false
                 snapshot.ref.push().setValue(uid)
                 Log.d(CoreHBBFT.TAG, "Succes setOnlineModeInRoomInFirebase ${CoreHBBFT.uniqueID1}")
             }
@@ -124,7 +126,7 @@ object RoomWork {
 
     fun setOnlineModeInRoomInFirebase(RoomId: String) {
         val queryRef =
-            CoreHBBFT.mDatabase.child("Rooms").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
+            CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId).orderByChild("uid").equalTo(CoreHBBFT.uniqueID1)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
@@ -152,7 +154,7 @@ object RoomWork {
     }
 
     fun getUIDsInRoomFromFirebase(RoomId: String): MutableList<Uids> {
-        val ref = CoreHBBFT.mDatabase.child("Rooms").child(RoomId)
+        val ref = CoreHBBFT.mDatabase.child("RoomsUsers").child(RoomId)
 
         val latch = CountDownLatch(1)
         val listObjectsOfUIds: MutableList<Uids> = arrayListOf()
@@ -175,11 +177,12 @@ object RoomWork {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+                latch.countDown()
                 // Getting Post failed, log a message
                 Log.w(CoreHBBFT.TAG, "loadPost:onCancelled", databaseError.toException())
             }
         }
-        ref.addValueEventListener(postListener)
+        ref.addListenerForSingleValueEvent(postListener)
         latch.await()
 
         listObjectsOfUIds.distinctBy { it.UID }

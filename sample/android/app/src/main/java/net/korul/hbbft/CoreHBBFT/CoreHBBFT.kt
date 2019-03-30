@@ -21,7 +21,7 @@ import net.korul.hbbft.CoreHBBFT.PushWork.registerForPush
 import net.korul.hbbft.CoreHBBFT.RoomDescrWork.updateAllRoomsFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.getUIDsInRoomFromFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.isSomeBodyOnlineInList
-import net.korul.hbbft.CoreHBBFT.RoomWork.reregisterInFirebase
+import net.korul.hbbft.CoreHBBFT.RoomWork.registerInFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.setOfflineModeInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.RoomWork.setOnlineModeInRoomInFirebase
 import net.korul.hbbft.CoreHBBFT.UserWork.initCurUser
@@ -48,10 +48,9 @@ object CoreHBBFT : IGetData {
 
     // p2p
     var mP2PMesh: P2PMesh? = null
-
     var mSocketWrapper: SocketWrapper? = null
-    val APP_PREFERENCES = "mysettings"
 
+    val APP_PREFERENCES = "mysettings"
     val APP_PREFERENCES_NAME1 = "UUID1" // UUID
     val APP_PREFERENCES_NAME2 = "UUID2" // UUID
 
@@ -64,8 +63,8 @@ object CoreHBBFT : IGetData {
     private val listeners = ArrayList<CoreHBBFTListener?>()
 
     var mUpdateStateToOnline = false
-    var mRoomId: String = ""
 
+    var mCurRoomId: String = ""
     var lastMes: String = ""
     var lastMestime = Calendar.getInstance().timeInMillis
 
@@ -75,10 +74,29 @@ object CoreHBBFT : IGetData {
     lateinit var mApplicationContext: Context
     var mDatabase: DatabaseReference
 
-    val formatDate= SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
 
-    val handler = Handler()
-    var runnable: Runnable? = null
+    private val format = "yyyy-MM-dd HH:mm:ss.SSS Z"
+    fun String.toDate(dateFormat: String = format, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Date {
+        val parser = SimpleDateFormat(dateFormat, Locale.getDefault())
+        parser.timeZone = timeZone
+        return parser.parse(this)
+    }
+
+    fun Date.formatTo(dateFormat: String = format, timeZone: TimeZone = TimeZone.getDefault()): String {
+        val formatter = SimpleDateFormat(dateFormat, Locale.getDefault())
+        formatter.timeZone = timeZone
+        return formatter.format(this)
+    }
+
+    enum class MessageType(s: String) {
+        ILIVE("ILIVE"),
+        IDIE("IDIE"),
+        MESSFOR("MESSFOR"),
+        MESS("MESS")
+    }
+
+    val listOnlineUsers: HashMap<String, HashMap<String, Boolean>> = hashMapOf()
+
 
     init {
         System.loadLibrary("hydra_android")
@@ -120,7 +138,7 @@ object CoreHBBFT : IGetData {
             val latch = authAnonymouslyInFirebase()
             latch.await()
             saveCurUserSync(DatabaseApplication.mCurUser)
-            reregisterInFirebase(getAllDialogsUids(), uniqueID1)
+            registerInFirebase(getAllDialogsUids(), uniqueID1)
         }
     }
 
@@ -132,7 +150,7 @@ object CoreHBBFT : IGetData {
     }
 
     fun setRoomId(roomid: String) {
-        mRoomId = roomid
+        mCurRoomId = roomid
     }
 
     fun authAnonymouslyInFirebase(): CountDownLatch {
@@ -179,12 +197,10 @@ object CoreHBBFT : IGetData {
 
             // if 1 dialog
             if (cntUsers < 2) {
-                AppUtils.showToast(
-                    mApplicationContext,
-                    "Room is empty", true
-                )
+                for (hl in listeners)
+                    hl?.updateStateToError()
+                setOfflineModeInRoomInFirebase(RoomId)
                 Log.d(TAG, "Room is empty $RoomId")
-
             }
             // if 2 users and i am first
             else if (cntUsers == 2 && !isSomebodyOnline) {
@@ -246,21 +262,20 @@ object CoreHBBFT : IGetData {
     fun start_node(RoomId: String) {
         setOnlineModeInRoomInFirebase(RoomId)
 
-        mRoomId = RoomId
+        mCurRoomId = RoomId
 
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
 
-        waitForConnect()
+        waitForConnect(false)
 
         mSocketWrapper!!.initSocketWrapper(RoomId, uniqueID1, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
-            for (clients in mSocketWrapper!!.clientsBusyPorts) {
+            for (clients in mSocketWrapper!!.clientsBusyPorts)
                 if (clients.key != uniqueID1)
                     strTosend += "127.0.0.1:${clients.value};"
-            }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
@@ -275,24 +290,23 @@ object CoreHBBFT : IGetData {
     fun start_node_2x(RoomId: String) {
         setOnlineModeInRoomInFirebase(RoomId)
 
-        mRoomId = RoomId
+        mCurRoomId = RoomId
 
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
         mP2PMesh?.initOneMesh(RoomId, uniqueID2)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
-        Thread.sleep(100)
+        Thread.sleep(200)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID2)
 
-        waitForConnectWithoutSelf()
+        waitForConnect(true)
 
         mSocketWrapper!!.initSocketWrapper2X(RoomId, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
-            for (clients in mSocketWrapper!!.clientsBusyPorts) {
+            for (clients in mSocketWrapper!!.clientsBusyPorts)
                 if (clients.key != uniqueID1 && clients.key != uniqueID2)
                     strTosend += "127.0.0.1:${clients.value};"
-            }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
@@ -303,11 +317,9 @@ object CoreHBBFT : IGetData {
             )
 
             strTosend = ""
-            for (clients in mSocketWrapper!!.clientsBusyPorts) {
-                if (clients.key != uniqueID2) {
+            for (clients in mSocketWrapper!!.clientsBusyPorts)
+                if (clients.key != uniqueID2)
                     strTosend += "127.0.0.1:${clients.value};"
-                }
-            }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
@@ -319,42 +331,16 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun waitForConnectWithoutSelf() {
+    fun waitForConnect(withoutSelf: Boolean) {
         val async = GlobalScope.async {
             var ready = false
             while (!ready) {
-                Thread.sleep(1000)
-                ready = true
-                for (con in mP2PMesh?.mConnections!!.values) {
-                    if (con.myName == uniqueID1 || con.myName == uniqueID2)
-                        continue
+                Thread.sleep(500)
 
-                    if (con.mIamReadyToDataTranfer) {
-                        ready = true
-                    } else {
-                        ready = false
-                        break
-                    }
-                }
-            }
-        }
-        runBlocking { async.await() }
-    }
-
-    fun waitForConnect() {
-        val async = GlobalScope.async {
-            var ready = false
-            while (!ready) {
-                Thread.sleep(1000)
-                ready = true
-                for (con in mP2PMesh?.mConnections!!.values) {
-                    if (con.mIamReadyToDataTranfer) {
-                        ready = true
-                    } else {
-                        ready = false
-                        break
-                    }
-                }
+                ready = if (withoutSelf)
+                    !mP2PMesh?.mConnections!!.values.filter { it.myName != uniqueID1 && it.myName != uniqueID2 }.any { !it.mIamReadyToDataTranfer }
+                else
+                    !mP2PMesh?.mConnections!!.values.any { !it.mIamReadyToDataTranfer }
             }
         }
         runBlocking { async.await() }
@@ -364,7 +350,24 @@ object CoreHBBFT : IGetData {
         mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
 
-        setOfflineModeInRoomInFirebase(mRoomId)
+        setOfflineModeInRoomInFirebase(mCurRoomId)
+    }
+
+    fun generateOrGetUID() {
+        val uiid = ReadObjectFromFile(APP_PREFERENCES_NAME1)
+        val uiid1 = ReadObjectFromFile(APP_PREFERENCES_NAME2)
+
+        if (uiid == null || uiid == "") {
+            uniqueID1 = UUID.randomUUID().toString()
+            WriteObjectToFile(uniqueID1, APP_PREFERENCES_NAME1)
+        } else
+            uniqueID1 = uiid
+
+        if (uiid1 == null || uiid1 == "") {
+            uniqueID2 = UUID.randomUUID().toString()
+            WriteObjectToFile(uniqueID2, APP_PREFERENCES_NAME2)
+        } else
+            uniqueID2 = uiid1
     }
 
     override fun dataReceived(bytes: ByteArray) {
@@ -426,7 +429,7 @@ object CoreHBBFT : IGetData {
                 lastMestime = Calendar.getInstance().timeInMillis
             }
         }
-        session?.subscribe { uid: String, mes: String ->
+        session?.subscribe { _: String, _: String ->
 
         }
     }
@@ -434,29 +437,44 @@ object CoreHBBFT : IGetData {
     fun parseMessage(mess: String, uid: String) {
         val commMes = mess.split("᳀†\u058D:")
         if(commMes.size >= 2) when(commMes[0]) {
-            "ILIVE" -> {
-                if(runnable == null) {
-                    runnable = Runnable {
+            MessageType.ILIVE.name -> {
+                if (listOnlineUsers[mCurRoomId] != null && listOnlineUsers[mCurRoomId]!!.contains(uid) && listOnlineUsers[mCurRoomId]!![uid] == true)
+                    return
+                else {
+                    listOnlineUsers[mCurRoomId]!![uid] = true
+                    Handler().post {
                         setUnOnlineUserWithUID(uid, true)
                         for (hl in listeners)
                             hl?.setOnlineUser(uid, true)
-                        runnable = null
                     }
-                    handler.post(runnable)
                 }
             }
-            "IDIE" -> {
-                if(runnable == null)
-                    handler.removeCallbacks(runnable)
-                runnable = Runnable {
-                    setUnOnlineUserWithUID(uid, false)
+            MessageType.IDIE.name -> {
+                if (listOnlineUsers[mCurRoomId] != null && listOnlineUsers[mCurRoomId]!!.contains(uid) && listOnlineUsers[mCurRoomId]!![uid] == false)
+                    return
+                else {
+                    listOnlineUsers[mCurRoomId]!![uid] = false
+                    Handler().post {
+                        setUnOnlineUserWithUID(uid, false)
+                        for (hl in listeners)
+                            hl?.setOnlineUser(uid, false)
+                    }
+                }
+            }
+            MessageType.MESS.name -> {
+                try {
+                    val you = uid == uniqueID1 || uid == uniqueID2
+                    val date = commMes[1].toDate(format, TimeZone.getDefault())
                     for (hl in listeners)
-                        hl?.setOnlineUser(uid, false)
-                    runnable = null
+                        hl?.reciveMessage(you, uid, commMes[2], date)
+                } catch (e: Exception) {
+                    Log.d(TAG, "ERROR parse incoming message")
+                    e.printStackTrace()
                 }
-                handler.post(runnable)
             }
-            "MESSFOR" -> {
+
+
+            MessageType.MESSFOR.name -> {
 //                try {
 //                    val mesforUId = commMes[1]
 //                    if(mesforUId == uniqueID1) {
@@ -477,18 +495,6 @@ object CoreHBBFT : IGetData {
 //                    e.printStackTrace()
 //                }
             }
-            "MESS" -> {
-                try {
-                    val you = uid == uniqueID1 || uid == uniqueID2
-                    val date = formatDate.parse(commMes[1])
-                    for (hl in listeners)
-                        hl?.reciveMessage(you, uid, commMes[2], date)
-                }
-                catch (e: Exception) {
-                    Log.d(TAG, "ERROR parse incoming message")
-                    e.printStackTrace()
-                }
-            }
         }
     }
 
@@ -499,28 +505,9 @@ object CoreHBBFT : IGetData {
 
     fun sendMessage(str: String) {
         if (str.isNotEmpty()) {
-            val dateString = formatDate.format(Date())
+            val dateString = Date().formatTo(format, TimeZone.getTimeZone("UTC"))
             val mes = "MESS᳀†\u058D:${dateString}᳀†\u058D:$str"
             session?.send_message(mes)
         }
-    }
-
-    fun generateOrGetUID() {
-        val uiid = ReadObjectFromFile(APP_PREFERENCES_NAME1)
-        val uiid1 = ReadObjectFromFile(APP_PREFERENCES_NAME2)
-
-        if (uiid == null || uiid == "") {
-            uniqueID1 = UUID.randomUUID().toString()
-
-            WriteObjectToFile(uniqueID1, APP_PREFERENCES_NAME1)
-        } else
-            uniqueID1 = uiid
-
-        if (uiid1 == null || uiid1 == "") {
-            uniqueID2 = UUID.randomUUID().toString()
-
-            WriteObjectToFile(uniqueID2, APP_PREFERENCES_NAME2)
-        } else
-            uniqueID2 = uiid1
     }
 }

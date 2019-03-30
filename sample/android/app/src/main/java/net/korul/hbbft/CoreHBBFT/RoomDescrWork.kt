@@ -43,7 +43,7 @@ object RoomDescrWork {
         }
     }
 
-    fun unreregisterInRoomDescrFirebase(dialogId: String) {
+    fun unregisterInRoomDescFirebase(dialogId: String) {
         val queryRef = CoreHBBFT.mDatabase.child("RoomDescr").child(dialogId)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -55,19 +55,19 @@ object RoomDescrWork {
                     postsnapshot.ref.removeValue()
                 }
 
-                Log.d(CoreHBBFT.TAG, "Succes unreregisterInRoomDescrFirebase ${dialogId}")
+                Log.d(CoreHBBFT.TAG, "Success unregisterInRoomDescFirebase $dialogId")
             }
         })
     }
 
-    fun reregisterInRoomDescrFirebase(dialog: Dialog) {
-        reregisterInRoomDescrFirebase(dialog, object : IComplete {
+    fun registerInRoomDescFirebase(dialog: Dialog) {
+        registerInRoomDescFirebase(dialog, object : IComplete {
             override fun complete() {
             }
         })
     }
 
-    fun reregisterInRoomDescrFirebase(dialog: Dialog, listener: IComplete) {
+    fun registerInRoomDescFirebase(dialog: Dialog, listener: IComplete) {
         val queryRef = CoreHBBFT.mDatabase.child("RoomDescr").child(dialog.id).orderByChild("id").equalTo(dialog.id)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -88,13 +88,13 @@ object RoomDescrWork {
 
                 listener.complete()
 
-                Log.d(CoreHBBFT.TAG, "Succes reregisterInRoomDescrFirebase ${dialog.id}")
+                Log.d(CoreHBBFT.TAG, "Success registerInRoomDescFirebase ${dialog.id}")
             }
         })
     }
 
 
-    fun getUpdateFromFirebase(dialogID: String, listener: IAddToRooms) {
+    private fun getUpdateFromFirebase(dialogID: String, listener: IAddToRooms) {
         val queryRef = CoreHBBFT.mDatabase.child("RoomDescr").child(dialogID)
         queryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -132,11 +132,6 @@ object RoomDescrWork {
                                     .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
                                     .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
                             )
-                            // Kick off MyDownloadUserService to download the file
-//                            val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadRoomService::class.java)
-//                                .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, dialogID)
-//                                .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
-//                            CoreHBBFT.mApplicationContext.startService(intent)
 
                             listener.dialog(saveDialog)
                         }

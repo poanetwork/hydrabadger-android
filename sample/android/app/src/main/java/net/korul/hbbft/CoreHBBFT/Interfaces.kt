@@ -7,6 +7,8 @@ import java.util.*
 interface CoreHBBFTListener {
     fun updateStateToOnline()
 
+    fun updateStateToError()
+
     fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date)
 
     fun setOnlineUser(uid: String, online: Boolean)

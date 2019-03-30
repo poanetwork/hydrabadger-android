@@ -81,6 +81,11 @@ object UserWork {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
+                for (postsnapshot in snapshot.children) {
+                    postsnapshot.key
+                    postsnapshot.ref.removeValue()
+                }
+
                 val userToSave = Users(
                     user.uid,
                     user.isOnline,
@@ -88,13 +93,9 @@ object UserWork {
                     user.nick
                 )
 
-                for (postsnapshot in snapshot.children) {
-                    postsnapshot.key
-                    postsnapshot.ref.removeValue()
-                }
                 val ref = snapshot.ref.push()
                 ref.setValue(userToSave)
-                Log.d(CoreHBBFT.TAG, "Succes insertOrUpdateUserInFirebase ${CoreHBBFT.uniqueID1}")
+                Log.d(CoreHBBFT.TAG, "Success insertOrUpdateUserInFirebase ${CoreHBBFT.uniqueID1}")
 
                 if(user.uid == CoreHBBFT.uniqueID1) {
                     val userToSave = Users(
@@ -149,7 +150,7 @@ object UserWork {
         return listObjectsOfUsers
     }
 
-    fun AddUserToLocalFromFirebaseWithAvatar(
+    private fun AddUserToLocalFromFirebaseWithAvatar(
         uid: String,
         dialogId: String,
         listObjectsOfUsers: MutableList<Users>,

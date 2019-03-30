@@ -228,6 +228,7 @@ object Getters {
         val dmessages = Select()
             .from(DMessage::class.java)
             .where(DMessage_Table.idDialog.eq(id))
+            .and(DMessage_Table.isVisible.eq(true))
             .orderBy(DMessage_Table.createdAt, false)
             .queryList()
 
@@ -245,6 +246,7 @@ object Getters {
         val dmessages = Select()
             .from(DMessage::class.java)
             .where(DMessage_Table.idDialog.eq(id))
+            .and(DMessage_Table.isVisible.eq(true))
             .and(DMessage_Table.createdAt.lessThan(startDate!!))
             .orderBy(DMessage_Table.createdAt, false)
             .queryList()

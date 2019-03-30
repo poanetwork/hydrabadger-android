@@ -102,7 +102,7 @@ class RingtonePickerDialog : BaseAlertDialogFragment() {
         private const val KEY_RINGTONE_URI = "key_ringtone_uri"
 
         /**
-         * @param ringtoneUri the URI of the ringtone to show as initially selected
+         * @param ringtoneUri the URI of the ringtone to isVisible as initially selected
          */
         fun newInstance(l: OnRingtoneSelectedListener, ringtoneUri: Uri): RingtonePickerDialog {
             val dialog = RingtonePickerDialog()

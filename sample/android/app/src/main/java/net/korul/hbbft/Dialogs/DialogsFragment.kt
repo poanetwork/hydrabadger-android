@@ -1,9 +1,10 @@
 package net.korul.hbbft.Dialogs
 
 import android.content.Context
-import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -47,7 +48,7 @@ class DialogsFragment :
     private var TAG = "HYDRA:DialogsFragment"
 
     companion object {
-        private val handlerProgress = Handler()
+        //        private val handlerProgress = Handler()
         private val handlerNewMes = Handler()
 
         fun newInstance(): DialogsFragment {
@@ -106,20 +107,17 @@ class DialogsFragment :
         super.onViewCreated(view, savedInstanceState)
 
         addDialog.setOnClickListener {
-
             AlertDialog.Builder(context!!)
-                .setItems(R.array.view_do_new_dialog, object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        when (which) {
-                            0 -> {
-                                onAddExistDialog()
-                            }
-                            1 -> {
-                                onAddNewDialog()
-                            }
+                .setItems(R.array.view_do_new_dialog) { _, which ->
+                    when (which) {
+                        0 -> {
+                            onAddExistDialog()
+                        }
+                        1 -> {
+                            onAddNewDialog()
                         }
                     }
-                })
+                }
                 .show()
         }
     }
@@ -167,18 +165,16 @@ class DialogsFragment :
         when (item.itemId) {
             R.id.action_add -> {
                 AlertDialog.Builder(context!!)
-                    .setItems(R.array.view_do_new_dialog, object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            when (which) {
-                                0 -> {
-                                    onAddExistDialog()
-                                }
-                                1 -> {
-                                    onAddNewDialog()
-                                }
+                    .setItems(R.array.view_do_new_dialog) { _, which ->
+                        when (which) {
+                            0 -> {
+                                onAddExistDialog()
+                            }
+                            1 -> {
+                                onAddNewDialog()
                             }
                         }
-                    })
+                    }
                     .show()
             }
         }
@@ -235,13 +231,29 @@ class DialogsFragment :
         dialogsList!!.setAdapter(super.dialogsAdapter!!, false)
     }
 
+    override fun updateStateToError() {
+        try {
+            Handler().post {
+                val mSnackbar = Snackbar.make(view!!, getString(R.string.need_users), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null)
+
+                val snackbarView = mSnackbar.view
+                snackbarView.setBackgroundColor(Color.BLUE)
+                mSnackbar.show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     override fun updateStateToOnline() {
         menu?.findItem(R.id.action_online)?.icon =
             DatabaseApplication.instance.resources.getDrawable(R.mipmap.ic_online_round)
     }
 
     override fun setOnlineUser(uid: String, online: Boolean) {
-        val users = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mRoomId).users.filter { it.uid == uid && !it.isOnline}
+        val users =
+            getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mCurRoomId).users.filter { it.uid == uid && !it.isOnline }
         for (user in users) {
             val us = Conversations.getDUser(user)
             us.isOnline = online
@@ -251,12 +263,10 @@ class DialogsFragment :
     }
 
     override fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date) {
-//        thread {
         try {
             if (!you) {
-                val dialog = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mRoomId)
-                val found = dialog.users.any { it.uid == uid }
-                if (!found) {
+                val dialog = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
+                if (!dialog.users.any { it.uid == uid }) {
                     getUserFromLocalOrDownloadFromFirebase(uid, dialog.id, object : IAddToContacts {
                         override fun errorAddContact() {
                         }
@@ -277,7 +287,6 @@ class DialogsFragment :
                         }
                     })
                 } else {
-//                    handlerNewMes.post {
                         val user = Getters.getUserbyUIDFromDialog(uid, dialog.id)
                         val mess = MessagesFixtures.setNewMessage(mes, dialog, user!!, data)
 
@@ -285,13 +294,11 @@ class DialogsFragment :
                         Conversations.getDDialog(dialog).update()
 
                         onNewMessage(dialog.id, mess)
-//                    }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-//        }
     }
 
     fun onAddExistDialog() {
@@ -309,7 +316,7 @@ class DialogsFragment :
         transaction.commit()
     }
 
-    //for example
+
     fun onNewMessage(dialogId: String, message: Message) {
         try {
             handlerNewMes.post {
@@ -324,7 +331,7 @@ class DialogsFragment :
         }
     }
 
-    //for example
+
     fun onNewDialog(dialog: Dialog) {
         dialogsAdapter!!.addItem(dialog)
     }

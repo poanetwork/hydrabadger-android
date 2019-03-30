@@ -62,6 +62,7 @@ class Conversations {
                     dmessage.id,
                     dmessage.id.toString(),
                     dmessage.idDialog,
+                    dmessage.isVisible,
                     getUser(dmessage.user),
                     dmessage.text,
                     dmessage.createdAt
@@ -82,6 +83,7 @@ class Conversations {
                 dmessage.idDialog = message.idDialog
                 dmessage.userID = message.user.id_
                 dmessage.user = getDUser(message.user)
+                dmessage.isVisible = message.isVisible
                 dmessage.text = message.text
                 dmessage.createdAt = message.createdAt
                 dmessage.image = message.getImage()

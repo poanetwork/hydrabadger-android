@@ -1,5 +1,6 @@
 package net.korul.hbbft.CommonData.utils
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -12,6 +13,7 @@ class FormatUtils private constructor() {
     }
 
     companion object {
+        @SuppressLint("SimpleDateFormat")
         fun getDurationString(seconds: Int): String {
             val date = Date((seconds * 1000).toLong())
             val formatter = SimpleDateFormat(if (seconds >= 3600) "HH:mm:ss" else "mm:ss")

@@ -74,7 +74,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     /**
-     * Create and show a simple notification containing the received FCM message.
+     * Create and isVisible a simple notification containing the received FCM message.
      *
      * @param messageBody FCM message body received.
      */
@@ -144,7 +144,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             // Since android Oreo notification channel is needed.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                // Create channel to show notifications.
+                // Create channel to isVisible notifications.
                 val channelId = getString(R.string.default_notification_channel_id)
                 val channelName = getString(R.string.default_notification_channel_name)
                 val notificationManager = getSystemService(NotificationManager::class.java)

@@ -22,6 +22,9 @@ class DMessage : BaseModel() {
 
     var user: DUser = DUser()
 
+    @Column(name = "isVisible")
+    var isVisible: Boolean = true
+
     @Column(name = "text")
     var text: String? = ""
 

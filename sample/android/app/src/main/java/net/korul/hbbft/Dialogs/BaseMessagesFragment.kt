@@ -12,7 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import net.korul.hbbft.CommonData.data.fixtures.MessagesFixtures
-import net.korul.hbbft.CommonData.data.fixtures.MessagesFixtures.Companion.deleteMeseges
+import net.korul.hbbft.CommonData.data.fixtures.MessagesFixtures.Companion.deleteMessages
 import net.korul.hbbft.CommonData.data.model.Dialog
 import net.korul.hbbft.CommonData.data.model.Message
 import net.korul.hbbft.CommonData.data.model.User
@@ -101,7 +101,7 @@ abstract class BaseMessagesFragment :
         when (item.itemId) {
             R.id.action_delete -> {
                 val sellmes = messagesAdapter!!.selectedMessages
-                deleteMeseges(sellmes)
+                deleteMessages(sellmes)
                 setLastMessage(mCurDialog)
                 mCurDialog = Getters.getDialog(mCurDialog!!.id)
                 messagesAdapter!!.deleteSelectedMessages()
@@ -112,7 +112,7 @@ abstract class BaseMessagesFragment :
                 AppUtils.showToast(context!!, R.string.copied_message, true)
             }
             R.id.action_online -> {
-//                DatabaseApplication.mCoreHBBFT2X.setOfflineModeInRoomInFirebase(DatabaseApplication.mCoreHBBFT2X.mRoomId)
+//                DatabaseApplication.mCoreHBBFT2X.setOfflineModeInRoomInFirebase(DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
             }
             R.id.action_startALL -> {
                 Handler().post {
@@ -163,7 +163,7 @@ abstract class BaseMessagesFragment :
 
 
     fun isNeedVilibleMenuHbbft(): Boolean {
-        return (DatabaseApplication.mCoreHBBFT2X.mUpdateStateToOnline && mCurDialog!!.id == DatabaseApplication.mCoreHBBFT2X.mRoomId)
+        return (DatabaseApplication.mCoreHBBFT2X.mUpdateStateToOnline && mCurDialog!!.id == DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
     }
 
     private fun loadMessages() {
