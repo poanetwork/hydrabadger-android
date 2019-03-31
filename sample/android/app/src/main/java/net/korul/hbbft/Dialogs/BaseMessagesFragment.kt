@@ -163,7 +163,7 @@ abstract class BaseMessagesFragment :
 
 
     fun isNeedVilibleMenuHbbft(): Boolean {
-        return (DatabaseApplication.mCoreHBBFT2X.mUpdateStateToOnline && mCurDialog!!.id == DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
+        return (DatabaseApplication.mCoreHBBFT2X.listUpdateStateToOnline.containsKey(mCurDialog!!.id) && DatabaseApplication.mCoreHBBFT2X.listUpdateStateToOnline[mCurDialog!!.id] == true && mCurDialog!!.id == DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
     }
 
     private fun loadMessages() {

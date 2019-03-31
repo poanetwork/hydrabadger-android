@@ -288,7 +288,7 @@ class MessagesFragment :
 //        messagesAdapter!!.notifyDataSetChanged()
     }
 
-    override fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date) {
+    override fun reciveMessage(you: Boolean, uid: String, mes: String, date: Date) {
         thread {
             try {
                 if (!you) {
@@ -303,7 +303,7 @@ class MessagesFragment :
                                     Conversations.getDUser(user).insert()
 
                                     val userMes = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                                    val mess = MessagesFixtures.setNewMessage(mes, mCurDialog!!, userMes!!, data)
+                                    val mess = MessagesFixtures.setNewMessage(mes, mCurDialog!!, userMes!!, date)
                                     messagesAdapter!!.addToStart(mess, true)
                                     mCurDialog = getDialog(mCurDialog!!.id)
                                 }
@@ -312,7 +312,7 @@ class MessagesFragment :
                     } else {
                         handlerNewMes.post {
                             val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                            val mess= MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!, data)
+                            val mess = MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!, date)
                             messagesAdapter!!.addToStart(mess, true)
                             mCurDialog = getDialog(mCurDialog!!.id)
                         }

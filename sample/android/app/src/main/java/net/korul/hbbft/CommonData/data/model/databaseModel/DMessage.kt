@@ -10,7 +10,7 @@ import java.util.*
 
 @Table(name = "DMessage", database = AppDatabase::class)
 class DMessage : BaseModel() {
-    @PrimaryKey()
+    @PrimaryKey
     @Column(name = "id")
     var id: Long = 0
 

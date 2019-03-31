@@ -259,6 +259,26 @@ object Getters {
         return messages
     }
 
+    fun getMessagesLessGreaterDate(startDate: Date?, endDate: Date?, id: String): MutableList<Message?> {
+        val messages: MutableList<Message?> = arrayListOf()
+
+        val dmessages = Select()
+            .from(DMessage::class.java)
+            .where(DMessage_Table.idDialog.eq(id))
+            .and(DMessage_Table.isVisible.eq(true))
+            .and(DMessage_Table.createdAt.lessThanOrEq(startDate!!))
+            .and(DMessage_Table.createdAt.greaterThanOrEq(endDate!!))
+            .orderBy(DMessage_Table.createdAt, false)
+            .queryList()
+
+        for (dmessage in dmessages) {
+            dmessage.user = getDUser(dmessage.userID)
+            messages.add(Conversations.getMessage(dmessage))
+        }
+
+        return messages
+    }
+
     fun getNextDialogID(): String {
         return java.lang.Long.toString(UUID.randomUUID().leastSignificantBits)
     }
