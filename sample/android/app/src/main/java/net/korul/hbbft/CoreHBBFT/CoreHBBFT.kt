@@ -25,6 +25,7 @@ import net.korul.hbbft.CommonData.data.model.core.Getters.getMessagesLessGreater
 import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadAnyObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
+import net.korul.hbbft.CoreHBBFT.FileUtil.WriteAnyObjectToFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
 import net.korul.hbbft.CoreHBBFT.PushWork.preSendPushToStart
 import net.korul.hbbft.CoreHBBFT.PushWork.registerForPush
@@ -110,7 +111,7 @@ object CoreHBBFT : IGetData {
     // roomName --  useruid - online/offline
     private val listOnlineUsers: HashMap<String, HashMap<String, Boolean>> = hashMapOf()
     // roomName -- sync/notsync
-    private val listSyncMess: HashMap<String, Boolean> = hashMapOf()
+    private val mFlagsSyncMess: HashMap<String, Boolean> = hashMapOf()
     // roomName -- update online/ offline
     val listUpdateStateToOnline: HashMap<String, Boolean> = hashMapOf()
 
@@ -118,7 +119,6 @@ object CoreHBBFT : IGetData {
     var mNotSyncMessInDialog: HashMap<String, MutableList<String>> = hashMapOf()
     // roomName - list of users try sync
     private var mSyncUsersUids: HashMap<String, MutableList<String>> = hashMapOf()
-    private var mUsersUidsInRoom: HashMap<String, MutableList<String>> = hashMapOf()
 
     val handler = Handler()
     val handlerNewMes = Handler()
@@ -296,7 +296,7 @@ object CoreHBBFT : IGetData {
 
         mCurRoomId = RoomId
         listUpdateStateToOnline[mCurRoomId] = false
-        listSyncMess[mCurRoomId] = false
+        mFlagsSyncMess[mCurRoomId] = false
 
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
@@ -326,7 +326,7 @@ object CoreHBBFT : IGetData {
 
         mCurRoomId = RoomId
         listUpdateStateToOnline[mCurRoomId] = false
-        listSyncMess[mCurRoomId] = false
+        mFlagsSyncMess[mCurRoomId] = false
 
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
         mP2PMesh?.initOneMesh(RoomId, uniqueID2)
@@ -386,6 +386,8 @@ object CoreHBBFT : IGetData {
         mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
 
+        WriteAnyObjectToFile(mNotSyncMessInDialog as Any, APP_PREFERENCES_MESSDATE)
+
         for (roomId in listUpdateStateToOnline.keys)
             setOfflineModeInRoomInFirebase(roomId)
     }
@@ -435,6 +437,9 @@ object CoreHBBFT : IGetData {
             }
 
             if (!listUpdateStateToOnline.containsKey(mCurRoomId) || listUpdateStateToOnline[mCurRoomId] == false) {
+
+                sendMessageGETHIST(uid)
+
                 listUpdateStateToOnline[mCurRoomId] = true
                 for (hl in listeners) {
                     hl?.updateStateToOnline()
@@ -562,11 +567,11 @@ object CoreHBBFT : IGetData {
                                         val dateString = mess.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))!!
 
                                         // if message was delete in other user but in this exist
-                                        if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId]!!.contains(
+                                        if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.contains(
                                                 dateString
                                             )
                                         )
-                                            mNotSyncMessInDialog[mCurRoomId]!!.remove(dateString)
+                                            mNotSyncMessInDialog[uidRoom]!!.remove(dateString)
 
                                         val date = dateString.toDate(format, TimeZone.getDefault())
                                         // if current dialog - then show new message
@@ -631,8 +636,13 @@ object CoreHBBFT : IGetData {
                         }
 
                         //  send not sync mes to get and save mNotSyncMessInDialog
-                        if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId]!!.size > 0) {
-//                            mUsersUidsInRoom
+                        if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.size > 0) {
+                            val randuid = getRandUID(uidRoom)
+                            if (randuid != "") {
+                                sendNotSync(randuid)
+                            }
+                        } else if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.isEmpty()) {
+                            mFlagsSyncMess[uidRoom] = true
                         }
                     }
                 } catch (e: Exception) {
@@ -641,6 +651,24 @@ object CoreHBBFT : IGetData {
                 }
             }
         }
+    }
+
+    fun getRandUID(uidRoom: String): String {
+        var uid = ""
+        try {
+            val list = listOnlineUsers[uidRoom]
+            for (ls in list!!.keys) {
+                if (listOnlineUsers[uidRoom]!![ls]!!) {
+                    if (!mSyncUsersUids[uidRoom]!!.contains(ls)) {
+                        uid = ls
+                        break
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return uid
     }
 
     fun sendMessageGETHIST(uid: String) {
@@ -659,12 +687,14 @@ object CoreHBBFT : IGetData {
     }
 
     private fun sendNotSync(uid: String) {
-        if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId] != null) {
+        if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId] != null && mNotSyncMessInDialog[mCurRoomId]!!.size > 0) {
             for (value in mNotSyncMessInDialog[mCurRoomId]!!) {
                 mSyncUsersUids[mCurRoomId]!!.add(uid)
                 val mes = "GETHIST᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$value᳀†\u058D:$value"
                 session?.send_message(mes)
             }
+        } else if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId]!!.isEmpty()) {
+            mFlagsSyncMess[mCurRoomId] = true
         }
     }
 
