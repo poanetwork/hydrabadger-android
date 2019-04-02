@@ -27,6 +27,7 @@ import kotlin.concurrent.thread
 object RoomDescrWork {
 
     fun updateAllRoomsFromFirebase() {
+        Log.d(CoreHBBFT.TAG, "updateAllRoomsFromFirebase")
         for (roomID in Getters.getAllDialogsUids()) {
             getUpdateFromFirebase(roomID, object : IAddToRooms {
                 override fun errorAddRoom() {

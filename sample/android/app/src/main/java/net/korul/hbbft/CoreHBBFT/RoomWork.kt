@@ -148,7 +148,7 @@ object RoomWork {
                 uid1.isOnline = false
                 ref.onDisconnect().setValue(uid1)
 
-                Log.d(CoreHBBFT.TAG, "Succes setOnlineModeInRoomInFirebase ${CoreHBBFT.uniqueID1}")
+                Log.d(CoreHBBFT.TAG, "Success setOnlineModeInRoomInFirebase ${CoreHBBFT.uniqueID1}")
             }
         })
     }
@@ -169,17 +169,14 @@ object RoomWork {
 
                     listObjectsOfUIds.add(uids)
                 }
-                try {
-                    latch.countDown()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                Log.d(CoreHBBFT.TAG, "getUIDsInRoomFromFirebase success")
+                latch.countDown()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 latch.countDown()
                 // Getting Post failed, log a message
-                Log.w(CoreHBBFT.TAG, "loadPost:onCancelled", databaseError.toException())
+                Log.w(CoreHBBFT.TAG, "getUIDsInRoomFromFirebase: onCancelled", databaseError.toException())
             }
         }
         ref.addListenerForSingleValueEvent(postListener)

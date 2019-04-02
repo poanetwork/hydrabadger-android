@@ -68,8 +68,12 @@ object UserWork {
         DatabaseApplication.mCurUser = user
 
         Getters.updateMetaUserbyUID(CoreHBBFT.uniqueID1, user)
+
+        Log.d(CoreHBBFT.TAG, "saveCurUserSync")
         val semaphore = insertOrUpdateUserInFirebase(user)
         semaphore.acquire()
+
+        Log.d(CoreHBBFT.TAG, "saveCurUserSync: insertOrUpdateUserInFirebase")
     }
 
     fun insertOrUpdateUserInFirebase(user: User): Semaphore {
@@ -330,6 +334,7 @@ object UserWork {
 
 
     fun updateAllUsersFromFirebase() {
+        Log.d(CoreHBBFT.TAG, "updateAllUsersFromFirebase")
         for (user in Getters.getAllLocalUsersDistinct().filter { it.uid != CoreHBBFT.uniqueID1 }) {
             val listObjectsOfUsers: MutableList<Users> = getUsersFromFirebase(user.uid)
             if (listObjectsOfUsers.isEmpty())

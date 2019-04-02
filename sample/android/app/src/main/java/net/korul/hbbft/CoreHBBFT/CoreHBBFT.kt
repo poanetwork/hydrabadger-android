@@ -57,7 +57,7 @@ import kotlin.math.abs
 
 
 object CoreHBBFT : IGetData {
-    val TAG = "HYDRA"
+    val TAG = "HYDRA:CoreHBBFT"
 
     // p2p
     var mP2PMesh: P2PMesh? = null
@@ -109,11 +109,12 @@ object CoreHBBFT : IGetData {
     }
 
     // roomName --  useruid - online/offline
-    private val listOnlineUsers: HashMap<String, HashMap<String, Boolean>> = hashMapOf()
+    private val listOnlineUsers: HashMap<String, MutableList<String>> = hashMapOf()
     // roomName -- sync/notsync
     private val mFlagsSyncMess: HashMap<String, Boolean> = hashMapOf()
     // roomName -- update online/ offline
-    val listUpdateStateToOnline: HashMap<String, Boolean> = hashMapOf()
+    val listFlagsUpdatedStateToOnline: HashMap<String, Boolean> = hashMapOf()
+    val listFlagsSendRequestToHistory: HashMap<String, Boolean> = hashMapOf()
 
     // roomName - list of dates less date
     var mNotSyncMessInDialog: HashMap<String, MutableList<String>> = hashMapOf()
@@ -174,6 +175,7 @@ object CoreHBBFT : IGetData {
     }
 
     fun ALLUpdate() {
+        Log.d(CoreHBBFT.TAG, "ALLUpdate")
         thread {
             updateAllUsersFromFirebase()
             updateAllRoomsFromFirebase()
@@ -222,13 +224,19 @@ object CoreHBBFT : IGetData {
     }
 
     fun startAllNode(RoomId: String) {
+        Log.d(CoreHBBFT.TAG, "startAllNode")
         thread {
+            Log.d(CoreHBBFT.TAG, "startAllNode: getUIDsInRoomFromFirebase")
             val listObjectsOfUIds = getUIDsInRoomFromFirebase(RoomId)
             val isSomebodyOnline = isSomeBodyOnlineInList(listObjectsOfUIds)
+            Log.d(CoreHBBFT.TAG, "startAllNode: isSomebodyOnline - $isSomebodyOnline")
             val cntUsers = listObjectsOfUIds.count()
+            Log.d(CoreHBBFT.TAG, "startAllNode: cntUsers - $cntUsers")
 
             // if 1 dialog
             if (cntUsers < 2) {
+                Log.d(CoreHBBFT.TAG, "startAllNode: cntUsers - $cntUsers < 2")
+
                 for (hl in listeners)
                     hl?.updateStateToError()
                 setOfflineModeInRoomInFirebase(RoomId)
@@ -236,6 +244,11 @@ object CoreHBBFT : IGetData {
             }
             // if 2 users and i am first
             else if (cntUsers == 2 && !isSomebodyOnline) {
+                Log.d(
+                    CoreHBBFT.TAG,
+                    "startAllNode: cntUsers - $cntUsers == 2 and isSomebodyOnline - $isSomebodyOnline - start_node_2x"
+                )
+
                 start_node_2x(RoomId)
 
                 var uid = ""
@@ -246,10 +259,10 @@ object CoreHBBFT : IGetData {
                     }
                 }
                 if (uid.isNotEmpty()) {
-                    Log.d(TAG, "2 users and i am first in room $RoomId")
+                    Log.d(TAG, "startAllNode: 2 users and i am first in room $RoomId")
                     preSendPushToStart(listOf(uid), RoomId, uniqueID1)
                 } else {
-                    Log.d(TAG, "Room uid is empty $RoomId")
+                    Log.d(TAG, "startAllNode: Room uid is empty $RoomId")
                     AppUtils.showToast(
                         mApplicationContext,
                         "Room is empty", true
@@ -258,7 +271,7 @@ object CoreHBBFT : IGetData {
             }
             // if 2 users and second start
             else if (cntUsers == 2 && isSomebodyOnline) {
-                Log.d(TAG, "2 users and second start in room $RoomId")
+                Log.d(TAG, "startAllNode: 2 users and second start in room $RoomId")
                 start_node(RoomId)
             }
             // if many users and i am first
@@ -272,19 +285,21 @@ object CoreHBBFT : IGetData {
                     }
                 }
                 if (uids.isNotEmpty()) {
-                    Log.d(TAG, "many users and i am first in room $RoomId")
+                    Log.d(TAG, "startAllNode: many users and i am first in room $RoomId")
                     preSendPushToStart(uids, RoomId, uniqueID1)
                 } else {
-                    Log.d(TAG, "Room uid is empty $RoomId")
-                    AppUtils.showToast(
-                        mApplicationContext,
-                        "Room uids is empty", true
-                    )
+                    Log.d(TAG, "startAllNode: Room uid is empty $RoomId")
+                    handler.post {
+                        AppUtils.showToast(
+                            mApplicationContext,
+                            "Room uids is empty", true
+                        )
+                    }
                 }
             }
             // if many users and i am not first
             else {
-                Log.d(TAG, "many users and i am not first in room $RoomId")
+                Log.d(TAG, "startAllNode: many users and i am not first in room $RoomId")
                 start_node(RoomId)
             }
         }
@@ -292,16 +307,20 @@ object CoreHBBFT : IGetData {
 
 
     fun start_node(RoomId: String) {
+        Log.d(TAG, "start_node: RoomId - $RoomId")
         setOnlineModeInRoomInFirebase(RoomId)
 
         mCurRoomId = RoomId
-        listUpdateStateToOnline[mCurRoomId] = false
+        listFlagsUpdatedStateToOnline[mCurRoomId] = false
+        listFlagsSendRequestToHistory[mCurRoomId] = false
         mFlagsSyncMess[mCurRoomId] = false
 
+        Log.d(TAG, "start_node: initOneMesh and publishAboutMe - $RoomId")
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
 
         waitForConnect(false)
+        Log.d(TAG, "start_node: waitForConnect finish - $RoomId")
 
         mSocketWrapper!!.initSocketWrapper(RoomId, uniqueID1, mP2PMesh!!.usersCon.toList())
 
@@ -313,6 +332,7 @@ object CoreHBBFT : IGetData {
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
+            Log.d(TAG, "start_node: session?.start_node - $RoomId")
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
                 strTosend,
@@ -322,10 +342,12 @@ object CoreHBBFT : IGetData {
     }
 
     fun start_node_2x(RoomId: String) {
+        Log.d(TAG, "start_node_2x: RoomId - $RoomId")
         setOnlineModeInRoomInFirebase(RoomId)
 
         mCurRoomId = RoomId
-        listUpdateStateToOnline[mCurRoomId] = false
+        listFlagsUpdatedStateToOnline[mCurRoomId] = false
+        listFlagsSendRequestToHistory[mCurRoomId] = false
         mFlagsSyncMess[mCurRoomId] = false
 
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
@@ -333,8 +355,10 @@ object CoreHBBFT : IGetData {
         mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
         Thread.sleep(200)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID2)
+        Log.d(TAG, "start_node_2x: initOneMesh and publishAboutMe - $RoomId")
 
         waitForConnect(true)
+        Log.d(TAG, "start_node_2x: waitForConnect finish - $RoomId")
 
         mSocketWrapper!!.initSocketWrapper2X(RoomId, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
@@ -346,6 +370,7 @@ object CoreHBBFT : IGetData {
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
+            Log.d(TAG, "start_node_2x: session?.start_node 1  - $RoomId")
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
                 strTosend,
@@ -359,6 +384,7 @@ object CoreHBBFT : IGetData {
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
+            Log.d(TAG, "start_node_2x: session?.start_node 2  - $RoomId")
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort2}",
                 strTosend,
@@ -371,7 +397,7 @@ object CoreHBBFT : IGetData {
         val async = GlobalScope.async {
             var ready = false
             while (!ready) {
-                Thread.sleep(500)
+                Thread.sleep(2000)
 
                 ready = if (withoutSelf)
                     !mP2PMesh?.mConnections!!.values.filter { it.myName != uniqueID1 && it.myName != uniqueID2 }.any { !it.mIamReadyToDataTranfer }
@@ -383,33 +409,41 @@ object CoreHBBFT : IGetData {
     }
 
     fun Free() {
+        Log.d(TAG, "Free: FreeConnect")
+
         mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
 
         WriteAnyObjectToFile(mNotSyncMessInDialog as Any, APP_PREFERENCES_MESSDATE)
 
-        for (roomId in listUpdateStateToOnline.keys)
+        Log.d(TAG, "Free: setOfflineModeInRoomInFirebase")
+        for (roomId in listFlagsUpdatedStateToOnline.keys)
             setOfflineModeInRoomInFirebase(roomId)
     }
 
     fun generateOrGetUID() {
+        Log.d(TAG, "generateOrGetUID")
+
         val uiid = ReadObjectFromFile(APP_PREFERENCES_NAME1)
         val uiid1 = ReadObjectFromFile(APP_PREFERENCES_NAME2)
 
         if (uiid == null || uiid == "") {
             uniqueID1 = UUID.randomUUID().toString()
+            Log.d(TAG, "generateOrGetUID: uniqueID1 $uniqueID1")
             WriteObjectToFile(uniqueID1, APP_PREFERENCES_NAME1)
         } else
             uniqueID1 = uiid
 
         if (uiid1 == null || uiid1 == "") {
             uniqueID2 = UUID.randomUUID().toString()
+            Log.d(TAG, "generateOrGetUID: uniqueID2 $uniqueID2")
             WriteObjectToFile(uniqueID2, APP_PREFERENCES_NAME2)
         } else
             uniqueID2 = uiid1
     }
 
     override fun dataReceived(bytes: ByteArray) {
+        Log.d(TAG, "dataReceived")
         if (mSocketWrapper?.mStarted != null && mSocketWrapper?.mStarted!!)
             mSocketWrapper?.sendReceivedDataToHydra(bytes)
     }
@@ -436,20 +470,35 @@ object CoreHBBFT : IGetData {
                 return@subscribe
             }
 
-            if (!listUpdateStateToOnline.containsKey(mCurRoomId) || listUpdateStateToOnline[mCurRoomId] == false) {
-
-                sendMessageGETHIST(uid)
-
-                listUpdateStateToOnline[mCurRoomId] = true
+            if (!listFlagsUpdatedStateToOnline.containsKey(mCurRoomId) || listFlagsUpdatedStateToOnline[mCurRoomId] == false) {
+                listFlagsUpdatedStateToOnline[mCurRoomId] = true
+                Log.d(TAG, "subscribeSession: listFlagsUpdatedStateToOnline")
                 for (hl in listeners) {
                     hl?.updateStateToOnline()
                 }
             }
 
             if (!uid.isEmpty() && !mes.isEmpty() && uid != uniqueID2 && uid != uniqueID1) {
+
+                if (!listFlagsSendRequestToHistory[mCurRoomId]!!) {
+                    Log.d(TAG, "subscribeSession: listFlagsSendRequestToHistory")
+                    listFlagsSendRequestToHistory[mCurRoomId] = true
+                    sendMessageGETHIST(uid)
+                } else {
+                    if (mFlagsSyncMess[mCurRoomId] != null && !mFlagsSyncMess[mCurRoomId]!!) {
+                        Log.d(TAG, "subscribeSession: try sendNotSync mFlagsSyncMess - false")
+                        val randUid = getRandUID(mCurRoomId)
+                        if (randUid != "") {
+                            Log.d(TAG, "subscribeSession: sendNotSync $randUid")
+                            sendNotSync(randUid)
+                        }
+                    }
+                }
+
                 if (lastMes == mes) {
                     val mestime = Calendar.getInstance().timeInMillis
                     if (abs(mestime - lastMestime) < 500) {
+                        Log.d(TAG, "subscribeSession: clear mes because  lastMes == mes ")
                         lastMestime = Calendar.getInstance().timeInMillis
                         return@subscribe
                     }
@@ -460,6 +509,8 @@ object CoreHBBFT : IGetData {
                     var mess = messJson.getString(i)
                     if(mess.endsWith('!'))
                         mess = mess.removeRange(mess.count() - 1, mess.count())
+
+                    Log.d(TAG, "subscribeSession: start parseMessage ")
 
                     parseMessage(mess, uid)
                 }
@@ -485,11 +536,22 @@ object CoreHBBFT : IGetData {
         val commMes = mess.split("᳀†\u058D:")
         if(commMes.size >= 2) when(commMes[0]) {
             MessageType.ILIVE.name -> {
-                if (listOnlineUsers[mCurRoomId] != null && listOnlineUsers[mCurRoomId]!!.contains(uid) && listOnlineUsers[mCurRoomId]!![uid] == true)
+                Log.d(TAG, "parseMessage: MessageType.ILIVE ")
+
+                if (listOnlineUsers[mCurRoomId] != null && listOnlineUsers[mCurRoomId]!!.contains(uid))
                     return
                 else {
-                    listOnlineUsers[mCurRoomId]!![uid] = true
+                    try {
+                        if (listOnlineUsers[mCurRoomId] == null)
+                            listOnlineUsers[mCurRoomId] = arrayListOf()
+
+                        listOnlineUsers[mCurRoomId]!!.add(uid)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                     handler.post {
+                        Log.d(TAG, "parseMessage: setUnOnlineUserWithUID $uid")
+
                         setUnOnlineUserWithUID(uid, true)
                         for (hl in listeners)
                             hl?.setOnlineUser(uid, true)
@@ -497,10 +559,12 @@ object CoreHBBFT : IGetData {
                 }
             }
             MessageType.IDIE.name -> {
-                if (listOnlineUsers[mCurRoomId] != null && listOnlineUsers[mCurRoomId]!!.contains(uid) && listOnlineUsers[mCurRoomId]!![uid] == false)
+                Log.d(TAG, "parseMessage: MessageType.IDIE ")
+
+                if (listOnlineUsers[mCurRoomId] != null && !listOnlineUsers[mCurRoomId]!!.contains(uid))
                     return
                 else {
-                    listOnlineUsers[mCurRoomId]!![uid] = false
+                    listOnlineUsers[mCurRoomId]!!.remove(uid)
                     handler.post {
                         setUnOnlineUserWithUID(uid, false)
                         for (hl in listeners)
@@ -509,6 +573,7 @@ object CoreHBBFT : IGetData {
                 }
             }
             MessageType.MESS.name -> {
+                Log.d(TAG, "parseMessage: MessageType.MESS ")
                 try {
                     val you = uid == uniqueID1 || uid == uniqueID2
                     val date = commMes[1].toDate(format, TimeZone.getDefault())
@@ -520,6 +585,7 @@ object CoreHBBFT : IGetData {
                 }
             }
             MessageType.GETHIST.name -> {
+                Log.d(TAG, "parseMessage: MessageType.GETHIST ")
                 try {
                     if (commMes[1] == uniqueID1 || commMes[1] == uniqueID2) {
                         val curRoom = commMes[2]
@@ -529,6 +595,7 @@ object CoreHBBFT : IGetData {
                         val messeges = getMessagesLessGreaterDate(lessDate, greaterDate, curRoom)
                         val mes = "SENDHIST᳀†\u058D:$uid᳀†\u058D:${uniqueID1}᳀†\u058D:${mCurRoomId}᳀†\u058D:$messeges"
 
+                        Log.d(TAG, "parseMessage: MessageType.GETHIST session?.send_message")
                         session?.send_message(mes)
                     }
                 } catch (e: Exception) {
@@ -538,6 +605,7 @@ object CoreHBBFT : IGetData {
             }
 
             MessageType.SENDHIST.name -> {
+                Log.d(TAG, "parseMessage: MessageType.SENDHIST ")
                 try {
                     if (commMes[1] == uniqueID1 || commMes[1] == uniqueID2) {
                         val uidFrom = commMes[2]
@@ -548,12 +616,22 @@ object CoreHBBFT : IGetData {
                         if (uidRoom == mCurRoomId)
                             curDialog = getDialog(uidRoom)
 
+                        if (commMes[4] == "[]") {
+                            Log.d(TAG, "parseMessage: MessageType.SENDHIST - Empty mess")
+                            mFlagsSyncMess[uidRoom] = true
+                            return
+                        }
+
                         val messages: MutableList<Message?> = commMes[4] as MutableList<Message?>
                         for (mess in messages) {
                             if (mess != null) {
                                 try {
                                     // if deleted message
                                     if (!mess.isVisible && mess.text == "") {
+                                        Log.d(TAG, "parseMessage: MessageType.SENDHIST - deleted message")
+                                        if (mNotSyncMessInDialog[uidRoom] == null)
+                                            mNotSyncMessInDialog[uidRoom] = arrayListOf()
+
                                         mNotSyncMessInDialog[uidRoom]!!.add(
                                             mess.createdAt!!.formatTo(
                                                 format,
@@ -570,18 +648,28 @@ object CoreHBBFT : IGetData {
                                         if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.contains(
                                                 dateString
                                             )
-                                        )
+                                        ) {
+                                            Log.d(TAG, "parseMessage: MessageType.SENDHIST - received deleted message")
                                             mNotSyncMessInDialog[uidRoom]!!.remove(dateString)
+                                        }
 
                                         val date = dateString.toDate(format, TimeZone.getDefault())
                                         // if current dialog - then show new message
                                         if (uidRoom == mCurRoomId) {
+                                            Log.d(
+                                                TAG,
+                                                "parseMessage: MessageType.SENDHIST - current dialog - then show new message - reciveMessage"
+                                            )
                                             for (hl in listeners)
                                                 hl?.reciveMessage(you, mess.user.uid, mess.text!!, date)
                                         }
                                         // if not current dialog - then get user and save mes
                                         else {
                                             if (curDialog != null) {
+                                                Log.d(
+                                                    TAG,
+                                                    "parseMessage: MessageType.SENDHIST - not current dialog - getUserFromLocalOrDownloadFromFirebase"
+                                                )
                                                 if (!curDialog.users.any { it.uid == mess.user.uid }) {
                                                     // user not exist - download it
                                                     getUserFromLocalOrDownloadFromFirebase(
@@ -595,6 +683,11 @@ object CoreHBBFT : IGetData {
                                                                 handlerNewMes.post {
                                                                     curDialog!!.users.add(user)
                                                                     Conversations.getDUser(user).insert()
+
+                                                                    Log.d(
+                                                                        TAG,
+                                                                        "parseMessage: MessageType.SENDHIST - not current dialog - getting user and add message"
+                                                                    )
 
                                                                     val userMes = Getters.getUserbyUIDFromDialog(
                                                                         mess.user.uid,
@@ -613,6 +706,11 @@ object CoreHBBFT : IGetData {
                                                 } else {
                                                     // past message
                                                     handlerNewMes.post {
+                                                        Log.d(
+                                                            TAG,
+                                                            "parseMessage: MessageType.SENDHIST - not current dialog - add message"
+                                                        )
+
                                                         val user = Getters.getUserbyUIDFromDialog(
                                                             mess.user.uid,
                                                             curDialog!!.id
@@ -637,11 +735,15 @@ object CoreHBBFT : IGetData {
 
                         //  send not sync mes to get and save mNotSyncMessInDialog
                         if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.size > 0) {
-                            val randuid = getRandUID(uidRoom)
-                            if (randuid != "") {
-                                sendNotSync(randuid)
-                            }
+                            Log.d(TAG, "parseMessage: send not sync mes to get and save mNotSyncMessInDialog")
+                            val randUid = getRandUID(uidRoom)
+                            if (randUid != "")
+                                sendNotSync(randUid)
                         } else if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.isEmpty()) {
+                            Log.d(TAG, "parseMessage: mFlagsSyncMess - true")
+                            mFlagsSyncMess[uidRoom] = true
+                        } else if (!mNotSyncMessInDialog.containsKey(uidRoom)) {
+                            Log.d(TAG, "parseMessage: mFlagsSyncMess - true")
                             mFlagsSyncMess[uidRoom] = true
                         }
                     }
@@ -654,33 +756,35 @@ object CoreHBBFT : IGetData {
     }
 
     fun getRandUID(uidRoom: String): String {
+        Log.d(TAG, "getRandUID")
         var uid = ""
         try {
             val list = listOnlineUsers[uidRoom]
-            for (ls in list!!.keys) {
-                if (listOnlineUsers[uidRoom]!![ls]!!) {
-                    if (!mSyncUsersUids[uidRoom]!!.contains(ls)) {
-                        uid = ls
-                        break
-                    }
+
+            if (mSyncUsersUids[uidRoom] == null)
+                return ""
+            for (ls in list!!) {
+                if (!mSyncUsersUids[uidRoom]!!.contains(ls)) {
+                    uid = ls
+                    break
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        Log.d(TAG, "getRandUID: uid - $uid")
         return uid
     }
 
     fun sendMessageGETHIST(uid: String) {
         try {
+            Log.d(TAG, "sendMessageGETHIST: to uid - $uid")
             val lastmesDate =
                 getMessagesLessDate(Date(), mCurRoomId)[0]!!.createdAt!!.formatTo(format, TimeZone.getTimeZone("UTC"))
             val curDate = Date().formatTo(format, TimeZone.getTimeZone("UTC"))
 
             val mes = "GETHIST᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$lastmesDate᳀†\u058D:$curDate"
             session?.send_message(mes)
-
-            sendNotSync(uid)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -688,22 +792,31 @@ object CoreHBBFT : IGetData {
 
     private fun sendNotSync(uid: String) {
         if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId] != null && mNotSyncMessInDialog[mCurRoomId]!!.size > 0) {
+            Log.d(TAG, "sendNotSync: to uid - $uid")
             for (value in mNotSyncMessInDialog[mCurRoomId]!!) {
+                if (mSyncUsersUids[mCurRoomId] == null)
+                    mSyncUsersUids[mCurRoomId] = arrayListOf()
                 mSyncUsersUids[mCurRoomId]!!.add(uid)
                 val mes = "GETHIST᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$value᳀†\u058D:$value"
                 session?.send_message(mes)
             }
         } else if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId]!!.isEmpty()) {
+            Log.d(TAG, "sendNotSync: mFlagsSyncMess - true")
+            mFlagsSyncMess[mCurRoomId] = true
+        } else if (!mNotSyncMessInDialog.containsKey(mCurRoomId)) {
+            Log.d(TAG, "sendNotSync: mFlagsSyncMess - true")
             mFlagsSyncMess[mCurRoomId] = true
         }
     }
 
     fun sendMessageIDIE() {
+        Log.d(TAG, "sendMessageIDIE")
         val mes = "IDIE᳀†\u058D:$uniqueID1"
         session?.send_message(mes)
     }
 
     fun sendMessage(str: String) {
+        Log.d(TAG, "sendMessage")
         if (str.isNotEmpty()) {
             val dateString = Date().formatTo(format, TimeZone.getTimeZone("UTC"))
             val mes = "MESS᳀†\u058D:${dateString}᳀†\u058D:$str"

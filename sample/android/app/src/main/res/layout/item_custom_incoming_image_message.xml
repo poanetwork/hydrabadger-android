@@ -16,15 +16,6 @@
             android:layout_marginRight="8dp"/>
 
     <!--this view is needed for custom holder-->
-    <ImageView
-            android:id="@+id/onlineIndicator"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_alignEnd="@id/messageUserAvatar"
-            android:layout_alignRight="@id/messageUserAvatar"
-            android:layout_alignTop="@id/messageUserAvatar"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"/>
 
     <com.github.siyamed.shapeimageview.mask.PorterShapeImageView
             android:id="@id/image"
@@ -47,5 +38,14 @@
             android:layout_below="@id/image"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"/>
+    <ImageView
+            android:id="@+id/onlineIndicator"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_alignEnd="@id/messageUserAvatar"
+            android:layout_alignRight="@id/messageUserAvatar"
+            android:layout_alignTop="@id/messageUserAvatar"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"/>
 
 </RelativeLayout>

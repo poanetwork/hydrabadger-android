@@ -14,16 +14,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"/>
 
-    <!--this view is needed for custom holder-->
-    <ImageView
-            android:id="@+id/onlineIndicator"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_alignEnd="@id/messageUserAvatar"
-            android:layout_alignRight="@id/messageUserAvatar"
-            android:layout_alignTop="@id/messageUserAvatar"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"/>
+
 
     <LinearLayout
             android:id="@id/bubble"
@@ -45,6 +36,17 @@
                 android:layout_marginStart="8dp"/>
 
     </LinearLayout>
+
+    <!--this view is needed for custom holder-->
+    <ImageView
+            android:id="@+id/onlineIndicator"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_alignEnd="@id/messageUserAvatar"
+            android:layout_alignRight="@id/messageUserAvatar"
+            android:layout_alignTop="@id/messageUserAvatar"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"/>
 
     <TextView
             android:id="@id/messageTime"
