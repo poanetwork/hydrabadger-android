@@ -42,19 +42,29 @@ class SocketWrapper {
         mP2PMesh = p_
     }
 
-    fun initSocketWrapper(roomId: String, myUID_: String, users: List<String>) {
-        Log.d(TAG, "SocketWrapper initSocketWrapper2X $roomId - roomId, $myUID_ - myUID")
+    fun initSocketWrapperFirst(roomId: String, myUID_: String, users: List<String>) {
+        Log.d(TAG, "SocketWrapper initSocketWrapperFirst $roomId - roomId, $myUID_ - myUID")
 
         myUID1 = myUID_
         mRoomId = roomId
 
         myLocalPort1 = getPortForUID(myUID1)
 
-        for (uid in users) {
-            if (uid == myUID1)
-                continue
-            addUser(uid)
-        }
+        users.filter { it != myUID1 }.forEach { addUser(it) }
+
+        mStarted = true
+    }
+
+    fun initSocketWrapperSecond(roomId: String, myUID_: String, users: List<String>) {
+        Log.d(TAG, "SocketWrapper initSocketWrapperSecond $roomId - roomId, $myUID_ - myUID")
+
+        myUID2 = myUID_
+        mRoomId = roomId
+
+        myLocalPort2 = getPortForUID(myUID2)
+
+        users.filter { it != myUID1 && it != myUID2 }.forEach { addUser(it) }
+
         mStarted = true
     }
 
@@ -68,11 +78,8 @@ class SocketWrapper {
         myLocalPort1 = getPortForUID(myUID1)
         myLocalPort2 = getPortForUID(myUID2)
 
-        for (uid in users) {
-            if (uid == myUID1 || uid == myUID2)
-                continue
-            addUser(uid)
-        }
+        users.filter { it != myUID1 && it != myUID2 }.forEach { addUser(it) }
+
         mStarted = true
     }
 
@@ -91,7 +98,7 @@ class SocketWrapper {
             println("SHA1 not implemented in this system")
         }
 
-        port1 = (2000 + CongruentPseudoGen(port))
+        port1 = (2000 + congruentPseudoGen(port))
         while (clientsBusyPorts.values.contains(port1)) {
             port1++
         }
@@ -99,7 +106,7 @@ class SocketWrapper {
         return port1
     }
 
-    private fun CongruentPseudoGen(x: BigInteger): Int {
+    private fun congruentPseudoGen(x: BigInteger): Int {
         val a: BigInteger = 1664525.toBigInteger()
         val c: BigInteger = 1013904223.toBigInteger()
         val m: BigInteger = (Math.pow(2.0, 15.0) - 1).toInt().toBigInteger()
@@ -135,7 +142,7 @@ class SocketWrapper {
         }
     }
 
-    fun flushToLocalHydra(
+    private fun flushToLocalHydra(
         pair: Pair<String, String>, uid: String,
         PseudoNotLocalSocket: HashMap<Pair<String, String>, Socket?>,
         LocalALoopSocket: HashMap<String, Socket?>,
@@ -169,9 +176,13 @@ class SocketWrapper {
         }
     }
 
-    fun startPseudoNotLocalSocketALoop(uid: String, port: Int) {
-        Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop new dialog - $uid ; port - $port")
+    private fun startPseudoNotLocalSocketALoop(uid: String, port: Int) {
+        if (mPseudoNotLocalThread.containsKey(uid) || mPseudoNotLocalSocketServer.containsKey(uid)) {
+            Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop  contains uid - $uid")
+            return
+        }
 
+        Log.d(TAG, "SocketWrapper startPseudoNotLocalSocketALoop new dialog - $uid ; port - $port")
         mPseudoNotLocalThread[uid] = thread {
             mPseudoNotLocalSocketServer[uid] = ServerSocket(port)
 
@@ -219,7 +230,7 @@ class SocketWrapper {
         }
     }
 
-    fun getUIDFromHelloRequest(bytes: ByteArray): String {
+    private fun getUIDFromHelloRequest(bytes: ByteArray): String {
         val portInBytes: ByteArray = byteArrayOf(bytes[49], bytes[48])
         val bufferBytes = ByteBuffer.wrap(portInBytes)
         val portUids = bufferBytes.getShort(0)
@@ -231,7 +242,7 @@ class SocketWrapper {
         return uid_
     }
 
-    fun startLocalSocketALoop(
+    private fun startLocalSocketALoop(
         myLocalPort: Int, uid: String, myUID: String,
         LocalALoopThread: HashMap<String, Thread>,
         LocalALoopSocket: HashMap<String, Socket?>
@@ -257,7 +268,7 @@ class SocketWrapper {
         }
     }
 
-    fun sendBytesToDataChannel(uid: String, touid: String, bytes: ByteArray) {
+    private fun sendBytesToDataChannel(uid: String, touid: String, bytes: ByteArray) {
         var pair: Pair<String, String> = Pair(uid, touid)
         val pair2: Pair<String, String> = Pair(touid, uid)
 

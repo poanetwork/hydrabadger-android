@@ -24,7 +24,7 @@ import net.korul.hbbft.CommonFragments.tabSettings.DialogThemeFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsFragment
 import net.korul.hbbft.CommonFragments.tabSettings.SettingsUserFragment
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
-import net.korul.hbbft.CoreHBBFT.CoreHBBFT.ALLUpdate
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT.allUpdateFirebase
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT.uniqueID1
 import net.korul.hbbft.CoreHBBFT.UserWork.getAnyLocalUserByUid
 import net.korul.hbbft.CoreHBBFT.UserWork.saveCurUser
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            else -> ALLUpdate()
+            else -> allUpdateFirebase()
         }
     }
 

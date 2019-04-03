@@ -73,8 +73,22 @@ class Message(
         }
     }
 
+    override fun hashCode(): Int {
+        var result = id_.hashCode()
+        result = 31 * result + id.hashCode()
+        result = 31 * result + idDialog.hashCode()
+        result = 31 * result + isVisible.hashCode()
+        result = 31 * result + user.hashCode()
+        result = 31 * result + (text?.hashCode() ?: 0)
+        result = 31 * result + (createdAt?.hashCode() ?: 0)
+        result = 31 * result + (image?.hashCode() ?: 0)
+        result = 31 * result + (voice?.hashCode() ?: 0)
+        return result
+    }
+
 
     class Image(val url: String)
 
     class Voice(val url: String, val duration: Int)
+
 }

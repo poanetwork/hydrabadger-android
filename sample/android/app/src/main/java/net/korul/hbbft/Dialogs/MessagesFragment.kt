@@ -61,7 +61,7 @@ class MessagesFragment :
         private val handlerNewMes = Handler()
 
         fun newInstance(dialog: Dialog, user: User): MessagesFragment {
-            mCoreHBBFT2X.setRoomId(dialog.id)
+            mCoreHBBFT2X.setCurRoomId(dialog.id)
 
             val f = MessagesFragment()
             val b = Bundle()
@@ -74,7 +74,7 @@ class MessagesFragment :
         }
 
         fun newInstance(dialog: Dialog, user: User, startHbbft: Boolean): MessagesFragment {
-            mCoreHBBFT2X.setRoomId(dialog.id)
+            mCoreHBBFT2X.setCurRoomId(dialog.id)
 
             val f = MessagesFragment()
             val b = Bundle()

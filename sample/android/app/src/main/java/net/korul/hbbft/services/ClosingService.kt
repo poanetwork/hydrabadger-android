@@ -52,8 +52,8 @@ class ClosingService : Service() {
 //        scheduleJob(this)
 
         Thread.sleep(7*1000)
-        DatabaseApplication.mCoreHBBFT2X.Free()
-        Log.i(TAG, "Free()")
+        DatabaseApplication.mCoreHBBFT2X.freeCoreHBBFT()
+        Log.i(TAG, "freeCoreHBBFT()")
 
 
         // Destroy the service

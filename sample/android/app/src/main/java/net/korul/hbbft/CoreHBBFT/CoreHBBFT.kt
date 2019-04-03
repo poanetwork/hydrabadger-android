@@ -9,6 +9,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -49,6 +52,7 @@ import net.korul.hbbft.Session
 import net.korul.hbbft.services.ClosingService
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -78,6 +82,7 @@ object CoreHBBFT : IGetData {
 
     var mCurRoomId: String = ""
     var lastMes: String = ""
+    var lastUid: String = ""
     var lastMestime = Calendar.getInstance().timeInMillis
 
     val mFunctions: FirebaseFunctions
@@ -86,8 +91,10 @@ object CoreHBBFT : IGetData {
     lateinit var mApplicationContext: Context
     var mDatabase: DatabaseReference
 
-
     private val format = "yyyy-MM-dd HH:mm:ss.SSS Z"
+    private val formatWithoutZone = "yyyy-MM-dd HH:mm:ss.SSS"
+    private val dateLastSync = "1970-04-12 12:18:11.000".toDate(formatWithoutZone)
+
     fun String.toDate(dateFormat: String = format, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Date {
         val parser = SimpleDateFormat(dateFormat, Locale.getDefault())
         parser.timeZone = timeZone
@@ -100,6 +107,7 @@ object CoreHBBFT : IGetData {
         return formatter.format(this)
     }
 
+    // Message types
     enum class MessageType(s: String) {
         ILIVE("ILIVE"),
         IDIE("IDIE"),
@@ -108,18 +116,28 @@ object CoreHBBFT : IGetData {
         SENDHIST("SENDHIST")
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                     Sync  _  Online
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
     // roomName --  useruid - online/offline
     private val listOnlineUsers: HashMap<String, MutableList<String>> = hashMapOf()
     // roomName -- sync/notsync
     private val mFlagsSyncMess: HashMap<String, Boolean> = hashMapOf()
     // roomName -- update online/ offline
     val listFlagsUpdatedStateToOnline: HashMap<String, Boolean> = hashMapOf()
-    val listFlagsSendRequestToHistory: HashMap<String, Boolean> = hashMapOf()
-
+    private val listFlagsSendRequestToHistory: HashMap<String, Boolean> = hashMapOf()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
     // roomName - list of dates less date
-    var mNotSyncMessInDialog: HashMap<String, MutableList<String>> = hashMapOf()
+    private var mNotSyncMessInDialog: HashMap<String, MutableList<String>> = hashMapOf()
     // roomName - list of users try sync
     private var mSyncUsersUids: HashMap<String, MutableList<String>> = hashMapOf()
+    // start new connection timer
+    private val handlerTimer = Handler()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    var stopWaitConnect: Boolean = false
+    var waitConnectLooping: Boolean = false
+    var mFlagSendNotSync: Boolean = false
 
     val handler = Handler()
     val handlerNewMes = Handler()
@@ -137,7 +155,7 @@ object CoreHBBFT : IGetData {
 //        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
     }
 
-    fun Init(applicationContext: Context) {
+    fun initCoreHBBFT(applicationContext: Context) {
         mApplicationContext = applicationContext
 
         generateOrGetUID()
@@ -174,15 +192,15 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun ALLUpdate() {
-        Log.d(CoreHBBFT.TAG, "ALLUpdate")
+    fun allUpdateFirebase() {
+        Log.d(CoreHBBFT.TAG, "allUpdateFirebase")
         thread {
             updateAllUsersFromFirebase()
             updateAllRoomsFromFirebase()
         }
     }
 
-    fun setRoomId(roomid: String) {
+    fun setCurRoomId(roomid: String) {
         mCurRoomId = roomid
     }
 
@@ -233,81 +251,92 @@ object CoreHBBFT : IGetData {
             val cntUsers = listObjectsOfUIds.count()
             Log.d(CoreHBBFT.TAG, "startAllNode: cntUsers - $cntUsers")
 
-            // if 1 dialog
-            if (cntUsers < 2) {
-                Log.d(CoreHBBFT.TAG, "startAllNode: cntUsers - $cntUsers < 2")
+            when {
+                // if 1 dialog
+                cntUsers < 2 -> {
+                    Log.d(CoreHBBFT.TAG, "startAllNode: cntUsers - $cntUsers < 2")
 
-                for (hl in listeners)
-                    hl?.updateStateToError()
-                setOfflineModeInRoomInFirebase(RoomId)
-                Log.d(TAG, "Room is empty $RoomId")
-            }
-            // if 2 users and i am first
-            else if (cntUsers == 2 && !isSomebodyOnline) {
-                Log.d(
-                    CoreHBBFT.TAG,
-                    "startAllNode: cntUsers - $cntUsers == 2 and isSomebodyOnline - $isSomebodyOnline - start_node_2x"
-                )
-
-                start_node_2x(RoomId)
-
-                var uid = ""
-                for (ui in listObjectsOfUIds) {
-                    if (ui.UID != uniqueID1) {
-                        uid = ui.UID!!
-                        break
-                    }
+                    for (hl in listeners)
+                        hl?.updateStateToError()
+                    setOfflineModeInRoomInFirebase(RoomId)
+                    Log.d(TAG, "Room is empty $RoomId")
                 }
-                if (uid.isNotEmpty()) {
-                    Log.d(TAG, "startAllNode: 2 users and i am first in room $RoomId")
-                    preSendPushToStart(listOf(uid), RoomId, uniqueID1)
-                } else {
-                    Log.d(TAG, "startAllNode: Room uid is empty $RoomId")
-                    AppUtils.showToast(
-                        mApplicationContext,
-                        "Room is empty", true
+                // if 2 users and i am first
+                cntUsers == 2 && !isSomebodyOnline -> {
+                    Log.d(
+                        CoreHBBFT.TAG,
+                        "startAllNode: cntUsers - $cntUsers == 2 and isSomebodyOnline - $isSomebodyOnline - start_node_2x"
                     )
-                }
-            }
-            // if 2 users and second start
-            else if (cntUsers == 2 && isSomebodyOnline) {
-                Log.d(TAG, "startAllNode: 2 users and second start in room $RoomId")
-                start_node(RoomId)
-            }
-            // if many users and i am first
-            else if (cntUsers > 2 && !isSomebodyOnline) {
-                start_node(RoomId)
 
-                val uids = mutableListOf<String>()
-                for (ui in listObjectsOfUIds) {
-                    if (ui.UID != uniqueID1) {
-                        uids.add(ui.UID!!)
+                    start_node_2x(RoomId, isSomebodyOnline)
+
+                    var uid = ""
+                    for (ui in listObjectsOfUIds) {
+                        if (ui.UID != uniqueID1) {
+                            uid = ui.UID!!
+                            break
+                        }
                     }
-                }
-                if (uids.isNotEmpty()) {
-                    Log.d(TAG, "startAllNode: many users and i am first in room $RoomId")
-                    preSendPushToStart(uids, RoomId, uniqueID1)
-                } else {
-                    Log.d(TAG, "startAllNode: Room uid is empty $RoomId")
-                    handler.post {
+                    if (uid.isNotEmpty()) {
+                        Log.d(TAG, "startAllNode: 2 users and i am first in room $RoomId")
+                        preSendPushToStart(listOf(uid), RoomId, uniqueID1)
+                    } else {
+                        Log.d(TAG, "startAllNode: Room uid is empty $RoomId")
                         AppUtils.showToast(
                             mApplicationContext,
-                            "Room uids is empty", true
+                            "Room is empty", true
                         )
                     }
                 }
-            }
-            // if many users and i am not first
-            else {
-                Log.d(TAG, "startAllNode: many users and i am not first in room $RoomId")
-                start_node(RoomId)
+                // if 2 users and second start
+                cntUsers == 2 && isSomebodyOnline -> {
+                    Log.d(TAG, "startAllNode: 2 users and second start in room $RoomId")
+                    start_node_first(RoomId, isSomebodyOnline)
+                }
+                // if many users and i am first
+                cntUsers > 2 && !isSomebodyOnline -> {
+//                    start_node_2x(RoomId, isSomebodyOnline)
+                    start_node_first(RoomId, isSomebodyOnline)
+
+                    val uids = mutableListOf<String>()
+                    listObjectsOfUIds.filter { it.UID != uniqueID1 && it.UID != null }.forEach { uids.add(it.UID!!) }
+
+
+//                    E/HYDRABADGERTAG: thread 'tokio-runtime-worker-1' panicked at '::handle_key_gen_part: State must be `GeneratingKeys`. State:
+//                    AwaitingPeers { required_peers: [], available_peers: [] }
+//
+//                    [FIXME: Enqueue these parts!]
+//
+//                    ': src/hydrabadger/key_gen.rs:333
+//                    handlerTimer.postDelayed({
+//                        start_node_second(RoomId, true)
+//                    }, 30000)
+
+                    if (uids.isNotEmpty()) {
+                        Log.d(TAG, "startAllNode: many users and i am first in room $RoomId")
+                        preSendPushToStart(uids, RoomId, uniqueID1)
+                    } else {
+                        Log.d(TAG, "startAllNode: Room uid is empty $RoomId")
+                        handler.post {
+                            AppUtils.showToast(
+                                mApplicationContext,
+                                "Room uids is empty", true
+                            )
+                        }
+                    }
+                }
+                // if many users and i am not first
+                else -> {
+                    Log.d(TAG, "startAllNode: many users and i am not first in room $RoomId")
+                    start_node_first(RoomId, isSomebodyOnline)
+                }
             }
         }
     }
 
 
-    fun start_node(RoomId: String) {
-        Log.d(TAG, "start_node: RoomId - $RoomId")
+    private fun start_node_first(RoomId: String, isSomebodyOnline: Boolean) {
+        Log.d(TAG, "start_node_first: RoomId - $RoomId")
         setOnlineModeInRoomInFirebase(RoomId)
 
         mCurRoomId = RoomId
@@ -315,24 +344,23 @@ object CoreHBBFT : IGetData {
         listFlagsSendRequestToHistory[mCurRoomId] = false
         mFlagsSyncMess[mCurRoomId] = false
 
-        Log.d(TAG, "start_node: initOneMesh and publishAboutMe - $RoomId")
+        Log.d(TAG, "start_node_first: initOneMesh and publishAboutMe - $RoomId")
         mP2PMesh?.initOneMesh(RoomId, uniqueID1)
         mP2PMesh?.publishAboutMe(RoomId, uniqueID1)
 
-        waitForConnect(false)
-        Log.d(TAG, "start_node: waitForConnect finish - $RoomId")
+        waitForConnect(false, isSomebodyOnline)
+        Log.d(TAG, "start_node_first: waitForConnect finish - $RoomId")
 
-        mSocketWrapper!!.initSocketWrapper(RoomId, uniqueID1, mP2PMesh!!.usersCon.toList())
+        mSocketWrapper!!.initSocketWrapperFirst(RoomId, uniqueID1, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
-            for (clients in mSocketWrapper!!.clientsBusyPorts)
-                if (clients.key != uniqueID1)
-                    strTosend += "127.0.0.1:${clients.value};"
+            mSocketWrapper!!.clientsBusyPorts.filter { it.key != uniqueID1 }
+                .forEach { strTosend += "127.0.0.1:${it.value};" }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
-            Log.d(TAG, "start_node: session?.start_node - $RoomId")
+            Log.d(TAG, "start_node_first: session?.start_node_first - $RoomId")
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
                 strTosend,
@@ -341,7 +369,47 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun start_node_2x(RoomId: String) {
+    private fun start_node_second(RoomId: String, isSomebodyOnline: Boolean) {
+        if (listFlagsUpdatedStateToOnline.containsKey(mCurRoomId) && listFlagsUpdatedStateToOnline[mCurRoomId] != null && !listFlagsUpdatedStateToOnline[mCurRoomId]!!) {
+            Log.d(TAG, "start_node_second: RoomId - $RoomId")
+            setOnlineModeInRoomInFirebase(RoomId)
+
+            mCurRoomId = RoomId
+            listFlagsUpdatedStateToOnline[mCurRoomId] = false
+            listFlagsSendRequestToHistory[mCurRoomId] = false
+            mFlagsSyncMess[mCurRoomId] = false
+
+            Log.d(TAG, "start_node_second: initOneMesh and publishAboutMe - $RoomId")
+            mP2PMesh?.initOneMesh(RoomId, uniqueID2)
+            mP2PMesh?.publishAboutMe(RoomId, uniqueID2)
+
+            stopWaitConnect = true
+            Thread.sleep(200)
+            while (waitConnectLooping)
+                Thread.sleep(100)
+            waitForConnect(true, isSomebodyOnline)
+            Log.d(TAG, "start_node_second: waitForConnect finish - $RoomId")
+
+            mSocketWrapper!!.initSocketWrapperSecond(RoomId, uniqueID2, mP2PMesh!!.usersCon.toList())
+
+            thread {
+                var strTosend = ""
+                mSocketWrapper!!.clientsBusyPorts.filter { it.key != uniqueID2 }
+                    .forEach { strTosend += "127.0.0.1:${it.value};" }
+                if (strTosend.endsWith(";"))
+                    strTosend = strTosend.substring(0, strTosend.length - 1)
+
+                Log.d(TAG, "start_node_second: session?.start_node_second - $RoomId")
+                session?.start_node(
+                    "127.0.0.1:${mSocketWrapper!!.myLocalPort2}",
+                    strTosend,
+                    uniqueID2
+                )
+            }
+        }
+    }
+
+    private fun start_node_2x(RoomId: String, isSomebodyOnline: Boolean) {
         Log.d(TAG, "start_node_2x: RoomId - $RoomId")
         setOnlineModeInRoomInFirebase(RoomId)
 
@@ -357,20 +425,19 @@ object CoreHBBFT : IGetData {
         mP2PMesh?.publishAboutMe(RoomId, uniqueID2)
         Log.d(TAG, "start_node_2x: initOneMesh and publishAboutMe - $RoomId")
 
-        waitForConnect(true)
+        waitForConnect(true, isSomebodyOnline)
         Log.d(TAG, "start_node_2x: waitForConnect finish - $RoomId")
 
         mSocketWrapper!!.initSocketWrapper2X(RoomId, uniqueID1, uniqueID2, mP2PMesh!!.usersCon.toList())
 
         thread {
             var strTosend = ""
-            for (clients in mSocketWrapper!!.clientsBusyPorts)
-                if (clients.key != uniqueID1 && clients.key != uniqueID2)
-                    strTosend += "127.0.0.1:${clients.value};"
+            mSocketWrapper!!.clientsBusyPorts.filter { it.key != uniqueID1 && it.key != uniqueID2 }
+                .forEach { strTosend += "127.0.0.1:${it.value};" }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
-            Log.d(TAG, "start_node_2x: session?.start_node 1  - $RoomId")
+            Log.d(TAG, "start_node_2x: session?.start_node_first 1  - $RoomId")
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort1}",
                 strTosend,
@@ -378,13 +445,12 @@ object CoreHBBFT : IGetData {
             )
 
             strTosend = ""
-            for (clients in mSocketWrapper!!.clientsBusyPorts)
-                if (clients.key != uniqueID2)
-                    strTosend += "127.0.0.1:${clients.value};"
+            mSocketWrapper!!.clientsBusyPorts.filter { it.key != uniqueID2 }
+                .forEach { strTosend += "127.0.0.1:${it.value};" }
             if (strTosend.endsWith(";"))
                 strTosend = strTosend.substring(0, strTosend.length - 1)
 
-            Log.d(TAG, "start_node_2x: session?.start_node 2  - $RoomId")
+            Log.d(TAG, "start_node_2x: session?.start_node_first 2  - $RoomId")
             session?.start_node(
                 "127.0.0.1:${mSocketWrapper!!.myLocalPort2}",
                 strTosend,
@@ -393,35 +459,48 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun waitForConnect(withoutSelf: Boolean) {
+    private fun waitForConnect(withoutSelf: Boolean, isSomebodyOnline: Boolean) {
+        stopWaitConnect = false
         val async = GlobalScope.async {
             var ready = false
             while (!ready) {
-                Thread.sleep(2000)
+                waitConnectLooping = true
+                if (mSocketWrapper!!.mAllStop || stopWaitConnect)
+                    break
+
+                if (isSomebodyOnline) {
+                    if (mP2PMesh?.mConnections!!.values.isEmpty()) {
+                        Thread.sleep(500)
+                        continue
+                    }
+                } else
+                    Thread.sleep(500)
 
                 ready = if (withoutSelf)
                     !mP2PMesh?.mConnections!!.values.filter { it.myName != uniqueID1 && it.myName != uniqueID2 }.any { !it.mIamReadyToDataTranfer }
                 else
                     !mP2PMesh?.mConnections!!.values.any { !it.mIamReadyToDataTranfer }
             }
+            waitConnectLooping = false
         }
         runBlocking { async.await() }
+        waitConnectLooping = false
     }
 
-    fun Free() {
-        Log.d(TAG, "Free: FreeConnect")
+    fun freeCoreHBBFT() {
+        Log.d(TAG, "freeCoreHBBFT: FreeConnect")
 
         mP2PMesh?.FreeConnect()
         mSocketWrapper?.mAllStop = true
 
         WriteAnyObjectToFile(mNotSyncMessInDialog as Any, APP_PREFERENCES_MESSDATE)
 
-        Log.d(TAG, "Free: setOfflineModeInRoomInFirebase")
+        Log.d(TAG, "freeCoreHBBFT: setOfflineModeInRoomInFirebase")
         for (roomId in listFlagsUpdatedStateToOnline.keys)
             setOfflineModeInRoomInFirebase(roomId)
     }
 
-    fun generateOrGetUID() {
+    private fun generateOrGetUID() {
         Log.d(TAG, "generateOrGetUID")
 
         val uiid = ReadObjectFromFile(APP_PREFERENCES_NAME1)
@@ -443,7 +522,7 @@ object CoreHBBFT : IGetData {
     }
 
     override fun dataReceived(bytes: ByteArray) {
-        Log.d(TAG, "dataReceived")
+        Log.d(TAG, "dataReceived ${bytes.size} bytes")
         if (mSocketWrapper?.mStarted != null && mSocketWrapper?.mStarted!!)
             mSocketWrapper?.sendReceivedDataToHydra(bytes)
     }
@@ -480,11 +559,11 @@ object CoreHBBFT : IGetData {
 
             if (!uid.isEmpty() && !mes.isEmpty() && uid != uniqueID2 && uid != uniqueID1) {
 
-                if (!listFlagsSendRequestToHistory[mCurRoomId]!!) {
+                if (!listFlagsSendRequestToHistory[mCurRoomId]!! && !mFlagSendNotSync) {
                     Log.d(TAG, "subscribeSession: listFlagsSendRequestToHistory")
                     listFlagsSendRequestToHistory[mCurRoomId] = true
                     sendMessageGETHIST(uid)
-                } else {
+                } else if (listFlagsSendRequestToHistory[mCurRoomId]!! && !mFlagSendNotSync) {
                     if (mFlagsSyncMess[mCurRoomId] != null && !mFlagsSyncMess[mCurRoomId]!!) {
                         Log.d(TAG, "subscribeSession: try sendNotSync mFlagsSyncMess - false")
                         val randUid = getRandUID(mCurRoomId)
@@ -495,7 +574,7 @@ object CoreHBBFT : IGetData {
                     }
                 }
 
-                if (lastMes == mes) {
+                if (lastMes == mes && uid == lastUid) {
                     val mestime = Calendar.getInstance().timeInMillis
                     if (abs(mestime - lastMestime) < 500) {
                         Log.d(TAG, "subscribeSession: clear mes because  lastMes == mes ")
@@ -504,7 +583,7 @@ object CoreHBBFT : IGetData {
                     }
                 }
 
-                val messJson = GetJsonArrayMess(mes)
+                val messJson = getJsonArrayMess(mes)
                 for (i in 0 until messJson!!.length()) {
                     var mess = messJson.getString(i)
                     if(mess.endsWith('!'))
@@ -516,6 +595,7 @@ object CoreHBBFT : IGetData {
                 }
 
                 lastMes = mes
+                lastUid = uid
                 lastMestime = Calendar.getInstance().timeInMillis
             }
         }
@@ -524,7 +604,7 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    private fun GetJsonArrayMess(mes: String): JSONArray? {
+    private fun getJsonArrayMess(mes: String): JSONArray? {
         var message = mes.replace("[Transaction ", "")
         message = message.removeRange(message.count() - 1, message.count())
         val jsonObj = JSONObject(message)
@@ -532,7 +612,9 @@ object CoreHBBFT : IGetData {
         return messJson
     }
 
-    fun parseMessage(mess: String, uid: String) {
+    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
+
+    private fun parseMessage(mess: String, uid: String) {
         val commMes = mess.split("᳀†\u058D:")
         if(commMes.size >= 2) when(commMes[0]) {
             MessageType.ILIVE.name -> {
@@ -547,6 +629,7 @@ object CoreHBBFT : IGetData {
 
                         listOnlineUsers[mCurRoomId]!!.add(uid)
                     } catch (e: Exception) {
+                        Log.d(TAG, "parseMessage: ERROR MessageType.ILIVE ")
                         e.printStackTrace()
                     }
                     handler.post {
@@ -592,8 +675,16 @@ object CoreHBBFT : IGetData {
                         val lessDate = commMes[3].toDate(format, TimeZone.getDefault())
                         val greaterDate = commMes[4].toDate(format, TimeZone.getDefault())
 
-                        val messeges = getMessagesLessGreaterDate(lessDate, greaterDate, curRoom)
-                        val mes = "SENDHIST᳀†\u058D:$uid᳀†\u058D:${uniqueID1}᳀†\u058D:${mCurRoomId}᳀†\u058D:$messeges"
+                        val messeges = getMessagesLessGreaterDate(lessDate, greaterDate, curRoom).filterNotNull()
+                        messeges.forEach {
+                            it.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))
+                                ?.toDate(format, TimeZone.getTimeZone("UTC"))
+                        }
+                        val mes =
+                            "SENDHIST᳀†\u058D:$uid᳀†\u058D:${uniqueID1}᳀†\u058D:${mCurRoomId}᳀†\u058D:${GsonBuilder().setDateFormat(
+                                DateFormat.FULL,
+                                DateFormat.FULL
+                            ).create().toJson(messeges)}"
 
                         Log.d(TAG, "parseMessage: MessageType.GETHIST session?.send_message")
                         session?.send_message(mes)
@@ -607,6 +698,7 @@ object CoreHBBFT : IGetData {
             MessageType.SENDHIST.name -> {
                 Log.d(TAG, "parseMessage: MessageType.SENDHIST ")
                 try {
+                    mFlagSendNotSync = false
                     if (commMes[1] == uniqueID1 || commMes[1] == uniqueID2) {
                         val uidFrom = commMes[2]
                         val uidRoom = commMes[3]
@@ -622,114 +714,115 @@ object CoreHBBFT : IGetData {
                             return
                         }
 
-                        val messages: MutableList<Message?> = commMes[4] as MutableList<Message?>
+                        var messages: List<Message> =
+                            GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create().fromJson(commMes[4])
+                        messages = messages.sortedBy { it.createdAt }
                         for (mess in messages) {
-                            if (mess != null) {
-                                try {
-                                    // if deleted message
-                                    if (!mess.isVisible && mess.text == "") {
-                                        Log.d(TAG, "parseMessage: MessageType.SENDHIST - deleted message")
-                                        if (mNotSyncMessInDialog[uidRoom] == null)
-                                            mNotSyncMessInDialog[uidRoom] = arrayListOf()
+                            try {
+                                // if deleted message
+                                if (!mess.isVisible && mess.text == "") {
+                                    Log.d(TAG, "parseMessage: MessageType.SENDHIST - deleted message")
+                                    if (mNotSyncMessInDialog[uidRoom] == null)
+                                        mNotSyncMessInDialog[uidRoom] = arrayListOf()
 
-                                        mNotSyncMessInDialog[uidRoom]!!.add(
-                                            mess.createdAt!!.formatTo(
-                                                format,
-                                                TimeZone.getTimeZone("UTC")
-                                            )
+                                    mNotSyncMessInDialog[uidRoom]!!.add(
+                                        mess.createdAt!!.formatTo(
+                                            format,
+                                            TimeZone.getTimeZone("UTC")
                                         )
+                                    )
+                                }
+                                // if message receive
+                                else {
+                                    val you = mess.user.uid == uniqueID1 || mess.user.uid == uniqueID2
+                                    val dateString = mess.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))!!
+
+                                    // if message was delete in other user but in this exist
+                                    if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.contains(
+                                            dateString
+                                        )
+                                    ) {
+                                        Log.d(TAG, "parseMessage: MessageType.SENDHIST - received deleted message")
+                                        mNotSyncMessInDialog[uidRoom]!!.remove(dateString)
                                     }
-                                    // if message receive
+
+                                    val date = dateString.toDate(format, TimeZone.getDefault())
+                                    // if current dialog - then show new message
+                                    if (uidRoom == mCurRoomId) {
+                                        Log.d(
+                                            TAG,
+                                            "parseMessage: MessageType.SENDHIST - current dialog - then show new message - reciveMessage"
+                                        )
+                                        for (hl in listeners)
+                                            hl?.reciveMessage(you, mess.user.uid, mess.text!!, date)
+                                    }
+                                    // if not current dialog - then get user and save mes
                                     else {
-                                        val you = mess.user.uid == uniqueID1 || mess.user.uid == uniqueID2
-                                        val dateString = mess.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))!!
-
-                                        // if message was delete in other user but in this exist
-                                        if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.contains(
-                                                dateString
-                                            )
-                                        ) {
-                                            Log.d(TAG, "parseMessage: MessageType.SENDHIST - received deleted message")
-                                            mNotSyncMessInDialog[uidRoom]!!.remove(dateString)
-                                        }
-
-                                        val date = dateString.toDate(format, TimeZone.getDefault())
-                                        // if current dialog - then show new message
-                                        if (uidRoom == mCurRoomId) {
+                                        if (curDialog != null) {
                                             Log.d(
                                                 TAG,
-                                                "parseMessage: MessageType.SENDHIST - current dialog - then show new message - reciveMessage"
+                                                "parseMessage: MessageType.SENDHIST - not current dialog - getUserFromLocalOrDownloadFromFirebase"
                                             )
-                                            for (hl in listeners)
-                                                hl?.reciveMessage(you, mess.user.uid, mess.text!!, date)
-                                        }
-                                        // if not current dialog - then get user and save mes
-                                        else {
-                                            if (curDialog != null) {
-                                                Log.d(
-                                                    TAG,
-                                                    "parseMessage: MessageType.SENDHIST - not current dialog - getUserFromLocalOrDownloadFromFirebase"
-                                                )
-                                                if (!curDialog.users.any { it.uid == mess.user.uid }) {
-                                                    // user not exist - download it
-                                                    getUserFromLocalOrDownloadFromFirebase(
+                                            if (!curDialog.users.any { it.uid == mess.user.uid }) {
+                                                // user not exist - download it
+                                                getUserFromLocalOrDownloadFromFirebase(
+                                                    mess.user.uid,
+                                                    curDialog.id,
+                                                    object : IAddToContacts {
+                                                        override fun errorAddContact() {
+                                                        }
+
+                                                        override fun user(user: User) {
+                                                            handlerNewMes.post {
+                                                                curDialog!!.users.add(user)
+                                                                Conversations.getDUser(user).insert()
+
+                                                                Log.d(
+                                                                    TAG,
+                                                                    "parseMessage: MessageType.SENDHIST - not current dialog - getting user and add message"
+                                                                )
+
+                                                                val userMes = Getters.getUserbyUIDFromDialog(
+                                                                    mess.user.uid,
+                                                                    curDialog!!.id
+                                                                )
+                                                                val mess = MessagesFixtures.setNewMessage(
+                                                                    mess.text!!,
+                                                                    curDialog!!,
+                                                                    userMes!!,
+                                                                    date
+                                                                )
+                                                                curDialog = getDialog(curDialog!!.id)
+                                                            }
+                                                        }
+                                                    })
+                                            } else {
+                                                // past message
+                                                handlerNewMes.post {
+                                                    Log.d(
+                                                        TAG,
+                                                        "parseMessage: MessageType.SENDHIST - not current dialog - add message"
+                                                    )
+
+                                                    val user = Getters.getUserbyUIDFromDialog(
                                                         mess.user.uid,
-                                                        curDialog.id,
-                                                        object : IAddToContacts {
-                                                            override fun errorAddContact() {
-                                                            }
-
-                                                            override fun user(user: User) {
-                                                                handlerNewMes.post {
-                                                                    curDialog!!.users.add(user)
-                                                                    Conversations.getDUser(user).insert()
-
-                                                                    Log.d(
-                                                                        TAG,
-                                                                        "parseMessage: MessageType.SENDHIST - not current dialog - getting user and add message"
-                                                                    )
-
-                                                                    val userMes = Getters.getUserbyUIDFromDialog(
-                                                                        mess.user.uid,
-                                                                        curDialog!!.id
-                                                                    )
-                                                                    val mess = MessagesFixtures.setNewMessage(
-                                                                        mess.text!!,
-                                                                        curDialog!!,
-                                                                        userMes!!,
-                                                                        date
-                                                                    )
-                                                                    curDialog = getDialog(curDialog!!.id)
-                                                                }
-                                                            }
-                                                        })
-                                                } else {
-                                                    // past message
-                                                    handlerNewMes.post {
-                                                        Log.d(
-                                                            TAG,
-                                                            "parseMessage: MessageType.SENDHIST - not current dialog - add message"
-                                                        )
-
-                                                        val user = Getters.getUserbyUIDFromDialog(
-                                                            mess.user.uid,
-                                                            curDialog!!.id
-                                                        )
-                                                        val mess = MessagesFixtures.setNewMessage(
-                                                            mess.text!!,
-                                                            curDialog!!,
-                                                            user!!,
-                                                            date
-                                                        )
-                                                        curDialog = getDialog(curDialog!!.id)
-                                                    }
+                                                        curDialog!!.id
+                                                    )
+                                                    val mess = MessagesFixtures.setNewMessage(
+                                                        mess.text!!,
+                                                        curDialog!!,
+                                                        user!!,
+                                                        date
+                                                    )
+                                                    curDialog = getDialog(curDialog!!.id)
                                                 }
                                             }
                                         }
                                     }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
                                 }
+                            } catch (e: Exception) {
+                                Log.d(TAG, "parseMessage: ERROR parse current message MessageType.SENDHIST ")
+                                e.printStackTrace()
                             }
                         }
 
@@ -755,48 +848,52 @@ object CoreHBBFT : IGetData {
         }
     }
 
-    fun getRandUID(uidRoom: String): String {
+    private fun getRandUID(uidRoom: String): String {
         Log.d(TAG, "getRandUID")
-        var uid = ""
-        try {
-            val list = listOnlineUsers[uidRoom]
+        val uid: String
+        val list = listOnlineUsers[uidRoom]
+        if (list == null || !mSyncUsersUids.containsKey(uidRoom) || mSyncUsersUids[uidRoom] == null)
+            return ""
 
-            if (mSyncUsersUids[uidRoom] == null)
-                return ""
-            for (ls in list!!) {
-                if (!mSyncUsersUids[uidRoom]!!.contains(ls)) {
-                    uid = ls
-                    break
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        try {
+            uid = list.first { !mSyncUsersUids[uidRoom]!!.contains(it) }
+        } catch (e: NoSuchElementException) {
+            return ""
         }
+
         Log.d(TAG, "getRandUID: uid - $uid")
         return uid
     }
 
-    fun sendMessageGETHIST(uid: String) {
+    private fun sendMessageGETHIST(uid: String) {
         try {
-            Log.d(TAG, "sendMessageGETHIST: to uid - $uid")
-            val lastmesDate =
-                getMessagesLessDate(Date(), mCurRoomId)[0]!!.createdAt!!.formatTo(format, TimeZone.getTimeZone("UTC"))
+            mFlagSendNotSync = true
+            lateinit var lastmesDate: String
+            val lastMes = getMessagesLessDate(Date(), mCurRoomId)
+            lastmesDate = if (lastMes == null || lastMes.isEmpty()) {
+                dateLastSync.formatTo(format, TimeZone.getTimeZone("UTC"))
+            } else {
+                lastMes[0]!!.createdAt!!.formatTo(format, TimeZone.getTimeZone("UTC"))
+            }
             val curDate = Date().formatTo(format, TimeZone.getTimeZone("UTC"))
 
+            Log.d(TAG, "sendMessageGETHIST: to uid - $uid from date - $lastmesDate to date - $curDate")
             val mes = "GETHIST᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$lastmesDate᳀†\u058D:$curDate"
             session?.send_message(mes)
         } catch (e: Exception) {
+            Log.d(TAG, "sendMessageGETHIST: ERROR uid - $uid")
             e.printStackTrace()
         }
     }
 
     private fun sendNotSync(uid: String) {
-        if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId] != null && mNotSyncMessInDialog[mCurRoomId]!!.size > 0) {
-            Log.d(TAG, "sendNotSync: to uid - $uid")
+        if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId] != null && mNotSyncMessInDialog[mCurRoomId]!!.isNotEmpty()) {
+            mFlagSendNotSync = true
             for (value in mNotSyncMessInDialog[mCurRoomId]!!) {
                 if (mSyncUsersUids[mCurRoomId] == null)
                     mSyncUsersUids[mCurRoomId] = arrayListOf()
                 mSyncUsersUids[mCurRoomId]!!.add(uid)
+                Log.d(TAG, "sendNotSync: to uid - $uid date - $value")
                 val mes = "GETHIST᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$value᳀†\u058D:$value"
                 session?.send_message(mes)
             }
