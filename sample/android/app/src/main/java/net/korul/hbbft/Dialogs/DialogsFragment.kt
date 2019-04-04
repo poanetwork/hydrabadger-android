@@ -218,7 +218,7 @@ class DialogsFragment :
         super.dialogsAdapter!!.setOnDialogClickListener(this)
         super.dialogsAdapter!!.setOnDialogLongClickListener(this)
         super.dialogsAdapter!!.setDatesFormatter(this)
-        super.dialogsAdapter!!.setOnDialogViewClickListener { view, dialog ->
+        super.dialogsAdapter!!.setOnDialogViewClickListener { _, dialog ->
             val transaction = (activity as AppCompatActivity).supportFragmentManager.beginTransaction()
             transaction.add(
                 R.id.view,

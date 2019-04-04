@@ -2,20 +2,23 @@ package net.korul.hbbft.Dialogs.holder.holders.messages
 
 import android.util.Pair
 import android.view.View
+import android.widget.TextView
 
 import com.stfalcon.chatkit.messages.MessageHolders
 import net.korul.hbbft.CommonData.data.model.Message
+import net.korul.hbbft.R
 
-/*
- * Created by troy379 on 05.04.17.
- */
+
+
 class CustomOutcomingImageMessageViewHolder(itemView: View) :
     MessageHolders.OutcomingImageMessageViewHolder<Message>(itemView) {
+
+    private val messageTime: TextView = itemView.findViewById<View>(R.id.messageTime) as TextView
 
     override fun onBind(message: Message) {
         super.onBind(message)
 
-        time.text = message.status + " " + time.text
+        messageTime.text = message.status + " " + time.text
     }
 
     //Override this method to have ability to pass custom data in ImageLoader for loading image(not avatar).

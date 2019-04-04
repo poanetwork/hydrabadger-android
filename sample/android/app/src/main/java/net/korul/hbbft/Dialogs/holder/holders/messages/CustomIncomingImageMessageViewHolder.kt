@@ -5,9 +5,7 @@ import com.stfalcon.chatkit.messages.MessageHolders
 import net.korul.hbbft.CommonData.data.model.Message
 import net.korul.hbbft.R
 
-/*
- * Created by troy379 on 05.04.17.
- */
+
 class CustomIncomingImageMessageViewHolder(itemView: View) :
     MessageHolders.IncomingImageMessageViewHolder<Message>(itemView) {
 

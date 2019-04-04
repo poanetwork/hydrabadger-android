@@ -2,6 +2,7 @@ package net.korul.hbbft.Dialogs
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -10,6 +11,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import net.korul.hbbft.CommonData.data.fixtures.MessagesFixtures
 import net.korul.hbbft.CommonData.data.fixtures.MessagesFixtures.Companion.deleteMessages
@@ -33,6 +35,7 @@ abstract class BaseMessagesFragment :
     MessagesListAdapter.OnLoadMoreListener {
 
     protected var messagesAdapter: MessagesListAdapter<Message>? = null
+    lateinit var imageLoader: ImageLoader
 
     var menu: Menu? = null
     var selectionCount: Int = 0
@@ -62,6 +65,19 @@ abstract class BaseMessagesFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+        imageLoader = ImageLoader { imageView, url, _ ->
+            try {
+                if (url != "") {
+                    val image = BitmapFactory.decodeFile(url)
+                    imageView.setImageBitmap(image)
+                } else {
+                    imageView.setImageResource(R.drawable.ic_contact)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
 
         progress = ProgressDialog(context!!)
         progress.setTitle("Connecting")
@@ -100,8 +116,8 @@ abstract class BaseMessagesFragment :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_delete -> {
-                val sellmes = messagesAdapter!!.selectedMessages
-                deleteMessages(sellmes)
+                val selectedmes = messagesAdapter!!.selectedMessages
+                deleteMessages(selectedmes)
                 setLastMessage(mCurDialog)
                 mCurDialog = Getters.getDialog(mCurDialog!!.id)
                 messagesAdapter!!.deleteSelectedMessages()

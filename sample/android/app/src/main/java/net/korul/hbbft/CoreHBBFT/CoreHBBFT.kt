@@ -295,8 +295,8 @@ object CoreHBBFT : IGetData {
                 }
                 // if many users and i am first
                 cntUsers > 2 && !isSomebodyOnline -> {
-//                    start_node_2x(RoomId, isSomebodyOnline)
-                    start_node_first(RoomId, isSomebodyOnline)
+                    start_node_2x(RoomId, isSomebodyOnline)
+//                    start_node_first(RoomId, isSomebodyOnline)
 
                     val uids = mutableListOf<String>()
                     listObjectsOfUIds.filter { it.UID != uniqueID1 && it.UID != null }.forEach { uids.add(it.UID!!) }
@@ -476,10 +476,15 @@ object CoreHBBFT : IGetData {
                 } else
                     Thread.sleep(500)
 
-                ready = if (withoutSelf)
-                    !mP2PMesh?.mConnections!!.values.filter { it.myName != uniqueID1 && it.myName != uniqueID2 }.any { !it.mIamReadyToDataTranfer }
-                else
-                    !mP2PMesh?.mConnections!!.values.any { !it.mIamReadyToDataTranfer }
+                ready = try {
+                    if (withoutSelf)
+                        !mP2PMesh?.mConnections!!.values.filter { it.myName != uniqueID1 && it.myName != uniqueID2 }.any { !it.mIamReadyToDataTranfer }
+                    else
+                        !mP2PMesh?.mConnections!!.values.any { !it.mIamReadyToDataTranfer }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
+                }
             }
             waitConnectLooping = false
         }
@@ -851,11 +856,12 @@ object CoreHBBFT : IGetData {
     private fun getRandUID(uidRoom: String): String {
         Log.d(TAG, "getRandUID")
         val uid: String
-        val list = listOnlineUsers[uidRoom]
-        if (list == null || !mSyncUsersUids.containsKey(uidRoom) || mSyncUsersUids[uidRoom] == null)
-            return ""
+        val list = listOnlineUsers[uidRoom] ?: return ""
 
         try {
+            if (mSyncUsersUids[uidRoom] == null || !mSyncUsersUids.containsKey(uidRoom))
+                return list.first()
+
             uid = list.first { !mSyncUsersUids[uidRoom]!!.contains(it) }
         } catch (e: NoSuchElementException) {
             return ""

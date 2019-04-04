@@ -2,7 +2,6 @@ package net.korul.hbbft.Dialogs
 
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -14,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.gson.Gson
-import com.stfalcon.chatkit.commons.ImageLoader
 import com.stfalcon.chatkit.messages.MessageHolders
 import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesListAdapter
@@ -330,7 +328,7 @@ class MessagesFragment :
             override fun onAvatarClick() {
                 AppUtils.showToast(
                     context!!,
-                    "Text message avatar clicked", true
+                    "message avatar clicked", true
                 )
             }
         }
@@ -370,19 +368,7 @@ class MessagesFragment :
             .setOutcomingImageLayout(R.layout.item_custom_outcoming_image_message)
 
 
-        super.messagesAdapter = MessagesListAdapter(mCurUser?.id, holders, ImageLoader { imageView, url, payload ->
-            try {
-                val pathAvatar = url
-                if (pathAvatar != "") {
-                    val image = BitmapFactory.decodeFile(pathAvatar)
-                    imageView.setImageBitmap(image)
-                } else {
-                    imageView.setImageResource(R.drawable.ic_contact)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        })
+        super.messagesAdapter = MessagesListAdapter(mCurUser?.id, holders, super.imageLoader)
         super.messagesAdapter!!.enableSelectionMode(this)
         super.messagesAdapter!!.setLoadMoreListener(this)
         super.messagesAdapter!!.setDateHeadersFormatter(this)

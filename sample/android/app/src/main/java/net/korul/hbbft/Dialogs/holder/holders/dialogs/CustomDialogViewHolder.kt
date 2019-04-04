@@ -7,9 +7,7 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.R
 
-/*
- * Created by Anton Bevza on 1/18/17.
- */
+
 class CustomDialogViewHolder(itemView: View) : DialogsListAdapter.DialogViewHolder<Dialog>(itemView) {
 
     private val onlineIndicator: View = itemView.findViewById(R.id.onlineIndicator)
