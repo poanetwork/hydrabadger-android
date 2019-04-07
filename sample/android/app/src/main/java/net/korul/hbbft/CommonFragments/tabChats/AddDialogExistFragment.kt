@@ -208,13 +208,55 @@ class AddDialogExistFragment : Fragment() {
                 val fileLocation = data.extras.getString("data")
                 val bitmap = BitmapFactory.decodeFile(fileLocation)
 
-                my_qr_code_view.setImageBitmap(bitmap)
-                button_add_dialog_qr.visibility = View.VISIBLE
+                val generatedQRCode = bitmap
+                val width = generatedQRCode.width
+                val height = generatedQRCode.height
+                val pixels = IntArray(width * height)
+                generatedQRCode.getPixels(pixels, 0, width, 0, 0, width, height)
 
-                AppUtils.showToast(
-                    activity!!,
-                    getString(R.string.qr_code_file_selected), true
-                )
+                val source = RGBLuminanceSource(width, height, pixels)
+
+                val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+
+                val reader = MultiFormatReader()
+                var result: Result? = null
+                try {
+                    result = reader.decode(binaryBitmap)
+                } catch (e: NotFoundException) {
+                    e.printStackTrace()
+                } catch (e: ChecksumException) {
+                    e.printStackTrace()
+                } catch (e: FormatException) {
+                    e.printStackTrace()
+                }
+
+                if (result != null) {
+                    val barcodeEncoder = BarcodeEncoder()
+                    val bitmap = barcodeEncoder.encodeBitmap(result.text, BarcodeFormat.QR_CODE, 400, 400)
+                    my_qr_code_view.setImageBitmap(bitmap)
+                    button_add_dialog_qr.visibility = View.VISIBLE
+
+                    AppUtils.showToast(
+                        activity!!,
+                        getString(R.string.qr_code_file_selected), true
+                    )
+                } else {
+                    AppUtils.showToast(
+                        activity!!,
+                        getString(R.string.qr_code_file_selected_wrongly), true
+                    )
+
+                    try {
+                        val barcodeEncoder = BarcodeEncoder()
+                        val bitmap = barcodeEncoder.encodeBitmap(CoreHBBFT.uniqueID1, BarcodeFormat.QR_CODE, 400, 400)
+                        val blurred = blurRenderScript(context!!, bitmap, 25)
+                        my_qr_code_view.setImageBitmap(blurred)
+                        button_add_dialog_qr.visibility = View.GONE
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
             } else {
                 AppUtils.showToast(
                     activity!!,

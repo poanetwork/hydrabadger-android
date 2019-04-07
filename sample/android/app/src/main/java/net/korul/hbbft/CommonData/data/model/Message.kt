@@ -6,8 +6,7 @@ import java.util.*
 
 
 class Message(
-    var id_: Long = 0,
-    private var id: String,
+    var id: Long = 0,
     var idDialog: String,
     var isVisible: Boolean,
     private var user: User,
@@ -26,12 +25,8 @@ class Message(
         return image
     }
 
-    override fun getId(): String {
-        return id
-    }
-
-    fun setId(id: String) {
-        this.id = id
+    override fun getUID(): String {
+        return id.toString()
     }
 
     override fun getText(): String? {
@@ -67,15 +62,16 @@ class Message(
     }
 
     override fun equals(other: Any?): Boolean {
-        return try { this.createdAt == (other as Message).createdAt && this.idDialog == other.idDialog && this.text == other.text }
+        return try {
+            this.createdAt == (other as Message).createdAt && this.idDialog == other.idDialog && this.id == other.id
+        }
         catch (e: Exception) {
             false
         }
     }
 
     override fun hashCode(): Int {
-        var result = id_.hashCode()
-        result = 31 * result + id.hashCode()
+        var result = id.hashCode()
         result = 31 * result + idDialog.hashCode()
         result = 31 * result + isVisible.hashCode()
         result = 31 * result + user.hashCode()

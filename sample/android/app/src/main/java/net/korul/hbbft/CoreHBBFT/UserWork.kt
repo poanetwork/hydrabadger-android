@@ -213,18 +213,18 @@ object UserWork {
     }
 
     fun getUserFromLocalOrDownloadFromFirebase(uid: String, dialogId: String, listener: IAddToContacts) {
-        val LocalUser = getAnyLocalUserByUid(uid)
-        if (LocalUser != null) {
+        val localUser = getAnyLocalUserByUid(uid)
+        if (localUser != null) {
             val id = Getters.getNextUserID()
             val user = User(
                 id,
                 uid,
                 id.toString(),
                 dialogId,
-                LocalUser.name,
-                LocalUser.nick,
-                LocalUser.avatar,
-                LocalUser.isOnline
+                localUser.name,
+                localUser.nick,
+                localUser.avatar,
+                localUser.isOnline
             )
 
             listener.user(user)

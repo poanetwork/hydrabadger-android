@@ -8,7 +8,7 @@ import net.korul.hbbft.CommonData.data.model.coreDataBase.AppDatabase
 
 @Table(name = "DUser", database = AppDatabase::class)
 class DUser : BaseModel() {
-    @PrimaryKey()
+    @PrimaryKey
     @Column(name = "id")
     var id: Long = 0
 

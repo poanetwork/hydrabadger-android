@@ -14,6 +14,7 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import net.korul.hbbft.CommonFragments.tabSettings.NotificationFragment
+import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 import net.korul.hbbft.FireAlarm.FireAlarmActivity
 import net.korul.hbbft.MainActivity
 import net.korul.hbbft.R
@@ -33,7 +34,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             Log.d(TAG, "onMessageReceived from uid: $uidsFrom and roomid $roomid")
 
-            sendNotification(roomid)
+            if (uidsFrom != CoreHBBFT.uniqueID1 && uidsFrom != CoreHBBFT.uniqueID2)
+                sendNotification(roomid)
         } catch (e: Exception) {
             e.printStackTrace()
         }

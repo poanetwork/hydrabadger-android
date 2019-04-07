@@ -10,6 +10,7 @@ import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
 
 class SocketWrapper {
@@ -37,6 +38,9 @@ class SocketWrapper {
     lateinit var mRoomId: String
     lateinit var myUID1: String
     lateinit var myUID2: String
+
+    var semaphore = Semaphore(1)
+    var semaphore2 = Semaphore(1)
 
     constructor(p_: P2PMesh) {
         mP2PMesh = p_
@@ -160,8 +164,10 @@ class SocketWrapper {
 
             Log.d(TAG, "SocketWrapper write to PseudoNotLocalSocket ${bytes.size} - bytes; pair - $pair")
 
+            semaphore.acquire()
             dout?.write(bytes)
             dout?.flush()
+            semaphore.release()
         } else {
             val socket = LocalALoopSocket[uid]
             val dout = socket?.getOutputStream()
@@ -171,8 +177,10 @@ class SocketWrapper {
 
             Log.d(TAG, "SocketWrapper write to LocalALoopSocket ${bytes.size} - bytes; pair - $pair")
 
+            semaphore.acquire()
             dout?.write(bytes)
             dout?.flush()
+            semaphore.release()
         }
     }
 
@@ -287,6 +295,8 @@ class SocketWrapper {
         json.put("toUID", uid)
         val buffer = ByteBuffer.wrap(json.toString().toByteArray(StandardCharsets.UTF_8))
 
+//        semaphore2.acquire()
         mP2PMesh!!.mConnections[pair]?.dataChannel?.send(DataChannel.Buffer(buffer, true))
+//        semaphore2.release()
     }
 }

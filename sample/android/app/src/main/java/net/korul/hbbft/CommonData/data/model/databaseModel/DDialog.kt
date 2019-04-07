@@ -9,7 +9,7 @@ import net.korul.hbbft.CommonData.data.model.coreDataBase.AppDatabase
 
 @Table(name = "DDialog", database = AppDatabase::class)
 class DDialog : BaseModel() {
-    @PrimaryKey()
+    @PrimaryKey
     @Column(name = "id")
     var id: String = ""
 

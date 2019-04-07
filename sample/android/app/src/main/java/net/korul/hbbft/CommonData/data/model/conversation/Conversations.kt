@@ -46,7 +46,7 @@ class Conversations {
             }
             ddialog.usersIDs = usersIDsModelList(ArrayList(listIDUsers))
 
-            ddialog.lastMessageID = dialog.lastMessage?.id_
+            ddialog.lastMessageID = dialog.lastMessage?.id
             ddialog.lastMessage = getDMessage(dialog.lastMessage)
 
             ddialog.unreadCount = dialog.unreadCount
@@ -60,7 +60,6 @@ class Conversations {
             else {
                 val mes = Message(
                     dmessage.id,
-                    dmessage.id.toString(),
                     dmessage.idDialog,
                     dmessage.isVisible,
                     getUser(dmessage.user),
@@ -79,7 +78,7 @@ class Conversations {
                 null
             else {
                 val dmessage = DMessage()
-                dmessage.id = message.id_
+                dmessage.id = message.id
                 dmessage.idDialog = message.idDialog
                 dmessage.userID = message.user.id_
                 dmessage.user = getDUser(message.user)

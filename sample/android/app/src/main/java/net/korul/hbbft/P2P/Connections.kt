@@ -68,7 +68,7 @@ class Connections() {
         mInited = true
     }
 
-    fun FreeConnect() {
+    fun freeConnect() {
         if (dataChannel != null) {
             dataChannel!!.close()
             dataChannel!!.unregisterObserver()
@@ -109,7 +109,7 @@ class Connections() {
         }
 
         override fun onIceCandidate(iceCandidate: IceCandidate) {
-            Log.d(TAG, "PeerConnectionObserver onIceCandidate: " + iceCandidate.toString())
+            Log.d(TAG, "PeerConnectionObserver onIceCandidate: $iceCandidate")
 
             val json = JSONObject()
 
@@ -226,7 +226,7 @@ class Connections() {
                 val data = ByteArray(limit)
                 buffer.data.get(data)
 
-                Log.d(TAG, "Reciver ${data.size} bytes")
+                Log.d(TAG, "Receiver ${data.size} bytes")
                 callback?.dataReceived(data)
             }
         }

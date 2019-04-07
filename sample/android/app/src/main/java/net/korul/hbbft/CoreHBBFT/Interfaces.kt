@@ -9,7 +9,9 @@ interface CoreHBBFTListener {
 
     fun updateStateToError()
 
-    fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date)
+    fun reciveMessage(you: Boolean, uid: String, mes: String, mesID: Long, data: Date)
+
+    fun reciveMessageWithDate(you: Boolean, uid: String, mes: String, mesID: Long, data: Date)
 
     fun setOnlineUser(uid: String, online: Boolean)
 }

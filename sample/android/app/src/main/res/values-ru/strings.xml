@@ -188,6 +188,7 @@
     <string name="options">Действия</string>
     <string name="or">или</string>
     <string name="qr_code_file_selected">QR изображение выбрано!</string>
+    <string name="qr_code_file_selected_wrongly">QR изображение выбрано неверное!</string>
     <string name="avatar">Аватар</string>
     <string name="qr">QR</string>
     <string name="qr_code_disk_saved">Изображение успешно сохранено!</string>

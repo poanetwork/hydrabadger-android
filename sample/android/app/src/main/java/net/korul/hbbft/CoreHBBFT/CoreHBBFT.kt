@@ -22,11 +22,12 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CommonData.data.model.core.Getters.getAllDialogsUids
-import net.korul.hbbft.CommonData.data.model.core.Getters.getDialog
-import net.korul.hbbft.CommonData.data.model.core.Getters.getMessagesLessDate
-import net.korul.hbbft.CommonData.data.model.core.Getters.getMessagesLessGreaterDate
+import net.korul.hbbft.CommonData.data.model.core.Getters.getAllMessagesLessGreaterDate
+import net.korul.hbbft.CommonData.data.model.core.Getters.getAllMessagesWithId
+import net.korul.hbbft.CommonData.data.model.core.Getters.getDialogByRoomId
+import net.korul.hbbft.CommonData.data.model.core.Getters.getVisMessagesLessDate
 import net.korul.hbbft.CommonData.utils.AppUtils
-import net.korul.hbbft.CoreHBBFT.FileUtil.ReadAnyObjectFromFile
+import net.korul.hbbft.CoreHBBFT.FileUtil.ReadAnyObjectHFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.ReadObjectFromFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteAnyObjectToFile
 import net.korul.hbbft.CoreHBBFT.FileUtil.WriteObjectToFile
@@ -91,8 +92,8 @@ object CoreHBBFT : IGetData {
     lateinit var mApplicationContext: Context
     var mDatabase: DatabaseReference
 
-    private val format = "yyyy-MM-dd HH:mm:ss.SSS Z"
-    private val formatWithoutZone = "yyyy-MM-dd HH:mm:ss.SSS"
+    private const val format = "yyyy-MM-dd HH:mm:ss.SSS Z"
+    private const val formatWithoutZone = "yyyy-MM-dd HH:mm:ss.SSS"
     private val dateLastSync = "1970-04-12 12:18:11.000".toDate(formatWithoutZone)
 
     fun String.toDate(dateFormat: String = format, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Date {
@@ -108,15 +109,14 @@ object CoreHBBFT : IGetData {
     }
 
     // Message types
-    enum class MessageType(s: String) {
-        ILIVE("ILIVE"),
-        IDIE("IDIE"),
-        MESS("MESS"),
-        GETHIST("GETHIST"),
-        SENDHIST("SENDHIST"),
-        GETSYNC("GETSYNC"),
-        SENDSYNC("SENDSYNC")
-
+    enum class MessageType {
+        ILIVE,
+        IDIE,
+        MESS,
+        GETHIST,
+        SENDHIST,
+        GETSYNC,
+        SENDSYNC
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ object CoreHBBFT : IGetData {
     private val listFlagsSendRequestToHistory: HashMap<String, Boolean> = hashMapOf()
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     // roomName - list of dates less date
-    private var mNotSyncMessInDialog: HashMap<String, MutableList<String>> = hashMapOf()
+    private var mNotSyncMessInDialog: HashMap<String, MutableList<Long>> = hashMapOf()
     // roomName - list of users try sync
     private var mSyncUsersUids: HashMap<String, MutableList<String>> = hashMapOf()
     // start new connection timer
@@ -163,11 +163,10 @@ object CoreHBBFT : IGetData {
 
         generateOrGetUID()
 
-        val any = ReadAnyObjectFromFile(APP_PREFERENCES_MESSDATE)
-        mNotSyncMessInDialog = if (any != null)
-            any as HashMap<String, MutableList<String>>
-        else
-            hashMapOf()
+        var notSyncMessInDialog = ReadAnyObjectHFromFile(APP_PREFERENCES_MESSDATE)
+        if (notSyncMessInDialog == null)
+            notSyncMessInDialog = hashMapOf()
+        mNotSyncMessInDialog = notSyncMessInDialog
 
         val serviceIntent = Intent(applicationContext, ClosingService::class.java)
         applicationContext.startService(serviceIntent)
@@ -248,7 +247,8 @@ object CoreHBBFT : IGetData {
         Log.d(CoreHBBFT.TAG, "startAllNode")
         thread {
             Log.d(CoreHBBFT.TAG, "startAllNode: getUIDsInRoomFromFirebase")
-            val listObjectsOfUIds = getUIDsInRoomFromFirebase(RoomId)
+            var listObjectsOfUIds = getUIDsInRoomFromFirebase(RoomId)
+            listObjectsOfUIds = listObjectsOfUIds.distinctBy { it.UID }.toMutableList()
             val isSomebodyOnline = isSomeBodyOnlineInList(listObjectsOfUIds)
             Log.d(CoreHBBFT.TAG, "startAllNode: isSomebodyOnline - $isSomebodyOnline")
             val cntUsers = listObjectsOfUIds.count()
@@ -298,9 +298,9 @@ object CoreHBBFT : IGetData {
                 }
                 // if many users and i am first
                 cntUsers > 2 && !isSomebodyOnline -> {
-                    start_node_2x(RoomId, isSomebodyOnline)
+//                    start_node_2x(RoomId, isSomebodyOnline)
                     //TODO fixxxxxxxxxxx
-//                    start_node_first(RoomId, isSomebodyOnline)
+                    start_node_first(RoomId, isSomebodyOnline)
 
                     val uids = mutableListOf<String>()
                     listObjectsOfUIds.filter { it.UID != uniqueID1 && it.UID != null }.forEach { uids.add(it.UID!!) }
@@ -497,12 +497,12 @@ object CoreHBBFT : IGetData {
     }
 
     fun freeCoreHBBFT() {
-        Log.d(TAG, "freeCoreHBBFT: FreeConnect")
+        Log.d(TAG, "freeCoreHBBFT: freeConnect")
 
-        mP2PMesh?.FreeConnect()
+        mP2PMesh?.freeConnect()
         mSocketWrapper?.mAllStop = true
 
-        WriteAnyObjectToFile(mNotSyncMessInDialog as Any, APP_PREFERENCES_MESSDATE)
+        WriteAnyObjectToFile(mNotSyncMessInDialog, APP_PREFERENCES_MESSDATE)
 
         Log.d(TAG, "freeCoreHBBFT: setOfflineModeInRoomInFirebase")
         for (roomId in listFlagsUpdatedStateToOnline.keys)
@@ -605,10 +605,10 @@ object CoreHBBFT : IGetData {
             listFlagsSendRequestToHistory[mCurRoomId] = true
             sendMessageGETHIST(uid)
         } else if (listFlagsSendRequestToHistory[mCurRoomId]!! && !mFlagSendNotSync) {
-            if (mFlagsSyncMess[mCurRoomId] != null && !mFlagsSyncMess[mCurRoomId]!!) {
+//            if (mFlagsSyncMess[mCurRoomId] != null && !mFlagsSyncMess[mCurRoomId]!!) {
                 Log.d(TAG, "getHistOrSync: try requestNotSyncMes")
-                requestNotSyncMes(uid)
-            }
+            requestNotSyncMes(mCurRoomId)
+//            }
         }
     }
 
@@ -668,8 +668,12 @@ object CoreHBBFT : IGetData {
                 try {
                     val you = uid == uniqueID1 || uid == uniqueID2
                     val date = commMes[1].toDate(format, TimeZone.getDefault())
+
+                    val id = commMes[2].toLong()
+                    val text = commMes[3]
+
                     for (hl in listeners)
-                        hl?.reciveMessage(you, uid, commMes[2], date)
+                        hl?.reciveMessage(you, uid, text, id, date)
                 } catch (e: Exception) {
                     Log.d(TAG, "ERROR parse MESS incoming message")
                     e.printStackTrace()
@@ -683,7 +687,7 @@ object CoreHBBFT : IGetData {
                         val lessDate = commMes[3].toDate(format, TimeZone.getDefault())
                         val greaterDate = commMes[4].toDate(format, TimeZone.getDefault())
 
-                        val messeges = getMessagesLessGreaterDate(lessDate, greaterDate, curRoom).filterNotNull()
+                        val messeges = getAllMessagesLessGreaterDate(lessDate, greaterDate, curRoom).filterNotNull()
                         messeges.forEach {
                             it.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))
                                 ?.toDate(format, TimeZone.getTimeZone("UTC"))
@@ -707,19 +711,20 @@ object CoreHBBFT : IGetData {
                 try {
                     if (commMes[1] == uniqueID1 || commMes[1] == uniqueID2) {
                         val curRoom = commMes[2]
-                        val lessDate = commMes[3].toDate(format, TimeZone.getDefault())
-                        val greaterDate = commMes[4].toDate(format, TimeZone.getDefault())
+                        val listId: List<Long> = Gson().fromJson(commMes[3])
 
-                        val messeges = getMessagesLessGreaterDate(lessDate, greaterDate, curRoom).filterNotNull()
-                        messeges.forEach {
+                        Log.d(TAG, "parseMessage: MessageType.GETSYNC list of need id mes $listId")
+                        val messages = getAllMessagesWithId(curRoom, listId)
+                        messages.forEach {
                             it.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))
                                 ?.toDate(format, TimeZone.getTimeZone("UTC"))
                         }
+
                         val mes =
                             "SENDSYNC᳀†\u058D:$uid᳀†\u058D:${uniqueID1}᳀†\u058D:${mCurRoomId}᳀†\u058D:${GsonBuilder().setDateFormat(
                                 DateFormat.FULL,
                                 DateFormat.FULL
-                            ).create().toJson(messeges)}"
+                            ).create().toJson(messages)}"
 
                         Log.d(TAG, "parseMessage: MessageType.GETSYNC session?.send_message")
                         session?.send_message(mes)
@@ -733,6 +738,10 @@ object CoreHBBFT : IGetData {
                 Log.d(TAG, "parseMessage: MessageType.SENDSYNC ")
                 try {
                     if (commMes[1] == uniqueID1 || commMes[1] == uniqueID2) {
+                        if (mSyncUsersUids[mCurRoomId] == null)
+                            mSyncUsersUids[mCurRoomId] = arrayListOf()
+                        mSyncUsersUids[mCurRoomId]!!.add(uid)
+
                         mFlagSendNotSync = false
                         val uidFrom = commMes[2]
                         val uidRoom = commMes[3]
@@ -740,25 +749,19 @@ object CoreHBBFT : IGetData {
                         // get dialog if not current
                         var curDialog: Dialog? = null
                         if (uidRoom == mCurRoomId)
-                            curDialog = getDialog(uidRoom)
+                            curDialog = getDialogByRoomId(uidRoom)
 
                         if (commMes[4] == "[]") {
                             Log.d(TAG, "parseMessage: MessageType.SENDSYNC - Empty mess")
-                            if (mSyncUsersUids[mCurRoomId] == null)
-                                mSyncUsersUids[mCurRoomId] = arrayListOf()
-                            mSyncUsersUids[mCurRoomId]!!.add(uid)
                             return
                         }
 
                         var messages: List<Message> =
                             GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create().fromJson(commMes[4])
                         messages = messages.sortedBy { it.createdAt }
-                        for (mess in messages) {
-                            addMessageToFragment(mess, uidRoom, curDialog, "SENDSYNC")
+                        for (mes in messages) {
+                            addMessageToFragment(mes, uidRoom, curDialog, "SENDSYNC")
                         }
-
-                        //  send not sync mes to get and save mNotSyncMessInDialog
-                        requestNotSyncMes(uidRoom)
                     }
                 } catch (e: Exception) {
                     Log.d(TAG, "ERROR parse SENDSYNC incoming message")
@@ -769,6 +772,10 @@ object CoreHBBFT : IGetData {
                 Log.d(TAG, "parseMessage: MessageType.SENDHIST ")
                 try {
                     if (commMes[1] == uniqueID1 || commMes[1] == uniqueID2) {
+                        if (mSyncUsersUids[mCurRoomId] == null)
+                            mSyncUsersUids[mCurRoomId] = arrayListOf()
+                        mSyncUsersUids[mCurRoomId]!!.add(uid)
+
                         mFlagSendNotSync = false
                         val uidFrom = commMes[2]
                         val uidRoom = commMes[3]
@@ -776,7 +783,7 @@ object CoreHBBFT : IGetData {
                         // get dialog if not current
                         var curDialog: Dialog? = null
                         if (uidRoom == mCurRoomId)
-                            curDialog = getDialog(uidRoom)
+                            curDialog = getDialogByRoomId(uidRoom)
 
                         if (commMes[4] == "[]") {
                             Log.d(TAG, "parseMessage: MessageType.SENDHIST - Empty mess")
@@ -786,12 +793,9 @@ object CoreHBBFT : IGetData {
                         var messages: List<Message> =
                             GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create().fromJson(commMes[4])
                         messages = messages.sortedBy { it.createdAt }
-                        for (mess in messages) {
-                            addMessageToFragment(mess, uidRoom, curDialog, "SENDHIST")
+                        for (mes in messages) {
+                            addMessageToFragment(mes, uidRoom, curDialog, "SENDHIST")
                         }
-
-                        //  send not sync mes to get and save mNotSyncMessInDialog
-                        requestNotSyncMes(uidRoom)
                     }
                 } catch (e: Exception) {
                     Log.d(TAG, "ERROR parse SENDHIST incoming message")
@@ -830,12 +834,8 @@ object CoreHBBFT : IGetData {
                 if (mNotSyncMessInDialog[uidRoom] == null)
                     mNotSyncMessInDialog[uidRoom] = arrayListOf()
 
-                mNotSyncMessInDialog[uidRoom]!!.add(
-                    mess.createdAt!!.formatTo(
-                        format,
-                        TimeZone.getTimeZone("UTC")
-                    )
-                )
+                mNotSyncMessInDialog[uidRoom]!!.add(mess.id)
+                WriteAnyObjectToFile(mNotSyncMessInDialog, APP_PREFERENCES_MESSDATE)
             }
             // if message receive
             else {
@@ -843,12 +843,11 @@ object CoreHBBFT : IGetData {
                 val dateString = mess.createdAt?.formatTo(format, TimeZone.getTimeZone("UTC"))!!
 
                 // if message was delete in other user but in this exist
-                if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.contains(
-                        dateString
-                    )
+                if (mNotSyncMessInDialog.containsKey(uidRoom) && mNotSyncMessInDialog[uidRoom]!!.contains(mess.id)
                 ) {
                     Log.d(TAG, "addMessageToFragment: MessageType.$subTag - received deleted message")
-                    mNotSyncMessInDialog[uidRoom]!!.remove(dateString)
+                    mNotSyncMessInDialog[uidRoom]!!.remove(mess.id)
+                    WriteAnyObjectToFile(mNotSyncMessInDialog, APP_PREFERENCES_MESSDATE)
                 }
 
                 val date = dateString.toDate(format, TimeZone.getDefault())
@@ -859,7 +858,7 @@ object CoreHBBFT : IGetData {
                         "addMessageToFragment: MessageType.$subTag - current dialog - then show new message - reciveMessage"
                     )
                     for (hl in listeners)
-                        hl?.reciveMessage(you, mess.user.uid, mess.text!!, date)
+                        hl?.reciveMessageWithDate(you, mess.user.uid, mess.text!!, mess.id, date)
                 }
                 // if not current dialog - then get user and save mes
                 else {
@@ -887,17 +886,17 @@ object CoreHBBFT : IGetData {
                                                 "addMessageToFragment: MessageType.$subTag - not current dialog - getting user and add message"
                                             )
 
-                                            val userMes = Getters.getUserbyUIDFromDialog(
-                                                mess.user.uid,
-                                                curDialog1!!.id
-                                            )
-                                            val mess = MessagesFixtures.setNewMessage(
+                                            MessagesFixtures.setNewMessage(
                                                 mess.text!!,
+                                                mess.id,
                                                 curDialog1!!,
-                                                userMes!!,
+                                                Getters.getUserbyUIDFromDialog(
+                                                    mess.user.uid,
+                                                    curDialog1!!.id
+                                                )!!,
                                                 date
                                             )
-                                            curDialog1 = getDialog(curDialog1!!.id)
+                                            curDialog1 = getDialogByRoomId(curDialog1!!.id)
                                         }
                                     }
                                 })
@@ -909,17 +908,17 @@ object CoreHBBFT : IGetData {
                                     "addMessageToFragment: MessageType.$subTag - not current dialog - add message"
                                 )
 
-                                val user = Getters.getUserbyUIDFromDialog(
-                                    mess.user.uid,
-                                    curDialog1!!.id
-                                )
-                                val mess = MessagesFixtures.setNewMessage(
+                                MessagesFixtures.setNewMessage(
                                     mess.text!!,
+                                    mess.id,
                                     curDialog1!!,
-                                    user!!,
+                                    Getters.getUserbyUIDFromDialog(
+                                        mess.user.uid,
+                                        curDialog1!!.id
+                                    )!!,
                                     date
                                 )
-                                curDialog1 = getDialog(curDialog1!!.id)
+                                curDialog1 = getDialogByRoomId(curDialog1!!.id)
                             }
                         }
                     }
@@ -935,6 +934,7 @@ object CoreHBBFT : IGetData {
         Log.d(TAG, "getRandUID")
         val uid: String
         val list = listOnlineUsers[uidRoom] ?: return ""
+        if (list.isEmpty()) return ""
 
         try {
             if (mSyncUsersUids[uidRoom] == null || !mSyncUsersUids.containsKey(uidRoom))
@@ -951,8 +951,9 @@ object CoreHBBFT : IGetData {
 
     private fun sendMessageGETHIST(uid: String) {
         try {
+            mFlagSendNotSync = true
             lateinit var lastmesDate: String
-            val lastMes = getMessagesLessDate(Date(), mCurRoomId)
+            val lastMes = getVisMessagesLessDate(Date(), mCurRoomId)
             lastmesDate = if (lastMes == null || lastMes.isEmpty()) {
                 dateLastSync.formatTo(format, TimeZone.getTimeZone("UTC"))
             } else {
@@ -963,7 +964,6 @@ object CoreHBBFT : IGetData {
             Log.d(TAG, "sendMessageGETHIST: to uid - $uid from date - $lastmesDate to date - $curDate")
             val mes = "GETHIST᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$lastmesDate᳀†\u058D:$curDate"
 
-            mFlagSendNotSync = true
             session?.send_message(mes)
         } catch (e: Exception) {
             Log.d(TAG, "sendMessageGETHIST: ERROR uid - $uid")
@@ -973,11 +973,12 @@ object CoreHBBFT : IGetData {
 
     private fun sendNotSync(uid: String) {
         if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId] != null && mNotSyncMessInDialog[mCurRoomId]!!.isNotEmpty()) {
-            for (value in mNotSyncMessInDialog[mCurRoomId]!!) {
-                Log.d(TAG, "sendNotSync: to uid - $uid date - $value")
-                val mes = "GETSYNC᳀†\u058D:$uid᳀†\u058D:${mCurRoomId}᳀†\u058D:$value᳀†\u058D:$value"
-
+            val listOfNotSyncId = mNotSyncMessInDialog[mCurRoomId]!!.toList()
+            if (listOfNotSyncId.isNotEmpty()) {
+                Log.d(TAG, "sendNotSync: to uid - $uid  id - $listOfNotSyncId")
                 mFlagSendNotSync = true
+                val mes =
+                    "GETSYNC᳀†\u058D:" + uid + "᳀†\u058D:" + mCurRoomId + "᳀†\u058D:" + Gson().toJson(listOfNotSyncId)
                 session?.send_message(mes)
             }
         } else if (mNotSyncMessInDialog.containsKey(mCurRoomId) && mNotSyncMessInDialog[mCurRoomId]!!.isEmpty()) {
@@ -995,11 +996,11 @@ object CoreHBBFT : IGetData {
         session?.send_message(mes)
     }
 
-    fun sendMessage(str: String) {
+    fun sendMessage(mes: Message) {
         Log.d(TAG, "sendMessage")
-        if (str.isNotEmpty()) {
+        if (mes.text != null && mes.text!!.isNotEmpty()) {
             val dateString = Date().formatTo(format, TimeZone.getTimeZone("UTC"))
-            val mes = "MESS᳀†\u058D:${dateString}᳀†\u058D:$str"
+            val mes = "MESS᳀†\u058D:${dateString}᳀†\u058D:${mes.id}᳀†\u058D:${mes.text!!}"
             session?.send_message(mes)
         }
     }

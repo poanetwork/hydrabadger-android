@@ -24,7 +24,7 @@ import net.korul.hbbft.CommonData.data.model.Message
 import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
-import net.korul.hbbft.CommonData.data.model.core.Getters.getDialog
+import net.korul.hbbft.CommonData.data.model.core.Getters.getDialogByRoomId
 import net.korul.hbbft.CommonData.utils.AppUtils
 import net.korul.hbbft.CoreHBBFT.CoreHBBFTListener
 import net.korul.hbbft.CoreHBBFT.IAddToContacts
@@ -111,6 +111,7 @@ class MessagesFragment :
             val extraDialog = bundle.getString("dialog")
             super.mCurDialog = Gson().fromJson(extraDialog, Dialog::class.java)
             mCurDialog!!.unreadCount = 0
+
             Conversations.getDDialog(mCurDialog!!).update()
 
             val extraUser = bundle.getString("user")
@@ -142,8 +143,8 @@ class MessagesFragment :
                 mes, true
             )
 
-            DatabaseApplication.mCoreHBBFT2X.sendMessage(mes.text.toString())
-            mCurDialog = getDialog(mCurDialog!!.id)
+            DatabaseApplication.mCoreHBBFT2X.sendMessage(mes)
+            mCurDialog = getDialogByRoomId(mCurDialog!!.id)
         } else {
             val mSnackbar = Snackbar.make(view!!, getString(R.string.need_online), Snackbar.LENGTH_LONG)
                 .setAction("Action", null)
@@ -230,15 +231,15 @@ class MessagesFragment :
                 val mes = MessagesFixtures.getImageMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
-                DatabaseApplication.mCoreHBBFT2X.sendMessage(mes.text.toString())
-                mCurDialog = getDialog(mCurDialog!!.id)
+                DatabaseApplication.mCoreHBBFT2X.sendMessage(mes)
+                mCurDialog = getDialogByRoomId(mCurDialog!!.id)
             }
             1 -> {
                 val mes = MessagesFixtures.getVoiceMessage(mCurDialog!!, mCurUser!!)
                 messagesAdapter!!.addToStart(mes, true)
 
-                DatabaseApplication.mCoreHBBFT2X.sendMessage(mes.text.toString())
-                mCurDialog = getDialog(mCurDialog!!.id)
+                DatabaseApplication.mCoreHBBFT2X.sendMessage(mes)
+                mCurDialog = getDialogByRoomId(mCurDialog!!.id)
             }
         }
     }
@@ -286,7 +287,7 @@ class MessagesFragment :
 //        messagesAdapter!!.notifyDataSetChanged()
     }
 
-    override fun reciveMessage(you: Boolean, uid: String, mes: String, date: Date) {
+    override fun reciveMessageWithDate(you: Boolean, uid: String, mes: String, mesID: Long, date: Date) {
         thread {
             try {
                 if (!you) {
@@ -301,18 +302,64 @@ class MessagesFragment :
                                     Conversations.getDUser(user).insert()
 
                                     val userMes = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                                    val mess = MessagesFixtures.setNewMessage(mes, mCurDialog!!, userMes!!, date)
-                                    messagesAdapter!!.addToStart(mess, true)
-                                    mCurDialog = getDialog(mCurDialog!!.id)
+                                    val mess = MessagesFixtures.setNewMessage(mes, mesID, mCurDialog!!, userMes!!, date)
+//                                    messagesAdapter!!.addToStart(mess, true)
+                                    val listMes: MutableList<Message> = arrayListOf()
+                                    listMes.add(mess)
+
+                                    messagesAdapter!!.notifyDataSetChanged()
+                                    loadMessages()
+                                    mCurDialog = getDialogByRoomId(mCurDialog!!.id)
                                 }
                             }
                         })
                     } else {
                         handlerNewMes.post {
                             val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
-                            val mess = MessagesFixtures.setNewMessage(mes, mCurDialog!!, user!!, date)
+                            val mess = MessagesFixtures.setNewMessage(mes, mesID, mCurDialog!!, user!!, date)
+//                            messagesAdapter!!.addToStart(mess, true)
+                            val listMes: MutableList<Message> = arrayListOf()
+                            listMes.add(mess)
+
+                            messagesAdapter!!.notifyDataSetChanged()
+                            loadMessages()
+                            mCurDialog = getDialogByRoomId(mCurDialog!!.id)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override fun reciveMessage(you: Boolean, uid: String, mes: String, mesID: Long, date: Date) {
+        thread {
+            try {
+                if (!you) {
+                    if (!mCurDialog!!.users.any { it.uid == uid }) {
+                        getUserFromLocalOrDownloadFromFirebase(uid, mCurDialog!!.id, object : IAddToContacts {
+                            override fun errorAddContact() {
+                            }
+
+                            override fun user(user: User) {
+                                handlerNewMes.post {
+                                    mCurDialog!!.users.add(user)
+                                    Conversations.getDUser(user).insert()
+
+                                    val userMes = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
+                                    val mess = MessagesFixtures.setNewMessage(mes, mesID, mCurDialog!!, userMes!!, date)
+                                    messagesAdapter!!.addToStart(mess, true)
+                                    mCurDialog = getDialogByRoomId(mCurDialog!!.id)
+                                }
+                            }
+                        })
+                    } else {
+                        handlerNewMes.post {
+                            val user = Getters.getUserbyUIDFromDialog(uid, mCurDialog!!.id)
+                            val mess = MessagesFixtures.setNewMessage(mes, mesID, mCurDialog!!, user!!, date)
                             messagesAdapter!!.addToStart(mess, true)
-                            mCurDialog = getDialog(mCurDialog!!.id)
+                            mCurDialog = getDialogByRoomId(mCurDialog!!.id)
                         }
                     }
                 }

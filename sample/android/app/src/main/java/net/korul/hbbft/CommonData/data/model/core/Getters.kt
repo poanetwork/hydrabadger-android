@@ -20,6 +20,8 @@ object Getters {
 
         val dialogs: MutableList<Dialog> = arrayListOf()
         for (ddialog in ddialogs) {
+//            setLastMessage(Conversations.getDialog(ddialog))
+
             ddialog.lastMessage = Select()
                 .from(DMessage::class.java)
                 .where(DMessage_Table.id.eq(ddialog.lastMessageID))
@@ -172,57 +174,19 @@ object Getters {
         return Conversations.getDialog(ddialog!!)
     }
 
-    fun getDialog(id: String): Dialog {
-        val ddialog = Select()
-            .from(DDialog::class.java)
-            .where(DDialog_Table.id.eq(id))
-            .querySingle()
-
-        if (ddialog != null) {
-            ddialog.lastMessage = Select()
-                .from(DMessage::class.java)
-                .where(DMessage_Table.id.eq(ddialog.lastMessageID))
-                .querySingle()
-
-            if (ddialog.lastMessage != null) {
-                val duser = Select()
-                    .from(DUser::class.java)
-                    .where(DUser_Table.id.eq(ddialog.lastMessage?.userID))
-                    .querySingle()
-
-                ddialog.lastMessage?.user = duser!!
-            }
-
-            ddialog.users.clear()
-            for (id in ddialog.usersIDs) {
-                val us = Select()
-                    .from(DUser::class.java)
-                    .where(DUser_Table.id.eq(id))
-                    .querySingle()
-
-                if (us != null)
-                    ddialog.users.add(
-                        us
-                    )
-            }
-        }
-
-        return Conversations.getDialog(ddialog!!)
-    }
-
     fun setLastMessage(dialog: Dialog?) {
         val ddialog = Conversations.getDDialog(dialog!!)
-        val mes = getMessagesLessDate(Date(), ddialog.id)
+        val mes = getVisMessagesLessDate(Date(), ddialog.id)
         if (mes.size > 0) {
             ddialog.lastMessage = Conversations.getDMessage(mes[0])
-            ddialog.lastMessageID = mes[0]?.id_
+            ddialog.lastMessageID = mes[0]?.id
         } else
             ddialog.lastMessage = null
 
         ddialog.update()
     }
 
-    fun getMessages(id: String): MutableList<Message?> {
+    fun getVisMessages(id: String): MutableList<Message?> {
         val messages: MutableList<Message?> = arrayListOf()
 
         val dmessages = Select()
@@ -240,7 +204,7 @@ object Getters {
         return messages
     }
 
-    fun getMessagesLessDate(startDate: Date?, id: String): MutableList<Message?> {
+    fun getVisMessagesLessDate(startDate: Date?, id: String): MutableList<Message?> {
         val messages: MutableList<Message?> = arrayListOf()
 
         val dmessages = Select()
@@ -259,7 +223,28 @@ object Getters {
         return messages
     }
 
-    fun getMessagesLessGreaterDate(startDate: Date?, endDate: Date?, id: String): MutableList<Message?> {
+    fun getAllMessagesWithId(idRoom: String, list: List<Long>): MutableList<Message> {
+        val messages: MutableList<Message> = arrayListOf()
+
+        for (id in list) {
+            val dmessage = Select()
+                .from(DMessage::class.java)
+                .where(DMessage_Table.idDialog.eq(idRoom))
+                .and(DMessage_Table.id.eq(id))
+                .orderBy(DMessage_Table.createdAt, false)
+                .querySingle()
+
+            if (dmessage != null) {
+                dmessage.user = getDUser(dmessage.userID)
+                val mes = Conversations.getMessage(dmessage)
+                if (mes != null) messages.add(mes)
+            }
+        }
+
+        return messages
+    }
+
+    fun getAllMessagesLessGreaterDate(startDate: Date?, endDate: Date?, id: String): MutableList<Message?> {
         val messages: MutableList<Message?> = arrayListOf()
 
         val dmessages = Select()
@@ -278,22 +263,8 @@ object Getters {
         return messages
     }
 
-    fun getNextDialogID(): String {
-        return java.lang.Long.toString(UUID.randomUUID().leastSignificantBits)
-    }
-
     fun getNextMessageID(): Long {
-        val list = Select()
-            .from(DMessage::class.java)
-            .orderBy(DMessage_Table.id, false)
-            .queryList()
-
-        return if (list.isEmpty())
-            0
-        else {
-            val ind = list.maxBy { it.id }!!.id
-            (ind + 1L)
-        }
+        return UUID.randomUUID().leastSignificantBits
     }
 
     fun getAllLocalUsersDistinct(): Array<User> {

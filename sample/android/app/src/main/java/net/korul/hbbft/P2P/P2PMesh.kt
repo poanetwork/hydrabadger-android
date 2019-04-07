@@ -78,13 +78,13 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         consNats[UID]?.publish("users:Room:$roomId", message.toByteArray(StandardCharsets.UTF_8))
     }
 
-    fun FreeConnect() {
-        Log.d(TAG, "P2PMesh FreeConnect")
+    fun freeConnect() {
+        Log.d(TAG, "P2PMesh freeConnect")
 
         try {
             lock.lock()
             for (con in mConnections.values) {
-                con.FreeConnect()
+                con.freeConnect()
             }
             lock.unlock()
         } catch (e: Exception) {
@@ -117,7 +117,7 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         }
     }
 
-    fun initNatsMeshInitiator(nats: Connection?, UID: String, roomId: String) {
+    private fun initNatsMeshInitiator(nats: Connection?, UID: String, roomId: String) {
         val sub = nats!!.subscribe(roomId) { msg: Message? ->
             if (msg == null)
                 return@subscribe
@@ -149,11 +149,11 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
                     val pair2: Pair<String, String> = Pair(myUid, user)
                     lock.lock()
                     if (mConnections.keys.contains(pair)) {
-                        mConnections[pair]?.FreeConnect()
+                        mConnections[pair]?.freeConnect()
                         mConnections.remove(pair)
                     }
                     if (mConnections.keys.contains(pair2)) {
-                        mConnections[pair2]?.FreeConnect()
+                        mConnections[pair2]?.freeConnect()
                         mConnections.remove(pair2)
                     }
                     lock.unlock()

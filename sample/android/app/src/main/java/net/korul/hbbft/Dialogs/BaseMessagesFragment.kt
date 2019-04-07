@@ -87,7 +87,7 @@ abstract class BaseMessagesFragment :
 
     override fun onStart() {
         super.onStart()
-        if (mCurDialog!!.lastMessage != null && (messagesAdapter!!.allMessages.size == 0 || messagesAdapter!!.allMessages[0] != mCurDialog!!.lastMessage)) {
+        if (mCurDialog!!.lastMessage != null && (messagesAdapter!!.allMessages.isEmpty() || messagesAdapter!!.allMessages[0] != mCurDialog!!.lastMessage)) {
             messagesAdapter!!.addToStart(mCurDialog!!.lastMessage, true)
         } else {
             loadMessages()
@@ -119,7 +119,7 @@ abstract class BaseMessagesFragment :
                 val selectedmes = messagesAdapter!!.selectedMessages
                 deleteMessages(selectedmes)
                 setLastMessage(mCurDialog)
-                mCurDialog = Getters.getDialog(mCurDialog!!.id)
+                mCurDialog = Getters.getDialogByRoomId(mCurDialog!!.id)
                 messagesAdapter!!.deleteSelectedMessages()
                 messagesAdapter!!.notifyDataSetChanged()
             }
@@ -182,10 +182,10 @@ abstract class BaseMessagesFragment :
         return (DatabaseApplication.mCoreHBBFT2X.listFlagsUpdatedStateToOnline.containsKey(mCurDialog!!.id) && DatabaseApplication.mCoreHBBFT2X.listFlagsUpdatedStateToOnline[mCurDialog!!.id] == true && mCurDialog!!.id == DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
     }
 
-    private fun loadMessages() {
+    fun loadMessages() {
         handler.postDelayed({
             try {
-                lastLoadedDate = if (messagesAdapter!!.allMessages.size > 0) {
+                lastLoadedDate = if (messagesAdapter!!.allMessages.isNotEmpty()) {
                     val min = messagesAdapter!!.allMessages.minBy { it.createdAt!!.time }
                     min!!.createdAt
                 } else {

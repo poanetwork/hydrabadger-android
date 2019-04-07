@@ -108,6 +108,28 @@ class FireAlarmActivity : AlarmActivity() {
             finish()
         }
 
+        closeAlarmTextView2.setOnClickListener {
+            Log.i(LOGTAG, "closeAlarmTextView is clicked")
+
+            finishAlarm()
+            val activityManager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val procInfos = activityManager.runningAppProcesses
+            var start = false
+            for (i in procInfos.indices) {
+                if (procInfos[i].processName == "net.korul.hbbft") {
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    start = true
+                    startActivity(intent)
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                }
+            }
+            if (!start) {
+                finish()
+            }
+        }
+
         openAppTextView.setOnClickListener {
             Log.i(LOGTAG, "openAppTextView is clicked")
 
@@ -132,7 +154,7 @@ class FireAlarmActivity : AlarmActivity() {
         val activityManager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val procInfos = activityManager.runningAppProcesses
         for (i in procInfos.indices) {
-            if (procInfos[i].processName == "ru.hintsolutions.diabets") {
+            if (procInfos[i].processName == "net.korul.hbbft") {
                 val intent = Intent(this, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }

@@ -22,7 +22,7 @@ class MessagesFixtures private constructor() {
 
         fun getImageMessage(curDialog: Dialog, user: User): Message {
             val id = getNextMessageID()
-            val message = Message(id, id.toString(), curDialog.id, true, user, null, Date())
+            val message = Message(id, curDialog.id, true, user, null, Date())
             message.setImage(Message.Image("https://habrastorage.org/getpro/habr/post_images/e4b/067/b17/e4b067b17a3e414083f7420351db272b.jpg"))
 
             val dmes = Conversations.getDMessage(message)
@@ -37,7 +37,7 @@ class MessagesFixtures private constructor() {
 
         fun getVoiceMessage(curDialog: Dialog, user: User): Message {
             val id = getNextMessageID()
-            val message = Message(id, id.toString(), curDialog.id, true, user, null, Date())
+            val message = Message(id, curDialog.id, true, user, null, Date())
             message.voice = Message.Voice("http://example.com", rnd.nextInt(200) + 30)
 
             val dmes = Conversations.getDMessage(message)
@@ -52,16 +52,42 @@ class MessagesFixtures private constructor() {
 
 
         // set new message
+        fun setNewMessage(text: String, id: Long, curDialog: Dialog, user: User, date: Date = Date()): Message {
+            user.idDialog = curDialog.id
+
+            val mes = Message(id, curDialog.id, true, user, text, date)
+            try {
+                Conversations.getDMessage(mes)?.insert()
+
+                if (curDialog.lastMessage != null && curDialog.lastMessage!!.createdAt != null) {
+                    if (mes.createdAt!!.time > curDialog.lastMessage!!.createdAt!!.time) {
+                        curDialog.setLastMessage(mes)
+                        curDialog.lastMessage?.user = user
+                        Conversations.getDDialog(curDialog).update()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            return mes
+        }
+
+        // set new message
         fun setNewMessage(text: String, curDialog: Dialog, user: User, date: Date = Date()): Message {
             user.idDialog = curDialog.id
             val id = getNextMessageID()
 
-            val mes = Message(id, id.toString(), curDialog.id, true, user, text, date)
+            val mes = Message(id, curDialog.id, true, user, text, date)
             Conversations.getDMessage(mes)?.insert()
 
-            curDialog.setLastMessage(mes)
-            curDialog.lastMessage?.user = user
-            Conversations.getDDialog(curDialog).update()
+            if (curDialog.lastMessage != null && curDialog.lastMessage!!.createdAt != null) {
+                if (mes.createdAt!!.time > curDialog.lastMessage!!.createdAt!!.time) {
+                    curDialog.setLastMessage(mes)
+                    curDialog.lastMessage?.user = user
+                    Conversations.getDDialog(curDialog).update()
+                }
+            }
 
             return mes
         }
@@ -76,7 +102,7 @@ class MessagesFixtures private constructor() {
         }
 
         fun getAllMessages(curDialog: Dialog): ArrayList<Message?> {
-            val messages = Getters.getMessages(curDialog.id)
+            val messages = Getters.getVisMessages(curDialog.id)
 
             return ArrayList(messages)
         }
@@ -85,7 +111,7 @@ class MessagesFixtures private constructor() {
             val startDate_ = Date()
             if (startDate != null) startDate_.time = startDate.time
 
-            val messages = Getters.getMessagesLessDate(startDate_, curDialog.id)
+            val messages = Getters.getVisMessagesLessDate(startDate_, curDialog.id)
 
             return ArrayList(messages)
         }

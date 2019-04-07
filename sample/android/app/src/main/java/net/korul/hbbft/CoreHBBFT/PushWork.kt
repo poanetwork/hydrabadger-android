@@ -48,7 +48,7 @@ object PushWork {
             })
     }
 
-    fun preSendPushToStart(listOfUIDs: List<String>, text: String, title: String) {
+    fun preSendPushToStart(listOfUIDs: List<String>, roomId: String, uniqUID: String) {
         val currentUser = CoreHBBFT.mAuth.currentUser
 
         if (currentUser == null) {
@@ -56,14 +56,15 @@ object PushWork {
             latch.await()
         }
 
-        for (uid in listOfUIDs)
-            sendPushToTopic(uid, title, text)
+        val listOfUIDs1 = listOfUIDs.filter { it != CoreHBBFT.uniqueID1 && it != CoreHBBFT.uniqueID2 }
+        for (uid in listOfUIDs1)
+            sendPushToTopic(uid, uniqUID, roomId)
     }
 
-    fun sendPushToTopic(UIDtopic: String, title: String, text: String): Task<String> {
+    fun sendPushToTopic(UIDtopic: String, uniqUID: String, roomId: String): Task<String> {
         val json = JSONObject()
-        json.put("text", text)
-        json.put("title", title)
+        json.put("text", roomId)
+        json.put("title", uniqUID)
         json.put("topic", UIDtopic)
 
         return CoreHBBFT.mFunctions

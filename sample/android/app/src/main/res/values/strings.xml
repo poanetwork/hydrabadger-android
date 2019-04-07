@@ -135,6 +135,7 @@
     <string name="avatar">Avatar</string>
     <string name="qr">QR</string>
     <string name="qr_code_file_selected">QR code file selected successfully!</string>
+    <string name="qr_code_file_selected_wrongly">QR code file selected wrongly!</string>
     <string name="qr_code_disk_saved">QR code saved successfully!</string>
     <string name="qr_code_disk_saved_fail" tools:ignore="ExtraTranslation">"Can't save qr code in this dir"</string>
     <string name="search_menu_title">Search</string>

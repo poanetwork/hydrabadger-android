@@ -24,6 +24,7 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CommonData.data.model.conversation.Conversations
 import net.korul.hbbft.CommonData.data.model.core.Getters
 import net.korul.hbbft.CommonData.data.model.core.Getters.getDialogByRoomId
+import net.korul.hbbft.CommonData.data.model.core.Getters.setLastMessage
 import net.korul.hbbft.CommonFragments.tabChats.AboutRoomFragment
 import net.korul.hbbft.CommonFragments.tabChats.AddDialogExistFragment
 import net.korul.hbbft.CommonFragments.tabChats.AddNewDialogFragment
@@ -45,6 +46,10 @@ class DialogsFragment :
     BaseDialogsFragment(),
     DateFormatter.Formatter,
     CoreHBBFTListener {
+    override fun reciveMessageWithDate(you: Boolean, uid: String, mes: String, mesID: Long, data: Date) {
+        reciveMessage(you, uid, mes, mesID, data)
+    }
+
     private var TAG = "HYDRA:DialogsFragment"
 
     companion object {
@@ -145,19 +150,27 @@ class DialogsFragment :
     }
 
     override fun onDialogClick(dialog: Dialog) {
+        var dialog1 = dialog
+        setLastMessage(dialog1)
+        dialog1 = Getters.getDialogByRoomId(dialog1.id)
+
         activity!!.supportFragmentManager.popBackStack(
             getString(R.string.tag_chats),
             FragmentManager.POP_BACK_STACK_INCLUSIVE
         )
 
         val transaction = activity!!.supportFragmentManager.beginTransaction()
-        val curuser = dialog.users.first { it.uid == CoreHBBFT.uniqueID1 }
-        transaction.replace(
-            R.id.view,
-            MessagesFragment.newInstance(dialog, curuser)
-        )
-        transaction.addToBackStack(getString(R.string.tag_chats2))
-        transaction.commit()
+        try {
+            val curuser = dialog1.users.first { it.uid == CoreHBBFT.uniqueID1 }
+            transaction.replace(
+                R.id.view,
+                MessagesFragment.newInstance(dialog1, curuser)
+            )
+            transaction.addToBackStack(getString(R.string.tag_chats2))
+            transaction.commit()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 
@@ -262,7 +275,7 @@ class DialogsFragment :
 //        dialogsAdapter!!.notifyDataSetChanged()
     }
 
-    override fun reciveMessage(you: Boolean, uid: String, mes: String, data: Date) {
+    override fun reciveMessage(you: Boolean, uid: String, mes: String, mesID: Long, data: Date) {
         try {
             if (!you) {
                 val dialog = getDialogByRoomId(DatabaseApplication.mCoreHBBFT2X.mCurRoomId)
@@ -277,7 +290,7 @@ class DialogsFragment :
                                 Conversations.getDUser(user).insert()
 
                                 val userMes = Getters.getUserbyUIDFromDialog(uid, dialog.id)
-                                val mess = MessagesFixtures.setNewMessage(mes, dialog, userMes!!, data)
+                                val mess = MessagesFixtures.setNewMessage(mes, mesID, dialog, userMes!!, data)
 
                                 dialog.unreadCount++
                                 Conversations.getDDialog(dialog).update()
@@ -288,7 +301,7 @@ class DialogsFragment :
                     })
                 } else {
                         val user = Getters.getUserbyUIDFromDialog(uid, dialog.id)
-                        val mess = MessagesFixtures.setNewMessage(mes, dialog, user!!, data)
+                    val mess = MessagesFixtures.setNewMessage(mes, mesID, dialog, user!!, data)
 
                         dialog.unreadCount++
                         Conversations.getDDialog(dialog).update()
