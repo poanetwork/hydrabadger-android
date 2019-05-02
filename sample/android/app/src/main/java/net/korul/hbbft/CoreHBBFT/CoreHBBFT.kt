@@ -2,6 +2,7 @@ package net.korul.hbbft.CoreHBBFT
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
@@ -169,7 +170,12 @@ object CoreHBBFT : IGetData {
         mNotSyncMessInDialog = notSyncMessInDialog
 
         val serviceIntent = Intent(applicationContext, ClosingService::class.java)
-        applicationContext.startService(serviceIntent)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            applicationContext.startForegroundService(serviceIntent)
+        } else {
+            applicationContext.startService(serviceIntent)
+        }
 
         mP2PMesh = P2PMesh(applicationContext, this)
         mSocketWrapper = SocketWrapper(mP2PMesh!!)

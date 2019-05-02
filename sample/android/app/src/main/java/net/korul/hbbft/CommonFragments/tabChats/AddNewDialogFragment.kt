@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -112,13 +113,23 @@ class AddNewDialogFragment : Fragment() {
         setNewExtDialog(dialogUID, dialogName, dialogDescription, localFile.path, DatabaseApplication.mCurUser)
 
         val uploadUri = Uri.fromFile(localFile)
-        if (localFile.exists())
-            context!!.startService(
-                Intent(context, MyUploadRoomService::class.java)
-                    .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
-                    .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialogUID)
-                    .setAction(MyUploadRoomService.ACTION_UPLOAD)
-            )
+        if (localFile.exists()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context!!.startForegroundService(
+                    Intent(context, MyUploadRoomService::class.java)
+                        .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+                        .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialogUID)
+                        .setAction(MyUploadRoomService.ACTION_UPLOAD)
+                )
+            } else {
+                context!!.startService(
+                    Intent(context, MyUploadRoomService::class.java)
+                        .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+                        .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialogUID)
+                        .setAction(MyUploadRoomService.ACTION_UPLOAD)
+                )
+            }
+        }
         else {
             dismissProgressBar()
             activity!!.supportFragmentManager.popBackStack(

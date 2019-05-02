@@ -1,6 +1,7 @@
 package net.korul.hbbft.CoreHBBFT
 
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
@@ -181,7 +182,13 @@ object UserWork {
                 val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
                     .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, user.UID)
                     .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
-                CoreHBBFT.mApplicationContext.startService(intent)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    CoreHBBFT.mApplicationContext.startForegroundService(intent)
+                } else {
+                    CoreHBBFT.mApplicationContext.startService(intent)
+                }
+//                CoreHBBFT.mApplicationContext.startService(intent)
             }
         }
 
@@ -348,11 +355,25 @@ object UserWork {
 
                     updateMetaInAllLocalUserByUidWithoutNick(us)
 
-                    CoreHBBFT.mApplicationContext.startService(
-                        Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationUserService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        CoreHBBFT.mApplicationContext.startForegroundService(
+                            Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationUserService::class.java)
+                                .putExtra(MyGetLastModificationUserService.EXTRA_COMPARE_UID, us.UID)
+                                .setAction(MyGetLastModificationUserService.ACTION_COMPARE)
+                        )
+                    } else {
+                        CoreHBBFT.mApplicationContext.startService(
+                            Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationUserService::class.java)
                             .putExtra(MyGetLastModificationUserService.EXTRA_COMPARE_UID, us.UID)
                             .setAction(MyGetLastModificationUserService.ACTION_COMPARE)
-                    )
+                        )
+                    }
+
+//                    CoreHBBFT.mApplicationContext.startService(
+//                        Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationUserService::class.java)
+//                            .putExtra(MyGetLastModificationUserService.EXTRA_COMPARE_UID, us.UID)
+//                            .setAction(MyGetLastModificationUserService.ACTION_COMPARE)
+//                    )
                 }
             }
         }

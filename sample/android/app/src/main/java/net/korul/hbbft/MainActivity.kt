@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -223,7 +224,13 @@ class MainActivity : AppCompatActivity() {
                                 val int = Intent(CoreHBBFT.mApplicationContext, MyDownloadUserService::class.java)
                                     .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, uid)
                                     .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
-                                CoreHBBFT.mApplicationContext.startService(int)
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    CoreHBBFT.mApplicationContext.startForegroundService(int)
+                                } else {
+                                    CoreHBBFT.mApplicationContext.startService(int)
+                                }
+//                                CoreHBBFT.mApplicationContext.startService(int)
                             }
                         }
                     }
@@ -243,7 +250,13 @@ class MainActivity : AppCompatActivity() {
                                 val intent = Intent(CoreHBBFT.mApplicationContext, MyDownloadRoomService::class.java)
                                     .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, uid)
                                     .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
-                                CoreHBBFT.mApplicationContext.startService(intent)
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    CoreHBBFT.mApplicationContext.startForegroundService(intent)
+                                } else {
+                                    CoreHBBFT.mApplicationContext.startService(intent)
+                                }
+//                                CoreHBBFT.mApplicationContext.startService(intent)
                             }
                         }
                     }
