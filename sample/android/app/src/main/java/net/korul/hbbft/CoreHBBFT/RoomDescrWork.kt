@@ -1,7 +1,6 @@
 package net.korul.hbbft.CoreHBBFT
 
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -104,7 +103,7 @@ object RoomDescrWork {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                val objectMap = snapshot.value as HashMap<String, Any>
+                val objectMap = snapshot.value as HashMap<String, Any?>?
                 if (objectMap != null) {
                     thread {
                         for (obj in objectMap.values) {
@@ -129,25 +128,25 @@ object RoomDescrWork {
                                 dialog.unreadCount
                             )
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                CoreHBBFT.mApplicationContext.startForegroundService(
-                                    Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
-                                        .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
-                                        .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
-                                )
-                            } else {
-                                CoreHBBFT.mApplicationContext.startService(
-                                    Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
-                                    .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
-                                    .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
-                                )
-                            }
-
-//                            CoreHBBFT.mApplicationContext.startService(
-//                                Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                CoreHBBFT.mApplicationContext.startForegroundService(
+//                                    Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
+//                                        .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
+//                                        .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
+//                                )
+//                            } else {
+//                                CoreHBBFT.mApplicationContext.startService(
+//                                    Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
 //                                    .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
 //                                    .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
-//                            )
+//                                )
+//                            }
+
+                            CoreHBBFT.mApplicationContext.startService(
+                                Intent(CoreHBBFT.mApplicationContext, MyGetLastModificationRoomService::class.java)
+                                    .putExtra(MyGetLastModificationRoomService.EXTRA_COMPARE_UID, dialogID)
+                                    .setAction(MyGetLastModificationRoomService.ACTION_COMPARE)
+                            )
 
                             listener.dialog(saveDialog)
                         }
@@ -224,12 +223,12 @@ object RoomDescrWork {
                                 .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, roomDescr.id!!)
                                 .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                CoreHBBFT.mApplicationContext.startForegroundService(intent)
-                            } else {
-                                CoreHBBFT.mApplicationContext.startService(intent)
-                            }
-//                            CoreHBBFT.mApplicationContext.startService(intent)
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                CoreHBBFT.mApplicationContext.startForegroundService(intent)
+//                            } else {
+//                                CoreHBBFT.mApplicationContext.startService(intent)
+//                            }
+                            CoreHBBFT.mApplicationContext.startService(intent)
 
                             listener.dialog(dialog)
                         }

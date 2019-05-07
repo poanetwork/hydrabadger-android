@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -225,12 +224,12 @@ class MainActivity : AppCompatActivity() {
                                     .putExtra(MyDownloadUserService.EXTRA_DOWNLOAD_USERID, uid)
                                     .setAction(MyDownloadUserService.ACTION_DOWNLOAD)
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    CoreHBBFT.mApplicationContext.startForegroundService(int)
-                                } else {
-                                    CoreHBBFT.mApplicationContext.startService(int)
-                                }
-//                                CoreHBBFT.mApplicationContext.startService(int)
+//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                    CoreHBBFT.mApplicationContext.startForegroundService(int)
+//                                } else {
+//                                    CoreHBBFT.mApplicationContext.startService(int)
+//                                }
+                                CoreHBBFT.mApplicationContext.startService(int)
                             }
                         }
                     }
@@ -251,12 +250,12 @@ class MainActivity : AppCompatActivity() {
                                     .putExtra(MyDownloadRoomService.EXTRA_DOWNLOAD_DIALOGID, uid)
                                     .setAction(MyDownloadRoomService.ACTION_DOWNLOAD)
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    CoreHBBFT.mApplicationContext.startForegroundService(intent)
-                                } else {
-                                    CoreHBBFT.mApplicationContext.startService(intent)
-                                }
-//                                CoreHBBFT.mApplicationContext.startService(intent)
+//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                    CoreHBBFT.mApplicationContext.startForegroundService(intent)
+//                                } else {
+//                                    CoreHBBFT.mApplicationContext.startService(intent)
+//                                }
+                                CoreHBBFT.mApplicationContext.startService(intent)
                             }
                         }
                     }

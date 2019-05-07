@@ -97,7 +97,7 @@ class AddDialogExistFragment : Fragment() {
 
         button_add_dialog.setOnClickListener {
             if (dialog_id.text.toString().isEmpty()) {
-                dialog_id_layout.error = getString(R.string.contact_request_error_id)
+                dialog_id_layout?.error = getString(R.string.contact_request_error_id)
             } else {
                 getDialogFromFirebase(dialog_id.text.toString(), object : IAddToRooms {
                     override fun dialog(dialog: Dialog) {
@@ -111,7 +111,7 @@ class AddDialogExistFragment : Fragment() {
                     }
 
                     override fun errorAddRoom() {
-                        dialog_id_layout.error = getString(R.string.contact_request_error_id)
+                        dialog_id_layout?.error = getString(R.string.contact_request_error_id)
                     }
                 })
             }
@@ -163,13 +163,13 @@ class AddDialogExistFragment : Fragment() {
 
                     override fun errorAddRoom() {
                         handler.post {
-                            dialog_id_layout.error = getString(R.string.contact_request_error_id)
+                            dialog_id_layout?.error = getString(R.string.contact_request_error_id)
                         }
                     }
                 })
             } else {
                 handler.post {
-                    dialog_id_layout.error = getString(R.string.contact_request_error_id)
+                    dialog_id_layout?.error = getString(R.string.contact_request_error_id)
                 }
             }
         }

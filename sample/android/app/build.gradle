@@ -28,7 +28,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         buildToolsVersion "28.0.3"
-        versionCode 26
+        versionCode 28
         versionName "2.5.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -98,9 +98,6 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
 
-    //Picasso
-//    implementation "com.squareup.picasso:picasso:$picassoVersion"
-
     //ImageViews
     implementation "de.hdodenhof:circleimageview:$circleImageViewVersion"
     implementation "com.github.siyamed:android-shape-imageview:$shapeImageViewVersion"
@@ -125,13 +122,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.0-alpha'
     //
     // deepstream
-//    implementation 'io.deepstream:deepstream.io-client-java:2.0.4'
+    //    implementation 'io.deepstream:deepstream.io-client-java:2.0.4'
     //
     // libjingle
     implementation 'io.pristine:libjingle:11139@aar'
-
-    // https://mvnrepository.com/artifact/com.google.common/google-collect
-//    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
 
     // firebase
     implementation 'com.google.firebase:firebase-core:16.0.8'
@@ -147,16 +141,19 @@ dependencies {
 
     //BAR CODE
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
+
     // swipe
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+
     //folder picker
     implementation 'lib.kashif:folderpicker:2.4'
 
     implementation 'com.daimajia.easing:library:2.1@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
     implementation 'com.nineoldandroids:library:2.4.0'
+
     // This dude gave a shoutout to you (daimajia) on his github page:
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0@aar'
 }

@@ -41,6 +41,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <permission android:name="net.korul.hbbft.permission.C2D_MESSAGE"
                 android:protectionLevel="signature"/>

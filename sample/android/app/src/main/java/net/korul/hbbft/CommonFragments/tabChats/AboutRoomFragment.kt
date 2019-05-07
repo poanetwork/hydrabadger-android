@@ -354,27 +354,27 @@ class AboutRoomFragment : Fragment() {
 
             val uploadUri = Uri.fromFile(mFile)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context!!.startForegroundService(
-                    Intent(context, MyUploadRoomService::class.java)
-                        .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
-                        .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
-                        .setAction(MyUploadRoomService.ACTION_UPLOAD)
-                )
-            } else {
-                context!!.startService(
-                    Intent(context, MyUploadRoomService::class.java)
-                        .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
-                        .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
-                        .setAction(MyUploadRoomService.ACTION_UPLOAD)
-                )
-            }
-//            context!!.startService(
-//                Intent(context, MyUploadRoomService::class.java)
-//                    .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
-//                    .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
-//                    .setAction(MyUploadRoomService.ACTION_UPLOAD)
-//            )
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context!!.startForegroundService(
+//                    Intent(context, MyUploadRoomService::class.java)
+//                        .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+//                        .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
+//                        .setAction(MyUploadRoomService.ACTION_UPLOAD)
+//                )
+//            } else {
+//                context!!.startService(
+//                    Intent(context, MyUploadRoomService::class.java)
+//                        .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+//                        .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
+//                        .setAction(MyUploadRoomService.ACTION_UPLOAD)
+//                )
+//            }
+            context!!.startService(
+                Intent(context, MyUploadRoomService::class.java)
+                    .putExtra(MyUploadRoomService.EXTRA_ROOM_FILE_URI, uploadUri)
+                    .putExtra(MyUploadRoomService.EXTRA_ROOM_ID, dialog.id)
+                    .setAction(MyUploadRoomService.ACTION_UPLOAD)
+            )
         } else {
             handle.post {
                 progress.show()

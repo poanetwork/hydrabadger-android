@@ -318,21 +318,21 @@ class SettingsUserFragment : Fragment() {
                         updateAvatarInAllLocalUserByUid(mCurUser.uid, localFile)
 
                         val uploadUri = Uri.fromFile(localFile)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            context!!.startForegroundService(
-                                Intent(context, MyUploadUserService::class.java)
-                                    .putExtra(MyUploadUserService.EXTRA_FILE_URI, uploadUri)
-                                    .putExtra(MyUploadUserService.EXTRA_USER_ID, mCurUser.uid)
-                                    .setAction(MyUploadUserService.ACTION_UPLOAD)
-                            )
-                        } else {
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                            context!!.startForegroundService(
+//                                Intent(context, MyUploadUserService::class.java)
+//                                    .putExtra(MyUploadUserService.EXTRA_FILE_URI, uploadUri)
+//                                    .putExtra(MyUploadUserService.EXTRA_USER_ID, mCurUser.uid)
+//                                    .setAction(MyUploadUserService.ACTION_UPLOAD)
+//                            )
+//                        } else {
                             context!!.startService(
                                 Intent(context, MyUploadUserService::class.java)
                                     .putExtra(MyUploadUserService.EXTRA_FILE_URI, uploadUri)
                                     .putExtra(MyUploadUserService.EXTRA_USER_ID, mCurUser.uid)
                                     .setAction(MyUploadUserService.ACTION_UPLOAD)
                             )
-                        }
+//                        }
                     }
                 } else if (resultCode == Activity.RESULT_CANCELED) {
                     AppUtils.showToast(
