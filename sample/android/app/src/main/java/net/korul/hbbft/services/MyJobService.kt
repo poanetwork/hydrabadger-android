@@ -12,10 +12,14 @@ class MyJobService : JobService() {
     override fun onStartJob(jobParameters: JobParameters): Boolean {
         Log.d(TAG, "Performing long running task in scheduled job")
 
-        Thread.sleep(7*1000)
-        DatabaseApplication.mCoreHBBFT2X.freeCoreHBBFT()
-        DatabaseApplication.delete()
-        Log.i(TAG, "freeCoreHBBFT()")
+        try {
+            Thread.sleep(7 * 1000)
+            DatabaseApplication.mCoreHBBFT2X.freeCoreHBBFT()
+            DatabaseApplication.delete()
+            Log.i(TAG, "freeCoreHBBFT()")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         return false
     }

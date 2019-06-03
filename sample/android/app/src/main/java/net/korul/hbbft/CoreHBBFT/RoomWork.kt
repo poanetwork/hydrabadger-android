@@ -163,11 +163,25 @@ object RoomWork {
                 val objectMap = dataSnapshot.value as HashMap<String, Any>
                 for (obj in objectMap.values) {
                     val mapObj: Map<String, Any> = obj as Map<String, Any>
-                    val uids = Uids()
-                    uids.UID = mapObj["uid"] as String
-                    uids.isOnline = mapObj["online"] as Boolean
+                    try {
+                        val uids = Uids()
+                        uids.UID = mapObj["uid"] as String
+                        uids.isOnline = mapObj["online"] as Boolean
 
-                    listObjectsOfUIds.add(uids)
+                        listObjectsOfUIds.add(uids)
+                    } catch (e: Exception) {
+                        try {
+                            val objj = mapObj.values.elementAt(0) as HashMap<String, Any>
+
+                            val uids = Uids()
+                            uids.UID = objj["uid"] as String
+                            uids.isOnline = objj["online"] as Boolean
+
+                            listObjectsOfUIds.add(uids)
+                        } catch (e: Exception) {
+
+                        }
+                    }
                 }
                 Log.d(CoreHBBFT.TAG, "getUIDsInRoomFromFirebase success")
                 latch.countDown()

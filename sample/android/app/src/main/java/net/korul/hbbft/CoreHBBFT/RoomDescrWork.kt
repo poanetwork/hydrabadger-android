@@ -110,9 +110,23 @@ object RoomDescrWork {
                             val mapObj: Map<String, Any> = obj as Map<String, Any>
 
                             val roomDescr = RoomDescr()
-                            roomDescr.id = mapObj["id"] as String
-                            roomDescr.dialogName = mapObj["dialogName"] as String
-                            roomDescr.dialogDescription = mapObj["dialogDescription"] as String
+
+                            try {
+                                roomDescr.id = mapObj["id"] as String
+                                roomDescr.dialogName = mapObj["dialogName"] as String
+                                roomDescr.dialogDescription = mapObj["dialogDescription"] as String
+                            } catch (e: Exception) {
+                                try {
+                                    val objj = mapObj.values.elementAt(0) as HashMap<String, Any>
+                                    roomDescr.id = objj["id"] as String
+                                    roomDescr.dialogName = objj["dialogName"] as String
+                                    roomDescr.dialogDescription = objj["dialogDescription"] as String
+
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+
 
                             val outputDir = CoreHBBFT.mApplicationContext.filesDir
                             val localFile = File(outputDir.path + File.separator + dialogID + ".png")
@@ -173,9 +187,21 @@ object RoomDescrWork {
                             val mapObj: Map<String, Any> = obj as Map<String, Any>
 
                             val roomDescr = RoomDescr()
-                            roomDescr.id = mapObj["id"] as String
-                            roomDescr.dialogName = mapObj["dialogName"] as String
-                            roomDescr.dialogDescription = mapObj["dialogDescription"] as String
+
+                            try {
+                                roomDescr.id = mapObj["id"] as String
+                                roomDescr.dialogName = mapObj["dialogName"] as String
+                                roomDescr.dialogDescription = mapObj["dialogDescription"] as String
+                            } catch (e: Exception) {
+                                try {
+                                    val objj = mapObj.values.elementAt(0) as HashMap<String, Any>
+                                    roomDescr.id = objj["id"] as String
+                                    roomDescr.dialogName = objj["dialogName"] as String
+                                    roomDescr.dialogDescription = objj["dialogDescription"] as String
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
 
                             val listOfUsersUIDS = getUIDsInRoomFromFirebase(roomDescr.id!!)
 

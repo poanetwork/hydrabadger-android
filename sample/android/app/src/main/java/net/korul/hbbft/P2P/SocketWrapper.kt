@@ -215,7 +215,13 @@ class SocketWrapper {
 
                             while (!mAllStop) {
                                 din = mPseudoNotLocalSocket[pair2]?.getInputStream()
-                                bytesnum = din.available()
+
+                                bytesnum = try {
+                                    din.available()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    0
+                                }
 
                                 if (bytesnum > 0) {
                                     bytes = ByteArray(bytesnum)

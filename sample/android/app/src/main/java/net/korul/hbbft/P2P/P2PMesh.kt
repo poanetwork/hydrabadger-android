@@ -185,82 +185,99 @@ class P2PMesh(private val applicationContext: Context, private val callback: IGe
         }
         val conNats = runBlocking { async.await() }
 
-        val sub = conNats!!.subscribe(listenFrom) { msg: Message? ->
-            if (msg == null)
-                return@subscribe
+        if (conNats == null) {
+            val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
+            msg.obj = "Nats error - Coonection not init!"
+            handlerToast.sendMessage(msg)
+        } else {
+            val sub = conNats.subscribe(listenFrom) { msg: Message? ->
+                if (msg == null)
+                    return@subscribe
 
-            val message = String(msg.data, StandardCharsets.UTF_8)
+                val message = String(msg.data, StandardCharsets.UTF_8)
 
-            val json2 = JSONObject(message)
-            val uid = json2.getString("UID")
-            val toUser = json2.getString("toUser")
-            val pair: Pair<String, String> = Pair(uid, toUser)
-            val pair2: Pair<String, String> = Pair(toUser, uid)
+                val json2 = JSONObject(message)
+                val uid = json2.getString("UID")
+                val toUser = json2.getString("toUser")
+                val pair: Pair<String, String> = Pair(uid, toUser)
+                val pair2: Pair<String, String> = Pair(toUser, uid)
 
-            if (json2.getString("type") == "candidate") {
-                val candidate =
-                    IceCandidate(json2.getString("sdpMid"), json2.getInt("sdpMLineIndex"), json2.getString("candidate"))
-                if (mConnections.keys.contains(pair)) {
-                    mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
-                } else if (mConnections.keys.contains(pair2)) {
-                    mConnections[pair2]?.peerConnection?.addIceCandidate(candidate)
-                }
-            } else {
-                val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
-                msg.obj = "Message - set SDP to $uid"
-                handlerToast.sendMessage(msg)
-
-                val type = json2.getString("type")
-                val sdp = json2.getString("sdp")
-
-                val sdp2 = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-                if (type == "offer") {
-                    if (!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2)) {
-                        if (!usersCon.contains(uid))
-                            usersCon.add(uid)
-                        mConnections[pair] =
-                            Connections(applicationContext, uid, listenFrom, consNats[listenFrom]!!, false, callback)
-                    }
-
+                if (json2.getString("type") == "candidate") {
+                    val candidate =
+                        IceCandidate(
+                            json2.getString("sdpMid"),
+                            json2.getInt("sdpMLineIndex"),
+                            json2.getString("candidate")
+                        )
                     if (mConnections.keys.contains(pair)) {
-                        mConnections[pair]?.peerConnection?.setRemoteDescription(
-                            mConnections[pair]?.SessionObserver,
-                            sdp2
-                        )
-                        val constraints = MediaConstraints()
-                        mConnections[pair]?.peerConnection?.createAnswer(
-                            mConnections[pair]?.SessionObserver,
-                            constraints
-                        )
+                        mConnections[pair]?.peerConnection?.addIceCandidate(candidate)
                     } else if (mConnections.keys.contains(pair2)) {
-                        mConnections[pair2]?.peerConnection?.setRemoteDescription(
-                            mConnections[pair2]?.SessionObserver,
-                            sdp2
-                        )
-                        val constraints = MediaConstraints()
-                        mConnections[pair2]?.peerConnection?.createAnswer(
-                            mConnections[pair2]?.SessionObserver,
-                            constraints
-                        )
+                        mConnections[pair2]?.peerConnection?.addIceCandidate(candidate)
                     }
-                } else if (type == "answer") {
-                    if (mConnections.keys.contains(pair)) {
-                        mConnections[pair]?.peerConnection?.setRemoteDescription(
-                            mConnections[pair]?.SessionObserver,
-                            sdp2
-                        )
-                    } else if (mConnections.keys.contains(pair2)) {
-                        mConnections[pair2]?.peerConnection?.setRemoteDescription(
-                            mConnections[pair2]?.SessionObserver,
-                            sdp2
-                        )
+                } else {
+                    val msg = handlerToast.obtainMessage(DISPLAY_UI_TOAST)
+                    msg.obj = "Message - set SDP to $uid"
+                    handlerToast.sendMessage(msg)
+
+                    val type = json2.getString("type")
+                    val sdp = json2.getString("sdp")
+
+                    val sdp2 = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
+                    if (type == "offer") {
+                        if (!mConnections.keys.contains(pair) && !mConnections.keys.contains(pair2)) {
+                            if (!usersCon.contains(uid))
+                                usersCon.add(uid)
+                            mConnections[pair] =
+                                Connections(
+                                    applicationContext,
+                                    uid,
+                                    listenFrom,
+                                    consNats[listenFrom]!!,
+                                    false,
+                                    callback
+                                )
+                        }
+
+                        if (mConnections.keys.contains(pair)) {
+                            mConnections[pair]?.peerConnection?.setRemoteDescription(
+                                mConnections[pair]?.SessionObserver,
+                                sdp2
+                            )
+                            val constraints = MediaConstraints()
+                            mConnections[pair]?.peerConnection?.createAnswer(
+                                mConnections[pair]?.SessionObserver,
+                                constraints
+                            )
+                        } else if (mConnections.keys.contains(pair2)) {
+                            mConnections[pair2]?.peerConnection?.setRemoteDescription(
+                                mConnections[pair2]?.SessionObserver,
+                                sdp2
+                            )
+                            val constraints = MediaConstraints()
+                            mConnections[pair2]?.peerConnection?.createAnswer(
+                                mConnections[pair2]?.SessionObserver,
+                                constraints
+                            )
+                        }
+                    } else if (type == "answer") {
+                        if (mConnections.keys.contains(pair)) {
+                            mConnections[pair]?.peerConnection?.setRemoteDescription(
+                                mConnections[pair]?.SessionObserver,
+                                sdp2
+                            )
+                        } else if (mConnections.keys.contains(pair2)) {
+                            mConnections[pair2]?.peerConnection?.setRemoteDescription(
+                                mConnections[pair2]?.SessionObserver,
+                                sdp2
+                            )
+                        }
                     }
                 }
             }
+
+            listOfSub.add(sub)
         }
 
-        listOfSub.add(sub)
-
-        return conNats
+        return conNats!!
     }
 }

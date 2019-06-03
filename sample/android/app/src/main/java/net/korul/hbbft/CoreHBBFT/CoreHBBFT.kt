@@ -147,7 +147,11 @@ object CoreHBBFT : IGetData {
     val handlerNewMes = Handler()
 
     init {
-        System.loadLibrary("hydra_android")
+        try {
+            System.loadLibrary("hydra_android")
+        } catch (e: Exception) {
+            AppUtils.showToast(mApplicationContext, "Failed load library on start", true)
+        }
 
         session = net.korul.hbbft.Session()
 
@@ -170,7 +174,6 @@ object CoreHBBFT : IGetData {
         mNotSyncMessInDialog = notSyncMessInDialog
 
         val serviceIntent = Intent(applicationContext, ClosingService::class.java)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             applicationContext.startForegroundService(serviceIntent)
         } else {

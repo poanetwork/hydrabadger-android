@@ -128,14 +128,29 @@ object UserWork {
                 if (objectMap != null) {
                     for (obj in objectMap.values) {
                         val mapObj: Map<String, Any> = obj as Map<String, Any>
+                        try {
+                            val user = Users()
+                            user.UID = mapObj["uid"] as String
+                            user.isOnline = mapObj["online"] as Boolean
+                            user.name = mapObj["name"] as String
+                            user.nick = mapObj["nick"] as String
 
-                        val user = Users()
-                        user.UID = mapObj["uid"] as String
-                        user.isOnline = mapObj["online"] as Boolean
-                        user.name = mapObj["name"] as String
-                        user.nick = mapObj["nick"] as String
+                            listObjectsOfUsers.add(user)
+                        } catch (e: Exception) {
+                            try {
+                                val objj = mapObj.values.elementAt(0) as HashMap<String, Any>
+                                val user = Users()
+                                user.UID = objj["uid"] as String
+                                user.isOnline = objj["online"] as Boolean
+                                user.name = objj["name"] as String
+                                user.nick = objj["nick"] as String
 
-                        listObjectsOfUsers.add(user)
+                                listObjectsOfUsers.add(user)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                        }
                     }
                     semaphore.release()
                 }

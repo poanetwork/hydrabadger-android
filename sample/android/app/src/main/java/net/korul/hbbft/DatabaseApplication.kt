@@ -1,6 +1,6 @@
 package net.korul.hbbft
 
-import android.app.Application
+import android.support.multidex.MultiDexApplication
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
@@ -11,7 +11,7 @@ import net.korul.hbbft.CommonData.data.model.User
 import net.korul.hbbft.CoreHBBFT.CoreHBBFT
 
 
-class DatabaseApplication : Application() {
+class DatabaseApplication : MultiDexApplication() {
     companion object {
         lateinit var instance: DatabaseApplication
             private set
